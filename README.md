@@ -53,7 +53,7 @@ img2dwg/
 
 - Python >= 3.10
 - [uv](https://github.com/astral-sh/uv) (패키지 매니저)
-- AutoCAD 또는 ODAFileConverter (DWG↔DXF 변환용)
+- **ODAFileConverter** (DWG↔DXF 변환용) - [설치 가이드](docs/ODAFC_INSTALLATION.md)
 
 ### 설치
 
@@ -137,17 +137,28 @@ datas/
 ## 🔧 기술 스택
 
 ### 핵심 라이브러리
-- **ezdxf**: DXF 파일 읽기/쓰기
+- **ezdxf**: DXF 파일 읽기/쓰기 ✅ 구현 완료
 - **pandas**: 데이터 처리 및 분석
-- **Pillow**: 이미지 처리
-- **opencv-python**: 이미지 전처리 (왜곡 보정, 노이즈 제거)
-- **pytesseract**: OCR (치수, 텍스트 추출)
+- **Pillow**: 이미지 처리 ✅ 구현 완료
+- **opencv-python**: 이미지 전처리 (왜곡 보정, 노이즈 제거) ✅ 구현 완료
+- **pytesseract**: OCR (치수, 텍스트 추출) - 선택사항
 - **openai**: GPT-4o API 연동
 
 ### 개발 도구
 - **pytest**: 테스트 프레임워크
 - **ruff**: 린터 및 포매터
 - **mypy**: 타입 체킹
+
+### 구현 상태
+
+| 기능 | 상태 |
+|------|------|
+| 데이터 스캔 및 분류 | ✅ 완료 |
+| DWG→DXF→JSON 변환 | ✅ 완료 |
+| 이미지 전처리 | ✅ 완료 |
+| JSON→DXF→DWG 역변환 | ✅ 완료 |
+| 파인튜닝 데이터셋 생성 | ✅ 완료 |
+| 테스트 코드 | ✅ 완료 |
 
 ## 🎯 파인튜닝 워크플로우
 

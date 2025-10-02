@@ -3,6 +3,12 @@
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import json
+import subprocess
+import tempfile
+import shutil
+
+import ezdxf
+from ezdxf.addons import odafc
 
 from ..utils.logger import get_logger
 
@@ -69,19 +75,54 @@ class DWGParser:
         Returns:
             변환된 DXF 파일 경로
 
-        Note:
-            실제 구현 시 ODAFileConverter 또는 AutoCAD API 사용
-            현재는 스텁(stub) 구현
+        Raises:
+            RuntimeError: 변환 실패 시
         """
+        # DXF 파일 경로
         dxf_path = dwg_path.with_suffix(".dxf")
         
-        # TODO: ODAFileConverter를 사용한 실제 변환 구현
-        # 예: subprocess.run([self.oda_converter_path, dwg_path, ...])
+        # DXF 파일이 이미 존재하면 그대로 사용
+        if dxf_path.exists():
+            logger.info(f"DXF 파일이 이미 존재합니다: {dxf_path}")
+            return dxf_path
         
-        logger.warning(
-            "DWG→DXF 변환은 현재 스텁 구현입니다. "
-            "ODAFileConverter 또는 AutoCAD API를 설정하세요."
-        )
+        try:
+            # ODAFileConverter가 설치되어 있는지 확인
+            if odafc.is_installed():
+                logger.info("ODAFileConverter를 사용하여 DWG→DXF 변환 시작")
+                
+                # 임시 폴더에 변환
+                temp_dir = Path(tempfile.mkdtemp())
+                try:
+                    # ODA File Converter를 사용한 변환
+                    odafc.convert(
+                        source=str(dwg_path),
+                        dest=str(temp_dir / dxf_path.name),
+                        version="ACAD2018"  # DXF R2018 버전으로 변환
+                    )
+                    
+                    # 변환된 파일을 원래 위치로 이동
+                    temp_dxf = temp_dir / dxf_path.name
+                    if temp_dxf.exists():
+                        shutil.move(str(temp_dxf), str(dxf_path))
+                        logger.info(f"DXF 변환 완료: {dxf_path}")
+                    else:
+                        raise RuntimeError("변환된 DXF 파일을 찾을 수 없습니다")
+                finally:
+                    # 임시 폴더 정리
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+            else:
+                # ODAFileConverter가 없으면 경고 출력
+                logger.warning(
+                    "ODAFileConverter가 설치되지 않았습니다. "
+                    "DWG 파일을 직접 파싱할 수 없습니다. "
+                    "https://www.opendesign.com/guestfiles/oda_file_converter 에서 다운로드하세요."
+                )
+                raise RuntimeError("ODAFileConverter가 설치되지 않았습니다")
+                
+        except Exception as e:
+            logger.error(f"DWG→DXF 변환 실패: {e}")
+            raise RuntimeError(f"DWG→DXF 변환 중 오류 발생: {e}") from e
         
         return dxf_path
 
@@ -95,32 +136,115 @@ class DWGParser:
         Returns:
             엔티티 딕셔너리 리스트
 
-        Note:
-            실제 구현 시 ezdxf 라이브러리 사용
-            현재는 스텁(stub) 구현
+        Raises:
+            RuntimeError: 파싱 실패 시
         """
-        # TODO: ezdxf를 사용한 실제 파싱 구현
-        # import ezdxf
-        # doc = ezdxf.readfile(dxf_path)
-        # msp = doc.modelspace()
-        # entities = []
-        # for entity in msp:
-        #     entities.append(self._convert_entity(entity))
+        if not dxf_path.exists():
+            raise FileNotFoundError(f"DXF 파일을 찾을 수 없습니다: {dxf_path}")
         
-        logger.warning(
-            "DXF 파싱은 현재 스텁 구현입니다. "
-            "ezdxf 라이브러리를 설치하고 구현하세요."
-        )
+        try:
+            logger.info(f"DXF 파일 파싱 시작: {dxf_path}")
+            
+            # DXF 파일 읽기
+            doc = ezdxf.readfile(str(dxf_path))
+            msp = doc.modelspace()
+            
+            entities = []
+            
+            # 모델스페이스의 모든 엔티티 순회
+            for entity in msp:
+                try:
+                    entity_data = self._convert_entity(entity)
+                    if entity_data:
+                        entities.append(entity_data)
+                except Exception as e:
+                    logger.warning(f"엔티티 변환 실패 ({entity.dxftype()}): {e}")
+                    continue
+            
+            logger.info(f"파싱 완료: {len(entities)}개 엔티티 추출")
+            return entities
+            
+        except Exception as e:
+            logger.error(f"DXF 파싱 실패: {e}")
+            raise RuntimeError(f"DXF 파싱 중 오류 발생: {e}") from e
+    
+    def _convert_entity(self, entity: Any) -> Optional[Dict[str, Any]]:
+        """
+        ezdxf 엔티티를 JSON 형태로 변환한다.
+
+        Args:
+            entity: ezdxf 엔티티 객체
+
+        Returns:
+            엔티티 딕셔너리 또는 None (지원하지 않는 타입)
+        """
+        entity_type = entity.dxftype()
         
-        # 스텁 데이터
-        return [
-            {
-                "type": "line",
-                "start": {"x": 0.0, "y": 0.0},
-                "end": {"x": 100.0, "y": 0.0},
-                "layer": "Wall",
-            }
-        ]
+        # 공통 속성
+        base_data = {
+            "type": entity_type.lower(),
+            "layer": entity.dxf.get("layer", "0"),
+            "color": entity.dxf.get("color", 256),  # 256 = BYLAYER
+            "linetype": entity.dxf.get("linetype", "BYLAYER"),
+        }
+        
+        # 엔티티 타입별 처리
+        if entity_type == "LINE":
+            base_data.update({
+                "start": {"x": entity.dxf.start.x, "y": entity.dxf.start.y},
+                "end": {"x": entity.dxf.end.x, "y": entity.dxf.end.y},
+            })
+            
+        elif entity_type == "LWPOLYLINE":
+            points = [{"x": p[0], "y": p[1]} for p in entity.get_points("xy")]
+            base_data.update({
+                "type": "polyline",
+                "points": points,
+                "closed": entity.closed,
+            })
+            
+        elif entity_type == "CIRCLE":
+            base_data.update({
+                "center": {"x": entity.dxf.center.x, "y": entity.dxf.center.y},
+                "radius": entity.dxf.radius,
+            })
+            
+        elif entity_type == "ARC":
+            base_data.update({
+                "center": {"x": entity.dxf.center.x, "y": entity.dxf.center.y},
+                "radius": entity.dxf.radius,
+                "start_angle": entity.dxf.start_angle,
+                "end_angle": entity.dxf.end_angle,
+            })
+            
+        elif entity_type == "TEXT":
+            base_data.update({
+                "position": {"x": entity.dxf.insert.x, "y": entity.dxf.insert.y},
+                "content": entity.dxf.text,
+                "height": entity.dxf.height,
+                "rotation": entity.dxf.get("rotation", 0.0),
+            })
+            
+        elif entity_type == "MTEXT":
+            base_data.update({
+                "type": "text",  # MTEXT도 text로 통합
+                "position": {"x": entity.dxf.insert.x, "y": entity.dxf.insert.y},
+                "content": entity.text,
+                "height": entity.dxf.char_height,
+            })
+            
+        elif entity_type in ["DIMENSION", "INSERT", "HATCH", "SPLINE"]:
+            # 지원하지만 간단한 정보만 저장
+            base_data.update({
+                "info": f"{entity_type} entity (simplified)",
+            })
+            
+        else:
+            # 지원하지 않는 엔티티 타입
+            logger.debug(f"지원하지 않는 엔티티 타입: {entity_type}")
+            return None
+        
+        return base_data
 
     def _create_json_structure(
         self,
