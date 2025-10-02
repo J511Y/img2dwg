@@ -1,19 +1,21 @@
 """파인튜닝 데이터셋 생성 스크립트."""
 
-import sys
-from pathlib import Path
 import argparse
 import json
-from typing import List, Dict, Any
+import sys
+from pathlib import Path
+from typing import Any, Dict, List
+
+import tiktoken
 
 # 프로젝트 루트를 Python 경로에 추가
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from img2dwg.data.scanner import DataScanner
 from img2dwg.data.image_processor import ImageProcessor
-from img2dwg.utils.logger import setup_logging, get_logger
+from img2dwg.data.scanner import DataScanner
 from img2dwg.utils.file_utils import ensure_dir
+from img2dwg.utils.logger import get_logger, setup_logging
 
 
 def parse_args():
@@ -44,6 +46,18 @@ def parse_args():
         type=float,
         default=0.8,
         help="Train/Validation 분할 비율 (기본: 0.8)",
+    )
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=60000,
+        help="최대 토큰 수 (기본: 60000)",
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="cl100k_base",
+        help="토큰 계산에 사용할 모델 (기본: cl100k_base)",
     )
     return parser.parse_args()
 
@@ -103,6 +117,30 @@ def create_finetune_record(
     return record
 
 
+def count_tokens(record: Dict[str, Any], model: str = "gpt-4o") -> int:
+    """
+    레코드의 토큰 수를 계산한다.
+
+    Args:
+        record: 파인튜닝 레코드
+        model: 토큰 계산에 사용할 모델명
+
+    Returns:
+        토큰 수
+    """
+    try:
+        encoding = tiktoken.encoding_for_model(model)
+    except KeyError:
+        # 모델을 찾을 수 없으면 기본 인코딩 사용
+        encoding = tiktoken.get_encoding("cl100k_base")
+
+    # 레코드 전체를 JSON 문자열로 변환하여 토큰 수 계산
+    record_str = json.dumps(record, ensure_ascii=False)
+    num_tokens = len(encoding.encode(record_str))
+
+    return num_tokens
+
+
 def main():
     """메인 함수."""
     args = parse_args()
@@ -131,6 +169,7 @@ def main():
 
     # 데이터셋 레코드
     records: List[Dict[str, Any]] = []
+    filtered_count = 0  # 필터링된 레코드 수
 
     # 각 프로젝트 처리
     for project in projects:
@@ -139,17 +178,30 @@ def main():
             for image_path in project.change_group.images:
                 # 대응하는 JSON 파일 찾기
                 json_path = args.input_json / f"{project.name}_변경.json"
-                
+
                 if json_path.exists():
                     try:
                         with open(json_path, "r", encoding="utf-8") as f:
                             json_data = json.load(f)
-                        
+
                         record = create_finetune_record(
                             image_path, json_data, image_processor
                         )
-                        records.append(record)
-                        logger.info(f"레코드 생성: {project.name} (변경)")
+
+                        # 토큰 수 확인
+                        token_count = count_tokens(record, args.model)
+
+                        if token_count <= args.max_tokens:
+                            records.append(record)
+                            logger.info(
+                                f"레코드 생성: {project.name} (변경) - {token_count:,} 토큰"
+                            )
+                        else:
+                            filtered_count += 1
+                            logger.warning(
+                                f"레코드 필터링: {project.name} (변경) - "
+                                f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
+                            )
                     except Exception as e:
                         logger.error(f"레코드 생성 실패: {project.name} - {e}")
 
@@ -158,17 +210,30 @@ def main():
             for image_path in project.section_group.images:
                 # 대응하는 JSON 파일 찾기
                 json_path = args.input_json / f"{project.name}_단면.json"
-                
+
                 if json_path.exists():
                     try:
                         with open(json_path, "r", encoding="utf-8") as f:
                             json_data = json.load(f)
-                        
+
                         record = create_finetune_record(
                             image_path, json_data, image_processor
                         )
-                        records.append(record)
-                        logger.info(f"레코드 생성: {project.name} (단면)")
+
+                        # 토큰 수 확인
+                        token_count = count_tokens(record, args.model)
+
+                        if token_count <= args.max_tokens:
+                            records.append(record)
+                            logger.info(
+                                f"레코드 생성: {project.name} (단면) - {token_count:,} 토큰"
+                            )
+                        else:
+                            filtered_count += 1
+                            logger.warning(
+                                f"레코드 필터링: {project.name} (단면) - "
+                                f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
+                            )
                     except Exception as e:
                         logger.error(f"레코드 생성 실패: {project.name} - {e}")
 
@@ -196,7 +261,10 @@ def main():
         "total_samples": len(records),
         "train_samples": len(train_records),
         "val_samples": len(val_records),
+        "filtered_samples": filtered_count,
         "split_ratio": args.split_ratio,
+        "max_tokens": args.max_tokens,
+        "model": args.model,
     }
 
     stats_path = args.output / "dataset_stats.json"
@@ -210,6 +278,8 @@ def main():
     print(f"총 샘플: {stats['total_samples']}개")
     print(f"Train: {stats['train_samples']}개")
     print(f"Validation: {stats['val_samples']}개")
+    print(f"필터링됨: {stats['filtered_samples']}개 (토큰 수 초과)")
+    print(f"\n토큰 제한: {args.max_tokens:,} 토큰 ({args.model})")
     print(f"\n파일 저장:")
     print(f"- {train_path}")
     print(f"- {val_path}")

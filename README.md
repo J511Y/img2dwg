@@ -61,10 +61,24 @@ img2dwg/
 # uv를 사용한 의존성 설치
 uv sync
 
-# 가상환경 활성화 (자동)
-source .venv/bin/activate  # Linux/Mac
-.venv\Scripts\activate     # Windows
+# 패키지를 editable 모드로 설치
+uv pip install -e .
 ```
+
+### ODAFileConverter 설정
+
+**중요**: DWG 변환 기능을 사용하려면 ODAFileConverter가 필요합니다.
+
+1. [ODAFileConverter 설치](docs/ODAFC_INSTALLATION.md)
+2. 홈 디렉토리에 `.ezdxfrc` 파일 생성:
+   ```ini
+   [odafc-addon]
+   win_exec_path = "C:\\Program Files\\ODA\\ODAFileConverter\\ODAFileConverter.exe"
+   ```
+3. 설치 확인:
+   ```bash
+   uv run python examples/test_odafc.py
+   ```
 
 ### 사용 방법
 
@@ -83,22 +97,32 @@ python scripts/scan_data.py
 ```bash
 python scripts/convert_dwg.py --input datas/ --output output/json/
 ```
-
 DWG 파일을 중간 표현 JSON 형태로 변환합니다.
 
 #### 3. 파인튜닝 데이터셋 생성
 
 ```bash
-python scripts/generate_dataset.py --output output/finetune_dataset.jsonl
+python scripts/generate_dataset.py \
+  --input-data datas \
+  --input-json output/json \
+  --output output \
+  --max-tokens 60000 \
+  --model gpt-4o
 ```
+OpenAI GPT-4o 파인튜닝을 위한 JSONL 형식 데이터셋을 생성합니다.
 
-OpenAI GPT-4o 파인튜닝용 JSONL 형식의 데이터셋을 생성합니다.
+**옵션**:
+- `--max-tokens`: 최대 토큰 수 제한 (기본: 60000)
+- `--model`: 토큰 계산에 사용할 모델 (기본: gpt-4o)
+- `--split-ratio`: Train/Validation 분할 비율 (기본: 0.8)
+
+**토큰 필터링**: 각 레코드는 tiktoken을 사용하여 토큰 수가 계산되며, 지정된 최대 토큰 수를 초과하는 레코드는 자동으로 필터링됩니다.
 
 ## 📊 데이터 구조
 
 ### 원본 데이터
 ```
-datas/
+{{ ... }}
 └── 2501 (2)/
     ├── 이매촌 진흥 814-405/
     │   ├── 변경전-모형.jpg

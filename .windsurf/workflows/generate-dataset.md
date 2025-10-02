@@ -48,7 +48,6 @@ OpenAI GPT-4o 파인튜닝용 JSONL 데이터셋을 생성하는 워크플로우
            "role": "assistant",
            "content": "{\"metadata\": {...}, \"entities\": [...]}"
          }
-       ]
      }
      ```
 
@@ -57,26 +56,15 @@ OpenAI GPT-4o 파인튜닝용 JSONL 데이터셋을 생성하는 워크플로우
    - Train: 80%, Validation: 20%
    - 프로젝트별로 stratified split
 
-5. **데이터셋 검증**
+## 5. 데이터셋 검증**
    - 각 레코드 형식 검증
    - 이미지 크기 확인
    - JSON 파싱 가능 여부 확인
 
-6. **저장**
+## 6. **저장**
    - `output/finetune_train.jsonl`: 학습 데이터셋
    - `output/finetune_val.jsonl`: 검증 데이터셋
    - `output/dataset_stats.json`: 데이터셋 통계
-
-## 실행 명령어
-
-```bash
-python scripts/generate_dataset.py --output output/ --split-ratio 0.8
-```
-
-## 데이터셋 통계 예시
-
-```json
-{
   "total_samples": 120,
   "train_samples": 96,
   "val_samples": 24,
