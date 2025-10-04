@@ -401,6 +401,7 @@ dependencies = [
     { name = "pillow" },
     { name = "pytesseract" },
     { name = "pytest" },
+    { name = "requests" },
     { name = "ruff" },
     { name = "tiktoken" },
 ]
@@ -426,6 +427,7 @@ requires-dist = [
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
+    { name = "requests", specifier = ">=2.31.0" },
     { name = "ruff", specifier = ">=0.13.2" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3.0" },
     { name = "tiktoken", specifier = ">=0.11.0" },

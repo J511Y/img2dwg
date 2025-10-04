@@ -4,7 +4,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import tiktoken
 
@@ -16,6 +16,7 @@ from img2dwg.data.dwg_parser import DWGParser, ParseOptions
 from img2dwg.data.image_processor import ImageProcessor
 from img2dwg.data.scanner import DataScanner
 from img2dwg.utils.file_utils import ensure_dir
+from img2dwg.utils.image_uploader import ImageUploader, URLCache
 from img2dwg.utils.logger import get_logger, setup_logging
 from img2dwg.utils.schema_compact import CompactSchemaConverter
 from img2dwg.utils.tiling import split_by_token_budget
@@ -79,6 +80,19 @@ def parse_args():
         default=True,
         help="최적화 옵션 사용 (RDP, 반올림 등)",
     )
+    parser.add_argument(
+        "--use-image-url",
+        action="store_true",
+        default=True,
+        help="이미지를 base64 대신 공개 URL로 사용 (토큰 절감)",
+    )
+    parser.add_argument(
+        "--image-service",
+        type=str,
+        default="github",
+        choices=["imgur", "cloudinary", "github"],
+        help="이미지 업로드 서비스 (기본: github)",
+    )
     return parser.parse_args()
 
 
@@ -86,6 +100,7 @@ def create_finetune_record(
     image_path: Path,
     json_data: Dict[str, Any],
     image_processor: ImageProcessor,
+    image_url: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     파인튜닝 레코드를 생성한다.
@@ -94,12 +109,14 @@ def create_finetune_record(
         image_path: 이미지 파일 경로
         json_data: 변환된 JSON 데이터
         image_processor: 이미지 프로세서
+        image_url: 공개 이미지 URL (None이면 base64 사용)
 
     Returns:
         파인튜닝 레코드 (OpenAI 형식)
     """
-    # 이미지를 base64로 인코딩
-    image_url = image_processor.to_base64(image_path)
+    # 이미지 URL 결정 (공개 URL 또는 base64)
+    if image_url is None:
+        image_url = image_processor.to_base64(image_path)
 
     # JSON 데이터를 문자열로 변환
     json_str = json.dumps(json_data, ensure_ascii=False)
@@ -177,6 +194,9 @@ def main():
     logger.info(f"타일링: {'활성화' if args.enable_tiling else '비활성화'}")
     logger.info(f"Compact 스키마: {'활성화' if args.compact_schema else '비활성화'}")
     logger.info(f"최적화: {'활성화' if args.optimize else '비활성화'}")
+    logger.info(f"이미지 URL 사용: {'활성화' if args.use_image_url else '비활성화 (base64)'}")
+    if args.use_image_url:
+        logger.info(f"이미지 서비스: {args.image_service}")
 
     # 출력 디렉토리 생성
     ensure_dir(args.output)
@@ -189,6 +209,15 @@ def main():
 
     # 이미지 프로세서 초기화
     image_processor = ImageProcessor()
+
+    # 이미지 업로더 초기화 (URL 모드인 경우)
+    uploader = None
+    url_cache = None
+    if args.use_image_url:
+        uploader = ImageUploader(service=args.image_service)
+        cache_file = args.output / "image_url_cache.json"
+        url_cache = URLCache(cache_file)
+        logger.info(f"이미지 업로더 초기화 완료 (서비스: {args.image_service})")
 
     # 데이터셋 레코드
     records: List[Dict[str, Any]] = []
@@ -213,6 +242,16 @@ def main():
                             converter = CompactSchemaConverter(use_local_coords=True)
                             json_data = converter.compact(json_data)
 
+                        # 이미지 URL 가져오기 (URL 모드인 경우)
+                        image_url = None
+                        if args.use_image_url:
+                            # 캐시 확인
+                            image_url = url_cache.get(image_path)
+                            if image_url is None:
+                                # 업로드 및 캐시 저장 (프로젝트명 포함)
+                                image_url = uploader.upload(image_path, project_name=project.name)
+                                url_cache.set(image_path, image_url)
+
                         # 타일링 처리
                         json_chunks = [json_data]
                         if args.enable_tiling:
@@ -220,7 +259,7 @@ def main():
                                 json_data,
                                 args.max_tokens,
                                 lambda d: count_tokens(
-                                    create_finetune_record(image_path, d, image_processor),
+                                    create_finetune_record(image_path, d, image_processor, image_url),
                                     args.model
                                 )
                             )
@@ -231,7 +270,7 @@ def main():
                         # 각 청크별 레코드 생성
                         for chunk_idx, chunk_data in enumerate(json_chunks):
                             record = create_finetune_record(
-                                image_path, chunk_data, image_processor
+                                image_path, chunk_data, image_processor, image_url
                             )
 
                             # 토큰 수 확인
@@ -268,6 +307,16 @@ def main():
                             converter = CompactSchemaConverter(use_local_coords=True)
                             json_data = converter.compact(json_data)
 
+                        # 이미지 URL 가져오기 (URL 모드인 경우)
+                        image_url = None
+                        if args.use_image_url:
+                            # 캐시 확인
+                            image_url = url_cache.get(image_path)
+                            if image_url is None:
+                                # 업로드 및 캐시 저장 (프로젝트명 포함)
+                                image_url = uploader.upload(image_path, project_name=project.name)
+                                url_cache.set(image_path, image_url)
+
                         # 타일링 처리
                         json_chunks = [json_data]
                         if args.enable_tiling:
@@ -275,7 +324,7 @@ def main():
                                 json_data,
                                 args.max_tokens,
                                 lambda d: count_tokens(
-                                    create_finetune_record(image_path, d, image_processor),
+                                    create_finetune_record(image_path, d, image_processor, image_url),
                                     args.model
                                 )
                             )
@@ -286,7 +335,7 @@ def main():
                         # 각 청크별 레코드 생성
                         for chunk_idx, chunk_data in enumerate(json_chunks):
                             record = create_finetune_record(
-                                image_path, chunk_data, image_processor
+                                image_path, chunk_data, image_processor, image_url
                             )
 
                             # 토큰 수 확인

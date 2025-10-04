@@ -120,19 +120,48 @@ DWG 파일을 중간 표현 JSON 형태로 변환합니다.
 #### 3. 파인튜닝 데이터셋 생성
 
 ```bash
+# 기본 방식 (base64 인코딩)
 python scripts/generate_dataset.py \
   --input-data datas \
   --input-json output/json \
   --output output \
   --max-tokens 60000 \
   --model gpt-4o
+
+# 🚀 권장: 이미지 URL 사용 (99% 토큰 절감!)
+python scripts/generate_dataset.py \
+  --use-image-url \
+  --image-service imgur
 ```
 OpenAI GPT-4o 파인튜닝을 위한 JSONL 형식 데이터셋을 생성합니다.
 
-**옵션**:
+**기본 옵션**:
 - `--max-tokens`: 최대 토큰 수 제한 (기본: 60000)
 - `--model`: 토큰 계산에 사용할 모델 (기본: gpt-4o)
 - `--split-ratio`: Train/Validation 분할 비율 (기본: 0.8)
+
+**이미지 URL 옵션** (권장):
+- `--use-image-url`: 이미지를 공개 URL로 사용 (base64 대신)
+  - **효과**: 이미지 토큰 99% 절감 (300k → 15 토큰)
+  - **비용**: 파인튜닝 비용 30배 절감
+- `--image-service`: 업로드 서비스 선택
+  - `imgur`: 간단, 무료 (기본, 권장)
+  - `github`: 영구 보관
+  - `cloudinary`: 이미지 최적화
+
+**환경변수 설정**:
+```bash
+# Imgur (권장)
+$env:IMGUR_CLIENT_ID="your_client_id"  # Windows
+export IMGUR_CLIENT_ID="your_client_id"  # Linux/Mac
+
+# GitHub
+$env:GITHUB_TOKEN="ghp_xxx"
+$env:GITHUB_REPO_OWNER="username"
+$env:GITHUB_REPO_NAME="img2dwg-images"
+```
+
+자세한 내용은 [이미지 URL 가이드](docs/image-url-guide.md)를 참조하세요.
 
 **토큰 필터링**: 각 레코드는 tiktoken을 사용하여 토큰 수가 계산되며, 지정된 최대 토큰 수를 초과하는 레코드는 자동으로 필터링됩니다.
 
