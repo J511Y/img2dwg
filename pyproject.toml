@@ -26,6 +26,7 @@ dependencies = [
     "tensorboard>=2.15.0",
     "scikit-learn>=1.4.0",
     "tqdm>=4.66.0",
+    "hf-xet>=1.1.10",
 ]
 
 [project.optional-dependencies]
