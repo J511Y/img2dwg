@@ -1,7 +1,7 @@
 [project]
 name = "img2dwg"
 version = "0.1.0"
-description = "LLM 파인튜닝을 위한 이미지→DWG 데이터셋 변환 도구"
+description = "Vision Encoder-Decoder 기반 이미지→DWG 변환 도구"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -16,6 +16,16 @@ dependencies = [
     "pytest>=8.4.2",
     "ruff>=0.13.2",
     "mypy>=1.18.2",
+    # Vision Encoder-Decoder 학습용 라이브러리
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "transformers>=4.40.0",
+    "accelerate>=0.27.0",
+    "datasets>=2.18.0",
+    "evaluate>=0.4.1",
+    "tensorboard>=2.15.0",
+    "scikit-learn>=1.4.0",
+    "tqdm>=4.66.0",
 ]
 
 [project.optional-dependencies]
@@ -24,6 +34,14 @@ dev = [
     "pytest-cov>=4.1.0",
     "ruff>=0.3.0",
     "mypy>=1.8.0",
+]
+
+# Vision Encoder-Decoder 학습용 추가 의존성
+ved = [
+    "wandb>=0.16.0",  # 실험 추적
+    "jupyter>=1.0.0",  # 노트북 환경
+    "matplotlib>=3.8.0",  # 시각화
+    "seaborn>=0.13.0",  # 고급 시각화
 ]
 
 [build-system]
@@ -84,5 +102,11 @@ module = [
     "ezdxf.*",
     "cv2.*",
     "pytesseract.*",
+    "transformers.*",
+    "torch.*",
+    "torchvision.*",
+    "accelerate.*",
+    "datasets.*",
+    "evaluate.*",
 ]
 ignore_missing_imports = true
