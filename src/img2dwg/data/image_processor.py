@@ -14,6 +14,21 @@ from ..utils.logger import get_logger
 logger = get_logger(__name__)
 
 
+def calculate_image_bbox(image_path: Path) -> Tuple[float, float, float, float]:
+    """
+    이미지의 바운딩박스를 계산한다 (픽셀 좌표).
+    
+    Args:
+        image_path: 이미지 파일 경로
+    
+    Returns:
+        (xmin, ymin, xmax, ymax) 튜플
+    """
+    with Image.open(image_path) as img:
+        width, height = img.size
+        return (0, 0, width, height)
+
+
 class ImageProcessor:
     """이미지 전처리를 수행하는 클래스."""
 
@@ -189,3 +204,32 @@ class ImageProcessor:
         except Exception as e:
             logger.error(f"이미지 왜곡 보정 실패: {e}")
             raise RuntimeError(f"이미지 왜곡 보정 중 오류 발생: {e}") from e
+    
+    def crop(
+        self,
+        image_path: Path,
+        output_path: Path,
+        bbox: Tuple[int, int, int, int],
+    ) -> None:
+        """
+        이미지를 지정된 영역으로 크롭한다.
+        
+        Args:
+            image_path: 입력 이미지 경로
+            output_path: 출력 이미지 경로
+            bbox: 크롭 영역 (left, top, right, bottom) 픽셀 좌표
+        """
+        try:
+            with Image.open(image_path) as img:
+                # 크롭
+                cropped = img.crop(bbox)
+                
+                # 저장
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                cropped.save(output_path, "JPEG", quality=self.quality, optimize=True)
+                
+                logger.info(f"이미지 크롭 완료: {output_path}")
+        
+        except Exception as e:
+            logger.error(f"이미지 크롭 실패: {e}")
+            raise RuntimeError(f"이미지 크롭 중 오류 발생: {e}") from e

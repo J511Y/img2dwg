@@ -12,10 +12,13 @@ import tiktoken
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
+from img2dwg.data.dwg_parser import DWGParser, ParseOptions
 from img2dwg.data.image_processor import ImageProcessor
 from img2dwg.data.scanner import DataScanner
 from img2dwg.utils.file_utils import ensure_dir
 from img2dwg.utils.logger import get_logger, setup_logging
+from img2dwg.utils.schema_compact import CompactSchemaConverter
+from img2dwg.utils.tiling import split_by_token_budget
 
 
 def parse_args():
@@ -58,6 +61,23 @@ def parse_args():
         type=str,
         default="cl100k_base",
         help="토큰 계산에 사용할 모델 (기본: cl100k_base)",
+    )
+    parser.add_argument(
+        "--enable-tiling",
+        action="store_true",
+        default=True,
+        help="토큰 초과 시 자동 타일링 활성화",
+    )
+    parser.add_argument(
+        "--compact-schema",
+        action="store_true",
+        help="Compact 스키마 사용 (추가 20~30%% 토큰 절감)",
+    )
+    parser.add_argument(
+        "--optimize",
+        action="store_true",
+        default=True,
+        help="최적화 옵션 사용 (RDP, 반올림 등)",
     )
     return parser.parse_args()
 
@@ -154,6 +174,9 @@ def main():
     logger.info("=" * 60)
     logger.info("파인튜닝 데이터셋 생성 시작")
     logger.info("=" * 60)
+    logger.info(f"타일링: {'활성화' if args.enable_tiling else '비활성화'}")
+    logger.info(f"Compact 스키마: {'활성화' if args.compact_schema else '비활성화'}")
+    logger.info(f"최적화: {'활성화' if args.optimize else '비활성화'}")
 
     # 출력 디렉토리 생성
     ensure_dir(args.output)
@@ -170,6 +193,7 @@ def main():
     # 데이터셋 레코드
     records: List[Dict[str, Any]] = []
     filtered_count = 0  # 필터링된 레코드 수
+    tiled_count = 0  # 타일링된 레코드 수
 
     # 각 프로젝트 처리
     for project in projects:
@@ -184,24 +208,47 @@ def main():
                         with open(json_path, "r", encoding="utf-8") as f:
                             json_data = json.load(f)
 
-                        record = create_finetune_record(
-                            image_path, json_data, image_processor
-                        )
+                        # Compact 스키마 적용
+                        if args.compact_schema:
+                            converter = CompactSchemaConverter(use_local_coords=True)
+                            json_data = converter.compact(json_data)
 
-                        # 토큰 수 확인
-                        token_count = count_tokens(record, args.model)
+                        # 타일링 처리
+                        json_chunks = [json_data]
+                        if args.enable_tiling:
+                            json_chunks = split_by_token_budget(
+                                json_data,
+                                args.max_tokens,
+                                lambda d: count_tokens(
+                                    create_finetune_record(image_path, d, image_processor),
+                                    args.model
+                                )
+                            )
+                            if len(json_chunks) > 1:
+                                tiled_count += len(json_chunks) - 1
+                                logger.info(f"{project.name} (변경): {len(json_chunks)}개 타일로 분할")
 
-                        if token_count <= args.max_tokens:
-                            records.append(record)
-                            logger.info(
-                                f"레코드 생성: {project.name} (변경) - {token_count:,} 토큰"
+                        # 각 청크별 레코드 생성
+                        for chunk_idx, chunk_data in enumerate(json_chunks):
+                            record = create_finetune_record(
+                                image_path, chunk_data, image_processor
                             )
-                        else:
-                            filtered_count += 1
-                            logger.warning(
-                                f"레코드 필터링: {project.name} (변경) - "
-                                f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
-                            )
+
+                            # 토큰 수 확인
+                            token_count = count_tokens(record, args.model)
+
+                            if token_count <= args.max_tokens:
+                                records.append(record)
+                                chunk_info = f" (타일 {chunk_idx + 1}/{len(json_chunks)})" if len(json_chunks) > 1 else ""
+                                logger.info(
+                                    f"레코드 생성: {project.name} (변경){chunk_info} - {token_count:,} 토큰"
+                                )
+                            else:
+                                filtered_count += 1
+                                logger.warning(
+                                    f"레코드 필터링: {project.name} (변경) - "
+                                    f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
+                                )
                     except Exception as e:
                         logger.error(f"레코드 생성 실패: {project.name} - {e}")
 
@@ -216,24 +263,47 @@ def main():
                         with open(json_path, "r", encoding="utf-8") as f:
                             json_data = json.load(f)
 
-                        record = create_finetune_record(
-                            image_path, json_data, image_processor
-                        )
+                        # Compact 스키마 적용
+                        if args.compact_schema:
+                            converter = CompactSchemaConverter(use_local_coords=True)
+                            json_data = converter.compact(json_data)
 
-                        # 토큰 수 확인
-                        token_count = count_tokens(record, args.model)
+                        # 타일링 처리
+                        json_chunks = [json_data]
+                        if args.enable_tiling:
+                            json_chunks = split_by_token_budget(
+                                json_data,
+                                args.max_tokens,
+                                lambda d: count_tokens(
+                                    create_finetune_record(image_path, d, image_processor),
+                                    args.model
+                                )
+                            )
+                            if len(json_chunks) > 1:
+                                tiled_count += len(json_chunks) - 1
+                                logger.info(f"{project.name} (단면): {len(json_chunks)}개 타일로 분할")
 
-                        if token_count <= args.max_tokens:
-                            records.append(record)
-                            logger.info(
-                                f"레코드 생성: {project.name} (단면) - {token_count:,} 토큰"
+                        # 각 청크별 레코드 생성
+                        for chunk_idx, chunk_data in enumerate(json_chunks):
+                            record = create_finetune_record(
+                                image_path, chunk_data, image_processor
                             )
-                        else:
-                            filtered_count += 1
-                            logger.warning(
-                                f"레코드 필터링: {project.name} (단면) - "
-                                f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
-                            )
+
+                            # 토큰 수 확인
+                            token_count = count_tokens(record, args.model)
+
+                            if token_count <= args.max_tokens:
+                                records.append(record)
+                                chunk_info = f" (타일 {chunk_idx + 1}/{len(json_chunks)})" if len(json_chunks) > 1 else ""
+                                logger.info(
+                                    f"레코드 생성: {project.name} (단면){chunk_info} - {token_count:,} 토큰"
+                                )
+                            else:
+                                filtered_count += 1
+                                logger.warning(
+                                    f"레코드 필터링: {project.name} (단면) - "
+                                    f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
+                                )
                     except Exception as e:
                         logger.error(f"레코드 생성 실패: {project.name} - {e}")
 
@@ -262,9 +332,13 @@ def main():
         "train_samples": len(train_records),
         "val_samples": len(val_records),
         "filtered_samples": filtered_count,
+        "tiled_samples": tiled_count,
         "split_ratio": args.split_ratio,
         "max_tokens": args.max_tokens,
         "model": args.model,
+        "tiling_enabled": args.enable_tiling,
+        "compact_schema": args.compact_schema,
+        "optimize": args.optimize,
     }
 
     stats_path = args.output / "dataset_stats.json"
@@ -279,6 +353,12 @@ def main():
     print(f"Train: {stats['train_samples']}개")
     print(f"Validation: {stats['val_samples']}개")
     print(f"필터링됨: {stats['filtered_samples']}개 (토큰 수 초과)")
+    if args.enable_tiling:
+        print(f"타일링됨: {stats['tiled_samples']}개 추가 타일")
+    print(f"\n최적화 옵션:")
+    print(f"- 타일링: {'✅' if args.enable_tiling else '❌'}")
+    print(f"- Compact 스키마: {'✅' if args.compact_schema else '❌'}")
+    print(f"- 기본 최적화: {'✅' if args.optimize else '❌'}")
     print(f"\n토큰 제한: {args.max_tokens:,} 토큰 ({args.model})")
     print(f"\n파일 저장:")
     print(f"- {train_path}")

@@ -1,7 +1,8 @@
 """DWG 파일 파싱 모듈."""
 
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass, field
 import json
 import subprocess
 import tempfile
@@ -9,25 +10,72 @@ import shutil
 
 import ezdxf
 from ezdxf.addons import odafc
+from ezdxf import bbox as ezdxf_bbox
 
 from ..utils.logger import get_logger
+from ..utils.geometry import (
+    rdp_simplify,
+    round_coordinate,
+    quantize_coordinate,
+    intersects_aabb,
+)
+from ..utils.schema_compact import CompactSchemaConverter
+from ..utils.layout_analyzer import LayoutAnalyzer
 
 
 logger = get_logger(__name__)
 
 
+@dataclass
+class ParseOptions:
+    """
+    DWG 파싱 옵션.
+    
+    Attributes:
+        include_types: 포함할 엔티티 타입 리스트 (기본: 주요 타입만)
+        include_layers: 포함할 레이어 리스트 (None이면 모두 포함)
+        exclude_layers: 제외할 레이어 리스트
+        window: 공간 클리핑 윈도우 (xmin, ymin, xmax, ymax)
+        rdp_tolerance: RDP 간소화 허용 오차 (None이면 간소화 안 함)
+        round_ndigits: 좌표 반올림 소수점 자리수 (None이면 반올림 안 함)
+        quantize_grid: 그리드 양자화 크기 (None이면 양자화 안 함)
+        drop_defaults: 기본값 속성 제거 여부
+        compact_schema: 단축 스키마 사용 여부
+        dxf_version: DXF 변환 버전 (R12, R2000, R2018 등)
+    """
+    include_types: List[str] = field(default_factory=lambda: [
+        "LINE", "LWPOLYLINE", "POLYLINE", "ARC", "CIRCLE", "TEXT", "MTEXT"
+    ])
+    include_layers: Optional[List[str]] = None
+    exclude_layers: List[str] = field(default_factory=list)
+    window: Optional[Tuple[float, float, float, float]] = None
+    rdp_tolerance: Optional[float] = None
+    round_ndigits: Optional[int] = 3
+    quantize_grid: Optional[float] = None
+    drop_defaults: bool = True
+    compact_schema: bool = False
+    use_layout_analysis: bool = False  # 고수준 레이아웃 분석 사용
+    dxf_version: str = "R2000"
+
+
 class DWGParser:
     """DWG 파일을 파싱하여 JSON 형태로 변환하는 클래스."""
 
-    def __init__(self, oda_converter_path: Optional[Path] = None):
+    def __init__(
+        self,
+        oda_converter_path: Optional[Path] = None,
+        options: Optional[ParseOptions] = None,
+    ):
         """
         DWGParser를 초기화한다.
 
         Args:
             oda_converter_path: ODAFileConverter 실행 파일 경로 (선택사항)
+            options: 파싱 옵션 (None이면 기본값 사용)
         """
         self.oda_converter_path = oda_converter_path
-        logger.info("DWGParser 초기화")
+        self.options = options or ParseOptions()
+        logger.info(f"DWGParser 초기화 (옵션: {self.options})")
 
     def parse(self, dwg_path: Path) -> Dict[str, Any]:
         """
@@ -98,7 +146,7 @@ class DWGParser:
                     odafc.convert(
                         source=str(dwg_path),
                         dest=str(temp_dir / dxf_path.name),
-                        version="ACAD2018"  # DXF R2018 버전으로 변환
+                        version=self.options.dxf_version  # 설정된 DXF 버전으로 변환
                     )
                     
                     # 변환된 파일을 원래 위치로 이동
@@ -149,10 +197,34 @@ class DWGParser:
             doc = ezdxf.readfile(str(dxf_path))
             msp = doc.modelspace()
             
-            entities = []
+            # 1단계: 타입 필터링
+            type_query = " ".join(self.options.include_types)
+            filtered_entities = list(msp.query(type_query))
+            logger.info(f"타입 필터링 후: {len(filtered_entities)}개 엔티티")
             
-            # 모델스페이스의 모든 엔티티 순회
-            for entity in msp:
+            # 2단계: 레이어 필터링
+            if self.options.include_layers:
+                filtered_entities = [
+                    e for e in filtered_entities
+                    if e.dxf.get("layer", "0") in self.options.include_layers
+                ]
+                logger.info(f"레이어 포함 필터링 후: {len(filtered_entities)}개 엔티티")
+            
+            if self.options.exclude_layers:
+                filtered_entities = [
+                    e for e in filtered_entities
+                    if e.dxf.get("layer", "0") not in self.options.exclude_layers
+                ]
+                logger.info(f"레이어 제외 필터링 후: {len(filtered_entities)}개 엔티티")
+            
+            # 3단계: 공간 클리핑 (window가 지정된 경우)
+            if self.options.window:
+                filtered_entities = self._filter_by_window(filtered_entities)
+                logger.info(f"공간 클리핑 후: {len(filtered_entities)}개 엔티티")
+            
+            # 4단계: 엔티티 변환
+            entities = []
+            for entity in filtered_entities:
                 try:
                     entity_data = self._convert_entity(entity)
                     if entity_data:
@@ -168,6 +240,74 @@ class DWGParser:
             logger.error(f"DXF 파싱 실패: {e}")
             raise RuntimeError(f"DXF 파싱 중 오류 발생: {e}") from e
     
+    def _filter_by_window(self, entities: List[Any]) -> List[Any]:
+        """
+        윈도우 영역과 교차하는 엔티티만 필터링한다.
+        
+        Args:
+            entities: 엔티티 리스트
+        
+        Returns:
+            필터링된 엔티티 리스트
+        """
+        if not self.options.window:
+            return entities
+        
+        filtered = []
+        try:
+            # 바운딩박스 계산 (fast=True로 빠른 계산)
+            bboxes = list(ezdxf_bbox.multi_flat(entities, fast=True))
+            
+            for entity, entity_bbox in zip(entities, bboxes):
+                if entity_bbox.has_data:
+                    bbox_tuple = (
+                        entity_bbox.extmin.x,
+                        entity_bbox.extmin.y,
+                        entity_bbox.extmax.x,
+                        entity_bbox.extmax.y,
+                    )
+                    if intersects_aabb(bbox_tuple, self.options.window):
+                        filtered.append(entity)
+                else:
+                    # bbox가 없는 엔티티는 포함 (안전)
+                    filtered.append(entity)
+        except Exception as e:
+            logger.warning(f"바운딩박스 필터링 실패, 모든 엔티티 포함: {e}")
+            return entities
+        
+        return filtered
+    
+    def _process_coordinate(self, value: float) -> float:
+        """
+        좌표값을 옵션에 따라 처리한다 (반올림/양자화).
+        
+        Args:
+            value: 원본 좌표값
+        
+        Returns:
+            처리된 좌표값
+        """
+        if self.options.quantize_grid:
+            return quantize_coordinate(value, self.options.quantize_grid)
+        elif self.options.round_ndigits is not None:
+            return round_coordinate(value, self.options.round_ndigits)
+        return value
+    
+    def _process_point(self, point: Any) -> Dict[str, float]:
+        """
+        포인트를 처리한다.
+        
+        Args:
+            point: ezdxf 포인트 객체
+        
+        Returns:
+            처리된 포인트 딕셔너리
+        """
+        return {
+            "x": self._process_coordinate(point.x),
+            "y": self._process_coordinate(point.y),
+        }
+    
     def _convert_entity(self, entity: Any) -> Optional[Dict[str, Any]]:
         """
         ezdxf 엔티티를 JSON 형태로 변환한다.
@@ -181,56 +321,79 @@ class DWGParser:
         entity_type = entity.dxftype()
         
         # 공통 속성
+        layer = entity.dxf.get("layer", "0")
+        color = entity.dxf.get("color", 256)  # 256 = BYLAYER
+        linetype = entity.dxf.get("linetype", "BYLAYER")
+        
         base_data = {
             "type": entity_type.lower(),
-            "layer": entity.dxf.get("layer", "0"),
-            "color": entity.dxf.get("color", 256),  # 256 = BYLAYER
-            "linetype": entity.dxf.get("linetype", "BYLAYER"),
         }
+        
+        # 기본값이 아닌 경우만 추가 (drop_defaults 옵션)
+        if not self.options.drop_defaults or layer != "0":
+            base_data["layer"] = layer
+        if not self.options.drop_defaults or color != 256:
+            base_data["color"] = color
+        if not self.options.drop_defaults or linetype != "BYLAYER":
+            base_data["linetype"] = linetype
         
         # 엔티티 타입별 처리
         if entity_type == "LINE":
             base_data.update({
-                "start": {"x": entity.dxf.start.x, "y": entity.dxf.start.y},
-                "end": {"x": entity.dxf.end.x, "y": entity.dxf.end.y},
+                "start": self._process_point(entity.dxf.start),
+                "end": self._process_point(entity.dxf.end),
             })
             
-        elif entity_type == "LWPOLYLINE":
-            points = [{"x": p[0], "y": p[1]} for p in entity.get_points("xy")]
+        elif entity_type == "LWPOLYLINE" or entity_type == "POLYLINE":
+            points = [(p[0], p[1]) for p in entity.get_points("xy")]
+            
+            # RDP 간소화 적용
+            if self.options.rdp_tolerance and len(points) > 2:
+                points = rdp_simplify(points, self.options.rdp_tolerance)
+            
+            # 좌표 처리
+            processed_points = [
+                {"x": self._process_coordinate(p[0]), "y": self._process_coordinate(p[1])}
+                for p in points
+            ]
+            
             base_data.update({
                 "type": "polyline",
-                "points": points,
+                "points": processed_points,
                 "closed": entity.closed,
             })
             
         elif entity_type == "CIRCLE":
             base_data.update({
-                "center": {"x": entity.dxf.center.x, "y": entity.dxf.center.y},
-                "radius": entity.dxf.radius,
+                "center": self._process_point(entity.dxf.center),
+                "radius": self._process_coordinate(entity.dxf.radius),
             })
             
         elif entity_type == "ARC":
             base_data.update({
-                "center": {"x": entity.dxf.center.x, "y": entity.dxf.center.y},
-                "radius": entity.dxf.radius,
-                "start_angle": entity.dxf.start_angle,
-                "end_angle": entity.dxf.end_angle,
+                "center": self._process_point(entity.dxf.center),
+                "radius": self._process_coordinate(entity.dxf.radius),
+                "start_angle": round(entity.dxf.start_angle, 2),
+                "end_angle": round(entity.dxf.end_angle, 2),
             })
             
         elif entity_type == "TEXT":
+            rotation = entity.dxf.get("rotation", 0.0)
             base_data.update({
-                "position": {"x": entity.dxf.insert.x, "y": entity.dxf.insert.y},
+                "position": self._process_point(entity.dxf.insert),
                 "content": entity.dxf.text,
-                "height": entity.dxf.height,
-                "rotation": entity.dxf.get("rotation", 0.0),
+                "height": self._process_coordinate(entity.dxf.height),
             })
+            # rotation이 0이 아닌 경우만 추가
+            if not self.options.drop_defaults or rotation != 0.0:
+                base_data["rotation"] = round(rotation, 2)
             
         elif entity_type == "MTEXT":
             base_data.update({
                 "type": "text",  # MTEXT도 text로 통합
-                "position": {"x": entity.dxf.insert.x, "y": entity.dxf.insert.y},
+                "position": self._process_point(entity.dxf.insert),
                 "content": entity.text,
-                "height": entity.dxf.char_height,
+                "height": self._process_coordinate(entity.dxf.char_height),
             })
             
         elif entity_type in ["DIMENSION", "INSERT", "HATCH", "SPLINE"]:
@@ -265,15 +428,49 @@ class DWGParser:
         filename = dwg_path.name.lower()
         file_type = "변경" if "변경" in filename else "단면" if "단면" in filename else "기타"
 
-        return {
-            "metadata": {
-                "filename": dwg_path.name,
-                "type": file_type,
-                "source_path": str(dwg_path),
-                "entity_count": len(entities),
-            },
-            "entities": entities,
-        }
+        # 레이아웃 분석 적용
+        if self.options.use_layout_analysis:
+            analyzer = LayoutAnalyzer()
+            layout = analyzer.analyze(entities)
+            
+            result = {
+                "metadata": {
+                    "filename": dwg_path.name,
+                    "type": file_type,
+                    "source_path": str(dwg_path),
+                    "representation": "layout",
+                    "original_entities": layout["statistics"]["original_entities"],
+                    "compression_ratio": layout["statistics"]["compression_ratio"],
+                },
+                "layout": {
+                    "walls": layout["walls"],
+                    "rooms": layout["rooms"],
+                    "openings": layout["openings"],
+                    "annotations": layout["annotations"],
+                    "patterns": layout["patterns"],
+                }
+            }
+            logger.info(f"레이아웃 분석 완료: {layout['statistics']['original_entities']}개 엔티티 → "
+                       f"{len(layout['walls'])}개 벽, {len(layout['rooms'])}개 방 "
+                       f"(압축률: {layout['statistics']['compression_ratio']}%)")
+        else:
+            result = {
+                "metadata": {
+                    "filename": dwg_path.name,
+                    "type": file_type,
+                    "source_path": str(dwg_path),
+                    "entity_count": len(entities),
+                },
+                "entities": entities,
+            }
+        
+        # Compact 스키마 적용
+        if self.options.compact_schema and not self.options.use_layout_analysis:
+            converter = CompactSchemaConverter(use_local_coords=True)
+            result = converter.compact(result)
+            logger.info("Compact 스키마 적용 완료")
+        
+        return result
 
     def save_json(self, data: Dict[str, Any], output_path: Path) -> None:
         """

@@ -10,7 +10,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
 from img2dwg.data.scanner import DataScanner
-from img2dwg.data.dwg_parser import DWGParser
+from img2dwg.data.dwg_parser import DWGParser, ParseOptions
 from img2dwg.utils.logger import setup_logging, get_logger
 from img2dwg.utils.file_utils import ensure_dir
 
@@ -34,6 +34,27 @@ def parse_args():
         "--oda-converter",
         type=Path,
         help="ODAFileConverter 실행 파일 경로 (선택사항)",
+    )
+    parser.add_argument(
+        "--optimize",
+        action="store_true",
+        help="최적화 옵션 사용 (RDP 간소화, 좌표 반올림, 기본값 제거)",
+    )
+    parser.add_argument(
+        "--rdp-tolerance",
+        type=float,
+        default=1.0,
+        help="RDP 간소화 허용 오차 (기본: 1.0)",
+    )
+    parser.add_argument(
+        "--compact-schema",
+        action="store_true",
+        help="Compact 스키마 사용 (추가 20~30%% 토큰 절감)",
+    )
+    parser.add_argument(
+        "--layout-analysis",
+        action="store_true",
+        help="고수준 레이아웃 분석 사용 (95~99%% 토큰 절감, 권장!)",
     )
     return parser.parse_args()
 
@@ -61,8 +82,39 @@ def main():
 
     logger.info(f"총 {len(projects)}개 프로젝트 발견")
 
+    # 파싱 옵션 설정
+    if args.layout_analysis:
+        # 레이아웃 분석 모드 (최고 압축)
+        options = ParseOptions(
+            rdp_tolerance=args.rdp_tolerance if args.optimize else 1.0,
+            round_ndigits=3,
+            drop_defaults=True,
+            use_layout_analysis=True,
+            dxf_version="R2000",
+        )
+        logger.info("🚀 레이아웃 분석 모드 활성화 (고수준 추상화)")
+    elif args.optimize:
+        options = ParseOptions(
+            rdp_tolerance=args.rdp_tolerance,
+            round_ndigits=3,
+            drop_defaults=True,
+            compact_schema=args.compact_schema,
+            dxf_version="R2000",
+        )
+        logger.info(f"최적화 모드 활성화 (RDP tolerance: {args.rdp_tolerance})")
+        if args.compact_schema:
+            logger.info("Compact 스키마 활성화")
+    else:
+        options = ParseOptions(
+            compact_schema=args.compact_schema,
+            use_layout_analysis=args.layout_analysis
+        ) if (args.compact_schema or args.layout_analysis) else None
+        logger.info("기본 모드")
+        if args.compact_schema:
+            logger.info("Compact 스키마 활성화")
+
     # DWG 파서 초기화
-    parser = DWGParser(oda_converter_path=args.oda_converter)
+    parser = DWGParser(oda_converter_path=args.oda_converter, options=options)
 
     # 변환 통계
     converted_count = 0
