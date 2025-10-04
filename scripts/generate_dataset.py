@@ -97,29 +97,44 @@ def parse_args():
 
 
 def create_finetune_record(
-    image_path: Path,
+    image_data: List[Dict[str, str]],
     json_data: Dict[str, Any],
-    image_processor: ImageProcessor,
-    image_url: Optional[str] = None,
+    dwg_type: str,
 ) -> Dict[str, Any]:
     """
-    파인튜닝 레코드를 생성한다.
+    파인튜닝 레코드를 생성한다 (여러 이미지 지원).
 
     Args:
-        image_path: 이미지 파일 경로
+        image_data: 이미지 정보 리스트 [{"url": "...", "description": "변경전"}, ...]
         json_data: 변환된 JSON 데이터
-        image_processor: 이미지 프로세서
-        image_url: 공개 이미지 URL (None이면 base64 사용)
+        dwg_type: DWG 타입 ("변경" 또는 "단면")
 
     Returns:
         파인튜닝 레코드 (OpenAI 형식)
     """
-    # 이미지 URL 결정 (공개 URL 또는 base64)
-    if image_url is None:
-        image_url = image_processor.to_base64(image_path)
-
     # JSON 데이터를 문자열로 변환
     json_str = json.dumps(json_data, ensure_ascii=False)
+
+    # 이미지 설명 생성
+    if dwg_type == "변경":
+        image_desc = "다음은 건축 평면도의 변경 전/후 이미지입니다. 이 이미지들을 분석하여 CAD 엔티티를 추출해주세요."
+    else:
+        image_desc = "다음은 건축 평면도의 단면도 이미지입니다. 이 이미지들을 분석하여 CAD 엔티티를 추출해주세요."
+
+    # user content 구성 (텍스트 + 여러 이미지)
+    user_content = [
+        {
+            "type": "text",
+            "text": image_desc,
+        }
+    ]
+
+    # 모든 이미지 추가
+    for img in image_data:
+        user_content.append({
+            "type": "image_url",
+            "image_url": {"url": img["url"]},
+        })
 
     # OpenAI 파인튜닝 형식
     record = {
@@ -128,21 +143,12 @@ def create_finetune_record(
                 "role": "system",
                 "content": (
                     "당신은 2D 건축 평면도 이미지를 분석하여 AutoCAD 호환 JSON 형태로 변환하는 전문가입니다. "
-                    "선, 곡선, 점선, 텍스트, 치수를 정확하게 추출해야 합니다."
+                    "여러 이미지(변경 전/후, 단면도 등)를 종합적으로 분석하여 정확한 CAD 엔티티를 추출해야 합니다."
                 ),
             },
             {
                 "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "다음 평면도 이미지를 분석하여 CAD 엔티티를 추출해주세요.",
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": image_url},
-                    },
-                ],
+                "content": user_content,
             },
             {
                 "role": "assistant",
@@ -226,23 +232,24 @@ def main():
 
     # 각 프로젝트 처리
     for project in projects:
-        # 변경 관련 파일
+        # 변경 관련 파일 (DWG 파일 기준으로 하나의 레코드 생성)
         if project.has_change_files:
-            for image_path in project.change_group.images:
-                # 대응하는 JSON 파일 찾기
-                json_path = args.input_json / f"{project.name}_변경.json"
+            # 대응하는 JSON 파일 찾기
+            json_path = args.input_json / f"{project.name}_변경.json"
 
-                if json_path.exists():
-                    try:
-                        with open(json_path, "r", encoding="utf-8") as f:
-                            json_data = json.load(f)
+            if json_path.exists() and len(project.change_group.images) > 0:
+                try:
+                    with open(json_path, "r", encoding="utf-8") as f:
+                        json_data = json.load(f)
 
-                        # Compact 스키마 적용
-                        if args.compact_schema:
-                            converter = CompactSchemaConverter(use_local_coords=True)
-                            json_data = converter.compact(json_data)
+                    # Compact 스키마 적용
+                    if args.compact_schema:
+                        converter = CompactSchemaConverter(use_local_coords=True)
+                        json_data = converter.compact(json_data)
 
-                        # 이미지 URL 가져오기 (URL 모드인 경우)
+                    # 모든 이미지 URL 수집
+                    image_data = []
+                    for image_path in project.change_group.images:
                         image_url = None
                         if args.use_image_url:
                             # 캐시 확인
@@ -251,63 +258,79 @@ def main():
                                 # 업로드 및 캐시 저장 (프로젝트명 포함)
                                 image_url = uploader.upload(image_path, project_name=project.name)
                                 url_cache.set(image_path, image_url)
+                        else:
+                            # base64 인코딩
+                            image_url = image_processor.to_base64(image_path)
 
-                        # 타일링 처리
-                        json_chunks = [json_data]
-                        if args.enable_tiling:
-                            json_chunks = split_by_token_budget(
-                                json_data,
-                                args.max_tokens,
-                                lambda d: count_tokens(
-                                    create_finetune_record(image_path, d, image_processor, image_url),
-                                    args.model
-                                )
+                        # 이미지 설명 추출 (파일명에서)
+                        filename = image_path.stem  # 확장자 제외
+                        description = "변경전" if "변경전" in filename else "변경후" if "변경후" in filename else "평면도"
+                        
+                        image_data.append({
+                            "url": image_url,
+                            "description": description
+                        })
+
+                    logger.info(f"{project.name} (변경): {len(image_data)}개 이미지 수집 완료")
+
+                    # 타일링 처리
+                    json_chunks = [json_data]
+                    if args.enable_tiling:
+                        json_chunks = split_by_token_budget(
+                            json_data,
+                            args.max_tokens,
+                            lambda d: count_tokens(
+                                create_finetune_record(image_data, d, "변경"),
+                                args.model
                             )
-                            if len(json_chunks) > 1:
-                                tiled_count += len(json_chunks) - 1
-                                logger.info(f"{project.name} (변경): {len(json_chunks)}개 타일로 분할")
+                        )
+                        if len(json_chunks) > 1:
+                            tiled_count += len(json_chunks) - 1
+                            logger.info(f"{project.name} (변경): {len(json_chunks)}개 타일로 분할")
 
-                        # 각 청크별 레코드 생성
-                        for chunk_idx, chunk_data in enumerate(json_chunks):
-                            record = create_finetune_record(
-                                image_path, chunk_data, image_processor, image_url
+                    # 각 청크별 레코드 생성
+                    for chunk_idx, chunk_data in enumerate(json_chunks):
+                        record = create_finetune_record(
+                            image_data, chunk_data, "변경"
+                        )
+
+                        # 토큰 수 확인
+                        token_count = count_tokens(record, args.model)
+
+                        if token_count <= args.max_tokens:
+                            records.append(record)
+                            chunk_info = f" (타일 {chunk_idx + 1}/{len(json_chunks)})" if len(json_chunks) > 1 else ""
+                            logger.info(
+                                f"레코드 생성: {project.name} (변경){chunk_info} - "
+                                f"{len(image_data)}개 이미지, {token_count:,} 토큰"
                             )
+                        else:
+                            filtered_count += 1
+                            logger.warning(
+                                f"레코드 필터링: {project.name} (변경) - "
+                                f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
+                            )
+                except Exception as e:
+                    logger.error(f"레코드 생성 실패: {project.name} (변경) - {e}")
 
-                            # 토큰 수 확인
-                            token_count = count_tokens(record, args.model)
-
-                            if token_count <= args.max_tokens:
-                                records.append(record)
-                                chunk_info = f" (타일 {chunk_idx + 1}/{len(json_chunks)})" if len(json_chunks) > 1 else ""
-                                logger.info(
-                                    f"레코드 생성: {project.name} (변경){chunk_info} - {token_count:,} 토큰"
-                                )
-                            else:
-                                filtered_count += 1
-                                logger.warning(
-                                    f"레코드 필터링: {project.name} (변경) - "
-                                    f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
-                                )
-                    except Exception as e:
-                        logger.error(f"레코드 생성 실패: {project.name} - {e}")
-
-        # 단면도 관련 파일
+        # 단면도 관련 파일 (DWG 파일 기준으로 하나의 레코드 생성)
         if project.has_section_files:
-            for image_path in project.section_group.images:
-                # 대응하는 JSON 파일 찾기
-                json_path = args.input_json / f"{project.name}_단면.json"
+            # 대응하는 JSON 파일 찾기
+            json_path = args.input_json / f"{project.name}_단면.json"
 
-                if json_path.exists():
-                    try:
-                        with open(json_path, "r", encoding="utf-8") as f:
-                            json_data = json.load(f)
+            if json_path.exists() and len(project.section_group.images) > 0:
+                try:
+                    with open(json_path, "r", encoding="utf-8") as f:
+                        json_data = json.load(f)
 
-                        # Compact 스키마 적용
-                        if args.compact_schema:
-                            converter = CompactSchemaConverter(use_local_coords=True)
-                            json_data = converter.compact(json_data)
+                    # Compact 스키마 적용
+                    if args.compact_schema:
+                        converter = CompactSchemaConverter(use_local_coords=True)
+                        json_data = converter.compact(json_data)
 
-                        # 이미지 URL 가져오기 (URL 모드인 경우)
+                    # 모든 이미지 URL 수집
+                    image_data = []
+                    for image_path in project.section_group.images:
                         image_url = None
                         if args.use_image_url:
                             # 캐시 확인
@@ -316,45 +339,62 @@ def main():
                                 # 업로드 및 캐시 저장 (프로젝트명 포함)
                                 image_url = uploader.upload(image_path, project_name=project.name)
                                 url_cache.set(image_path, image_url)
+                        else:
+                            # base64 인코딩
+                            image_url = image_processor.to_base64(image_path)
 
-                        # 타일링 처리
-                        json_chunks = [json_data]
-                        if args.enable_tiling:
-                            json_chunks = split_by_token_budget(
-                                json_data,
-                                args.max_tokens,
-                                lambda d: count_tokens(
-                                    create_finetune_record(image_path, d, image_processor, image_url),
-                                    args.model
-                                )
+                        # 이미지 설명 추출 (파일명에서)
+                        filename = image_path.stem  # 확장자 제외
+                        description = "단면도"
+                        if "단면도" in filename:
+                            description = "단면도"
+                        
+                        image_data.append({
+                            "url": image_url,
+                            "description": description
+                        })
+
+                    logger.info(f"{project.name} (단면): {len(image_data)}개 이미지 수집 완료")
+
+                    # 타일링 처리
+                    json_chunks = [json_data]
+                    if args.enable_tiling:
+                        json_chunks = split_by_token_budget(
+                            json_data,
+                            args.max_tokens,
+                            lambda d: count_tokens(
+                                create_finetune_record(image_data, d, "단면"),
+                                args.model
                             )
-                            if len(json_chunks) > 1:
-                                tiled_count += len(json_chunks) - 1
-                                logger.info(f"{project.name} (단면): {len(json_chunks)}개 타일로 분할")
+                        )
+                        if len(json_chunks) > 1:
+                            tiled_count += len(json_chunks) - 1
+                            logger.info(f"{project.name} (단면): {len(json_chunks)}개 타일로 분할")
 
-                        # 각 청크별 레코드 생성
-                        for chunk_idx, chunk_data in enumerate(json_chunks):
-                            record = create_finetune_record(
-                                image_path, chunk_data, image_processor, image_url
+                    # 각 청크별 레코드 생성
+                    for chunk_idx, chunk_data in enumerate(json_chunks):
+                        record = create_finetune_record(
+                            image_data, chunk_data, "단면"
+                        )
+
+                        # 토큰 수 확인
+                        token_count = count_tokens(record, args.model)
+
+                        if token_count <= args.max_tokens:
+                            records.append(record)
+                            chunk_info = f" (타일 {chunk_idx + 1}/{len(json_chunks)})" if len(json_chunks) > 1 else ""
+                            logger.info(
+                                f"레코드 생성: {project.name} (단면){chunk_info} - "
+                                f"{len(image_data)}개 이미지, {token_count:,} 토큰"
                             )
-
-                            # 토큰 수 확인
-                            token_count = count_tokens(record, args.model)
-
-                            if token_count <= args.max_tokens:
-                                records.append(record)
-                                chunk_info = f" (타일 {chunk_idx + 1}/{len(json_chunks)})" if len(json_chunks) > 1 else ""
-                                logger.info(
-                                    f"레코드 생성: {project.name} (단면){chunk_info} - {token_count:,} 토큰"
-                                )
-                            else:
-                                filtered_count += 1
-                                logger.warning(
-                                    f"레코드 필터링: {project.name} (단면) - "
-                                    f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
-                                )
-                    except Exception as e:
-                        logger.error(f"레코드 생성 실패: {project.name} - {e}")
+                        else:
+                            filtered_count += 1
+                            logger.warning(
+                                f"레코드 필터링: {project.name} (단면) - "
+                                f"{token_count:,} 토큰 > {args.max_tokens:,} 토큰 제한"
+                            )
+                except Exception as e:
+                    logger.error(f"레코드 생성 실패: {project.name} (단면) - {e}")
 
     # Train/Val 분할
     split_idx = int(len(records) * args.split_ratio)

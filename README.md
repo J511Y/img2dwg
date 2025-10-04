@@ -131,9 +131,15 @@ python scripts/generate_dataset.py \
 # 🚀 권장: 이미지 URL 사용 (99% 토큰 절감!)
 python scripts/generate_dataset.py \
   --use-image-url \
-  --image-service imgur
+  --image-service github
 ```
 OpenAI GPT-4o 파인튜닝을 위한 JSONL 형식 데이터셋을 생성합니다.
+
+**💡 다중 이미지 지원**:
+- DWG 파일 기준으로 레코드 생성 (이미지 기준 아님)
+- 변경전/후 이미지를 하나의 레코드로 통합
+- 레코드 수 50% 절감, 학습 효율 향상
+- 자세한 내용: [다중 이미지 가이드](docs/multi-image-dataset.md)
 
 **기본 옵션**:
 - `--max-tokens`: 최대 토큰 수 제한 (기본: 60000)
