@@ -4,7 +4,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from time import perf_counter
-from typing import Any
+from typing import Any, Literal
+
+
+RiskTier = Literal["safe", "high"]
 
 
 @dataclass(slots=True)
@@ -27,6 +30,8 @@ class ConversionStrategy(ABC):
     """Abstract strategy for image->DXF conversion experiments."""
 
     name: str
+    track: str = "core"
+    risk_tier: RiskTier = "safe"
 
     @abstractmethod
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
