@@ -2,28 +2,49 @@
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional
+from typing import TypedDict
 
+from ..utils.file_utils import is_dwg_file, is_image_file
 from ..utils.logger import get_logger
-from ..utils.file_utils import is_image_file, is_dwg_file
-
 
 logger = get_logger(__name__)
+
+
+class IncompleteDetail(TypedDict):
+    """불완전 프로젝트 상세 통계 타입."""
+
+    name: str
+    parent_folder: str
+    change_images: int
+    change_dwgs: int
+    section_images: int
+    section_dwgs: int
+
+
+class ScanStats(TypedDict):
+    """스캐너 통계 타입."""
+
+    total_projects: int
+    complete_change_pairs: int
+    complete_section_pairs: int
+    incomplete_projects: int
+    incomplete_details: list[IncompleteDetail]
 
 
 @dataclass
 class FileGroup:
     """
     파일 그룹 (변경 또는 단면도).
-    
+
     Attributes:
         type: 파일 타입 ('변경' 또는 '단면')
         images: 이미지 파일 목록
         dwg_files: DWG 파일 목록
     """
+
     type: str  # '변경' 또는 '단면'
-    images: List[Path] = field(default_factory=list)
-    dwg_files: List[Path] = field(default_factory=list)
+    images: list[Path] = field(default_factory=list)
+    dwg_files: list[Path] = field(default_factory=list)
 
     @property
     def is_complete(self) -> bool:
@@ -45,7 +66,7 @@ class FileGroup:
 class ProjectData:
     """
     프로젝트 데이터.
-    
+
     Attributes:
         name: 프로젝트 이름
         path: 프로젝트 경로
@@ -53,6 +74,7 @@ class ProjectData:
         change_group: 변경 관련 파일 그룹
         section_group: 단면도 관련 파일 그룹
     """
+
     name: str
     path: Path
     parent_folder: str
@@ -75,11 +97,11 @@ class ProjectData:
         change_incomplete = (
             len(self.change_group.images) > 0 or len(self.change_group.dwg_files) > 0
         ) and not self.change_group.is_complete
-        
+
         section_incomplete = (
             len(self.section_group.images) > 0 or len(self.section_group.dwg_files) > 0
         ) and not self.section_group.is_complete
-        
+
         return change_incomplete or section_incomplete
 
 
@@ -92,17 +114,17 @@ class DataScanner:
 
         Args:
             data_path: 데이터 폴더 경로 (예: datas/)
-        
+
         Raises:
             FileNotFoundError: 데이터 경로가 존재하지 않을 때
         """
         if not data_path.exists():
             raise FileNotFoundError(f"데이터 경로를 찾을 수 없습니다: {data_path}")
-        
+
         self.data_path = data_path
         logger.info(f"DataScanner 초기화: {data_path}")
 
-    def scan(self) -> List[ProjectData]:
+    def scan(self) -> list[ProjectData]:
         """
         데이터 폴더를 스캔하여 프로젝트 목록을 반환한다.
 
@@ -131,7 +153,7 @@ class DataScanner:
         logger.info(f"스캔 완료: 총 {len(projects)}개 프로젝트 발견")
         return projects
 
-    def _scan_project(self, project_path: Path, parent_folder: str) -> Optional[ProjectData]:
+    def _scan_project(self, project_path: Path, parent_folder: str) -> ProjectData | None:
         """
         개별 프로젝트 폴더를 스캔한다.
 
@@ -187,7 +209,7 @@ class DataScanner:
                 project.section_group.dwg_files.append(file_path)
                 logger.debug(f"단면 DWG 발견: {file_path.name}")
 
-    def get_statistics(self, projects: List[ProjectData]) -> dict:
+    def get_statistics(self, projects: list[ProjectData]) -> ScanStats:
         """
         프로젝트 통계를 계산한다.
 
@@ -201,7 +223,7 @@ class DataScanner:
         complete_section = sum(1 for p in projects if p.has_section_files)
         incomplete = [p for p in projects if p.is_incomplete]
 
-        stats = {
+        stats: ScanStats = {
             "total_projects": len(projects),
             "complete_change_pairs": complete_change,
             "complete_section_pairs": complete_section,

@@ -14,9 +14,6 @@ dependencies = [
     "tiktoken>=0.11.0",
     "requests>=2.31.0",
     "numpy>=1.26.0",
-    "pytest>=8.4.2",
-    "ruff>=0.13.2",
-    "mypy>=1.18.2",
     # Vision Encoder-Decoder 학습용 라이브러리
     "torch==2.2.2",
     "torchvision==0.17.2",
@@ -32,10 +29,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.0.0",
+    "pytest>=8.4.2",
     "pytest-cov>=4.1.0",
-    "ruff>=0.3.0",
-    "mypy>=1.8.0",
+    "ruff>=0.13.2",
+    "mypy>=1.18.2",
 ]
 
 # Vision Encoder-Decoder 학습용 추가 의존성

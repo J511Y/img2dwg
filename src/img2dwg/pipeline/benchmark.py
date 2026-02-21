@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from img2dwg.pipeline.schema import build_report
 from img2dwg.strategies import ConversionInput, ConversionOutput, StrategyRegistry
 
 
-def _to_legacy_dict(out: ConversionOutput) -> dict:
+def _to_legacy_dict(out: ConversionOutput) -> dict[str, Any]:
     return {
         "strategy_name": out.strategy_name,
         "dxf_path": str(out.dxf_path) if out.dxf_path else None,
@@ -25,12 +26,12 @@ def run_benchmark(
     strategy_names: list[str] | None = None,
     dataset_id: str = "default",
     git_ref: str = "local",
-) -> dict:
+) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     target_names = strategy_names or registry.list_names()
 
-    legacy_results: dict[str, list[dict]] = {name: [] for name in target_names}
-    outputs_map = {name: [] for name in target_names}
+    legacy_results: dict[str, list[dict[str, Any]]] = {name: [] for name in target_names}
+    outputs_map: dict[str, list[ConversionOutput]] = {name: [] for name in target_names}
 
     for image_path in image_paths:
         conv_input = ConversionInput(image_path=image_path)
