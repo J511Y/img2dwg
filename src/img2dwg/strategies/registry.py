@@ -1,0 +1,46 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+from .base import ConversionStrategy
+
+
+@dataclass(slots=True)
+class FeatureFlags:
+    enable_high_risk: bool = False
+    high_risk_allowlist: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class StrategyRegistry:
+    _strategies: dict[str, ConversionStrategy] = field(default_factory=dict)
+
+    def register(self, strategy: ConversionStrategy) -> None:
+        self._strategies[strategy.name] = strategy
+
+    def get(self, name: str) -> ConversionStrategy:
+        if name not in self._strategies:
+            raise KeyError(f"Unknown strategy: {name}")
+        return self._strategies[name]
+
+    def list_names(self) -> list[str]:
+        return sorted(self._strategies.keys())
+
+    def get_enabled_names(self, flags: FeatureFlags) -> list[str]:
+        enabled: list[str] = []
+        for name in self.list_names():
+            strategy = self.get(name)
+            if strategy.risk_tier == "high":
+                if not flags.enable_high_risk:
+                    continue
+                if flags.high_risk_allowlist and name not in flags.high_risk_allowlist:
+                    continue
+            enabled.append(name)
+        return enabled
+
+    def get_safe_default(self) -> ConversionStrategy:
+        for name in self.list_names():
+            strategy = self.get(name)
+            if strategy.risk_tier == "safe":
+                return strategy
+        raise RuntimeError("No safe strategy registered")
