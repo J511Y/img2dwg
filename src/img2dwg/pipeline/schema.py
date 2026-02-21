@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +21,45 @@ def _p95(values: list[float]) -> float:
     ordered = sorted(values)
     index = min(len(ordered) - 1, max(0, int(round(0.95 * (len(ordered) - 1)))))
     return ordered[index]
+
+
+def _normalize_non_negative(value: Any, *, default: float = 0.0) -> float:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return default
+    if not math.isfinite(numeric):
+        return default
+    return max(numeric, 0.0)
+
+
+def _normalize_ratio(value: Any, *, default: float = 0.0) -> float:
+    numeric = _normalize_non_negative(value, default=default)
+    return min(numeric, 1.0)
+
+
+def _normalize_success(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        if isinstance(value, float) and not math.isfinite(value):
+            return False
+        return bool(value)
+    return False
+
+
+def _normalize_metrics(value: Any) -> dict[str, float]:
+    source: Mapping[str, Any] = value if isinstance(value, Mapping) else {}
+    return {
+        "iou": _normalize_ratio(source.get("iou", 0.0)),
+        "topology_f1": _normalize_ratio(source.get("topology_f1", 0.0)),
+    }
+
+
+def _normalize_notes(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(note) for note in value if note is not None]
 
 
 @dataclass(slots=True)
@@ -138,17 +179,25 @@ def build_strategy_result(
     status: str,
     promoted: bool,
 ) -> BenchmarkStrategyResult:
+    if len(outputs) != len(image_paths):
+        msg = (
+            "outputs/image_paths length mismatch: "
+            f"strategy={strategy_name}, outputs={len(outputs)}, images={len(image_paths)}"
+        )
+        raise ValueError(msg)
+
     cases: list[BenchmarkCaseResult] = []
-    for idx, (image_path, out) in enumerate(zip(image_paths, outputs), start=1):
+    for idx, (image_path, out) in enumerate(zip(image_paths, outputs, strict=True), start=1):
+        normalized_metrics = _normalize_metrics(out.metrics)
         cases.append(
             BenchmarkCaseResult(
                 case_id=f"case_{idx:03d}",
                 image_path=str(image_path),
                 dxf_path=str(out.dxf_path) if out.dxf_path else None,
-                success=out.success,
-                elapsed_ms=out.elapsed_ms,
-                metrics=out.metrics,
-                notes=out.notes,
+                success=_normalize_success(out.success),
+                elapsed_ms=round(_normalize_non_negative(out.elapsed_ms), 2),
+                metrics=normalized_metrics,
+                notes=_normalize_notes(out.notes),
             )
         )
 
@@ -178,6 +227,16 @@ def build_strategy_result(
     )
 
 
+def _composite_score(summary: BenchmarkStrategySummary) -> float:
+    return round(
+        0.35 * summary.success_rate
+        + 0.25 * summary.mean_iou
+        + 0.25 * summary.mean_topology_f1
+        + 0.15 * (1 / (1 + max(summary.median_elapsed_ms, 0.0))),
+        4,
+    )
+
+
 def build_report(
     *,
     strategy_outputs: dict[str, list[ConversionOutput]],
@@ -199,30 +258,28 @@ def build_report(
             )
         )
 
+    scored_results = [
+        (strategy, _composite_score(strategy.summary)) for strategy in strategy_results
+    ]
     ranked = sorted(
-        strategy_results,
-        key=lambda s: (
-            s.summary.success_rate,
-            s.summary.mean_iou,
-            s.summary.mean_topology_f1,
-            -s.summary.median_elapsed_ms,
+        scored_results,
+        key=lambda item: (
+            item[1],
+            item[0].summary.success_rate,
+            item[0].summary.mean_iou,
+            item[0].summary.mean_topology_f1,
+            -item[0].summary.median_elapsed_ms,
         ),
         reverse=True,
     )
 
     ranking = [
         BenchmarkRankingEntry(
-            strategy_name=s.strategy_name,
-            composite_score=round(
-                0.35 * s.summary.success_rate
-                + 0.25 * s.summary.mean_iou
-                + 0.25 * s.summary.mean_topology_f1
-                + 0.15 * (1 / (1 + max(s.summary.median_elapsed_ms, 0.0))),
-                4,
-            ),
+            strategy_name=strategy.strategy_name,
+            composite_score=score,
             rank=i + 1,
         )
-        for i, s in enumerate(ranked)
+        for i, (strategy, score) in enumerate(ranked)
     ]
 
     return BenchmarkReport(
@@ -240,7 +297,15 @@ def build_report(
                 "p95_elapsed_ms": "ms",
                 "mean_iou": "ratio_0_1",
                 "mean_topology_f1": "ratio_0_1",
-            }
+            },
+            "validation": {
+                "elapsed_ms": {"min": 0.0},
+                "metrics": {
+                    "iou": {"min": 0.0, "max": 1.0},
+                    "topology_f1": {"min": 0.0, "max": 1.0},
+                },
+                "missing_metric_policy": "default_to_0.0",
+            },
         },
         strategies=strategy_results,
         ranking=ranking,

@@ -16,7 +16,7 @@
   - `hybrid_mvp`
   - `two_stage_baseline`
   - `consensus_qa`
-- 벤치 실행: `python scripts/benchmark_strategies.py --images <dir>`
+- 벤치 실행: `uv run python scripts/benchmark_strategies.py --images <dir>`
 
 ## 공통 지표
 - export_success_rate
@@ -29,3 +29,7 @@
 - P0: 전략 인터페이스 + 벤치 러너 + 리포트 JSON
 - P1: 유사도 측정 고도화, 실패 유형 분류 자동화
 - P2: Human-in-the-loop 피드백 로그 반영
+
+## 운영 문서
+- Linear 코멘트 운영 가이드: `docs/linear-agent-comment-system-prompt.md`
+- Linear 코멘트 템플릿: `docs/templates/linear-comment-template.md`
