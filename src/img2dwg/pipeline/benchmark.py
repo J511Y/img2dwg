@@ -19,6 +19,35 @@ def _to_legacy_dict(out: ConversionOutput) -> dict[str, Any]:
     }
 
 
+def _resolve_strategy_names(
+    registry: StrategyRegistry,
+    strategy_names: list[str] | None,
+) -> list[str]:
+    if strategy_names is None:
+        return registry.list_names()
+
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for name in strategy_names:
+        cleaned = name.strip()
+        if not cleaned or cleaned in seen:
+            continue
+        seen.add(cleaned)
+        normalized.append(cleaned)
+
+    # Backward compatibility: empty/blank-only input behaves like default-all.
+    if not normalized:
+        return registry.list_names()
+
+    known_names = set(registry.list_names())
+    unknown = [name for name in normalized if name not in known_names]
+    if unknown:
+        unknown_display = ", ".join(unknown)
+        raise ValueError(f"Unknown strategies requested: {unknown_display}")
+
+    return normalized
+
+
 def run_benchmark(
     image_paths: list[Path],
     registry: StrategyRegistry,
@@ -28,7 +57,7 @@ def run_benchmark(
     git_ref: str = "local",
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    target_names = strategy_names or registry.list_names()
+    target_names = _resolve_strategy_names(registry, strategy_names)
 
     legacy_results: dict[str, list[dict[str, Any]]] = {name: [] for name in target_names}
     outputs_map: dict[str, list[ConversionOutput]] = {name: [] for name in target_names}

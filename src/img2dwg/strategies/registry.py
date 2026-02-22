@@ -52,6 +52,38 @@ class StrategyRegistry:
             enabled.append(name)
         return enabled
 
+    def resolve_requested_names(self, requested_names: list[str], flags: FeatureFlags) -> list[str]:
+        """Normalize user input and enforce feature-flag risk safeguards."""
+        normalized: list[str] = []
+        seen: set[str] = set()
+        for name in requested_names:
+            cleaned = name.strip()
+            if not cleaned or cleaned in seen:
+                continue
+            normalized.append(cleaned)
+            seen.add(cleaned)
+
+        if not normalized:
+            return self.get_enabled_names(flags)
+
+        known_names = set(self.list_names())
+        unknown = [name for name in normalized if name not in known_names]
+        if unknown:
+            raise ValueError(f"Unknown strategies requested: {', '.join(unknown)}")
+
+        enabled = set(self.get_enabled_names(flags))
+        blocked = [name for name in normalized if name not in enabled]
+        if blocked:
+            blocked_display = ", ".join(blocked)
+            raise ValueError(
+                "Blocked strategies by feature flags: "
+                f"{blocked_display}. "
+                "For high-risk strategies, use --enable-high-risk "
+                "with --high-risk-allowlist=<strategy_name>."
+            )
+
+        return normalized
+
     def get_safe_default(self) -> ConversionStrategy:
         for name in self.list_names():
             strategy = self.get(name)
