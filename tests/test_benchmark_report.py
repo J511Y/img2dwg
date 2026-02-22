@@ -1,6 +1,7 @@
 import math
 from pathlib import Path
 
+import ezdxf
 import pytest
 
 from img2dwg.pipeline.benchmark import run_benchmark
@@ -52,6 +53,60 @@ class SlowHighQualityStrategy(ConversionStrategy):
             metrics={"iou": 0.95, "topology_f1": 0.93},
             notes=[],
         )
+
+
+class TriadThesisStrategy(ConversionStrategy):
+    name = "two_stage_baseline"
+
+    def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return ConversionOutput(
+            strategy_name=self.name,
+            dxf_path=output_dir / f"{conv_input.image_path.stem}.dxf",
+            success=True,
+            elapsed_ms=10.0,
+            metrics={"iou": 0.55, "topology_f1": 0.50},
+            notes=[],
+        )
+
+    def timed_run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+        return self.run(conv_input, output_dir)
+
+
+class TriadAntithesisStrategy(ConversionStrategy):
+    name = "consensus_qa"
+
+    def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return ConversionOutput(
+            strategy_name=self.name,
+            dxf_path=output_dir / f"{conv_input.image_path.stem}.dxf",
+            success=True,
+            elapsed_ms=12.0,
+            metrics={"iou": 0.60, "topology_f1": 0.65},
+            notes=[],
+        )
+
+    def timed_run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+        return self.run(conv_input, output_dir)
+
+
+class TriadSynthesisStrategy(ConversionStrategy):
+    name = "hybrid_mvp"
+
+    def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return ConversionOutput(
+            strategy_name=self.name,
+            dxf_path=output_dir / f"{conv_input.image_path.stem}.dxf",
+            success=True,
+            elapsed_ms=11.0,
+            metrics={"iou": 0.70, "topology_f1": 0.72},
+            notes=[],
+        )
+
+    def timed_run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+        return self.run(conv_input, output_dir)
 
 
 class PartialMetricStrategy(ConversionStrategy):
@@ -160,6 +215,7 @@ def test_run_benchmark_returns_v2_schema(tmp_path: Path) -> None:
     assert result["schema_version"] == 2
     assert result["run"]["dataset_id"] == "unit"
     assert result["strategies"][0]["summary"]["success_rate"] == 1.0
+    assert result["strategies"][0]["summary"]["cad_loadable_rate"] == 0.0
     assert result["ranking"][0]["strategy_name"] == "success"
 
 
@@ -314,10 +370,58 @@ def test_build_strategy_result_handles_empty_cases() -> None:
     assert result.summary.total_cases == 0
     assert result.summary.success_count == 0
     assert result.summary.success_rate == 0.0
+    assert result.summary.cad_loadable_count == 0
+    assert result.summary.cad_loadable_rate == 0.0
     assert result.summary.median_elapsed_ms == 0.0
     assert result.summary.p95_elapsed_ms == 0.0
     assert result.summary.mean_iou == 0.0
     assert result.summary.mean_topology_f1 == 0.0
+
+
+def test_build_strategy_result_tracks_cad_loadable_rate(tmp_path: Path) -> None:
+    img1 = tmp_path / "a.png"
+    img2 = tmp_path / "b.png"
+    img1.write_bytes(b"fake")
+    img2.write_bytes(b"fake")
+
+    loadable_dxf = tmp_path / "a.dxf"
+    ezdxf.new("R2018", setup=True).saveas(str(loadable_dxf))
+
+    broken_dxf = tmp_path / "b.dxf"
+    broken_dxf.write_text("not-a-valid-dxf", encoding="utf-8")
+
+    outputs = [
+        ConversionOutput(
+            strategy_name="cad_loadable_check",
+            dxf_path=loadable_dxf,
+            success=True,
+            elapsed_ms=1.0,
+            metrics={"iou": 0.7, "topology_f1": 0.6},
+            notes=[],
+        ),
+        ConversionOutput(
+            strategy_name="cad_loadable_check",
+            dxf_path=broken_dxf,
+            success=True,
+            elapsed_ms=1.2,
+            metrics={"iou": 0.6, "topology_f1": 0.5},
+            notes=[],
+        ),
+    ]
+
+    result = build_strategy_result(
+        strategy_name="cad_loadable_check",
+        outputs=outputs,
+        image_paths=[img1, img2],
+        track="core",
+        status="candidate",
+        promoted=False,
+    )
+
+    assert result.cases[0].cad_loadable is True
+    assert result.cases[1].cad_loadable is False
+    assert result.summary.cad_loadable_count == 1
+    assert result.summary.cad_loadable_rate == 0.5
 
 
 def test_build_strategy_result_normalizes_numeric_success(tmp_path: Path) -> None:
@@ -391,6 +495,44 @@ def test_run_benchmark_rejects_nan_success_payload(tmp_path: Path) -> None:
     assert case["success"] is False
 
 
+def test_run_benchmark_rejects_unknown_strategy_name(tmp_path: Path) -> None:
+    img = tmp_path / "a.png"
+    img.write_bytes(b"fake")
+
+    reg = StrategyRegistry()
+    reg.register(SuccessStrategy())
+
+    with pytest.raises(ValueError, match="Unknown strategies requested: missing"):
+        run_benchmark(
+            image_paths=[img],
+            registry=reg,
+            output_dir=tmp_path / "out-unknown",
+            strategy_names=["missing"],
+            dataset_id="unknown-strategy",
+            git_ref="test",
+        )
+
+
+def test_run_benchmark_normalizes_strategy_names(tmp_path: Path) -> None:
+    img = tmp_path / "a.png"
+    img.write_bytes(b"fake")
+
+    reg = StrategyRegistry()
+    reg.register(SuccessStrategy())
+    reg.register(FastLowQualityStrategy())
+
+    result = run_benchmark(
+        image_paths=[img],
+        registry=reg,
+        output_dir=tmp_path / "out-normalized",
+        strategy_names=[" success ", "success", ""],
+        dataset_id="normalized-strategy-names",
+        git_ref="test",
+    )
+
+    assert [strategy["strategy_name"] for strategy in result["strategies"]] == ["success"]
+
+
 def test_build_strategy_result_raises_on_length_mismatch(tmp_path: Path) -> None:
     img = tmp_path / "a.png"
     img.write_bytes(b"fake")
@@ -404,3 +546,161 @@ def test_build_strategy_result_raises_on_length_mismatch(tmp_path: Path) -> None
             status="candidate",
             promoted=False,
         )
+
+
+def test_run_benchmark_adds_triad_comparison_when_all_present(tmp_path: Path) -> None:
+    img = tmp_path / "triad.png"
+    img.write_bytes(b"fake")
+
+    reg = StrategyRegistry()
+    reg.register(TriadThesisStrategy())
+    reg.register(TriadAntithesisStrategy())
+    reg.register(TriadSynthesisStrategy())
+
+    result = run_benchmark(
+        image_paths=[img],
+        registry=reg,
+        output_dir=tmp_path / "out-triad",
+        dataset_id="triad-compare",
+        git_ref="test",
+    )
+
+    triad = result["comparisons"]["thesis_antithesis_synthesis"]
+
+    assert triad["available"] is True
+    assert triad["cad_loadable_snapshot"] == {
+        "thesis": {"count": 0, "rate": 0.0},
+        "antithesis": {"count": 0, "rate": 0.0},
+        "synthesis": {"count": 0, "rate": 0.0},
+    }
+    assert triad["cad_loadable_gate"] == {
+        "synthesis_ge_thesis": True,
+        "synthesis_ge_antithesis": True,
+        "synthesis_ge_best_baseline_rate": True,
+        "synthesis_ge_best_baseline_count": True,
+        "passed": True,
+    }
+    assert triad["deltas"]["synthesis_vs_thesis"] == {
+        "success_rate": 0.0,
+        "cad_loadable_count": 0,
+        "cad_loadable_rate": 0.0,
+        "mean_iou": 0.15,
+        "mean_topology_f1": 0.22,
+        "median_elapsed_ms": 1.0,
+    }
+    assert triad["deltas"]["synthesis_vs_antithesis"] == {
+        "success_rate": 0.0,
+        "cad_loadable_count": 0,
+        "cad_loadable_rate": 0.0,
+        "mean_iou": 0.1,
+        "mean_topology_f1": 0.07,
+        "median_elapsed_ms": -1.0,
+    }
+
+
+def test_run_benchmark_triad_comparison_tracks_cad_loadable_gate(tmp_path: Path) -> None:
+    class LoadableThesisStrategy(ConversionStrategy):
+        name = "two_stage_baseline"
+
+        def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
+            ezdxf.new("R2018", setup=True).saveas(str(dxf_path))
+            return ConversionOutput(
+                strategy_name=self.name,
+                dxf_path=dxf_path,
+                success=True,
+                elapsed_ms=10.0,
+                metrics={"iou": 0.6, "topology_f1": 0.6},
+                notes=[],
+            )
+
+    class LoadableAntithesisStrategy(ConversionStrategy):
+        name = "consensus_qa"
+
+        def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
+            ezdxf.new("R2018", setup=True).saveas(str(dxf_path))
+            return ConversionOutput(
+                strategy_name=self.name,
+                dxf_path=dxf_path,
+                success=True,
+                elapsed_ms=12.0,
+                metrics={"iou": 0.6, "topology_f1": 0.6},
+                notes=[],
+            )
+
+    class BrokenSynthesisStrategy(ConversionStrategy):
+        name = "hybrid_mvp"
+
+        def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
+            dxf_path.write_text("broken", encoding="utf-8")
+            return ConversionOutput(
+                strategy_name=self.name,
+                dxf_path=dxf_path,
+                success=True,
+                elapsed_ms=11.0,
+                metrics={"iou": 0.6, "topology_f1": 0.6},
+                notes=[],
+            )
+
+    img = tmp_path / "triad-loadability.png"
+    img.write_bytes(b"fake")
+
+    reg = StrategyRegistry()
+    reg.register(LoadableThesisStrategy())
+    reg.register(LoadableAntithesisStrategy())
+    reg.register(BrokenSynthesisStrategy())
+
+    result = run_benchmark(
+        image_paths=[img],
+        registry=reg,
+        output_dir=tmp_path / "out-triad-loadability",
+        dataset_id="triad-loadability",
+        git_ref="test",
+    )
+
+    triad = result["comparisons"]["thesis_antithesis_synthesis"]
+
+    assert triad["cad_loadable_snapshot"] == {
+        "thesis": {"count": 1, "rate": 1.0},
+        "antithesis": {"count": 1, "rate": 1.0},
+        "synthesis": {"count": 0, "rate": 0.0},
+    }
+    assert triad["cad_loadable_gate"] == {
+        "synthesis_ge_thesis": False,
+        "synthesis_ge_antithesis": False,
+        "synthesis_ge_best_baseline_rate": False,
+        "synthesis_ge_best_baseline_count": False,
+        "passed": False,
+    }
+    assert triad["deltas"]["synthesis_vs_thesis"]["cad_loadable_count"] == -1
+    assert triad["deltas"]["synthesis_vs_antithesis"]["cad_loadable_count"] == -1
+
+
+def test_run_benchmark_marks_triad_comparison_unavailable_when_missing(tmp_path: Path) -> None:
+    img = tmp_path / "triad-missing.png"
+    img.write_bytes(b"fake")
+
+    reg = StrategyRegistry()
+    reg.register(SuccessStrategy())
+
+    result = run_benchmark(
+        image_paths=[img],
+        registry=reg,
+        output_dir=tmp_path / "out-triad-missing",
+        dataset_id="triad-missing",
+        git_ref="test",
+    )
+
+    triad = result["comparisons"]["thesis_antithesis_synthesis"]
+
+    assert triad["available"] is False
+    assert triad["missing"] == [
+        "two_stage_baseline",
+        "consensus_qa",
+        "hybrid_mvp",
+    ]

@@ -8,6 +8,8 @@ from pathlib import Path
 from statistics import mean, median
 from typing import Any
 
+import ezdxf
+
 from img2dwg.strategies.base import ConversionOutput
 
 
@@ -62,6 +64,21 @@ def _normalize_notes(value: Any) -> list[str]:
     return [str(note) for note in value if note is not None]
 
 
+def _is_dxf_loadable(path_value: str | None) -> bool:
+    if not path_value:
+        return False
+
+    path = Path(path_value)
+    if not path.exists() or not path.is_file():
+        return False
+
+    try:
+        ezdxf.readfile(str(path))
+    except Exception:
+        return False
+    return True
+
+
 @dataclass(slots=True)
 class BenchmarkRunMeta:
     run_id: str
@@ -75,6 +92,7 @@ class BenchmarkCaseResult:
     case_id: str
     image_path: str
     dxf_path: str | None
+    cad_loadable: bool
     success: bool
     elapsed_ms: float
     metrics: dict[str, float] = field(default_factory=dict)
@@ -86,6 +104,8 @@ class BenchmarkStrategySummary:
     total_cases: int
     success_count: int
     success_rate: float
+    cad_loadable_count: int
+    cad_loadable_rate: float
     median_elapsed_ms: float
     p95_elapsed_ms: float
     mean_iou: float
@@ -114,6 +134,7 @@ class BenchmarkReport:
     schema_version: int
     run: BenchmarkRunMeta
     standards: dict[str, Any]
+    comparisons: dict[str, Any]
     strategies: list[BenchmarkStrategyResult]
     ranking: list[BenchmarkRankingEntry]
     legacy: dict[str, list[dict[str, Any]]]
@@ -128,6 +149,7 @@ class BenchmarkReport:
                 "generated_at": self.run.generated_at,
             },
             "standards": self.standards,
+            "comparisons": self.comparisons,
             "strategies": [
                 {
                     "strategy_name": s.strategy_name,
@@ -139,6 +161,7 @@ class BenchmarkReport:
                             "case_id": c.case_id,
                             "image_path": c.image_path,
                             "dxf_path": c.dxf_path,
+                            "cad_loadable": c.cad_loadable,
                             "success": c.success,
                             "elapsed_ms": c.elapsed_ms,
                             "metrics": c.metrics,
@@ -150,6 +173,8 @@ class BenchmarkReport:
                         "total_cases": s.summary.total_cases,
                         "success_count": s.summary.success_count,
                         "success_rate": s.summary.success_rate,
+                        "cad_loadable_count": s.summary.cad_loadable_count,
+                        "cad_loadable_rate": s.summary.cad_loadable_rate,
                         "median_elapsed_ms": s.summary.median_elapsed_ms,
                         "p95_elapsed_ms": s.summary.p95_elapsed_ms,
                         "mean_iou": s.summary.mean_iou,
@@ -189,11 +214,13 @@ def build_strategy_result(
     cases: list[BenchmarkCaseResult] = []
     for idx, (image_path, out) in enumerate(zip(image_paths, outputs, strict=True), start=1):
         normalized_metrics = _normalize_metrics(out.metrics)
+        dxf_path = str(out.dxf_path) if out.dxf_path else None
         cases.append(
             BenchmarkCaseResult(
                 case_id=f"case_{idx:03d}",
                 image_path=str(image_path),
-                dxf_path=str(out.dxf_path) if out.dxf_path else None,
+                dxf_path=dxf_path,
+                cad_loadable=_is_dxf_loadable(dxf_path),
                 success=_normalize_success(out.success),
                 elapsed_ms=round(_normalize_non_negative(out.elapsed_ms), 2),
                 metrics=normalized_metrics,
@@ -205,12 +232,15 @@ def build_strategy_result(
     ious = [c.metrics.get("iou", 0.0) for c in cases]
     topologies = [c.metrics.get("topology_f1", 0.0) for c in cases]
     success_count = sum(1 for c in cases if c.success)
+    cad_loadable_count = sum(1 for c in cases if c.cad_loadable)
     total = len(cases)
 
     summary = BenchmarkStrategySummary(
         total_cases=total,
         success_count=success_count,
         success_rate=round(success_count / total, 4) if total else 0.0,
+        cad_loadable_count=cad_loadable_count,
+        cad_loadable_rate=round(cad_loadable_count / total, 4) if total else 0.0,
         median_elapsed_ms=round(median(elapsed), 2) if elapsed else 0.0,
         p95_elapsed_ms=round(_p95(elapsed), 2) if elapsed else 0.0,
         mean_iou=round(mean(ious), 4) if ious else 0.0,
@@ -235,6 +265,117 @@ def _composite_score(summary: BenchmarkStrategySummary) -> float:
         + 0.15 * (1 / (1 + max(summary.median_elapsed_ms, 0.0))),
         4,
     )
+
+
+def _build_triad_comparison(
+    strategy_results: list[BenchmarkStrategyResult],
+) -> dict[str, Any]:
+    """정/반/합(Thesis/Antithesis/Synthesis) 핵심 지표 비교를 구성한다."""
+    thesis_name = "two_stage_baseline"
+    antithesis_name = "consensus_qa"
+    synthesis_name = "hybrid_mvp"
+
+    by_name = {result.strategy_name: result for result in strategy_results}
+    missing = [
+        name
+        for name in (thesis_name, antithesis_name, synthesis_name)
+        if name not in by_name
+    ]
+    if missing:
+        return {
+            "available": False,
+            "missing": missing,
+        }
+
+    thesis = by_name[thesis_name].summary
+    antithesis = by_name[antithesis_name].summary
+    synthesis = by_name[synthesis_name].summary
+
+    def delta(target: float, baseline: float, *, ndigits: int = 4) -> float:
+        return round(target - baseline, ndigits)
+
+    best_baseline_rate = max(thesis.cad_loadable_rate, antithesis.cad_loadable_rate)
+    best_baseline_count = max(thesis.cad_loadable_count, antithesis.cad_loadable_count)
+
+    synthesis_ge_thesis = synthesis.cad_loadable_rate >= thesis.cad_loadable_rate
+    synthesis_ge_antithesis = (
+        synthesis.cad_loadable_rate >= antithesis.cad_loadable_rate
+    )
+    synthesis_ge_best_baseline_rate = synthesis.cad_loadable_rate >= best_baseline_rate
+    synthesis_ge_best_baseline_count = synthesis.cad_loadable_count >= best_baseline_count
+
+    return {
+        "available": True,
+        "thesis": thesis_name,
+        "antithesis": antithesis_name,
+        "synthesis": synthesis_name,
+        "cad_loadable_snapshot": {
+            "thesis": {
+                "count": thesis.cad_loadable_count,
+                "rate": thesis.cad_loadable_rate,
+            },
+            "antithesis": {
+                "count": antithesis.cad_loadable_count,
+                "rate": antithesis.cad_loadable_rate,
+            },
+            "synthesis": {
+                "count": synthesis.cad_loadable_count,
+                "rate": synthesis.cad_loadable_rate,
+            },
+        },
+        "cad_loadable_gate": {
+            "synthesis_ge_thesis": synthesis_ge_thesis,
+            "synthesis_ge_antithesis": synthesis_ge_antithesis,
+            "synthesis_ge_best_baseline_rate": synthesis_ge_best_baseline_rate,
+            "synthesis_ge_best_baseline_count": synthesis_ge_best_baseline_count,
+            "passed": (
+                synthesis_ge_thesis
+                and synthesis_ge_antithesis
+                and synthesis_ge_best_baseline_rate
+                and synthesis_ge_best_baseline_count
+            ),
+        },
+        "deltas": {
+            "synthesis_vs_thesis": {
+                "success_rate": delta(synthesis.success_rate, thesis.success_rate),
+                "cad_loadable_count": (
+                    synthesis.cad_loadable_count - thesis.cad_loadable_count
+                ),
+                "cad_loadable_rate": delta(
+                    synthesis.cad_loadable_rate,
+                    thesis.cad_loadable_rate,
+                ),
+                "mean_iou": delta(synthesis.mean_iou, thesis.mean_iou),
+                "mean_topology_f1": delta(
+                    synthesis.mean_topology_f1,
+                    thesis.mean_topology_f1,
+                ),
+                "median_elapsed_ms": round(
+                    synthesis.median_elapsed_ms - thesis.median_elapsed_ms,
+                    2,
+                ),
+            },
+            "synthesis_vs_antithesis": {
+                "success_rate": delta(synthesis.success_rate, antithesis.success_rate),
+                "cad_loadable_count": (
+                    synthesis.cad_loadable_count - antithesis.cad_loadable_count
+                ),
+                "cad_loadable_rate": delta(
+                    synthesis.cad_loadable_rate,
+                    antithesis.cad_loadable_rate,
+                ),
+                "mean_iou": delta(synthesis.mean_iou, antithesis.mean_iou),
+                "mean_topology_f1": delta(
+                    synthesis.mean_topology_f1,
+                    antithesis.mean_topology_f1,
+                ),
+                "median_elapsed_ms": round(
+                    synthesis.median_elapsed_ms - antithesis.median_elapsed_ms,
+                    2,
+                ),
+            },
+        },
+    }
 
 
 def build_report(
@@ -293,6 +434,8 @@ def build_report(
         standards={
             "metric_units": {
                 "success_rate": "ratio_0_1",
+                "cad_loadable_count": "count",
+                "cad_loadable_rate": "ratio_0_1",
                 "median_elapsed_ms": "ms",
                 "p95_elapsed_ms": "ms",
                 "mean_iou": "ratio_0_1",
@@ -306,6 +449,9 @@ def build_report(
                 },
                 "missing_metric_policy": "default_to_0.0",
             },
+        },
+        comparisons={
+            "thesis_antithesis_synthesis": _build_triad_comparison(strategy_results),
         },
         strategies=strategy_results,
         ranking=ranking,

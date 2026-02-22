@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from img2dwg.pipeline.schema import build_report
 from img2dwg.strategies import ConversionInput, ConversionOutput, StrategyRegistry
 
 
-def _to_legacy_dict(out: ConversionOutput) -> dict:
+def _to_legacy_dict(out: ConversionOutput) -> dict[str, Any]:
     return {
         "strategy_name": out.strategy_name,
         "dxf_path": str(out.dxf_path) if out.dxf_path else None,
@@ -18,6 +19,35 @@ def _to_legacy_dict(out: ConversionOutput) -> dict:
     }
 
 
+def _resolve_strategy_names(
+    registry: StrategyRegistry,
+    strategy_names: list[str] | None,
+) -> list[str]:
+    if strategy_names is None:
+        return registry.list_names()
+
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for name in strategy_names:
+        cleaned = name.strip()
+        if not cleaned or cleaned in seen:
+            continue
+        seen.add(cleaned)
+        normalized.append(cleaned)
+
+    # Backward compatibility: empty/blank-only input behaves like default-all.
+    if not normalized:
+        return registry.list_names()
+
+    known_names = set(registry.list_names())
+    unknown = [name for name in normalized if name not in known_names]
+    if unknown:
+        unknown_display = ", ".join(unknown)
+        raise ValueError(f"Unknown strategies requested: {unknown_display}")
+
+    return normalized
+
+
 def run_benchmark(
     image_paths: list[Path],
     registry: StrategyRegistry,
@@ -25,12 +55,12 @@ def run_benchmark(
     strategy_names: list[str] | None = None,
     dataset_id: str = "default",
     git_ref: str = "local",
-) -> dict:
+) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    target_names = strategy_names or registry.list_names()
+    target_names = _resolve_strategy_names(registry, strategy_names)
 
-    legacy_results: dict[str, list[dict]] = {name: [] for name in target_names}
-    outputs_map = {name: [] for name in target_names}
+    legacy_results: dict[str, list[dict[str, Any]]] = {name: [] for name in target_names}
+    outputs_map: dict[str, list[ConversionOutput]] = {name: [] for name in target_names}
 
     for image_path in image_paths:
         conv_input = ConversionInput(image_path=image_path)

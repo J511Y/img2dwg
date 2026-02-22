@@ -47,13 +47,11 @@ def main() -> None:
     registry.register(TwoStageBaselineStrategy())
     registry.register(ConsensusQAStrategy())
 
-    selected = _parse_csv(args.strategies)
-    if not selected:
-        flags = FeatureFlags(
-            enable_high_risk=args.enable_high_risk,
-            high_risk_allowlist=_parse_csv(args.high_risk_allowlist),
-        )
-        selected = registry.get_enabled_names(flags)
+    flags = FeatureFlags(
+        enable_high_risk=args.enable_high_risk,
+        high_risk_allowlist=_parse_csv(args.high_risk_allowlist),
+    )
+    selected = registry.resolve_requested_names(_parse_csv(args.strategies), flags)
 
     if not selected:
         safe = registry.get_safe_default()
