@@ -22,6 +22,7 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="comma-separated strategy names; empty means auto-enabled set",
     )
+    parser.add_argument("--recursive", action="store_true", help="recursively scan image files")
     parser.add_argument("--enable-high-risk", action="store_true")
     parser.add_argument(
         "--high-risk-allowlist",
@@ -38,7 +39,8 @@ def _parse_csv(value: str) -> list[str]:
 
 def main() -> None:
     args = parse_args()
-    image_paths = sorted([p for p in args.images.iterdir() if p.suffix.lower() in {".jpg", ".jpeg", ".png"}])
+    iterator = args.images.rglob("*") if args.recursive else args.images.iterdir()
+    image_paths = sorted([p for p in iterator if p.is_file() and p.suffix.lower() in {".jpg", ".jpeg", ".png"}])
     if not image_paths:
         raise ValueError(f"no image files found in: {args.images}")
 
@@ -51,17 +53,12 @@ def main() -> None:
         enable_high_risk=args.enable_high_risk,
         high_risk_allowlist=_parse_csv(args.high_risk_allowlist),
     )
-    selected = registry.resolve_requested_names(_parse_csv(args.strategies), flags)
-
-    if not selected:
-        safe = registry.get_safe_default()
-        selected = [safe.name]
-
     run_benchmark(
         image_paths=image_paths,
         registry=registry,
         output_dir=args.output,
-        strategy_names=selected,
+        strategy_names=_parse_csv(args.strategies),
+        feature_flags=flags,
         dataset_id=args.dataset_id,
         git_ref=args.git_ref,
     )

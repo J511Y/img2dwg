@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from img2dwg.pipeline.schema import build_report
-from img2dwg.strategies import ConversionInput, ConversionOutput, StrategyRegistry
+from img2dwg.strategies import ConversionInput, ConversionOutput, FeatureFlags, StrategyRegistry
 
 
 def _to_legacy_dict(out: ConversionOutput) -> dict[str, Any]:
@@ -22,30 +22,17 @@ def _to_legacy_dict(out: ConversionOutput) -> dict[str, Any]:
 def _resolve_strategy_names(
     registry: StrategyRegistry,
     strategy_names: list[str] | None,
+    feature_flags: FeatureFlags,
 ) -> list[str]:
-    if strategy_names is None:
-        return registry.list_names()
+    requested_names = strategy_names or []
+    selected = registry.resolve_requested_names(requested_names, feature_flags)
+    if selected:
+        return selected
 
-    normalized: list[str] = []
-    seen: set[str] = set()
-    for name in strategy_names:
-        cleaned = name.strip()
-        if not cleaned or cleaned in seen:
-            continue
-        seen.add(cleaned)
-        normalized.append(cleaned)
-
-    # Backward compatibility: empty/blank-only input behaves like default-all.
-    if not normalized:
-        return registry.list_names()
-
-    known_names = set(registry.list_names())
-    unknown = [name for name in normalized if name not in known_names]
-    if unknown:
-        unknown_display = ", ".join(unknown)
-        raise ValueError(f"Unknown strategies requested: {unknown_display}")
-
-    return normalized
+    # Keep benchmark runnable even when the enabled set is empty by falling back
+    # to one safe strategy (matches CLI behavior).
+    safe = registry.get_safe_default()
+    return [safe.name]
 
 
 def run_benchmark(
@@ -53,11 +40,13 @@ def run_benchmark(
     registry: StrategyRegistry,
     output_dir: Path,
     strategy_names: list[str] | None = None,
+    feature_flags: FeatureFlags | None = None,
     dataset_id: str = "default",
     git_ref: str = "local",
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    target_names = _resolve_strategy_names(registry, strategy_names)
+    flags = feature_flags or FeatureFlags()
+    target_names = _resolve_strategy_names(registry, strategy_names, flags)
 
     legacy_results: dict[str, list[dict[str, Any]]] = {name: [] for name in target_names}
     outputs_map: dict[str, list[ConversionOutput]] = {name: [] for name in target_names}
