@@ -287,9 +287,13 @@ def _build_triad_comparison(
             "missing": missing,
         }
 
-    thesis = by_name[thesis_name].summary
-    antithesis = by_name[antithesis_name].summary
-    synthesis = by_name[synthesis_name].summary
+    thesis_result = by_name[thesis_name]
+    antithesis_result = by_name[antithesis_name]
+    synthesis_result = by_name[synthesis_name]
+
+    thesis = thesis_result.summary
+    antithesis = antithesis_result.summary
+    synthesis = synthesis_result.summary
 
     def delta(target: float, baseline: float, *, ndigits: int = 4) -> float:
         return round(target - baseline, ndigits)
@@ -303,6 +307,51 @@ def _build_triad_comparison(
     )
     synthesis_ge_best_baseline_rate = synthesis.cad_loadable_rate >= best_baseline_rate
     synthesis_ge_best_baseline_count = synthesis.cad_loadable_count >= best_baseline_count
+
+    thesis_case_map = {case.case_id: case.cad_loadable for case in thesis_result.cases}
+    antithesis_case_map = {
+        case.case_id: case.cad_loadable for case in antithesis_result.cases
+    }
+    synthesis_case_map = {case.case_id: case.cad_loadable for case in synthesis_result.cases}
+
+    aligned_case_ids = [
+        case.case_id
+        for case in thesis_result.cases
+        if case.case_id in antithesis_case_map and case.case_id in synthesis_case_map
+    ]
+
+    synthesis_rescue_vs_thesis = 0
+    synthesis_rescue_vs_antithesis = 0
+    synthesis_rescue_vs_both_baselines = 0
+    synthesis_regression_vs_thesis = 0
+    synthesis_regression_vs_antithesis = 0
+    synthesis_regression_vs_either_baseline = 0
+    all_three_loadable = 0
+    all_three_unloadable = 0
+
+    for case_id in aligned_case_ids:
+        thesis_loadable = thesis_case_map[case_id]
+        antithesis_loadable = antithesis_case_map[case_id]
+        synthesis_loadable = synthesis_case_map[case_id]
+
+        if synthesis_loadable and not thesis_loadable:
+            synthesis_rescue_vs_thesis += 1
+        if synthesis_loadable and not antithesis_loadable:
+            synthesis_rescue_vs_antithesis += 1
+        if synthesis_loadable and not thesis_loadable and not antithesis_loadable:
+            synthesis_rescue_vs_both_baselines += 1
+
+        if not synthesis_loadable and thesis_loadable:
+            synthesis_regression_vs_thesis += 1
+        if not synthesis_loadable and antithesis_loadable:
+            synthesis_regression_vs_antithesis += 1
+        if not synthesis_loadable and (thesis_loadable or antithesis_loadable):
+            synthesis_regression_vs_either_baseline += 1
+
+        if thesis_loadable and antithesis_loadable and synthesis_loadable:
+            all_three_loadable += 1
+        if not thesis_loadable and not antithesis_loadable and not synthesis_loadable:
+            all_three_unloadable += 1
 
     return {
         "available": True,
@@ -334,6 +383,21 @@ def _build_triad_comparison(
                 and synthesis_ge_best_baseline_rate
                 and synthesis_ge_best_baseline_count
             ),
+        },
+        "casewise_cad_loadable": {
+            "aligned_case_count": len(aligned_case_ids),
+            "all_three_loadable_count": all_three_loadable,
+            "all_three_unloadable_count": all_three_unloadable,
+            "synthesis_rescue": {
+                "vs_thesis_count": synthesis_rescue_vs_thesis,
+                "vs_antithesis_count": synthesis_rescue_vs_antithesis,
+                "vs_both_baselines_count": synthesis_rescue_vs_both_baselines,
+            },
+            "synthesis_regression": {
+                "vs_thesis_count": synthesis_regression_vs_thesis,
+                "vs_antithesis_count": synthesis_regression_vs_antithesis,
+                "vs_either_baseline_count": synthesis_regression_vs_either_baseline,
+            },
         },
         "deltas": {
             "synthesis_vs_thesis": {

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
 from img2dwg.pipeline.schema import build_report
-from img2dwg.strategies import ConversionInput, ConversionOutput, StrategyRegistry
+from img2dwg.strategies import ConversionInput, ConversionOutput, FeatureFlags, StrategyRegistry
 
 
 def _to_legacy_dict(out: ConversionOutput) -> dict[str, Any]:
@@ -22,30 +23,115 @@ def _to_legacy_dict(out: ConversionOutput) -> dict[str, Any]:
 def _resolve_strategy_names(
     registry: StrategyRegistry,
     strategy_names: list[str] | None,
+    feature_flags: FeatureFlags,
 ) -> list[str]:
-    if strategy_names is None:
-        return registry.list_names()
+    requested_names = strategy_names or []
+    selected = registry.resolve_requested_names(requested_names, feature_flags)
+    if selected:
+        return selected
 
-    normalized: list[str] = []
-    seen: set[str] = set()
-    for name in strategy_names:
-        cleaned = name.strip()
-        if not cleaned or cleaned in seen:
+    # Keep benchmark runnable even when the enabled set is empty by falling back
+    # to one safe strategy (matches CLI behavior).
+    safe = registry.get_safe_default()
+    return [safe.name]
+
+
+def _build_final_summary(report: dict[str, Any]) -> dict[str, Any]:
+    ranking_raw = report.get("ranking")
+    ranking = ranking_raw if isinstance(ranking_raw, list) else []
+
+    ranking_by_name: dict[str, dict[str, Any]] = {}
+    for entry in ranking:
+        if not isinstance(entry, Mapping):
             continue
-        seen.add(cleaned)
-        normalized.append(cleaned)
+        name = str(entry.get("strategy_name", ""))
+        if not name:
+            continue
+        ranking_by_name[name] = {
+            "rank": entry.get("rank"),
+            "composite_score": entry.get("composite_score"),
+        }
 
-    # Backward compatibility: empty/blank-only input behaves like default-all.
-    if not normalized:
-        return registry.list_names()
+    winner: dict[str, Any] | None = None
+    if ranking and isinstance(ranking[0], Mapping):
+        top = ranking[0]
+        winner_name = str(top.get("strategy_name", ""))
+        if winner_name:
+            winner = {
+                "strategy_name": winner_name,
+                "rank": top.get("rank"),
+                "composite_score": top.get("composite_score"),
+            }
 
-    known_names = set(registry.list_names())
-    unknown = [name for name in normalized if name not in known_names]
-    if unknown:
-        unknown_display = ", ".join(unknown)
-        raise ValueError(f"Unknown strategies requested: {unknown_display}")
+    strategies_raw = report.get("strategies")
+    strategies = strategies_raw if isinstance(strategies_raw, list) else []
+    rows: list[dict[str, Any]] = []
+    for strategy in strategies:
+        if not isinstance(strategy, Mapping):
+            continue
+        strategy_name = str(strategy.get("strategy_name", ""))
+        if not strategy_name:
+            continue
 
-    return normalized
+        summary_raw = strategy.get("summary")
+        summary = summary_raw if isinstance(summary_raw, Mapping) else {}
+        ranking_info = ranking_by_name.get(strategy_name, {})
+
+        rows.append(
+            {
+                "strategy_name": strategy_name,
+                "rank": ranking_info.get("rank"),
+                "composite_score": ranking_info.get("composite_score"),
+                "success_rate": summary.get("success_rate", 0.0),
+                "cad_loadable_count": summary.get("cad_loadable_count", 0),
+                "cad_loadable_rate": summary.get("cad_loadable_rate", 0.0),
+                "mean_iou": summary.get("mean_iou", 0.0),
+                "mean_topology_f1": summary.get("mean_topology_f1", 0.0),
+                "median_elapsed_ms": summary.get("median_elapsed_ms", 0.0),
+                "p95_elapsed_ms": summary.get("p95_elapsed_ms", 0.0),
+            }
+        )
+
+    def _rank_key(item: dict[str, Any]) -> tuple[int, str]:
+        rank = item.get("rank")
+        if isinstance(rank, int):
+            return (rank, item["strategy_name"])
+        return (10**9, item["strategy_name"])
+
+    rows.sort(key=_rank_key)
+
+    comparisons_raw = report.get("comparisons")
+    comparisons = comparisons_raw if isinstance(comparisons_raw, Mapping) else {}
+    triad_raw = comparisons.get("thesis_antithesis_synthesis")
+    triad = triad_raw if isinstance(triad_raw, Mapping) else {}
+
+    gate_raw = triad.get("cad_loadable_gate")
+    gate = gate_raw if isinstance(gate_raw, Mapping) else {}
+    available = bool(triad.get("available", False))
+
+    missing_raw = triad.get("missing")
+    missing = [str(name) for name in missing_raw] if isinstance(missing_raw, list) else []
+
+    run_raw = report.get("run")
+    run = run_raw if isinstance(run_raw, Mapping) else {}
+
+    return {
+        "summary_schema_version": 1,
+        "source_schema_version": report.get("schema_version"),
+        "run": {
+            "run_id": run.get("run_id"),
+            "dataset_id": run.get("dataset_id"),
+            "git_ref": run.get("git_ref"),
+            "generated_at": run.get("generated_at"),
+        },
+        "winner": winner,
+        "triad_gate": {
+            "available": available,
+            "passed": gate.get("passed") if available else None,
+            "missing": missing,
+        },
+        "strategies": rows,
+    }
 
 
 def run_benchmark(
@@ -53,11 +139,13 @@ def run_benchmark(
     registry: StrategyRegistry,
     output_dir: Path,
     strategy_names: list[str] | None = None,
+    feature_flags: FeatureFlags | None = None,
     dataset_id: str = "default",
     git_ref: str = "local",
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    target_names = _resolve_strategy_names(registry, strategy_names)
+    flags = feature_flags or FeatureFlags()
+    target_names = _resolve_strategy_names(registry, strategy_names, flags)
 
     legacy_results: dict[str, list[dict[str, Any]]] = {name: [] for name in target_names}
     outputs_map: dict[str, list[ConversionOutput]] = {name: [] for name in target_names}
@@ -83,4 +171,11 @@ def run_benchmark(
         json.dumps(serialized, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+
+    summary = _build_final_summary(serialized)
+    (output_dir / "benchmark_summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
     return serialized

@@ -1,13 +1,20 @@
+import json
 import math
 from pathlib import Path
+from typing import Any, cast
 
 import ezdxf
 import pytest
 
-from img2dwg.pipeline.benchmark import run_benchmark
+from img2dwg.pipeline.benchmark import _build_final_summary, run_benchmark
 from img2dwg.pipeline.schema import build_strategy_result
 from img2dwg.strategies.base import ConversionInput, ConversionOutput, ConversionStrategy
-from img2dwg.strategies.registry import StrategyRegistry
+from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
+
+
+def _load_summary_payload(output_dir: Path) -> dict[str, Any]:
+    summary_file = output_dir / "benchmark_summary.json"
+    return cast(dict[str, Any], json.loads(summary_file.read_text(encoding="utf-8")))
 
 
 class SuccessStrategy(ConversionStrategy):
@@ -23,6 +30,11 @@ class SuccessStrategy(ConversionStrategy):
             metrics={"iou": 0.9, "topology_f1": 0.8},
             notes=[],
         )
+
+
+class HighRiskSuccessStrategy(SuccessStrategy):
+    name = "high_risk_success"
+    risk_tier = "high"
 
 
 class FastLowQualityStrategy(ConversionStrategy):
@@ -217,6 +229,156 @@ def test_run_benchmark_returns_v2_schema(tmp_path: Path) -> None:
     assert result["strategies"][0]["summary"]["success_rate"] == 1.0
     assert result["strategies"][0]["summary"]["cad_loadable_rate"] == 0.0
     assert result["ranking"][0]["strategy_name"] == "success"
+
+    summary_file = tmp_path / "out" / "benchmark_summary.json"
+    assert summary_file.exists()
+
+    summary_payload = json.loads(summary_file.read_text(encoding="utf-8"))
+    assert summary_payload["summary_schema_version"] == 1
+    assert summary_payload["source_schema_version"] == 2
+    assert summary_payload["run"]["dataset_id"] == "unit"
+    assert summary_payload["winner"] == {
+        "strategy_name": "success",
+        "rank": 1,
+        "composite_score": result["ranking"][0]["composite_score"],
+    }
+    assert summary_payload["triad_gate"] == {
+        "available": False,
+        "passed": None,
+        "missing": [
+            "two_stage_baseline",
+            "consensus_qa",
+            "hybrid_mvp",
+        ],
+    }
+    assert len(summary_payload["strategies"]) == 1
+    strategy_row = summary_payload["strategies"][0]
+    assert strategy_row["strategy_name"] == "success"
+    assert strategy_row["rank"] == 1
+    assert strategy_row["composite_score"] == result["ranking"][0]["composite_score"]
+    assert strategy_row["success_rate"] == 1.0
+    assert strategy_row["cad_loadable_count"] == 0
+    assert strategy_row["cad_loadable_rate"] == 0.0
+    assert strategy_row["mean_iou"] == 0.9
+    assert strategy_row["mean_topology_f1"] == 0.8
+    assert strategy_row["median_elapsed_ms"] >= 0.0
+    assert strategy_row["p95_elapsed_ms"] >= 0.0
+
+
+def test_run_benchmark_summary_fields_match_results_payload(tmp_path: Path) -> None:
+    img1 = tmp_path / "a.png"
+    img2 = tmp_path / "b.png"
+    img1.write_bytes(b"fake")
+    img2.write_bytes(b"fake")
+
+    reg = StrategyRegistry()
+    reg.register(FastLowQualityStrategy())
+    reg.register(SlowHighQualityStrategy())
+
+    out_dir = tmp_path / "out-summary-consistency"
+    result = run_benchmark(
+        image_paths=[img1, img2],
+        registry=reg,
+        output_dir=out_dir,
+        dataset_id="summary-consistency",
+        git_ref="test",
+    )
+
+    summary_payload = _load_summary_payload(out_dir)
+
+    ranking_by_name = {
+        entry["strategy_name"]: entry
+        for entry in result["ranking"]
+    }
+    results_summary_by_name = {
+        strategy["strategy_name"]: strategy["summary"]
+        for strategy in result["strategies"]
+    }
+
+    run_info = summary_payload["run"]
+    assert isinstance(run_info, dict)
+    assert run_info == result["run"]
+
+    winner = summary_payload["winner"]
+    assert winner == {
+        "strategy_name": result["ranking"][0]["strategy_name"],
+        "rank": result["ranking"][0]["rank"],
+        "composite_score": result["ranking"][0]["composite_score"],
+    }
+
+    summary_rows = summary_payload["strategies"]
+    assert isinstance(summary_rows, list)
+    assert [row["rank"] for row in summary_rows] == sorted(
+        entry["rank"] for entry in result["ranking"]
+    )
+
+    for row in summary_rows:
+        strategy_name = row["strategy_name"]
+        rank_entry = ranking_by_name[strategy_name]
+        source_summary = results_summary_by_name[strategy_name]
+
+        assert row["rank"] == rank_entry["rank"]
+        assert row["composite_score"] == rank_entry["composite_score"]
+        assert row["success_rate"] == source_summary["success_rate"]
+        assert row["cad_loadable_count"] == source_summary["cad_loadable_count"]
+        assert row["cad_loadable_rate"] == source_summary["cad_loadable_rate"]
+        assert row["mean_iou"] == source_summary["mean_iou"]
+        assert row["mean_topology_f1"] == source_summary["mean_topology_f1"]
+        assert row["median_elapsed_ms"] == source_summary["median_elapsed_ms"]
+        assert row["p95_elapsed_ms"] == source_summary["p95_elapsed_ms"]
+
+
+def test_build_final_summary_allows_nullable_winner_and_sorts_unranked_rows() -> None:
+    report = {
+        "schema_version": 2,
+        "run": {
+            "run_id": "r1",
+            "dataset_id": "unit",
+            "git_ref": "test",
+            "generated_at": "2026-02-24T00:00:00Z",
+        },
+        "ranking": [
+            {
+                "strategy_name": "",
+                "rank": 1,
+                "composite_score": 0.99,
+            },
+            {
+                "strategy_name": "gamma",
+                "rank": 1,
+                "composite_score": 0.95,
+            },
+        ],
+        "strategies": [
+            {
+                "strategy_name": "beta",
+                "summary": {"success_rate": 0.3},
+            },
+            {
+                "strategy_name": "alpha",
+                "summary": {"success_rate": 0.2},
+            },
+            {
+                "strategy_name": "gamma",
+                "summary": {"success_rate": 0.4},
+            },
+        ],
+        "comparisons": {
+            "thesis_antithesis_synthesis": {
+                "available": False,
+                "missing": ["two_stage_baseline"],
+            }
+        },
+    }
+
+    summary = _build_final_summary(report)
+
+    assert summary["winner"] is None
+    assert [row["strategy_name"] for row in summary["strategies"]] == [
+        "gamma",
+        "alpha",
+        "beta",
+    ]
 
 
 def test_run_benchmark_ranking_prefers_quality_when_success_equal(tmp_path: Path) -> None:
@@ -533,6 +695,44 @@ def test_run_benchmark_normalizes_strategy_names(tmp_path: Path) -> None:
     assert [strategy["strategy_name"] for strategy in result["strategies"]] == ["success"]
 
 
+def test_run_benchmark_blocks_high_risk_strategy_without_allowlist(tmp_path: Path) -> None:
+    img = tmp_path / "a.png"
+    img.write_bytes(b"fake")
+
+    reg = StrategyRegistry()
+    reg.register(HighRiskSuccessStrategy())
+
+    with pytest.raises(ValueError, match="Blocked strategies by feature flags: high_risk_success"):
+        run_benchmark(
+            image_paths=[img],
+            registry=reg,
+            output_dir=tmp_path / "out-high-risk-blocked",
+            strategy_names=["high_risk_success"],
+            dataset_id="high-risk-blocked",
+            git_ref="test",
+        )
+
+
+def test_run_benchmark_allows_allowlisted_high_risk_strategy(tmp_path: Path) -> None:
+    img = tmp_path / "a.png"
+    img.write_bytes(b"fake")
+
+    reg = StrategyRegistry()
+    reg.register(HighRiskSuccessStrategy())
+
+    result = run_benchmark(
+        image_paths=[img],
+        registry=reg,
+        output_dir=tmp_path / "out-high-risk-allowlisted",
+        strategy_names=["high_risk_success"],
+        feature_flags=FeatureFlags(enable_high_risk=True, high_risk_allowlist=["high_risk_success"]),
+        dataset_id="high-risk-allowlisted",
+        git_ref="test",
+    )
+
+    assert [strategy["strategy_name"] for strategy in result["strategies"]] == ["high_risk_success"]
+
+
 def test_build_strategy_result_raises_on_length_mismatch(tmp_path: Path) -> None:
     img = tmp_path / "a.png"
     img.write_bytes(b"fake")
@@ -580,6 +780,21 @@ def test_run_benchmark_adds_triad_comparison_when_all_present(tmp_path: Path) ->
         "synthesis_ge_best_baseline_count": True,
         "passed": True,
     }
+    assert triad["casewise_cad_loadable"] == {
+        "aligned_case_count": 1,
+        "all_three_loadable_count": 0,
+        "all_three_unloadable_count": 1,
+        "synthesis_rescue": {
+            "vs_thesis_count": 0,
+            "vs_antithesis_count": 0,
+            "vs_both_baselines_count": 0,
+        },
+        "synthesis_regression": {
+            "vs_thesis_count": 0,
+            "vs_antithesis_count": 0,
+            "vs_either_baseline_count": 0,
+        },
+    }
     assert triad["deltas"]["synthesis_vs_thesis"] == {
         "success_rate": 0.0,
         "cad_loadable_count": 0,
@@ -595,6 +810,13 @@ def test_run_benchmark_adds_triad_comparison_when_all_present(tmp_path: Path) ->
         "mean_iou": 0.1,
         "mean_topology_f1": 0.07,
         "median_elapsed_ms": -1.0,
+    }
+
+    summary_payload = _load_summary_payload(tmp_path / "out-triad")
+    assert summary_payload["triad_gate"] == {
+        "available": True,
+        "passed": True,
+        "missing": [],
     }
 
 
@@ -677,8 +899,122 @@ def test_run_benchmark_triad_comparison_tracks_cad_loadable_gate(tmp_path: Path)
         "synthesis_ge_best_baseline_count": False,
         "passed": False,
     }
+    assert triad["casewise_cad_loadable"] == {
+        "aligned_case_count": 1,
+        "all_three_loadable_count": 0,
+        "all_three_unloadable_count": 0,
+        "synthesis_rescue": {
+            "vs_thesis_count": 0,
+            "vs_antithesis_count": 0,
+            "vs_both_baselines_count": 0,
+        },
+        "synthesis_regression": {
+            "vs_thesis_count": 1,
+            "vs_antithesis_count": 1,
+            "vs_either_baseline_count": 1,
+        },
+    }
     assert triad["deltas"]["synthesis_vs_thesis"]["cad_loadable_count"] == -1
     assert triad["deltas"]["synthesis_vs_antithesis"]["cad_loadable_count"] == -1
+
+    summary_payload = _load_summary_payload(tmp_path / "out-triad-loadability")
+    assert summary_payload["triad_gate"] == {
+        "available": True,
+        "passed": False,
+        "missing": [],
+    }
+
+
+def test_run_benchmark_triad_casewise_reports_rescue_and_regression(tmp_path: Path) -> None:
+    def write_dxf(path: Path, *, loadable: bool) -> None:
+        if loadable:
+            ezdxf.new("R2018", setup=True).saveas(str(path))
+            return
+        path.write_text("broken", encoding="utf-8")
+
+    class SplitLoadableThesisStrategy(ConversionStrategy):
+        name = "two_stage_baseline"
+
+        def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
+            write_dxf(dxf_path, loadable=conv_input.image_path.stem == "a")
+            return ConversionOutput(
+                strategy_name=self.name,
+                dxf_path=dxf_path,
+                success=True,
+                elapsed_ms=10.0,
+                metrics={"iou": 0.6, "topology_f1": 0.6},
+                notes=[],
+            )
+
+    class SplitLoadableAntithesisStrategy(ConversionStrategy):
+        name = "consensus_qa"
+
+        def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
+            write_dxf(dxf_path, loadable=conv_input.image_path.stem == "b")
+            return ConversionOutput(
+                strategy_name=self.name,
+                dxf_path=dxf_path,
+                success=True,
+                elapsed_ms=12.0,
+                metrics={"iou": 0.6, "topology_f1": 0.6},
+                notes=[],
+            )
+
+    class SplitLoadableSynthesisStrategy(ConversionStrategy):
+        name = "hybrid_mvp"
+
+        def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
+            write_dxf(dxf_path, loadable=conv_input.image_path.stem == "c")
+            return ConversionOutput(
+                strategy_name=self.name,
+                dxf_path=dxf_path,
+                success=True,
+                elapsed_ms=11.0,
+                metrics={"iou": 0.6, "topology_f1": 0.6},
+                notes=[],
+            )
+
+    image_paths = [tmp_path / "a.png", tmp_path / "b.png", tmp_path / "c.png"]
+    for image in image_paths:
+        image.write_bytes(b"fake")
+
+    reg = StrategyRegistry()
+    reg.register(SplitLoadableThesisStrategy())
+    reg.register(SplitLoadableAntithesisStrategy())
+    reg.register(SplitLoadableSynthesisStrategy())
+
+    result = run_benchmark(
+        image_paths=image_paths,
+        registry=reg,
+        output_dir=tmp_path / "out-triad-casewise",
+        dataset_id="triad-casewise",
+        git_ref="test",
+    )
+
+    triad = result["comparisons"]["thesis_antithesis_synthesis"]
+
+    assert triad["cad_loadable_gate"]["passed"] is True
+    assert triad["casewise_cad_loadable"] == {
+        "aligned_case_count": 3,
+        "all_three_loadable_count": 0,
+        "all_three_unloadable_count": 0,
+        "synthesis_rescue": {
+            "vs_thesis_count": 1,
+            "vs_antithesis_count": 1,
+            "vs_both_baselines_count": 1,
+        },
+        "synthesis_regression": {
+            "vs_thesis_count": 1,
+            "vs_antithesis_count": 1,
+            "vs_either_baseline_count": 2,
+        },
+    }
 
 
 def test_run_benchmark_marks_triad_comparison_unavailable_when_missing(tmp_path: Path) -> None:
