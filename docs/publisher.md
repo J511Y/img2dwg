@@ -34,10 +34,13 @@ uv run --frozen --extra web python scripts/web_gradio.py --host 127.0.0.1 --port
 
 - `--host`: 바인딩 주소 (기본 `127.0.0.1`)
 - `--port`: 포트 (기본 `7860`)
+- `--allow-remote`: non-loopback host(예: `0.0.0.0`, 사내 IP) 바인딩을 명시적으로 허용
 - `--output-root`: 결과 저장 경로 (기본 `output/web`, 상대 경로는 프로젝트 루트 기준으로 고정 해석)
 - `--share`: Gradio share URL 사용
 
 > 실행 전 포트 사용 여부를 사전 점검합니다. 이미 점유된 포트면 즉시 에러를 반환합니다.
+>
+> 또한 loopback이 아닌 host에 바인딩하려면 `--allow-remote`를 함께 지정해야 합니다.
 
 ### 스모크 테스트
 
@@ -67,11 +70,14 @@ uv run --frozen --extra web python scripts/web_streamlit.py --host 127.0.0.1 --p
 
 - `--host`: 바인딩 주소 (기본 `127.0.0.1`)
 - `--port`: 포트 (기본 `8501`)
+- `--allow-remote`: non-loopback host(예: `0.0.0.0`, 사내 IP) 바인딩을 명시적으로 허용
 - `--output-root`: 결과 저장 경로 (기본 `output/web-streamlit`, 상대 경로는 프로젝트 루트 기준으로 고정 해석)
 - `--smoke-log-lines`: 스모크 실패 시 출력할 Streamlit 로그 tail 라인 수 (기본 `80`)
 - `--smoke-keep-log`: 스모크 성공 시에도 임시 로그 파일 유지
 
 > 실행 전 포트 사용 여부를 사전 점검합니다. 이미 점유된 포트면 즉시 에러를 반환합니다.
+>
+> 또한 loopback이 아닌 host에 바인딩하려면 `--allow-remote`를 함께 지정해야 합니다.
 
 ### 스모크 테스트
 
@@ -160,14 +166,24 @@ uv run --frozen --extra web python scripts/smoke_web_publishers.py --cleanup-dry
 
 ## 5) 외부 기기에서 접근 (LAN 테스트)
 
-같은 네트워크의 다른 기기에서 접속해야 하면 host를 `0.0.0.0`으로 실행합니다.
+같은 네트워크의 다른 기기에서 접속해야 하면 host를 `0.0.0.0`으로 실행하고,
+반드시 `--allow-remote`로 의도적인 노출을 명시해야 합니다.
 
 ```bash
 # Gradio
-uv run --frozen --extra web python scripts/web_gradio.py --host 0.0.0.0 --port 7860
+uv run --frozen --extra web python scripts/web_gradio.py \
+  --host 0.0.0.0 --port 7860 --allow-remote
 
 # Streamlit
-uv run --frozen --extra web python scripts/web_streamlit.py --host 0.0.0.0 --port 8501
+uv run --frozen --extra web python scripts/web_streamlit.py \
+  --host 0.0.0.0 --port 8501 --allow-remote
+```
+
+통합 스모크에서도 동일하게 `--allow-remote`를 전달합니다.
+
+```bash
+uv run --frozen --extra web python scripts/smoke_web_publishers.py \
+  --host 0.0.0.0 --allow-remote
 ```
 
 이후 `http://<실행머신-IP>:포트`로 접근하세요.
@@ -201,7 +217,19 @@ uv run --frozen --extra web python scripts/web_streamlit.py --port 8505
 4. `--smoke-timeout-seconds` 값을 늘려 재시도
 5. Streamlit 실패 시 로그 tail 확인 (`--smoke-log-lines`)
 
-### Q4. DXF 생성 실패
+### Q4. `Refusing non-loopback host binding...` 에러가 발생합니다
+
+원격 노출 의도를 명시하지 않은 상태에서 non-loopback host를 지정한 경우입니다.
+
+```bash
+# 예: LAN 공개가 필요한 경우
+uv run --frozen --extra web python scripts/web_streamlit.py \
+  --host 0.0.0.0 --allow-remote
+```
+
+로컬에서만 테스트한다면 `--host 127.0.0.1`을 유지하는 것이 안전합니다.
+
+### Q5. DXF 생성 실패
 
 - Strategy 실행 중 오류가 난 경우 Summary의 Notes 확인
 - 입력 이미지 업로드 확인

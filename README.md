@@ -93,6 +93,8 @@ uv run --frozen --extra web python scripts/web_gradio.py --host 127.0.0.1 --port
 uv run --frozen --extra web python scripts/web_streamlit.py --host 127.0.0.1 --port 8501
 ```
 
+> 보안 기본값: non-loopback host(예: `0.0.0.0`) 바인딩 시 `--allow-remote`를 명시해야 실행됩니다.
+
 통합 스모크 테스트:
 
 ```bash
