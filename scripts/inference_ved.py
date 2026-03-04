@@ -14,7 +14,7 @@ from PIL import Image
 from torchvision import transforms
 
 from img2dwg.utils.logger import get_logger, setup_logging
-from img2dwg.ved.config import InferenceConfig
+from img2dwg.ved.config import InferenceConfig, resolve_inference_max_length
 from img2dwg.ved.model import VEDModel
 from img2dwg.ved.utils import get_device, validate_json
 
@@ -50,7 +50,10 @@ def parse_args():
         "--max-length",
         type=int,
         default=None,
-        help="최대 생성 길이 (기본: 모델 설정)",
+        help=(
+            "최대 생성 길이. 미지정 시 체크포인트 학습 메타데이터의 max_length를 사용하고, "
+            "메타데이터가 없으면 VEDConfig 기본값(131072)으로 fallback"
+        ),
     )
     return parser.parse_args()
 
@@ -76,10 +79,30 @@ def main():
     # 모델 로드
     logger.info("모델 로드 중...")
     config = InferenceConfig(model_path=args.model_path)
+
+    try:
+        length_resolution = resolve_inference_max_length(
+            model_path=args.model_path,
+            cli_max_length=args.max_length,
+        )
+    except ValueError as exc:
+        logger.error(f"Invalid --max-length: {exc}")
+        raise SystemExit(2) from exc
+
+    config.max_length = length_resolution.value
+    logger.info(
+        "max_length=%s (source=%s, training=%s)",
+        length_resolution.value,
+        length_resolution.source,
+        length_resolution.training_value,
+    )
+    for warning in length_resolution.warnings:
+        logger.warning(warning)
+
     model = VEDModel.from_pretrained(args.model_path, config=config)
     model = model.to(device)
     model.eval()
-    
+
     logger.info("✅ 모델 로드 완료")
     
     # 이미지 로드 및 전처리
@@ -102,7 +125,7 @@ def main():
     with torch.no_grad():
         generated_ids = model.generate(
             pixel_values=pixel_values,
-            max_length=args.max_length or config.max_length,
+            max_length=config.max_length,
             num_beams=args.num_beams,
             temperature=config.temperature,
             top_k=config.top_k,
@@ -117,7 +140,21 @@ def main():
     )
     
     logger.info("✅ 추론 완료")
-    
+
+    generated_tokens = int(generated_ids.shape[-1])
+    reached_max_length = generated_tokens >= config.max_length
+    logger.info(
+        "generated_tokens=%s / max_length=%s (reached_limit=%s)",
+        generated_tokens,
+        config.max_length,
+        reached_max_length,
+    )
+    if reached_max_length:
+        logger.warning(
+            "Generation reached max_length boundary; output may be truncated. "
+            "Increase --max-length only after memory validation."
+        )
+
     # JSON 검증
     if validate_json(generated_text):
         logger.info("✅ 유효한 JSON 생성")

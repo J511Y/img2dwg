@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from img2dwg.utils.logger import get_logger, setup_logging
-from img2dwg.ved.config import VEDConfig
+from img2dwg.ved.config import VEDConfig, write_training_metadata
 from img2dwg.ved.dataset import ImageToJSONDataset, collate_fn
 from img2dwg.ved.model import VEDModel
 from img2dwg.ved.tokenizer import CADTokenizer
@@ -125,9 +125,11 @@ def main():
     # 학습 루프
     best_val_loss = float("inf")
     global_step = 0
-    
+
     config.output_dir.mkdir(parents=True, exist_ok=True)
-    
+    metadata_path = write_training_metadata(config, config.output_dir)
+    logger.info(f"Training max_length metadata saved: {metadata_path}")
+
     for epoch in range(config.num_epochs):
         logger.info(f"\n{'=' * 80}")
         logger.info(f"Epoch {epoch + 1}/{config.num_epochs}")
@@ -203,12 +205,14 @@ def main():
             best_val_loss = avg_val_loss
             best_model_path = config.output_dir / "best"
             model.save_pretrained(best_model_path)
+            write_training_metadata(config, best_model_path)
             logger.info(f"✅ Best model saved: {best_model_path} (val_loss={avg_val_loss:.4f})")
         
         # 주기적 체크포인트
         if (epoch + 1) % 10 == 0:
             checkpoint_path = config.output_dir / f"checkpoint-epoch-{epoch + 1}"
             model.save_pretrained(checkpoint_path)
+            write_training_metadata(config, checkpoint_path)
             logger.info(f"Checkpoint saved: {checkpoint_path}")
     
     logger.info("\n" + "=" * 80)
