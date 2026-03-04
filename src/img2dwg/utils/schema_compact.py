@@ -1,6 +1,7 @@
 """Compact 스키마 변환 유틸리티."""
 
-from typing import Any, Dict, List, Optional, Tuple
+import math
+from typing import Any
 
 
 class CompactSchemaConverter:
@@ -47,11 +48,11 @@ class CompactSchemaConverter:
             use_local_coords: 로컬 좌표계 사용 여부
         """
         self.use_local_coords = use_local_coords
-        self.layer_table: List[str] = []
-        self.linetype_table: List[str] = []
-        self.origin: Optional[Tuple[float, float]] = None
+        self.layer_table: list[str] = []
+        self.linetype_table: list[str] = []
+        self.origin: tuple[float, float] | None = None
 
-    def compact(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def compact(self, data: dict[str, Any]) -> dict[str, Any]:
         """
         JSON 데이터를 compact 형태로 변환한다.
 
@@ -67,8 +68,11 @@ class CompactSchemaConverter:
         self._build_tables(entities)
 
         # 2단계: 로컬 좌표계 원점 계산
+        self.origin = None
         if self.use_local_coords:
-            self.origin = self._calculate_origin(entities)
+            calculated_origin = self._calculate_origin(entities)
+            if calculated_origin is not None and self._is_finite_origin(calculated_origin):
+                self.origin = calculated_origin
 
         # 3단계: 엔티티 변환
         compact_entities = [self._compact_entity(e) for e in entities]
@@ -88,12 +92,12 @@ class CompactSchemaConverter:
             result["ltt"] = self.linetype_table
 
         # 원점 추가
-        if self.origin:
+        if self.origin is not None:
             result["o"] = list(self.origin)
 
         return result
 
-    def expand(self, compact_data: Dict[str, Any]) -> Dict[str, Any]:
+    def expand(self, compact_data: dict[str, Any]) -> dict[str, Any]:
         """
         Compact 형태를 원래 JSON으로 복원한다.
 
@@ -106,7 +110,7 @@ class CompactSchemaConverter:
         # 테이블 복원
         self.layer_table = compact_data.get("lt", [])
         self.linetype_table = compact_data.get("ltt", [])
-        self.origin = tuple(compact_data["o"]) if "o" in compact_data else None
+        self.origin = self._normalize_origin(compact_data.get("o"))
 
         # 메타데이터 복원
         metadata = self._expand_metadata(compact_data.get("m", {}))
@@ -119,7 +123,7 @@ class CompactSchemaConverter:
             "entities": entities,
         }
 
-    def _build_tables(self, entities: List[Dict[str, Any]]) -> None:
+    def _build_tables(self, entities: list[dict[str, Any]]) -> None:
         """레이어 및 리네타입 테이블을 생성한다."""
         layers = set()
         linetypes = set()
@@ -130,13 +134,32 @@ class CompactSchemaConverter:
             if "linetype" in entity:
                 linetypes.add(entity["linetype"])
 
-        self.layer_table = sorted(list(layers))
-        self.linetype_table = sorted(list(linetypes))
+        self.layer_table = sorted(layers)
+        self.linetype_table = sorted(linetypes)
 
-    def _calculate_origin(self, entities: List[Dict[str, Any]]) -> Tuple[float, float]:
+    def _is_finite_origin(self, origin: tuple[float, float]) -> bool:
+        """원점 좌표가 유한 실수인지 검증한다."""
+        return math.isfinite(origin[0]) and math.isfinite(origin[1])
+
+    def _normalize_origin(self, raw_origin: Any) -> tuple[float, float] | None:
+        """외부 입력 원점을 정규화하고 비정상 값은 제거한다."""
+        if not isinstance(raw_origin, (list, tuple)) or len(raw_origin) != 2:
+            return None
+
+        try:
+            origin = (float(raw_origin[0]), float(raw_origin[1]))
+        except (TypeError, ValueError):
+            return None
+
+        if not self._is_finite_origin(origin):
+            return None
+
+        return origin
+
+    def _calculate_origin(self, entities: list[dict[str, Any]]) -> tuple[float, float] | None:
         """엔티티들의 바운딩박스 최소점을 원점으로 계산한다."""
-        min_x = float('inf')
-        min_y = float('inf')
+        min_x = float("inf")
+        min_y = float("inf")
 
         for entity in entities:
             # LINE
@@ -163,31 +186,35 @@ class CompactSchemaConverter:
                 min_x = min(min_x, entity["position"]["x"])
                 min_y = min(min_y, entity["position"]["y"])
 
-        return (min_x, min_y)
+        origin = (min_x, min_y)
+        if not self._is_finite_origin(origin):
+            return None
 
-    def _to_local(self, x: float, y: float) -> Tuple[float, float]:
+        return origin
+
+    def _to_local(self, x: float, y: float) -> tuple[float, float]:
         """전역 좌표를 로컬 좌표로 변환한다."""
-        if self.origin:
+        if self.origin is not None:
             return (x - self.origin[0], y - self.origin[1])
         return (x, y)
 
-    def _to_global(self, x: float, y: float) -> Tuple[float, float]:
+    def _to_global(self, x: float, y: float) -> tuple[float, float]:
         """로컬 좌표를 전역 좌표로 변환한다."""
-        if self.origin:
+        if self.origin is not None:
             return (x + self.origin[0], y + self.origin[1])
         return (x, y)
 
-    def _compact_point(self, point: Dict[str, float]) -> List[float]:
+    def _compact_point(self, point: dict[str, float]) -> list[float]:
         """포인트를 배열로 평탄화한다."""
         x, y = self._to_local(point["x"], point["y"])
         return [x, y]
 
-    def _expand_point(self, point: List[float]) -> Dict[str, float]:
+    def _expand_point(self, point: list[float]) -> dict[str, float]:
         """배열을 포인트 객체로 복원한다."""
         x, y = self._to_global(point[0], point[1])
         return {"x": x, "y": y}
 
-    def _compact_metadata(self, metadata: Dict[str, Any]) -> Dict[str, Any]:
+    def _compact_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
         """메타데이터를 compact 형태로 변환한다."""
         result = {}
 
@@ -202,7 +229,7 @@ class CompactSchemaConverter:
 
         return result
 
-    def _expand_metadata(self, compact: Dict[str, Any]) -> Dict[str, Any]:
+    def _expand_metadata(self, compact: dict[str, Any]) -> dict[str, Any]:
         """Compact 메타데이터를 복원한다."""
         result = {}
 
@@ -217,7 +244,7 @@ class CompactSchemaConverter:
 
         return result
 
-    def _compact_entity(self, entity: Dict[str, Any]) -> Dict[str, Any]:
+    def _compact_entity(self, entity: dict[str, Any]) -> dict[str, Any]:
         """엔티티를 compact 형태로 변환한다."""
         result = {}
         entity_type = entity.get("type", "")
@@ -279,7 +306,7 @@ class CompactSchemaConverter:
 
         return result
 
-    def _expand_entity(self, compact: Dict[str, Any]) -> Dict[str, Any]:
+    def _expand_entity(self, compact: dict[str, Any]) -> dict[str, Any]:
         """Compact 엔티티를 복원한다."""
         result = {}
         entity_type = compact.get("t", "")
