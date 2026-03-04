@@ -28,6 +28,9 @@ def module() -> ModuleType:
         "evil.gif",
         "evil",
         "",
+        "con.png",
+        "evil?.png",
+        f"{'a' * 121}.png",
     ],
 )
 def test_sanitize_upload_filename_rejects_malicious_inputs(module: ModuleType, filename: str) -> None:
@@ -67,3 +70,28 @@ def test_build_safe_upload_path_returns_internal_path(module: ModuleType, tmp_pa
     assert path.parent == upload_dir
     assert path.name.endswith("-ok.png")
     assert path.resolve().is_relative_to(output_root.resolve())
+
+
+def test_validate_upload_payload_rejects_empty_and_oversized(module: ModuleType) -> None:
+    with pytest.raises(ValueError):
+        module.validate_upload_payload(b"")
+
+    with pytest.raises(ValueError):
+        module.validate_upload_payload(b"x" * (module.MAX_UPLOAD_BYTES + 1))
+
+
+def test_write_upload_payload_writes_once_and_rejects_overwrite(
+    module: ModuleType,
+    tmp_path: Path,
+) -> None:
+    output_root = tmp_path / "output-root"
+    upload_dir = output_root / "_uploads"
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    upload_path = upload_dir / "sample.png"
+    module.write_upload_payload(upload_path, output_root, b"png-bytes")
+
+    assert upload_path.read_bytes() == b"png-bytes"
+
+    with pytest.raises(ValueError):
+        module.write_upload_payload(upload_path, output_root, b"second")

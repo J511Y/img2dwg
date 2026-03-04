@@ -13,6 +13,16 @@ from typing import Any
 from uuid import uuid4
 
 ALLOWED_UPLOAD_SUFFIXES = {".jpg", ".jpeg", ".png"}
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+MAX_UPLOAD_BASENAME_LENGTH = 120
+WINDOWS_RESERVED_BASENAMES = {
+    "con",
+    "prn",
+    "aux",
+    "nul",
+    *(f"com{i}" for i in range(1, 10)),
+    *(f"lpt{i}" for i in range(1, 10)),
+}
 
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root / "src"))
@@ -26,7 +36,7 @@ from img2dwg.strategies.two_stage import TwoStageBaselineStrategy  # type: ignor
 
 def import_streamlit() -> Any:
     try:
-        import streamlit as st
+        import streamlit as st  # type: ignore[import-not-found]
     except ModuleNotFoundError as exc:
         if exc.name == "streamlit":
             raise SystemExit(
@@ -92,6 +102,15 @@ def format_result_markdown(
     return "\n".join(lines)
 
 
+def assert_path_within_output_root(target_path: Path, output_root: Path, error_message: str) -> None:
+    resolved_root = output_root.resolve()
+    resolved_target = target_path.resolve()
+    try:
+        resolved_target.relative_to(resolved_root)
+    except ValueError as exc:
+        raise ValueError(error_message) from exc
+
+
 def sanitize_upload_filename(filename: str) -> str:
     raw = filename.strip().replace("\x00", "")
     if not raw:
@@ -110,6 +129,16 @@ def sanitize_upload_filename(filename: str) -> str:
     if safe_name in {"", ".", ".."} or ".." in safe_name:
         raise ValueError("상대 경로 토큰('..')이 포함된 파일명은 허용되지 않습니다.")
 
+    if len(safe_name) > MAX_UPLOAD_BASENAME_LENGTH:
+        raise ValueError(f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다.")
+
+    if any(char in safe_name for char in {":", "*", "?", '"', "<", ">", "|"}):
+        raise ValueError("업로드 파일명에 허용되지 않은 특수문자가 포함되어 있습니다.")
+
+    stem = Path(safe_name).stem.rstrip(" .").lower()
+    if stem in WINDOWS_RESERVED_BASENAMES:
+        raise ValueError("운영체제 예약 이름은 업로드 파일명으로 사용할 수 없습니다.")
+
     suffix = Path(safe_name).suffix.lower()
     if suffix not in ALLOWED_UPLOAD_SUFFIXES:
         raise ValueError("허용되지 않은 파일 확장자입니다. (.jpg/.jpeg/.png만 허용)")
@@ -117,18 +146,56 @@ def sanitize_upload_filename(filename: str) -> str:
     return safe_name
 
 
+def validate_upload_payload(payload: bytes, max_upload_bytes: int = MAX_UPLOAD_BYTES) -> None:
+    if not payload:
+        raise ValueError("업로드 파일 내용이 비어 있습니다.")
+
+    if len(payload) > max_upload_bytes:
+        max_mb = max_upload_bytes // (1024 * 1024)
+        raise ValueError(f"업로드 파일 크기는 {max_mb}MB를 초과할 수 없습니다.")
+
+
 def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filename: str) -> Path:
     safe_filename = sanitize_upload_filename(uploaded_filename)
+
+    assert_path_within_output_root(
+        upload_dir,
+        output_root,
+        "업로드 저장 디렉터리가 output-root를 벗어났습니다.",
+    )
+
     upload_path = upload_dir / f"{uuid4().hex[:8]}-{safe_filename}"
-
-    resolved_root = output_root.resolve()
-    resolved_upload_path = upload_path.resolve()
-    try:
-        resolved_upload_path.relative_to(resolved_root)
-    except ValueError as exc:
-        raise ValueError("업로드 저장 경로가 output-root를 벗어났습니다.") from exc
-
+    assert_path_within_output_root(
+        upload_path,
+        output_root,
+        "업로드 저장 경로가 output-root를 벗어났습니다.",
+    )
     return upload_path
+
+
+def write_upload_payload(upload_path: Path, output_root: Path, payload: bytes) -> None:
+    validate_upload_payload(payload)
+
+    assert_path_within_output_root(
+        upload_path.parent,
+        output_root,
+        "업로드 저장 디렉터리가 output-root를 벗어났습니다.",
+    )
+
+    if upload_path.exists():
+        raise ValueError("업로드 저장 경로가 이미 존재합니다.")
+
+    try:
+        with upload_path.open("xb") as handle:
+            handle.write(payload)
+    except FileExistsError as exc:
+        raise ValueError("업로드 저장 경로가 이미 존재합니다.") from exc
+
+    assert_path_within_output_root(
+        upload_path,
+        output_root,
+        "업로드 저장 경로가 output-root를 벗어났습니다.",
+    )
 
 
 def main() -> None:
@@ -183,11 +250,10 @@ def main() -> None:
 
         try:
             upload_path = build_safe_upload_path(upload_dir, output_root, uploaded_file.name)
+            write_upload_payload(upload_path, output_root, uploaded_file.getvalue())
         except ValueError as exc:
-            st.error(f"업로드 파일명 검증 실패: {exc}")
+            st.error(f"업로드 파일 검증 실패: {exc}")
             return
-
-        upload_path.write_bytes(uploaded_file.getvalue())
 
         run_dir = output_root / datetime.now().strftime("%Y%m%d-%H%M%S") / uuid4().hex[:8]
         conv_input = ConversionInput(
