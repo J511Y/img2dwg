@@ -359,7 +359,7 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 
 ## 🔐 Streamlit 업로드 보안 스모크
 
-`web_streamlit_app.py`는 파일명 검증(경로 이탈 차단) 외에도 **확장자-파일시그니처 일치 검증**을 수행합니다.
+`web_streamlit_app.py`는 파일명 검증(경로 이탈 차단) 외에도 **확장자-파일시그니처 일치 + 종료 시그니처(IEND/EOI) 검증**을 수행합니다.
 
 빠른 확인 예시:
 
@@ -375,10 +375,10 @@ assert spec and spec.loader
 spec.loader.exec_module(mod)
 
 mod.validate_upload_payload(
-    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR',
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x00IEND\xaeB`\x82',
     filename_suffix='.png',
 )
-print('streamlit upload signature guard: ok')
+print('streamlit upload signature+footer guard: ok')
 PY
 ```
 

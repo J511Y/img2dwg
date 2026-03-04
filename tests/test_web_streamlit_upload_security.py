@@ -6,8 +6,10 @@ from types import ModuleType
 
 import pytest
 
-VALID_PNG_BYTES = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
-VALID_JPEG_BYTES = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01"
+VALID_PNG_BYTES = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x00IEND\xaeB`\x82"
+VALID_JPEG_BYTES = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\xff\xd9"
+TRUNCATED_PNG_BYTES = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
+TRUNCATED_JPEG_BYTES = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01"
 
 
 @pytest.fixture(scope="module")
@@ -92,6 +94,14 @@ def test_validate_upload_payload_rejects_signature_mismatch(module: ModuleType) 
 
     with pytest.raises(ValueError):
         module.validate_upload_payload(b"not-an-image", filename_suffix=".jpg")
+
+
+def test_validate_upload_payload_rejects_truncated_payload(module: ModuleType) -> None:
+    with pytest.raises(ValueError, match="PNG 파일 종료 시그니처"):
+        module.validate_upload_payload(TRUNCATED_PNG_BYTES, filename_suffix=".png")
+
+    with pytest.raises(ValueError, match="JPEG 파일 종료 시그니처"):
+        module.validate_upload_payload(TRUNCATED_JPEG_BYTES, filename_suffix=".jpg")
 
 
 @pytest.mark.parametrize(

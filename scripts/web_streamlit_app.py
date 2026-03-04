@@ -17,7 +17,9 @@ ALLOWED_UPLOAD_SUFFIXES = {".jpg", ".jpeg", ".png"}
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 MAX_UPLOAD_BASENAME_LENGTH = 120
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+PNG_IEND_CHUNK = b"\x00\x00\x00\x00IEND\xaeB`\x82"
 JPEG_SOI = b"\xff\xd8"
+JPEG_EOI = b"\xff\xd9"
 WINDOWS_RESERVED_BASENAMES = {
     "con",
     "prn",
@@ -170,6 +172,12 @@ def validate_upload_signature(payload: bytes, filename_suffix: str) -> None:
 
     if detected != expected:
         raise ValueError("파일 내용 시그니처가 확장자와 일치하지 않습니다.")
+
+    if detected == "png" and not payload.endswith(PNG_IEND_CHUNK):
+        raise ValueError("PNG 파일 종료 시그니처(IEND)가 없어 손상된 파일로 판단됩니다.")
+
+    if detected == "jpeg" and not payload.endswith(JPEG_EOI):
+        raise ValueError("JPEG 파일 종료 시그니처(EOI)가 없어 손상된 파일로 판단됩니다.")
 
 
 def validate_upload_payload(
