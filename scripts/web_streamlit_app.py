@@ -8,6 +8,7 @@ import argparse
 import importlib
 import sys
 import time
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -106,7 +107,9 @@ def format_result_markdown(
     return "\n".join(lines)
 
 
-def assert_path_within_output_root(target_path: Path, output_root: Path, error_message: str) -> None:
+def assert_path_within_output_root(
+    target_path: Path, output_root: Path, error_message: str
+) -> None:
     resolved_root = output_root.resolve()
     resolved_target = target_path.resolve()
     try:
@@ -120,10 +123,10 @@ def sanitize_upload_filename(filename: str) -> str:
     if not raw:
         raise ValueError("업로드 파일명이 비어 있습니다.")
 
-    if any(ord(char) < 32 or ord(char) == 127 for char in raw):
-        raise ValueError("업로드 파일명에 제어 문자가 포함되어 있습니다.")
+    if any(unicodedata.category(char) in {"Cc", "Cf", "Cs", "Co", "Cn"} for char in raw):
+        raise ValueError("업로드 파일명에 제어/포맷 문자가 포함되어 있습니다.")
 
-    normalized = raw.replace("\\", "/")
+    normalized = unicodedata.normalize("NFKC", raw).replace("\\", "/")
 
     if normalized.startswith("/"):
         raise ValueError("절대 경로 업로드 파일명은 허용되지 않습니다.")
@@ -140,7 +143,9 @@ def sanitize_upload_filename(filename: str) -> str:
         raise ValueError("숨김 파일(dotfile) 형태의 업로드 파일명은 허용되지 않습니다.")
 
     if len(safe_name) > MAX_UPLOAD_BASENAME_LENGTH:
-        raise ValueError(f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다.")
+        raise ValueError(
+            f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다."
+        )
 
     if any(char in safe_name for char in {":", "*", "?", '"', "<", ">", "|"}):
         raise ValueError("업로드 파일명에 허용되지 않은 특수문자가 포함되어 있습니다.")
