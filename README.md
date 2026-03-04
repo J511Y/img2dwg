@@ -346,3 +346,18 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 - [OpenAI Fine-tuning Guide](https://platform.openai.com/docs/guides/fine-tuning)
 - [ezdxf Documentation](https://ezdxf.readthedocs.io/)
 - [AutoCAD DXF Reference](https://help.autodesk.com/view/OARX/2024/ENU/)
+
+## 🌐 Web Benchmark Asset Downloader
+
+공개 라이선스 웹 자산(JPG/PNG + DXF 후보)을 로컬 벤치마크 입력으로 동기화하려면 아래 스크립트를 사용하세요.
+
+```bash
+python scripts/fetch_web_benchmark_assets.py \
+  --manifest eval/datasets/web_image2cad_v1/manifest.csv \
+  --output-dir output/web_image2cad_v1
+```
+
+보안 규칙:
+- `case_id`, `image_filename`, `dxf_candidate_filename`에 `..`, 절대경로, path separator 포함 금지
+- 다운로드 결과는 항상 `output_dir/images`, `output_dir/dxf_candidates` 하위로만 저장
+- SHA256 검증 실패 시 즉시 에러 처리
