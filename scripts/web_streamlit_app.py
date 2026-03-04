@@ -16,6 +16,8 @@ from uuid import uuid4
 ALLOWED_UPLOAD_SUFFIXES = {".jpg", ".jpeg", ".png"}
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 MAX_UPLOAD_BASENAME_LENGTH = 120
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+JPEG_SOI = b"\xff\xd8"
 WINDOWS_RESERVED_BASENAMES = {
     "con",
     "prn",
@@ -146,13 +148,44 @@ def sanitize_upload_filename(filename: str) -> str:
     return safe_name
 
 
-def validate_upload_payload(payload: bytes, max_upload_bytes: int = MAX_UPLOAD_BYTES) -> None:
+def detect_image_signature(payload: bytes) -> str | None:
+    if payload.startswith(PNG_SIGNATURE):
+        return "png"
+    if payload.startswith(JPEG_SOI):
+        return "jpeg"
+    return None
+
+
+def validate_upload_signature(payload: bytes, filename_suffix: str) -> None:
+    detected = detect_image_signature(payload)
+
+    expected_by_suffix = {
+        ".png": "png",
+        ".jpg": "jpeg",
+        ".jpeg": "jpeg",
+    }
+    expected = expected_by_suffix.get(filename_suffix.lower())
+    if expected is None:
+        raise ValueError("허용되지 않은 파일 확장자입니다. (.jpg/.jpeg/.png만 허용)")
+
+    if detected != expected:
+        raise ValueError("파일 내용 시그니처가 확장자와 일치하지 않습니다.")
+
+
+def validate_upload_payload(
+    payload: bytes,
+    *,
+    filename_suffix: str,
+    max_upload_bytes: int = MAX_UPLOAD_BYTES,
+) -> None:
     if not payload:
         raise ValueError("업로드 파일 내용이 비어 있습니다.")
 
     if len(payload) > max_upload_bytes:
         max_mb = max_upload_bytes // (1024 * 1024)
         raise ValueError(f"업로드 파일 크기는 {max_mb}MB를 초과할 수 없습니다.")
+
+    validate_upload_signature(payload, filename_suffix)
 
 
 def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filename: str) -> Path:
@@ -174,7 +207,7 @@ def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filenam
 
 
 def write_upload_payload(upload_path: Path, output_root: Path, payload: bytes) -> None:
-    validate_upload_payload(payload)
+    validate_upload_payload(payload, filename_suffix=upload_path.suffix)
 
     assert_path_within_output_root(
         upload_path.parent,

@@ -6,6 +6,9 @@ from types import ModuleType
 
 import pytest
 
+VALID_PNG_BYTES = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
+VALID_JPEG_BYTES = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01"
+
 
 @pytest.fixture(scope="module")
 def module() -> ModuleType:
@@ -74,10 +77,37 @@ def test_build_safe_upload_path_returns_internal_path(module: ModuleType, tmp_pa
 
 def test_validate_upload_payload_rejects_empty_and_oversized(module: ModuleType) -> None:
     with pytest.raises(ValueError):
-        module.validate_upload_payload(b"")
+        module.validate_upload_payload(b"", filename_suffix=".png")
 
     with pytest.raises(ValueError):
-        module.validate_upload_payload(b"x" * (module.MAX_UPLOAD_BYTES + 1))
+        module.validate_upload_payload(
+            b"x" * (module.MAX_UPLOAD_BYTES + 1),
+            filename_suffix=".png",
+        )
+
+
+def test_validate_upload_payload_rejects_signature_mismatch(module: ModuleType) -> None:
+    with pytest.raises(ValueError):
+        module.validate_upload_payload(VALID_JPEG_BYTES, filename_suffix=".png")
+
+    with pytest.raises(ValueError):
+        module.validate_upload_payload(b"not-an-image", filename_suffix=".jpg")
+
+
+@pytest.mark.parametrize(
+    ("payload", "suffix"),
+    [
+        (VALID_PNG_BYTES, ".png"),
+        (VALID_JPEG_BYTES, ".jpg"),
+        (VALID_JPEG_BYTES, ".jpeg"),
+    ],
+)
+def test_validate_upload_payload_accepts_matching_signature(
+    module: ModuleType,
+    payload: bytes,
+    suffix: str,
+) -> None:
+    module.validate_upload_payload(payload, filename_suffix=suffix)
 
 
 def test_write_upload_payload_writes_once_and_rejects_overwrite(
@@ -89,9 +119,9 @@ def test_write_upload_payload_writes_once_and_rejects_overwrite(
     upload_dir.mkdir(parents=True, exist_ok=True)
 
     upload_path = upload_dir / "sample.png"
-    module.write_upload_payload(upload_path, output_root, b"png-bytes")
+    module.write_upload_payload(upload_path, output_root, VALID_PNG_BYTES)
 
-    assert upload_path.read_bytes() == b"png-bytes"
+    assert upload_path.read_bytes() == VALID_PNG_BYTES
 
     with pytest.raises(ValueError):
-        module.write_upload_payload(upload_path, output_root, b"second")
+        module.write_upload_payload(upload_path, output_root, VALID_PNG_BYTES)

@@ -357,6 +357,31 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 
 자세한 내용은 `.windsurf/workflows/` 참조
 
+## 🔐 Streamlit 업로드 보안 스모크
+
+`web_streamlit_app.py`는 파일명 검증(경로 이탈 차단) 외에도 **확장자-파일시그니처 일치 검증**을 수행합니다.
+
+빠른 확인 예시:
+
+```bash
+uv run python - <<'PY'
+import importlib.util
+from pathlib import Path
+
+path = Path('scripts/web_streamlit_app.py')
+spec = importlib.util.spec_from_file_location('web_streamlit_smoke', path)
+mod = importlib.util.module_from_spec(spec)
+assert spec and spec.loader
+spec.loader.exec_module(mod)
+
+mod.validate_upload_payload(
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR',
+    filename_suffix='.png',
+)
+print('streamlit upload signature guard: ok')
+PY
+```
+
 ## 🤝 기여 가이드
 
 1. 이 저장소를 포크합니다
