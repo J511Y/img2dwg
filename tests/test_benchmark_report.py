@@ -1040,3 +1040,56 @@ def test_run_benchmark_marks_triad_comparison_unavailable_when_missing(tmp_path:
         "consensus_qa",
         "hybrid_mvp",
     ]
+
+
+def test_run_benchmark_isolates_case_outputs_for_same_stem_images(tmp_path: Path) -> None:
+    left = tmp_path / "left"
+    right = tmp_path / "right"
+    left.mkdir(parents=True, exist_ok=True)
+    right.mkdir(parents=True, exist_ok=True)
+
+    image_a = left / "same.png"
+    image_b = right / "same.png"
+    image_a.write_bytes(b"image-a")
+    image_b.write_bytes(b"image-b")
+
+    class SameStemLoadabilityStrategy(ConversionStrategy):
+        name = "same_stem_loadability"
+
+        def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
+            if conv_input.image_path.parent.name == "left":
+                ezdxf.new("R2018", setup=True).saveas(str(dxf_path))
+            else:
+                dxf_path.write_text("broken", encoding="utf-8")
+
+            return ConversionOutput(
+                strategy_name=self.name,
+                dxf_path=dxf_path,
+                success=True,
+                elapsed_ms=1.0,
+                metrics={"iou": 0.5, "topology_f1": 0.5},
+                notes=[],
+            )
+
+    reg = StrategyRegistry()
+    reg.register(SameStemLoadabilityStrategy())
+
+    result = run_benchmark(
+        image_paths=[image_a, image_b],
+        registry=reg,
+        output_dir=tmp_path / "out-same-stem",
+        dataset_id="same-stem",
+        git_ref="test",
+    )
+
+    strategy_row = result["strategies"][0]
+    cases = strategy_row["cases"]
+
+    assert len(cases) == 2
+    assert cases[0]["dxf_path"] != cases[1]["dxf_path"]
+    assert cases[0]["cad_loadable"] is True
+    assert cases[1]["cad_loadable"] is False
+    assert strategy_row["summary"]["cad_loadable_count"] == 1
+    assert strategy_row["summary"]["cad_loadable_rate"] == 0.5

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -134,6 +136,24 @@ def _build_final_summary(report: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _slugify_image_stem(stem: str) -> str:
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", stem.strip())
+    slug = slug.strip("-._")
+    if not slug:
+        return "image"
+    return slug[:40]
+
+
+def _build_case_output_dir(base_dir: Path, image_path: Path, case_index: int) -> Path:
+    try:
+        image_token = str(image_path.resolve())
+    except OSError:
+        image_token = str(image_path.absolute())
+    digest = hashlib.sha1(image_token.encode("utf-8")).hexdigest()[:10]
+    slug = _slugify_image_stem(image_path.stem)
+    return base_dir / f"case_{case_index:04d}_{slug}_{digest}"
+
+
 def run_benchmark(
     image_paths: list[Path],
     registry: StrategyRegistry,
@@ -150,11 +170,13 @@ def run_benchmark(
     legacy_results: dict[str, list[dict[str, Any]]] = {name: [] for name in target_names}
     outputs_map: dict[str, list[ConversionOutput]] = {name: [] for name in target_names}
 
-    for image_path in image_paths:
+    for case_index, image_path in enumerate(image_paths, start=1):
         conv_input = ConversionInput(image_path=image_path)
         for name in target_names:
             strategy = registry.get(name)
-            out = strategy.timed_run(conv_input, output_dir / name)
+            strategy_output_root = output_dir / name
+            case_output_dir = _build_case_output_dir(strategy_output_root, image_path, case_index)
+            out = strategy.timed_run(conv_input, case_output_dir)
             outputs_map[name].append(out)
             legacy_results[name].append(_to_legacy_dict(out))
 
