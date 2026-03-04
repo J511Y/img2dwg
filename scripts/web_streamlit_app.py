@@ -116,9 +116,12 @@ def assert_path_within_output_root(target_path: Path, output_root: Path, error_m
 
 
 def sanitize_upload_filename(filename: str) -> str:
-    raw = filename.strip().replace("\x00", "")
+    raw = filename.strip()
     if not raw:
         raise ValueError("업로드 파일명이 비어 있습니다.")
+
+    if any(ord(char) < 32 or ord(char) == 127 for char in raw):
+        raise ValueError("업로드 파일명에 제어 문자가 포함되어 있습니다.")
 
     normalized = raw.replace("\\", "/")
 
@@ -132,6 +135,9 @@ def sanitize_upload_filename(filename: str) -> str:
     safe_name = Path(tokens[0]).name.strip()
     if safe_name in {"", ".", ".."} or ".." in safe_name:
         raise ValueError("상대 경로 토큰('..')이 포함된 파일명은 허용되지 않습니다.")
+
+    if safe_name.startswith("."):
+        raise ValueError("숨김 파일(dotfile) 형태의 업로드 파일명은 허용되지 않습니다.")
 
     if len(safe_name) > MAX_UPLOAD_BASENAME_LENGTH:
         raise ValueError(f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다.")

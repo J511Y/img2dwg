@@ -378,6 +378,12 @@ mod.validate_upload_payload(
     b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x00IEND\xaeB`\x82',
     filename_suffix='.png',
 )
+
+try:
+    mod.sanitize_upload_filename('evil\nname.png')
+except ValueError:
+    print('streamlit upload filename control-char guard: ok')
+
 print('streamlit upload signature+footer guard: ok')
 PY
 ```

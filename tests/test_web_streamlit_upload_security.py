@@ -35,6 +35,9 @@ def module() -> ModuleType:
         "",
         "con.png",
         "evil?.png",
+        "evil\x00name.png",
+        "evil\nname.png",
+        ".hidden.png",
         f"{'a' * 121}.png",
     ],
 )
@@ -44,7 +47,7 @@ def test_sanitize_upload_filename_rejects_malicious_inputs(module: ModuleType, f
 
 
 def test_sanitize_upload_filename_accepts_valid_name(module: ModuleType) -> None:
-    assert module.sanitize_upload_filename("FloorPlan.PNG") == "FloorPlan.PNG"
+    assert module.sanitize_upload_filename("  FloorPlan.PNG  ") == "FloorPlan.PNG"
 
 
 def test_build_safe_upload_path_rejects_output_root_escape_via_symlink(
