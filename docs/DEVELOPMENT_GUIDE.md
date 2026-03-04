@@ -215,10 +215,31 @@ Closes #123
 3. **개발 진행** → 코드 작성 + 테스트
 4. **린트 & 포맷** → `ruff check --fix && ruff format`
 5. **테스트 실행** → `pytest tests/`
-6. **커밋** → Conventional Commits 규칙 준수
-7. **Push** → 원격 브랜치에 푸시
-8. **PR 생성** → develop 브랜치로
-9. **코드 리뷰** → 팀 리뷰 후 머지
+6. **정적 게이트 실행** → 변경 파일 기준 `ruff + mypy`
+7. **커밋** → Conventional Commits 규칙 준수
+8. **Push** → 원격 브랜치에 푸시
+9. **PR 생성** → develop 브랜치로
+10. **코드 리뷰** → 팀 리뷰 후 머지
+
+### 변경 파일 정적 게이트 (Ruff/Mypy)
+
+PR 전에 아래 순서로 최소 품질선을 확인합니다.
+
+```bash
+# 권장: 헬퍼 스크립트 사용
+BASE_REF=origin/master scripts/static_gate_changed.sh
+
+# (동일 동작 수동 실행)
+BASE_REF=${BASE_REF:-origin/master}
+CHANGED_PY=$(git diff --name-only --diff-filter=ACMRTUXB "$BASE_REF"...HEAD -- '*.py')
+[ -z "$CHANGED_PY" ] || .venv/bin/ruff check $CHANGED_PY
+[ -z "$CHANGED_PY" ] || .venv/bin/ruff format --check $CHANGED_PY
+MYPY_TARGETS=$(printf '%s\n' $CHANGED_PY | grep -v '^tests/' || true)
+[ -z "$MYPY_TARGETS" ] || .venv/bin/mypy $MYPY_TARGETS
+```
+
+- `BASE_REF`를 지정하면 다른 기준 브랜치에도 동일하게 적용할 수 있습니다.
+- 변경 파일이 없으면 게이트는 자동 스킵됩니다.
 
 ### Windsurf 워크플로우 사용
 
