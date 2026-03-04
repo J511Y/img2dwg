@@ -80,6 +80,27 @@ uv pip install -e .
    uv run python examples/test_odafc.py
    ```
 
+### 🌐 웹에서 바로 테스트 (Gradio / Streamlit Publisher)
+
+```bash
+# 웹 실행 전용 의존성 설치
+uv sync --frozen --extra web
+
+# Gradio
+uv run --frozen --extra web python scripts/web_gradio.py --host 127.0.0.1 --port 7860
+
+# Streamlit
+uv run --frozen --extra web python scripts/web_streamlit.py --host 127.0.0.1 --port 8501
+```
+
+통합 스모크 테스트:
+
+```bash
+uv run --frozen --extra web python scripts/smoke_web_publishers.py
+```
+
+- 실행/접속/보존정책(run/access + cleanup) 상세 문서: [docs/publisher.md](docs/publisher.md)
+
 ### 사용 방법
 
 #### 1. 데이터 스캔 및 분류
