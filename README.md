@@ -329,6 +329,13 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 
 자세한 내용은 `.windsurf/workflows/` 참조
 
+## 🔐 보안 가드레일
+
+- PR/Push 시 GitHub Actions `secret-scan`(gitleaks) 실행
+- `setup_logging()` 기본값으로 토큰 마스킹 필터 적용
+- 인증/시크릿 운영 가이드: [docs/security/authentication-and-secret-safety.md](docs/security/authentication-and-secret-safety.md)
+- 유출 대응 절차: [docs/security/secret-leak-response-runbook.md](docs/security/secret-leak-response-runbook.md)
+
 ## 🤝 기여 가이드
 
 1. 이 저장소를 포크합니다
