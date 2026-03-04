@@ -186,6 +186,13 @@ uv run --extra web streamlit run scripts/web_streamlit_app.py \
 - **접근 정책**: 기본 바인딩은 `127.0.0.1`(로컬 전용)으로 유지합니다. 외부 접근이 꼭 필요할 때만 리버스 프록시/방화벽 뒤에서 공개하세요.
 - **업로드 정책**: 업로드 파일명은 경로 토큰(`..`, `/`, `\\`)·OS 예약 이름·비허용 특수문자를 거부하며, 확장자는 `.jpg/.jpeg/.png`만 허용됩니다.
 - **용량 정책**: 단일 업로드는 최대 `10MB`까지만 허용됩니다.
+- **개발 검증 스모크**: 업로드 보안 헬퍼 심볼/모듈 로드 확인
+  ```bash
+  uv run python - <<'PY'
+  from scripts.web_streamlit_app import sanitize_upload_filename
+  print("smoke:module-load=ok safe_filename=", sanitize_upload_filename("floorplan.png"))
+  PY
+  ```
 - **보존 정책(권장)**: `output/web-streamlit`은 7일 또는 5GB 기준으로 정리 정책을 적용하세요.
   - 예시(7일 초과 파일 정리):
     ```bash

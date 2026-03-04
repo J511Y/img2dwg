@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import sys
 import time
 from datetime import datetime
@@ -36,7 +37,7 @@ from img2dwg.strategies.two_stage import TwoStageBaselineStrategy  # type: ignor
 
 def import_streamlit() -> Any:
     try:
-        import streamlit as st  # type: ignore[import-not-found]
+        return importlib.import_module("streamlit")
     except ModuleNotFoundError as exc:
         if exc.name == "streamlit":
             raise SystemExit(
@@ -45,7 +46,6 @@ def import_streamlit() -> Any:
                 "Run with: uv run --frozen --extra web python scripts/web_streamlit.py"
             ) from exc
         raise
-    return st
 
 
 def parse_runtime_args() -> argparse.Namespace:
