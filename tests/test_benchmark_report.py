@@ -6,7 +6,11 @@ from typing import Any, cast
 import ezdxf
 import pytest
 
-from img2dwg.pipeline.benchmark import _build_final_summary, run_benchmark
+from img2dwg.pipeline.benchmark import (
+    _build_case_output_dir,
+    _build_final_summary,
+    run_benchmark,
+)
 from img2dwg.pipeline.schema import build_strategy_result
 from img2dwg.strategies.base import ConversionInput, ConversionOutput, ConversionStrategy
 from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
@@ -286,13 +290,9 @@ def test_run_benchmark_summary_fields_match_results_payload(tmp_path: Path) -> N
 
     summary_payload = _load_summary_payload(out_dir)
 
-    ranking_by_name = {
-        entry["strategy_name"]: entry
-        for entry in result["ranking"]
-    }
+    ranking_by_name = {entry["strategy_name"]: entry for entry in result["ranking"]}
     results_summary_by_name = {
-        strategy["strategy_name"]: strategy["summary"]
-        for strategy in result["strategies"]
+        strategy["strategy_name"]: strategy["summary"] for strategy in result["strategies"]
     }
 
     run_info = summary_payload["run"]
@@ -725,7 +725,9 @@ def test_run_benchmark_allows_allowlisted_high_risk_strategy(tmp_path: Path) -> 
         registry=reg,
         output_dir=tmp_path / "out-high-risk-allowlisted",
         strategy_names=["high_risk_success"],
-        feature_flags=FeatureFlags(enable_high_risk=True, high_risk_allowlist=["high_risk_success"]),
+        feature_flags=FeatureFlags(
+            enable_high_risk=True, high_risk_allowlist=["high_risk_success"]
+        ),
         dataset_id="high-risk-allowlisted",
         git_ref="test",
     )
@@ -1040,3 +1042,72 @@ def test_run_benchmark_marks_triad_comparison_unavailable_when_missing(tmp_path:
         "consensus_qa",
         "hybrid_mvp",
     ]
+
+
+def test_run_benchmark_isolates_case_outputs_for_same_stem_images(tmp_path: Path) -> None:
+    left = tmp_path / "left"
+    right = tmp_path / "right"
+    left.mkdir(parents=True, exist_ok=True)
+    right.mkdir(parents=True, exist_ok=True)
+
+    image_a = left / "same.png"
+    image_b = right / "same.png"
+    image_a.write_bytes(b"image-a")
+    image_b.write_bytes(b"image-b")
+
+    class SameStemLoadabilityStrategy(ConversionStrategy):
+        name = "same_stem_loadability"
+
+        def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
+            if conv_input.image_path.parent.name == "left":
+                ezdxf.new("R2018", setup=True).saveas(str(dxf_path))
+            else:
+                dxf_path.write_text("broken", encoding="utf-8")
+
+            return ConversionOutput(
+                strategy_name=self.name,
+                dxf_path=dxf_path,
+                success=True,
+                elapsed_ms=1.0,
+                metrics={"iou": 0.5, "topology_f1": 0.5},
+                notes=[],
+            )
+
+    reg = StrategyRegistry()
+    reg.register(SameStemLoadabilityStrategy())
+
+    result = run_benchmark(
+        image_paths=[image_a, image_b],
+        registry=reg,
+        output_dir=tmp_path / "out-same-stem",
+        dataset_id="same-stem",
+        git_ref="test",
+    )
+
+    strategy_row = result["strategies"][0]
+    cases = strategy_row["cases"]
+
+    assert len(cases) == 2
+    assert cases[0]["dxf_path"] != cases[1]["dxf_path"]
+    assert cases[0]["cad_loadable"] is True
+    assert cases[1]["cad_loadable"] is False
+    assert strategy_row["summary"]["cad_loadable_count"] == 1
+    assert strategy_row["summary"]["cad_loadable_rate"] == 0.5
+
+
+def test_build_case_output_dir_uses_safe_fallback_slug_for_non_ascii_stems(tmp_path: Path) -> None:
+    strategy_root = tmp_path / "strategy"
+    image_dir = tmp_path / "원본"
+    image_dir.mkdir(parents=True, exist_ok=True)
+    image_path = image_dir / "😀😀.png"
+    image_path.write_bytes(b"fake")
+
+    case1 = _build_case_output_dir(strategy_root, image_path, case_index=1)
+    case2 = _build_case_output_dir(strategy_root, image_path, case_index=2)
+
+    assert case1.parent == strategy_root
+    assert case1.name.startswith("case_0001_image_")
+    assert case2.name.startswith("case_0002_image_")
+    assert case1 != case2
