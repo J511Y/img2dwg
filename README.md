@@ -112,6 +112,8 @@ uv run --extra dev pytest -q tests/test_mypy_publisher_gate_config.py
 
 > 참고: `pyproject.toml`의 `[tool.mypy].mypy_path = "src"`를 기준으로 로컬 패키지 import를 해석하므로,
 > publisher mypy 검증 시 `PYTHONPATH=src` 같은 환경변수 우회가 필요하지 않습니다.
+> 또한 wheel에 `src/img2dwg/py.typed`를 포함해(Pep 561) 설치형 실행 환경에서도
+> `import-untyped` 오탐이 재발하지 않도록 고정했습니다.
 
 - 실행/접속/보존정책(run/access + cleanup) 상세 문서: [docs/publisher.md](docs/publisher.md)
 
