@@ -35,6 +35,11 @@ dev = [
     "mypy>=1.18.2",
 ]
 
+web = [
+    "gradio>=5.0.0",
+    "streamlit>=1.40.0",
+]
+
 # Vision Encoder-Decoder 학습용 추가 의존성
 ved = [
     "wandb>=0.16.0",  # 실험 추적
@@ -89,6 +94,7 @@ addopts = [
 
 [tool.mypy]
 python_version = "3.10"
+mypy_path = "src"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
