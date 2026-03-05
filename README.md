@@ -325,6 +325,22 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 4. **파인튜닝**: OpenAI API를 통한 모델 학습
 5. **검증**: 생성된 JSON→DWG 변환 및 정확도 평가
 
+## 📏 VED 평가 실행
+
+학습 완료 모델은 `scripts/evaluate_ved.py`로 표준 metric을 산출할 수 있습니다.
+
+```bash
+python scripts/evaluate_ved.py \
+  --model-path output/ved_checkpoints/best \
+  --data-file output/finetune_val.jsonl \
+  --output output/ved_eval
+```
+
+- 주요 출력: `parse_success_rate`, `exact_match`, `entity_type_accuracy`
+- 산출물:
+  - `output/ved_eval/metrics.json`
+  - `output/ved_eval/failures.jsonl`
+
 ## 📝 Windsurf 워크플로우
 
 프로젝트에서 사용 가능한 Windsurf 워크플로우:
