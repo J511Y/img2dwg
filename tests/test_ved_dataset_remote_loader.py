@@ -176,6 +176,42 @@ def test_remote_image_loader_does_not_retry_on_http_404(
     assert sleeps == []
 
 
+def test_remote_image_loader_retries_on_http_429(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    image_url = "https://example.com/rate-limit.png"
+    attempts = {"count": 0}
+    sleeps: list[float] = []
+
+    def flaky_429(url: str, timeout: float) -> DummyResponse:
+        assert url == image_url
+        assert timeout == 1.5
+        attempts["count"] += 1
+        if attempts["count"] < 3:
+            return DummyResponse(b"", status_code=429)
+        return DummyResponse(_png_bytes())
+
+    monkeypatch.setattr("img2dwg.ved.dataset.requests.get", flaky_429)
+    monkeypatch.setattr("img2dwg.ved.dataset.time.sleep", lambda value: sleeps.append(value))
+
+    dataset = _make_dataset(
+        tmp_path,
+        image_url,
+        policy=RemoteImagePolicy(
+            cache_dir=tmp_path / "cache",
+            timeout_seconds=1.5,
+            max_retries=3,
+            backoff_seconds=0.2,
+        ),
+    )
+
+    image = dataset._load_image(image_url)
+
+    assert image.size == (2, 2)
+    assert attempts["count"] == 3
+    assert sleeps == [0.2, 0.4]
+
+
 def test_offline_mode_requires_cached_remote_image(tmp_path: Path) -> None:
     image_url = "https://example.com/offline.png"
     dataset = _make_dataset(
