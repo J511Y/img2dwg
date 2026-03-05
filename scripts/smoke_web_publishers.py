@@ -18,6 +18,11 @@ streamlit_script_path = project_root / "scripts" / "web_streamlit.py"
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run smoke tests for all web publishers")
     parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind")
+    parser.add_argument(
+        "--allow-remote",
+        action="store_true",
+        help="Acknowledge non-loopback host binding for both publisher smoke checks",
+    )
     parser.add_argument("--gradio-port", type=int, default=7861, help="Smoke port for Gradio")
     parser.add_argument("--streamlit-port", type=int, default=8502, help="Smoke port for Streamlit")
     parser.add_argument(
@@ -71,6 +76,8 @@ def build_gradio_command(args: argparse.Namespace) -> list[str]:
         "--smoke-timeout-seconds",
         str(args.gradio_timeout_seconds),
     ]
+    if args.allow_remote:
+        command.append("--allow-remote")
     if args.cleanup_dry_run:
         command.append("--cleanup-dry-run")
     return command
@@ -94,6 +101,8 @@ def build_streamlit_command(args: argparse.Namespace) -> list[str]:
     ]
     if args.streamlit_smoke_keep_log:
         command.append("--smoke-keep-log")
+    if args.allow_remote:
+        command.append("--allow-remote")
     if args.cleanup_dry_run:
         command.append("--cleanup-dry-run")
     return command

@@ -6,11 +6,13 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import ipaddress
 import socket
 import subprocess
 import sys
 import tempfile
 import time
+import unicodedata
 from collections.abc import Sequence
 from pathlib import Path
 from urllib.error import URLError
@@ -20,7 +22,10 @@ project_root = Path(__file__).resolve().parent.parent
 streamlit_app_path = project_root / "scripts" / "web_streamlit_app.py"
 sys.path.insert(0, str(project_root / "src"))
 
-from img2dwg.web.retention import cleanup_output_root, format_cleanup_report
+from img2dwg.web.retention import (
+    cleanup_output_root,
+    format_cleanup_report,
+)
 
 
 def resolve_output_root(path: Path) -> Path:
@@ -30,10 +35,24 @@ def resolve_output_root(path: Path) -> Path:
     return (project_root / path).resolve()
 
 
+def normalize_host_input(host: str) -> str:
+    """Normalize host CLI input and reject ambiguous control/format-character payloads."""
+    normalized = host.strip()
+    if not normalized:
+        raise RuntimeError("Host must not be empty.")
+    if host != normalized:
+        raise RuntimeError("Host must not include surrounding whitespace.")
+    if any(unicodedata.category(char).startswith("C") for char in normalized):
+        raise RuntimeError(
+            "Host contains control or format characters; provide a plain hostname or IP."
+        )
+    return normalized
+
+
 def resolve_probe_host(host: str) -> str:
     """Normalize wildcard hosts to loopback for local smoke probes."""
-    normalized = host.strip()
-    if normalized in {"0.0.0.0", "::", "[::]", ""}:
+    normalized = normalize_host_input(host)
+    if normalized in {"0.0.0.0", "::", "[::]"}:
         return "127.0.0.1"
     return normalized
 
@@ -57,6 +76,31 @@ def ensure_port_available(host: str, port: int) -> None:
         raise RuntimeError(
             f"Port {port} is already in use on {resolve_probe_host(host)}. "
             "Use --port to select another one."
+        )
+
+
+def requires_remote_access_ack(host: str) -> bool:
+    """Return True when host binding may expose the publisher beyond loopback."""
+    normalized = normalize_host_input(host).lower()
+    if normalized in {"localhost", "127.0.0.1", "::1", "[::1]"}:
+        return False
+
+    candidate = (
+        normalized[1:-1] if normalized.startswith("[") and normalized.endswith("]") else normalized
+    )
+    try:
+        return not ipaddress.ip_address(candidate).is_loopback
+    except ValueError:
+        # Hostnames other than localhost are treated as remotely reachable by default.
+        return True
+
+
+def ensure_access_policy(host: str, allow_remote: bool) -> None:
+    """Require explicit opt-in before exposing publisher on non-loopback hosts."""
+    if requires_remote_access_ack(host) and not allow_remote:
+        raise RuntimeError(
+            "Refusing non-loopback host binding without explicit acknowledgement. "
+            "Pass --allow-remote when you intentionally expose the web publisher."
         )
 
 
@@ -124,6 +168,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run img2dwg Streamlit web app")
     parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind")
     parser.add_argument("--port", type=int, default=8501, help="Port to bind")
+    parser.add_argument(
+        "--allow-remote",
+        action="store_true",
+        help="Acknowledge non-loopback host binding (required for 0.0.0.0/LAN exposure)",
+    )
     parser.add_argument(
         "--output-root",
         type=Path,
@@ -203,10 +252,11 @@ def build_streamlit_command(args: argparse.Namespace) -> list[str]:
 
 
 def run_smoke_test(args: argparse.Namespace) -> None:
+    ensure_access_policy(args.host, args.allow_remote)
+    ensure_port_available(args.host, args.port)
     args.output_root = resolve_output_root(args.output_root)
     args.output_root.mkdir(parents=True, exist_ok=True)
     run_startup_cleanup(args)
-    ensure_port_available(args.host, args.port)
 
     command = build_streamlit_command(args)
     probe_url = f"http://{resolve_probe_host(args.host)}:{args.port}"
@@ -268,10 +318,11 @@ def run_smoke_test(args: argparse.Namespace) -> None:
 
 
 def run_server(args: argparse.Namespace) -> None:
+    ensure_access_policy(args.host, args.allow_remote)
+    ensure_port_available(args.host, args.port)
     args.output_root = resolve_output_root(args.output_root)
     args.output_root.mkdir(parents=True, exist_ok=True)
     run_startup_cleanup(args)
-    ensure_port_available(args.host, args.port)
     command = build_streamlit_command(args)
     completed = subprocess.run(command, cwd=str(project_root), check=False)
     raise SystemExit(completed.returncode)

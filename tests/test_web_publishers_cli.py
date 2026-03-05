@@ -57,6 +57,7 @@ def test_gradio_cli_defaults() -> None:
 
     assert args.host == "127.0.0.1"
     assert args.port == 7860
+    assert args.allow_remote is False
     assert args.smoke_test is False
     assert args.smoke_timeout_seconds == 15.0
     assert args.cleanup_max_age_days == 7.0
@@ -72,6 +73,7 @@ def test_streamlit_cli_defaults() -> None:
 
     assert args.host == "127.0.0.1"
     assert args.port == 8501
+    assert args.allow_remote is False
     assert args.smoke_test is False
     assert args.smoke_timeout_seconds == 20.0
     assert args.smoke_log_lines == 80
@@ -99,6 +101,7 @@ def test_smoke_runner_cli_defaults() -> None:
     args = module.parse_args([])
 
     assert args.host == "127.0.0.1"
+    assert args.allow_remote is False
     assert args.gradio_port == 7861
     assert args.streamlit_port == 8502
     assert args.smoke_wait_seconds == 0.5
@@ -116,6 +119,7 @@ def test_smoke_runner_build_commands_include_overrides() -> None:
         [
             "--host",
             "0.0.0.0",
+            "--allow-remote",
             "--gradio-port",
             "7900",
             "--streamlit-port",
@@ -135,12 +139,14 @@ def test_smoke_runner_build_commands_include_overrides() -> None:
     assert "--host" in gradio_command and "0.0.0.0" in gradio_command
     assert "--port" in gradio_command and "7900" in gradio_command
     assert "--smoke-test" in gradio_command
+    assert "--allow-remote" in gradio_command
     assert "--cleanup-dry-run" in gradio_command
 
     assert "--host" in streamlit_command and "0.0.0.0" in streamlit_command
     assert "--port" in streamlit_command and "8600" in streamlit_command
     assert "--smoke-log-lines" in streamlit_command and "120" in streamlit_command
     assert "--smoke-keep-log" in streamlit_command
+    assert "--allow-remote" in streamlit_command
     assert "--cleanup-dry-run" in streamlit_command
 
 
@@ -148,9 +154,54 @@ def test_resolve_probe_host_handles_wildcards() -> None:
     gradio_module = _load_script_module("web_gradio_script_for_tests", GRADIO_SCRIPT_PATH)
     streamlit_module = _load_script_module("web_streamlit_script_for_tests", STREAMLIT_SCRIPT_PATH)
 
-    for host in ["0.0.0.0", "::", "[::]", ""]:
+    for host in ["0.0.0.0", "::", "[::]"]:
         assert gradio_module.resolve_probe_host(host) == "127.0.0.1"
         assert streamlit_module.resolve_probe_host(host) == "127.0.0.1"
+
+
+def test_access_policy_rejects_empty_or_control_char_hosts() -> None:
+    gradio_module = _load_script_module("web_gradio_script_for_tests", GRADIO_SCRIPT_PATH)
+    streamlit_module = _load_script_module("web_streamlit_script_for_tests", STREAMLIT_SCRIPT_PATH)
+
+    for module in (gradio_module, streamlit_module):
+        with pytest.raises(RuntimeError, match="Host must not be empty"):
+            module.ensure_access_policy("   ", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="surrounding whitespace"):
+            module.ensure_access_policy(" 127.0.0.1", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="control or format characters"):
+            module.ensure_access_policy("127.0.\n0.1", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="control or format characters"):
+            module.ensure_access_policy("127.0.0.1\x7f", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="control or format characters"):
+            module.ensure_access_policy("127.0.0.1\u202e", allow_remote=False)
+
+
+def test_requires_remote_access_ack_detects_loopback_and_remote_hosts() -> None:
+    gradio_module = _load_script_module("web_gradio_script_for_tests", GRADIO_SCRIPT_PATH)
+    streamlit_module = _load_script_module("web_streamlit_script_for_tests", STREAMLIT_SCRIPT_PATH)
+
+    for module in (gradio_module, streamlit_module):
+        assert module.requires_remote_access_ack("127.0.0.1") is False
+        assert module.requires_remote_access_ack("localhost") is False
+        assert module.requires_remote_access_ack("::1") is False
+        assert module.requires_remote_access_ack("0.0.0.0") is True
+        assert module.requires_remote_access_ack("192.168.0.12") is True
+
+
+def test_ensure_access_policy_requires_allow_remote_for_non_loopback() -> None:
+    gradio_module = _load_script_module("web_gradio_script_for_tests", GRADIO_SCRIPT_PATH)
+    streamlit_module = _load_script_module("web_streamlit_script_for_tests", STREAMLIT_SCRIPT_PATH)
+
+    for module in (gradio_module, streamlit_module):
+        module.ensure_access_policy("127.0.0.1", allow_remote=False)
+        module.ensure_access_policy("0.0.0.0", allow_remote=True)
+
+        with pytest.raises(RuntimeError, match="--allow-remote"):
+            module.ensure_access_policy("0.0.0.0", allow_remote=False)
 
 
 def test_port_probe_detects_open_socket() -> None:
