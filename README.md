@@ -418,6 +418,7 @@ uv run --extra dev pytest -q tests/test_web_streamlit_gate_regressions.py tests/
 - Streamlit 업로드 관련 `ruff format --check` / `ruff check`
 - `mypy scripts/web_streamlit_app.py`
 - 업로드 보안 테스트 스위트(`tests/test_web_streamlit_upload_security.py`)
+- 게이트 툴 실행을 `sys.executable -m <tool>`로 고정해 PATH/venv 활성화 여부에 따른 false skip을 방지
 
 ## 🤝 기여 가이드
 
