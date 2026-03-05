@@ -109,6 +109,12 @@ uv run --extra dev ruff format --check scripts/web_gradio.py scripts/web_streaml
 uv run --extra dev mypy scripts/smoke_web_publishers.py scripts/web_gradio.py scripts/web_streamlit.py scripts/web_streamlit_app.py src/img2dwg/web/__init__.py src/img2dwg/web/retention.py
 ```
 
+게이트 회귀 방지 테스트(포맷/타입 + stale ignore 자동 감시):
+
+```bash
+uv run --extra dev pytest -q tests/test_web_publisher_gate_regressions.py
+```
+
 - 실행/접속/보존정책(run/access + cleanup) 상세 문서: [docs/publisher.md](docs/publisher.md)
 
 ### 사용 방법

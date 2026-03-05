@@ -253,6 +253,13 @@ uv run --extra dev ruff format --check scripts/web_gradio.py scripts/web_streaml
 uv run --extra dev mypy scripts/smoke_web_publishers.py scripts/web_gradio.py scripts/web_streamlit.py scripts/web_streamlit_app.py src/img2dwg/web/__init__.py src/img2dwg/web/retention.py
 ```
 
+추가로 회귀 방지 테스트를 실행하면, 퍼블리셔 정적 게이트(ruff format/mypy)와
+`# type: ignore[import-untyped]` 재유입을 한 번에 감시할 수 있습니다.
+
+```bash
+uv run --extra dev pytest -q tests/test_web_publisher_gate_regressions.py
+```
+
 `unused "type: ignore"`가 뜨면 해당 import 라인에서 불필요한 `# type: ignore[import-untyped]` 주석을 제거합니다.
 
 ---
