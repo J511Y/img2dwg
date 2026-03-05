@@ -36,7 +36,7 @@ from img2dwg.strategies.two_stage import TwoStageBaselineStrategy  # type: ignor
 
 def import_streamlit() -> Any:
     try:
-        import streamlit as st  # type: ignore[import-not-found]
+        import streamlit as st
     except ModuleNotFoundError as exc:
         if exc.name == "streamlit":
             raise SystemExit(
@@ -102,7 +102,9 @@ def format_result_markdown(
     return "\n".join(lines)
 
 
-def assert_path_within_output_root(target_path: Path, output_root: Path, error_message: str) -> None:
+def assert_path_within_output_root(
+    target_path: Path, output_root: Path, error_message: str
+) -> None:
     resolved_root = output_root.resolve()
     resolved_target = target_path.resolve()
     try:
@@ -130,7 +132,9 @@ def sanitize_upload_filename(filename: str) -> str:
         raise ValueError("상대 경로 토큰('..')이 포함된 파일명은 허용되지 않습니다.")
 
     if len(safe_name) > MAX_UPLOAD_BASENAME_LENGTH:
-        raise ValueError(f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다.")
+        raise ValueError(
+            f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다."
+        )
 
     if any(char in safe_name for char in {":", "*", "?", '"', "<", ">", "|"}):
         raise ValueError("업로드 파일명에 허용되지 않은 특수문자가 포함되어 있습니다.")
