@@ -73,7 +73,9 @@ def test_dataset_loads_base64_image(tmp_path: Path) -> None:
     jsonl_path = tmp_path / "samples.jsonl"
     _write_jsonl(jsonl_path, image_url)
 
-    ds = ImageToJSONDataset(jsonl_path=jsonl_path, tokenizer=DummyTokenizer(), image_size=8, max_length=4)
+    ds = ImageToJSONDataset(
+        jsonl_path=jsonl_path, tokenizer=DummyTokenizer(), image_size=8, max_length=4
+    )
     sample = ds[0]
 
     assert sample["pixel_values"].shape == (3, 8, 8)
@@ -92,7 +94,9 @@ def test_dataset_http_image_and_error_fallback(
             self.content = content
 
     monkeypatch.setattr("requests.get", lambda _: Resp(_png_bytes()))
-    ds = ImageToJSONDataset(jsonl_path=jsonl_path, tokenizer=DummyTokenizer(), image_size=8, max_length=4)
+    ds = ImageToJSONDataset(
+        jsonl_path=jsonl_path, tokenizer=DummyTokenizer(), image_size=8, max_length=4
+    )
     assert ds[0]["pixel_values"].shape == (3, 8, 8)
 
     def raise_timeout(url: str):

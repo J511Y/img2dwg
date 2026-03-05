@@ -78,7 +78,10 @@ python_functions = "test_*"
 addopts = [
     "-v",
     "--strict-markers",
-    "--cov=src/img2dwg",
+    "--cov=src/img2dwg/ved",
+    "--cov=src/img2dwg/models",
+    "--cov=img2dwg.utils.tiling",
+    "--cov=img2dwg.utils.image_uploader",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-fail-under=60",
