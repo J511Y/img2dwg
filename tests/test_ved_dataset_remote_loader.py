@@ -27,14 +27,18 @@ class DummyTokenizer:
 
 
 class DummyResponse:
-    def __init__(self, content: bytes, status_code: int = 200, headers: dict[str, str] | None = None):
+    def __init__(
+        self, content: bytes, status_code: int = 200, headers: dict[str, str] | None = None
+    ):
         self.content = content
         self.status_code = status_code
         self.headers = headers or {"Content-Type": "image/png"}
 
     def raise_for_status(self) -> None:
         if self.status_code >= 400:
-            raise requests.HTTPError(f"status={self.status_code}")
+            error = requests.HTTPError(f"status={self.status_code}")
+            error.response = self  # type: ignore[assignment]
+            raise error
 
 
 def _png_bytes() -> bytes:
@@ -74,7 +78,9 @@ def _make_dataset(tmp_path: Path, image_url: str, policy: RemoteImagePolicy) -> 
     )
 
 
-def test_remote_image_cache_hit_skips_second_download(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_remote_image_cache_hit_skips_second_download(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     image_url = "https://example.com/floorplan.png"
     calls: list[float] = []
 
@@ -100,7 +106,9 @@ def test_remote_image_cache_hit_skips_second_download(tmp_path: Path, monkeypatc
     assert len(list((tmp_path / "cache").iterdir())) == 1
 
 
-def test_remote_image_loader_retries_with_backoff(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_remote_image_loader_retries_with_backoff(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     image_url = "https://example.com/retry.png"
     attempts = {"count": 0}
     sleeps: list[float] = []
@@ -132,6 +140,40 @@ def test_remote_image_loader_retries_with_backoff(tmp_path: Path, monkeypatch: p
     assert image.size == (2, 2)
     assert attempts["count"] == 3
     assert sleeps == [0.25, 0.5]
+
+
+def test_remote_image_loader_does_not_retry_on_http_404(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    image_url = "https://example.com/missing.png"
+    attempts = {"count": 0}
+    sleeps: list[float] = []
+
+    def always_404(url: str, timeout: float) -> DummyResponse:
+        assert url == image_url
+        assert timeout == 2.5
+        attempts["count"] += 1
+        return DummyResponse(b"", status_code=404)
+
+    monkeypatch.setattr("img2dwg.ved.dataset.requests.get", always_404)
+    monkeypatch.setattr("img2dwg.ved.dataset.time.sleep", lambda value: sleeps.append(value))
+
+    dataset = _make_dataset(
+        tmp_path,
+        image_url,
+        policy=RemoteImagePolicy(
+            cache_dir=tmp_path / "cache",
+            timeout_seconds=2.5,
+            max_retries=3,
+            backoff_seconds=1.0,
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match="Failed to load remote image after retries"):
+        dataset._load_image(image_url)
+
+    assert attempts["count"] == 1
+    assert sleeps == []
 
 
 def test_offline_mode_requires_cached_remote_image(tmp_path: Path) -> None:

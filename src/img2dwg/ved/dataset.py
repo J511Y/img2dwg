@@ -210,7 +210,9 @@ class ImageToJSONDataset(Dataset):
             try:
                 response = requests.get(image_url, timeout=self.remote_policy.timeout_seconds)
                 response.raise_for_status()
-                content_type = response.headers.get("Content-Type", "").split(";")[0].strip().lower()
+                content_type = (
+                    response.headers.get("Content-Type", "").split(";")[0].strip().lower()
+                )
                 if content_type and not content_type.startswith("image/"):
                     raise ValueError(
                         f"Expected image content type for {image_url}, got: {content_type}"
@@ -221,9 +223,14 @@ class ImageToJSONDataset(Dataset):
                 self._write_cache_file(cache_path, response.content)
                 return Image.open(io.BytesIO(response.content)).convert("RGB")
 
-            except (requests.exceptions.RequestException, UnidentifiedImageError, ValueError) as exc:
+            except (
+                requests.exceptions.RequestException,
+                UnidentifiedImageError,
+                ValueError,
+            ) as exc:
                 last_error = exc
-                if attempt_idx == max_attempts - 1:
+                should_stop_retry = self._is_non_retryable_http_error(exc)
+                if should_stop_retry or attempt_idx == max_attempts - 1:
                     break
 
                 backoff = self.remote_policy.backoff_seconds * (2**attempt_idx)
@@ -236,7 +243,27 @@ class ImageToJSONDataset(Dataset):
                 if backoff > 0:
                     time.sleep(backoff)
 
-        raise RuntimeError(f"Failed to load remote image after retries: {image_url}") from last_error
+        raise RuntimeError(
+            f"Failed to load remote image after retries: {image_url}"
+        ) from last_error
+
+    @staticmethod
+    def _is_non_retryable_http_error(exc: Exception) -> bool:
+        if not isinstance(exc, requests.exceptions.HTTPError):
+            return False
+
+        response = exc.response
+        if response is None:
+            return False
+
+        status_code = getattr(response, "status_code", None)
+        if not isinstance(status_code, int):
+            return False
+
+        if status_code in {408, 429}:
+            return False
+
+        return 400 <= status_code < 500
 
     def _write_cache_file(self, cache_path: Path, payload: bytes) -> None:
         tmp_path = cache_path.with_suffix(f"{cache_path.suffix}.tmp")
