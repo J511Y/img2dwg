@@ -244,16 +244,21 @@ host 인자에 공백만 전달되었거나 앞뒤 공백/개행/탭/NUL/`DEL`/b
 - `--host 127.0.0.1` 또는 `--host 0.0.0.0 --allow-remote`처럼 **명시적인 host 문자열**을 사용하세요.
 - 자동화 스크립트에서 환경변수 치환 시 숨김 제어문자(예: `\u202e`)가 섞이지 않았는지 확인하세요.
 
-### Q7. 리뷰 게이트에서 `ruff format --check` 또는 `mypy (unused-ignore)`가 실패합니다
+### Q7. 리뷰 게이트에서 `ruff format --check` 또는 `mypy`가 실패합니다
 
 퍼블리셔 스크립트 변경 후 아래 정적 게이트를 먼저 실행해 CI/리뷰 FAIL을 예방하세요.
 
 ```bash
 uv run --extra dev ruff format --check scripts/web_gradio.py scripts/web_streamlit.py scripts/web_streamlit_app.py
 uv run --extra dev mypy scripts/smoke_web_publishers.py scripts/web_gradio.py scripts/web_streamlit.py scripts/web_streamlit_app.py src/img2dwg/web/__init__.py src/img2dwg/web/retention.py
+uv run --extra dev pytest -q tests/test_mypy_publisher_gate_config.py
 ```
 
-`unused "type: ignore"`가 뜨면 해당 import 라인에서 불필요한 `# type: ignore[import-untyped]` 주석을 제거합니다.
+`pyproject.toml`의 `[tool.mypy].mypy_path = "src"`를 기준으로 local package import를 해석하므로,
+`PYTHONPATH=src` 환경변수 우회 없이 동일 명령을 재현할 수 있습니다.
+
+또한 `unused "type: ignore"`가 뜨면 해당 import 라인에서 불필요한
+`# type: ignore[import-untyped]` 또는 파일 레벨 `disable-error-code=import-untyped`를 제거합니다.
 
 ---
 
