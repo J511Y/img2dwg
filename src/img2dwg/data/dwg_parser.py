@@ -307,6 +307,34 @@ class DWGParser:
             "x": self._process_coordinate(point.x),
             "y": self._process_coordinate(point.y),
         }
+
+    def _polyline_points(self, entity: Any) -> List[Tuple[float, float]]:
+        """LWPOLYLINE/POLYLINE 좌표를 타입별 API로 추출한다."""
+        entity_type = entity.dxftype()
+        if entity_type == "LWPOLYLINE":
+            return [(float(x), float(y)) for x, y, *_ in entity.get_points("xy")]
+
+        points = []
+        for vertex in getattr(entity, "vertices", []):
+            location = vertex.dxf.location
+            points.append((float(location.x), float(location.y)))
+
+        return points
+
+    def _polyline_closed(self, entity: Any) -> bool:
+        """폴리라인 닫힘 여부를 타입별로 계산한다."""
+        entity_type = entity.dxftype()
+        if entity_type == "LWPOLYLINE":
+            return bool(getattr(entity, "closed", False))
+
+        is_closed = getattr(entity, "is_closed", None)
+        if callable(is_closed):
+            return bool(is_closed())
+        if is_closed is not None:
+            return bool(is_closed)
+
+        flags = int(entity.dxf.get("flags", 0))
+        return bool(flags & 1)
     
     def _convert_entity(self, entity: Any) -> Optional[Dict[str, Any]]:
         """
@@ -345,22 +373,22 @@ class DWGParser:
             })
             
         elif entity_type == "LWPOLYLINE" or entity_type == "POLYLINE":
-            points = [(p[0], p[1]) for p in entity.get_points("xy")]
-            
+            points = self._polyline_points(entity)
+
             # RDP 간소화 적용
             if self.options.rdp_tolerance and len(points) > 2:
                 points = rdp_simplify(points, self.options.rdp_tolerance)
-            
+
             # 좌표 처리
             processed_points = [
                 {"x": self._process_coordinate(p[0]), "y": self._process_coordinate(p[1])}
                 for p in points
             ]
-            
+
             base_data.update({
                 "type": "polyline",
                 "points": processed_points,
-                "closed": entity.closed,
+                "closed": self._polyline_closed(entity),
             })
             
         elif entity_type == "CIRCLE":
