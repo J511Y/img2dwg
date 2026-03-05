@@ -30,7 +30,9 @@ def module() -> ModuleType:
         "",
     ],
 )
-def test_sanitize_upload_filename_rejects_malicious_inputs(module: ModuleType, filename: str) -> None:
+def test_sanitize_upload_filename_rejects_malicious_inputs(
+    module: ModuleType, filename: str
+) -> None:
     with pytest.raises(ValueError):
         module.sanitize_upload_filename(filename)
 

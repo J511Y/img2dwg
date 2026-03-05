@@ -226,6 +226,16 @@ $env:GITHUB_REPO_NAME="img2dwg-images"
 - **ruff**: 린터 및 포매터
 - **mypy**: 타입 체킹
 
+### #21 Streamlit 업로드 보안 리뷰 게이트 (FAIL 재발 방지)
+리뷰 사이클에서 반복된 `ruff format --check` FAIL을 방지하려면 PR 전 아래 명령을 실행하세요.
+
+```bash
+uv run --extra dev ruff format --check scripts/web_streamlit_app.py tests/test_web_streamlit_upload_security.py
+uv run --extra dev ruff check scripts/web_streamlit_app.py tests/test_web_streamlit_upload_security.py
+uv run --extra dev mypy scripts/web_streamlit_app.py
+uv run --extra dev pytest -q tests/test_web_streamlit_upload_security.py tests/test_web_streamlit_format_gate.py
+```
+
 ### 구현 상태
 
 | 기능 | 상태 |
