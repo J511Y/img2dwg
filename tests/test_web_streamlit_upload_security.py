@@ -37,17 +37,32 @@ def module() -> ModuleType:
         "evil?.png",
         "evil\x00name.png",
         "evil\nname.png",
+        "a／evil.png",
+        "evil\u202ename.png",
         ".hidden.png",
         f"{'a' * 121}.png",
     ],
 )
-def test_sanitize_upload_filename_rejects_malicious_inputs(module: ModuleType, filename: str) -> None:
+def test_sanitize_upload_filename_rejects_malicious_inputs(
+    module: ModuleType, filename: str
+) -> None:
     with pytest.raises(ValueError):
         module.sanitize_upload_filename(filename)
 
 
-def test_sanitize_upload_filename_accepts_valid_name(module: ModuleType) -> None:
-    assert module.sanitize_upload_filename("  FloorPlan.PNG  ") == "FloorPlan.PNG"
+@pytest.mark.parametrize(
+    ("filename", "expected"),
+    [
+        ("  FloorPlan.PNG  ", "FloorPlan.PNG"),
+        (" 도면_테스트.PNG ", "도면_테스트.PNG"),
+    ],
+)
+def test_sanitize_upload_filename_accepts_valid_name(
+    module: ModuleType,
+    filename: str,
+    expected: str,
+) -> None:
+    assert module.sanitize_upload_filename(filename) == expected
 
 
 def test_build_safe_upload_path_rejects_output_root_escape_via_symlink(
@@ -73,10 +88,12 @@ def test_build_safe_upload_path_returns_internal_path(module: ModuleType, tmp_pa
     upload_dir = output_root / "_uploads" / "20260305"
     upload_dir.mkdir(parents=True, exist_ok=True)
 
-    path = module.build_safe_upload_path(upload_dir, output_root, "ok.png")
+    path = module.build_safe_upload_path(upload_dir, output_root, "ok.PNG")
 
     assert path.parent == upload_dir
-    assert path.name.endswith("-ok.png")
+    assert path.suffix == ".png"
+    assert path.stem != "ok"
+    assert len(path.stem) == 8
     assert path.resolve().is_relative_to(output_root.resolve())
 
 

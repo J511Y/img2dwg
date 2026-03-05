@@ -8,6 +8,7 @@ import argparse
 import importlib
 import sys
 import time
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -32,11 +33,11 @@ WINDOWS_RESERVED_BASENAMES = {
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from img2dwg.strategies.base import ConversionInput  # type: ignore[import-untyped]
-from img2dwg.strategies.consensus_qa import ConsensusQAStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry  # type: ignore[import-untyped]
-from img2dwg.strategies.two_stage import TwoStageBaselineStrategy  # type: ignore[import-untyped]
+from img2dwg.strategies.base import ConversionInput
+from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
+from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy
+from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
+from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
 
 
 def import_streamlit() -> Any:
@@ -106,7 +107,9 @@ def format_result_markdown(
     return "\n".join(lines)
 
 
-def assert_path_within_output_root(target_path: Path, output_root: Path, error_message: str) -> None:
+def assert_path_within_output_root(
+    target_path: Path, output_root: Path, error_message: str
+) -> None:
     resolved_root = output_root.resolve()
     resolved_target = target_path.resolve()
     try:
@@ -120,10 +123,12 @@ def sanitize_upload_filename(filename: str) -> str:
     if not raw:
         raise ValueError("업로드 파일명이 비어 있습니다.")
 
-    if any(ord(char) < 32 or ord(char) == 127 for char in raw):
-        raise ValueError("업로드 파일명에 제어 문자가 포함되어 있습니다.")
+    if any(unicodedata.category(char) in {"Cc", "Cf", "Cs", "Co", "Cn"} for char in raw):
+        raise ValueError("업로드 파일명에 제어/포맷 문자가 포함되어 있습니다.")
 
-    normalized = raw.replace("\\", "/")
+    normalized = unicodedata.normalize("NFKC", raw).replace("\\", "/")
+    if any(unicodedata.category(char) in {"Cc", "Cf", "Cs", "Co", "Cn"} for char in normalized):
+        raise ValueError("정규화 후 파일명에 제어/포맷 문자가 포함되어 있습니다.")
 
     if normalized.startswith("/"):
         raise ValueError("절대 경로 업로드 파일명은 허용되지 않습니다.")
@@ -140,7 +145,9 @@ def sanitize_upload_filename(filename: str) -> str:
         raise ValueError("숨김 파일(dotfile) 형태의 업로드 파일명은 허용되지 않습니다.")
 
     if len(safe_name) > MAX_UPLOAD_BASENAME_LENGTH:
-        raise ValueError(f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다.")
+        raise ValueError(
+            f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다."
+        )
 
     if any(char in safe_name for char in {":", "*", "?", '"', "<", ">", "|"}):
         raise ValueError("업로드 파일명에 허용되지 않은 특수문자가 포함되어 있습니다.")
@@ -204,6 +211,7 @@ def validate_upload_payload(
 
 def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filename: str) -> Path:
     safe_filename = sanitize_upload_filename(uploaded_filename)
+    safe_suffix = Path(safe_filename).suffix.lower()
 
     assert_path_within_output_root(
         upload_dir,
@@ -211,7 +219,8 @@ def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filenam
         "업로드 저장 디렉터리가 output-root를 벗어났습니다.",
     )
 
-    upload_path = upload_dir / f"{uuid4().hex[:8]}-{safe_filename}"
+    # 사용자 제공 basename에 의존하지 않고 랜덤 + 허용 확장자만 사용한다.
+    upload_path = upload_dir / f"{uuid4().hex[:8]}{safe_suffix}"
     assert_path_within_output_root(
         upload_path,
         output_root,
