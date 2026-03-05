@@ -110,7 +110,9 @@ def test_ved_model_build_forward_generate_save_and_load(monkeypatch, tmp_path: P
     assert fake_model.config.eos_token_id == tokenizer.eos_token_id
     assert fake_model.decoder.resized_to == tokenizer.vocab_size
 
-    outputs = model.forward(pixel_values=torch.zeros(1, 3, 16, 16), labels=torch.ones(1, 3, dtype=torch.long))
+    outputs = model.forward(
+        pixel_values=torch.zeros(1, 3, 16, 16), labels=torch.ones(1, 3, dtype=torch.long)
+    )
     assert float(outputs.loss) == 0.5
 
     generated = model.generate(pixel_values=torch.zeros(1, 3, 16, 16))

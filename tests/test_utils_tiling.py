@@ -43,7 +43,9 @@ def test_generate_tiles_splits_entities_into_tiles(monkeypatch: pytest.MonkeyPat
     assert len(tiles[1]["entities"]) == 1
 
 
-def test_split_by_token_budget_prefers_tiles_and_falls_back(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_split_by_token_budget_prefers_tiles_and_falls_back(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     json_data = _sample_json()
 
     def token_counter(payload: dict) -> int:

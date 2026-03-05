@@ -58,7 +58,9 @@ def test_imgur_upload_success_and_error(
         uploader._upload_imgur(image)
 
 
-def test_upload_cloudinary_requires_package(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_upload_cloudinary_requires_package(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     image = tmp_path / "a.png"
     image.write_bytes(b"png")
 
