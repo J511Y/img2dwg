@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any
 
 from img2dwg.pipeline.benchmark import run_benchmark
 from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
@@ -12,11 +15,14 @@ from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 DEFAULT_RECURSIVE_SCAN_LIMIT = 2_000
+DEFAULT_METADATA_WARNING_SAMPLE_SIZE = 5
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Compare conversion strategies on same samples")
-    parser.add_argument("--images", type=Path, required=True, help="directory containing input images")
+    parser.add_argument(
+        "--images", type=Path, required=True, help="directory containing input images"
+    )
     parser.add_argument("--output", type=Path, default=Path("output/benchmark"))
     parser.add_argument("--dataset-id", type=str, default="default")
     parser.add_argument("--git-ref", type=str, default="local")
@@ -47,6 +53,26 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default="",
         help="comma-separated allowlist for high-risk strategies",
+    )
+    parser.add_argument(
+        "--metadata-manifest",
+        type=Path,
+        default=None,
+        help="optional JSON map: {<image-key>: <metadata-object>} for per-image metadata",
+    )
+    parser.add_argument(
+        "--strict-metadata-manifest",
+        action="store_true",
+        help="fail benchmark if metadata manifest has unmatched keys",
+    )
+    parser.add_argument(
+        "--metadata-warning-sample-size",
+        type=int,
+        default=DEFAULT_METADATA_WARNING_SAMPLE_SIZE,
+        help=(
+            "max unmatched manifest keys shown in warning messages "
+            f"(default: {DEFAULT_METADATA_WARNING_SAMPLE_SIZE})"
+        ),
     )
     return parser.parse_args()
 
@@ -155,6 +181,65 @@ def collect_image_paths(
     )
 
 
+def load_metadata_manifest(manifest_path: Path) -> dict[str, dict[str, Any]]:
+    if not manifest_path.exists() or not manifest_path.is_file():
+        raise ValueError(f"metadata manifest path does not exist: {manifest_path}")
+
+    try:
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"metadata manifest must be valid JSON: {manifest_path}") from exc
+
+    if not isinstance(payload, Mapping):
+        raise ValueError("metadata manifest root must be an object")
+
+    metadata_by_image: dict[str, dict[str, Any]] = {}
+    for raw_key, raw_value in payload.items():
+        key = str(raw_key).strip()
+        if not key:
+            raise ValueError("metadata manifest key must not be empty")
+
+        if not isinstance(raw_value, Mapping):
+            raise ValueError(f"metadata manifest value must be an object for key: {raw_key}")
+
+        metadata_by_image[key] = {str(k): v for k, v in raw_value.items()}
+
+    return metadata_by_image
+
+
+def build_metadata_key_candidates(
+    image_paths: list[Path],
+    images_root: Path,
+) -> dict[Path, list[tuple[str, str]]]:
+    root_resolved = _safe_resolve(images_root)
+    by_image: dict[Path, list[tuple[str, str]]] = {}
+
+    for image_path in image_paths:
+        resolved_image = _safe_resolve(image_path)
+        candidates: list[tuple[str, str]] = [("absolute", resolved_image.as_posix())]
+
+        try:
+            root_relative = resolved_image.relative_to(root_resolved).as_posix()
+        except ValueError:
+            root_relative = ""
+        if root_relative:
+            candidates.append(("root_relative", root_relative))
+
+        as_given = image_path.as_posix()
+        resolved_key = resolved_image.as_posix()
+        if as_given and as_given != resolved_key:
+            candidates.append(("relative", as_given))
+
+        if image_path.name:
+            candidates.append(("name", image_path.name))
+        if image_path.stem and image_path.stem != image_path.name:
+            candidates.append(("stem", image_path.stem))
+
+        by_image[image_path] = candidates
+
+    return by_image
+
+
 def main() -> None:
     args = parse_args()
     image_paths = collect_image_paths(
@@ -165,6 +250,12 @@ def main() -> None:
     )
     if not image_paths:
         raise ValueError(f"no image files found in: {args.images}")
+
+    metadata_by_image: dict[str, dict[str, Any]] | None = None
+    metadata_key_candidates_by_image: dict[Path, list[tuple[str, str]]] | None = None
+    if args.metadata_manifest is not None:
+        metadata_by_image = load_metadata_manifest(args.metadata_manifest)
+        metadata_key_candidates_by_image = build_metadata_key_candidates(image_paths, args.images)
 
     registry = StrategyRegistry()
     registry.register(HybridMVPStrategy())
@@ -183,6 +274,10 @@ def main() -> None:
         feature_flags=flags,
         dataset_id=args.dataset_id,
         git_ref=args.git_ref,
+        metadata_by_image=metadata_by_image,
+        metadata_key_candidates_by_image=metadata_key_candidates_by_image,
+        strict_metadata_manifest=args.strict_metadata_manifest,
+        metadata_warning_sample_size=args.metadata_warning_sample_size,
     )
     print(f"done: benchmark results -> {args.output / 'benchmark_results.json'}")
 
