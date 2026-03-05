@@ -94,7 +94,7 @@ uv run --frozen --extra web python scripts/web_streamlit.py --host 127.0.0.1 --p
 ```
 
 > 보안 기본값: non-loopback host(예: `0.0.0.0`) 바인딩 시 `--allow-remote`를 명시해야 실행됩니다.
-> 또한 빈 host, 앞뒤 공백, 제어문자(host에 개행·탭·NUL 포함)는 실행 전에 거부됩니다.
+> 또한 빈 host, 앞뒤 공백, 제어/포맷 문자(host에 개행·탭·NUL·DEL·bidi 숨김문자 포함)는 실행 전에 거부됩니다.
 
 통합 스모크 테스트:
 

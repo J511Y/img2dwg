@@ -9,6 +9,7 @@ import ipaddress
 import socket
 import sys
 import time
+import unicodedata
 from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
@@ -51,14 +52,16 @@ def import_gradio() -> Any:
 
 
 def normalize_host_input(host: str) -> str:
-    """Normalize host CLI input and reject ambiguous control-character payloads."""
+    """Normalize host CLI input and reject ambiguous control/format-character payloads."""
     normalized = host.strip()
     if not normalized:
         raise RuntimeError("Host must not be empty.")
     if host != normalized:
         raise RuntimeError("Host must not include surrounding whitespace.")
-    if any(ord(char) < 32 for char in normalized):
-        raise RuntimeError("Host contains control characters; provide a plain hostname or IP.")
+    if any(unicodedata.category(char).startswith("C") for char in normalized):
+        raise RuntimeError(
+            "Host contains control or format characters; provide a plain hostname or IP."
+        )
     return normalized
 
 
