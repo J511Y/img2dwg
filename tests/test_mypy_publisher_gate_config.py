@@ -16,6 +16,17 @@ def test_mypy_path_includes_src_root() -> None:
     assert 'mypy_path = "src"' in content
 
 
+def test_hatch_wheel_includes_pep561_marker() -> None:
+    """Ensure installed wheel exports py.typed for import-untyped stability."""
+    marker = PROJECT_ROOT / "src" / "img2dwg" / "py.typed"
+    assert marker.exists()
+
+    pyproject = PROJECT_ROOT / "pyproject.toml"
+    content = pyproject.read_text(encoding="utf-8")
+    assert "[tool.hatch.build.targets.wheel.force-include]" in content
+    assert '"src/img2dwg/py.typed" = "img2dwg/py.typed"' in content
+
+
 def test_publisher_scripts_do_not_use_import_untyped_ignores() -> None:
     """Avoid env-dependent mypy behavior from stale import-untyped suppressions."""
     scripts = [
