@@ -79,6 +79,12 @@ python scripts/inference_ved.py \
   --output output/predicted.json
 ```
 
+`inference_ved.py`의 길이 정책:
+- 기본: 체크포인트의 `ved_training_config.json`에서 학습 `max_length` 자동 정렬
+- fallback: 메타데이터가 없으면 `VEDConfig.max_length(131072)` 사용
+- override: `--max-length` 지정 시 최우선 적용(양수/상한선 검증)
+- 생성 토큰 수가 `max_length`와 같으면 truncation 가능성 경고 로그 출력
+
 ## 📊 예상 결과
 
 ### 학습 곡선
