@@ -170,8 +170,14 @@ def test_access_policy_rejects_empty_or_control_char_hosts() -> None:
         with pytest.raises(RuntimeError, match="surrounding whitespace"):
             module.ensure_access_policy(" 127.0.0.1", allow_remote=False)
 
-        with pytest.raises(RuntimeError, match="control characters"):
+        with pytest.raises(RuntimeError, match="control or format characters"):
             module.ensure_access_policy("127.0.\n0.1", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="control or format characters"):
+            module.ensure_access_policy("127.0.0.1\x7f", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="control or format characters"):
+            module.ensure_access_policy("127.0.0.1\u202e", allow_remote=False)
 
 
 def test_requires_remote_access_ack_detects_loopback_and_remote_hosts() -> None:

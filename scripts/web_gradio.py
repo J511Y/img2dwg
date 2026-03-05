@@ -9,6 +9,7 @@ import ipaddress
 import socket
 import sys
 import time
+import unicodedata
 from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
@@ -21,15 +22,15 @@ from uuid import uuid4
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from img2dwg.strategies.base import ConversionInput  # type: ignore[import-untyped]
-from img2dwg.strategies.consensus_qa import ConsensusQAStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.registry import (  # type: ignore[import-untyped]
+from img2dwg.strategies.base import ConversionInput
+from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
+from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy
+from img2dwg.strategies.registry import (
     FeatureFlags,
     StrategyRegistry,
 )
-from img2dwg.strategies.two_stage import TwoStageBaselineStrategy  # type: ignore[import-untyped]
-from img2dwg.web.retention import (  # type: ignore[import-untyped]
+from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
+from img2dwg.web.retention import (
     cleanup_output_root,
     format_cleanup_report,
 )
@@ -51,14 +52,16 @@ def import_gradio() -> Any:
 
 
 def normalize_host_input(host: str) -> str:
-    """Normalize host CLI input and reject ambiguous control-character payloads."""
+    """Normalize host CLI input and reject ambiguous control/format-character payloads."""
     normalized = host.strip()
     if not normalized:
         raise RuntimeError("Host must not be empty.")
     if host != normalized:
         raise RuntimeError("Host must not include surrounding whitespace.")
-    if any(ord(char) < 32 for char in normalized):
-        raise RuntimeError("Host contains control characters; provide a plain hostname or IP.")
+    if any(unicodedata.category(char).startswith("C") for char in normalized):
+        raise RuntimeError(
+            "Host contains control or format characters; provide a plain hostname or IP."
+        )
     return normalized
 
 
