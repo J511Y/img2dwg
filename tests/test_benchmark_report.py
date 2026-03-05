@@ -6,7 +6,11 @@ from typing import Any, cast
 import ezdxf
 import pytest
 
-from img2dwg.pipeline.benchmark import _build_final_summary, run_benchmark
+from img2dwg.pipeline.benchmark import (
+    _build_case_output_dir,
+    _build_final_summary,
+    run_benchmark,
+)
 from img2dwg.pipeline.schema import build_strategy_result
 from img2dwg.strategies.base import ConversionInput, ConversionOutput, ConversionStrategy
 from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
@@ -286,13 +290,9 @@ def test_run_benchmark_summary_fields_match_results_payload(tmp_path: Path) -> N
 
     summary_payload = _load_summary_payload(out_dir)
 
-    ranking_by_name = {
-        entry["strategy_name"]: entry
-        for entry in result["ranking"]
-    }
+    ranking_by_name = {entry["strategy_name"]: entry for entry in result["ranking"]}
     results_summary_by_name = {
-        strategy["strategy_name"]: strategy["summary"]
-        for strategy in result["strategies"]
+        strategy["strategy_name"]: strategy["summary"] for strategy in result["strategies"]
     }
 
     run_info = summary_payload["run"]
@@ -725,7 +725,9 @@ def test_run_benchmark_allows_allowlisted_high_risk_strategy(tmp_path: Path) -> 
         registry=reg,
         output_dir=tmp_path / "out-high-risk-allowlisted",
         strategy_names=["high_risk_success"],
-        feature_flags=FeatureFlags(enable_high_risk=True, high_risk_allowlist=["high_risk_success"]),
+        feature_flags=FeatureFlags(
+            enable_high_risk=True, high_risk_allowlist=["high_risk_success"]
+        ),
         dataset_id="high-risk-allowlisted",
         git_ref="test",
     )
@@ -1093,3 +1095,19 @@ def test_run_benchmark_isolates_case_outputs_for_same_stem_images(tmp_path: Path
     assert cases[1]["cad_loadable"] is False
     assert strategy_row["summary"]["cad_loadable_count"] == 1
     assert strategy_row["summary"]["cad_loadable_rate"] == 0.5
+
+
+def test_build_case_output_dir_uses_safe_fallback_slug_for_non_ascii_stems(tmp_path: Path) -> None:
+    strategy_root = tmp_path / "strategy"
+    image_dir = tmp_path / "원본"
+    image_dir.mkdir(parents=True, exist_ok=True)
+    image_path = image_dir / "😀😀.png"
+    image_path.write_bytes(b"fake")
+
+    case1 = _build_case_output_dir(strategy_root, image_path, case_index=1)
+    case2 = _build_case_output_dir(strategy_root, image_path, case_index=2)
+
+    assert case1.parent == strategy_root
+    assert case1.name.startswith("case_0001_image_")
+    assert case2.name.startswith("case_0002_image_")
+    assert case1 != case2
