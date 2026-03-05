@@ -154,9 +154,30 @@ def test_resolve_probe_host_handles_wildcards() -> None:
     gradio_module = _load_script_module("web_gradio_script_for_tests", GRADIO_SCRIPT_PATH)
     streamlit_module = _load_script_module("web_streamlit_script_for_tests", STREAMLIT_SCRIPT_PATH)
 
-    for host in ["0.0.0.0", "::", "[::]", ""]:
+    for host in ["0.0.0.0", "::", "[::]"]:
         assert gradio_module.resolve_probe_host(host) == "127.0.0.1"
         assert streamlit_module.resolve_probe_host(host) == "127.0.0.1"
+
+
+def test_access_policy_rejects_empty_or_control_char_hosts() -> None:
+    gradio_module = _load_script_module("web_gradio_script_for_tests", GRADIO_SCRIPT_PATH)
+    streamlit_module = _load_script_module("web_streamlit_script_for_tests", STREAMLIT_SCRIPT_PATH)
+
+    for module in (gradio_module, streamlit_module):
+        with pytest.raises(RuntimeError, match="Host must not be empty"):
+            module.ensure_access_policy("   ", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="surrounding whitespace"):
+            module.ensure_access_policy(" 127.0.0.1", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="control or format characters"):
+            module.ensure_access_policy("127.0.\n0.1", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="control or format characters"):
+            module.ensure_access_policy("127.0.0.1\x7f", allow_remote=False)
+
+        with pytest.raises(RuntimeError, match="control or format characters"):
+            module.ensure_access_policy("127.0.0.1\u202e", allow_remote=False)
 
 
 def test_requires_remote_access_ack_detects_loopback_and_remote_hosts() -> None:

@@ -9,6 +9,7 @@ import ipaddress
 import socket
 import sys
 import time
+import unicodedata
 from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
@@ -21,15 +22,15 @@ from uuid import uuid4
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from img2dwg.strategies.base import ConversionInput  # type: ignore[import-untyped]
-from img2dwg.strategies.consensus_qa import ConsensusQAStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.registry import (  # type: ignore[import-untyped]
+from img2dwg.strategies.base import ConversionInput
+from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
+from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy
+from img2dwg.strategies.registry import (
     FeatureFlags,
     StrategyRegistry,
 )
-from img2dwg.strategies.two_stage import TwoStageBaselineStrategy  # type: ignore[import-untyped]
-from img2dwg.web.retention import (  # type: ignore[import-untyped]
+from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
+from img2dwg.web.retention import (
     cleanup_output_root,
     format_cleanup_report,
 )
@@ -50,10 +51,24 @@ def import_gradio() -> Any:
     return gr
 
 
+def normalize_host_input(host: str) -> str:
+    """Normalize host CLI input and reject ambiguous control/format-character payloads."""
+    normalized = host.strip()
+    if not normalized:
+        raise RuntimeError("Host must not be empty.")
+    if host != normalized:
+        raise RuntimeError("Host must not include surrounding whitespace.")
+    if any(unicodedata.category(char).startswith("C") for char in normalized):
+        raise RuntimeError(
+            "Host contains control or format characters; provide a plain hostname or IP."
+        )
+    return normalized
+
+
 def resolve_probe_host(host: str) -> str:
     """Normalize wildcard hosts to loopback for local smoke probes."""
-    normalized = host.strip()
-    if normalized in {"0.0.0.0", "::", "[::]", ""}:
+    normalized = normalize_host_input(host)
+    if normalized in {"0.0.0.0", "::", "[::]"}:
         return "127.0.0.1"
     return normalized
 
@@ -82,11 +97,13 @@ def ensure_port_available(host: str, port: int) -> None:
 
 def requires_remote_access_ack(host: str) -> bool:
     """Return True when host binding may expose the publisher beyond loopback."""
-    normalized = host.strip().lower()
-    if normalized in {"", "localhost", "127.0.0.1", "::1", "[::1]"}:
+    normalized = normalize_host_input(host).lower()
+    if normalized in {"localhost", "127.0.0.1", "::1", "[::1]"}:
         return False
 
-    candidate = normalized[1:-1] if normalized.startswith("[") and normalized.endswith("]") else normalized
+    candidate = (
+        normalized[1:-1] if normalized.startswith("[") and normalized.endswith("]") else normalized
+    )
     try:
         return not ipaddress.ip_address(candidate).is_loopback
     except ValueError:
@@ -344,11 +361,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    ensure_access_policy(args.host, args.allow_remote)
+    ensure_port_available(args.host, args.port)
     args.output_root = resolve_output_root(args.output_root)
     args.output_root.mkdir(parents=True, exist_ok=True)
     run_startup_cleanup(args)
-    ensure_access_policy(args.host, args.allow_remote)
-    ensure_port_available(args.host, args.port)
 
     gr = import_gradio()
     app = build_app(args.output_root, gr)
