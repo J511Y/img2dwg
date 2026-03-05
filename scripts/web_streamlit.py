@@ -22,7 +22,7 @@ project_root = Path(__file__).resolve().parent.parent
 streamlit_app_path = project_root / "scripts" / "web_streamlit_app.py"
 sys.path.insert(0, str(project_root / "src"))
 
-from img2dwg.web.retention import (  # type: ignore[import-untyped]
+from img2dwg.web.retention import (
     cleanup_output_root,
     format_cleanup_report,
 )

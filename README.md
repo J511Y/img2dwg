@@ -102,6 +102,13 @@ uv run --frozen --extra web python scripts/web_streamlit.py --host 127.0.0.1 --p
 uv run --frozen --extra web python scripts/smoke_web_publishers.py
 ```
 
+퍼블리셔 변경 후 정적 게이트(리뷰 FAIL 방지) 빠른 점검:
+
+```bash
+uv run --extra dev ruff format --check scripts/web_gradio.py scripts/web_streamlit.py scripts/web_streamlit_app.py
+uv run --extra dev mypy scripts/smoke_web_publishers.py scripts/web_gradio.py scripts/web_streamlit.py scripts/web_streamlit_app.py src/img2dwg/web/__init__.py src/img2dwg/web/retention.py
+```
+
 - 실행/접속/보존정책(run/access + cleanup) 상세 문서: [docs/publisher.md](docs/publisher.md)
 
 ### 사용 방법
