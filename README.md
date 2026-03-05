@@ -184,8 +184,15 @@ uv run --extra web streamlit run scripts/web_streamlit_app.py \
 
 운영 가드레일:
 - **접근 정책**: 기본 바인딩은 `127.0.0.1`(로컬 전용)으로 유지합니다. 외부 접근이 꼭 필요할 때만 리버스 프록시/방화벽 뒤에서 공개하세요.
-- **업로드 정책**: 업로드 파일명은 경로 토큰(`..`, `/`, `\\`)·OS 예약 이름·비허용 특수문자를 거부하며, 확장자는 `.jpg/.jpeg/.png`만 허용됩니다.
+- **업로드 정책**: 업로드 파일명은 경로 토큰(`..`, `/`, `\\`)·OS 예약 이름·비허용 특수문자를 거부하며, 확장자는 `.jpg/.jpeg/.png`만 허용됩니다. 저장 시에는 사용자 basename을 버리고 `8hex + 확장자` 랜덤 이름으로 기록해 경로/이름 기반 리스크를 줄입니다.
 - **용량 정책**: 단일 업로드는 최대 `10MB`까지만 허용됩니다.
+- **개발 검증 스모크**: 업로드 보안 헬퍼 심볼/모듈 로드 확인
+  ```bash
+  uv run python - <<'PY'
+  from scripts.web_streamlit_app import sanitize_upload_filename
+  print("smoke:module-load=ok safe_filename=", sanitize_upload_filename("floorplan.png"))
+  PY
+  ```
 - **보존 정책(권장)**: `output/web-streamlit`은 7일 또는 5GB 기준으로 정리 정책을 적용하세요.
   - 예시(7일 초과 파일 정리):
     ```bash
@@ -349,6 +356,68 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 - `/lint-fix`: 코드 린트 및 포맷 자동 수정
 
 자세한 내용은 `.windsurf/workflows/` 참조
+
+## 🔐 Streamlit 업로드 보안 스모크
+
+`web_streamlit_app.py`는 파일명 검증(경로 이탈 차단) 외에도 **유니코드 제어/포맷 문자 + confusable 경로 구분자(NFKC 정규화) 차단**, **저장 시 사용자 basename 제거(랜덤 파일명)**, **확장자-파일시그니처 일치 + 종료 시그니처(IEND/EOI) 검증**을 수행합니다.
+
+빠른 확인 예시:
+
+```bash
+uv run python - <<'PY'
+import importlib.util
+from pathlib import Path
+
+path = Path('scripts/web_streamlit_app.py')
+spec = importlib.util.spec_from_file_location('web_streamlit_smoke', path)
+mod = importlib.util.module_from_spec(spec)
+assert spec and spec.loader
+spec.loader.exec_module(mod)
+
+mod.validate_upload_payload(
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x00IEND\xaeB`\x82',
+    filename_suffix='.png',
+)
+
+try:
+    mod.sanitize_upload_filename('evil\nname.png')
+except ValueError:
+    print('streamlit upload filename control-char guard: ok')
+
+try:
+    mod.sanitize_upload_filename('a／evil.png')
+except ValueError:
+    print('streamlit upload filename unicode-separator guard: ok')
+
+root = Path('output/_smoke')
+upload_dir = root / '_uploads' / '20260305'
+upload_dir.mkdir(parents=True, exist_ok=True)
+path = mod.build_safe_upload_path(upload_dir, root, 'floorplan.png')
+assert path.suffix == '.png' and 'floorplan' not in path.name
+print('streamlit upload randomized-save-name guard: ok')
+
+print('streamlit upload signature+footer guard: ok')
+PY
+```
+
+## 🧪 Streamlit 업로드 리뷰 게이트 회귀 방지
+
+리뷰 사이클에서 반복된 FAIL 원인(`ruff format/check` 드리프트, `mypy unused-ignore`)을
+한 번에 재현/차단하려면 아래 순서로 실행하세요.
+
+```bash
+uv run --extra dev ruff format --check scripts/web_streamlit_app.py tests/test_web_streamlit_upload_security.py tests/test_web_streamlit_gate_regressions.py
+uv run --extra dev ruff check scripts/web_streamlit_app.py tests/test_web_streamlit_upload_security.py tests/test_web_streamlit_gate_regressions.py
+uv run --extra dev mypy scripts/web_streamlit_app.py
+uv run --extra dev pytest -q tests/test_web_streamlit_gate_regressions.py tests/test_web_streamlit_upload_security.py
+```
+
+`tests/test_web_streamlit_gate_regressions.py`는 아래 항목을 자동 점검합니다.
+- `# type: ignore[import-untyped]`/`# mypy: disable-error-code=import-untyped` 재유입 여부
+- `pyproject.toml`의 `[tool.mypy].mypy_path = "src"` 유지 여부
+- Streamlit 업로드 관련 `ruff format --check` / `ruff check`
+- `mypy scripts/web_streamlit_app.py`
+- 업로드 보안 테스트 스위트(`tests/test_web_streamlit_upload_security.py`)
 
 ## 🤝 기여 가이드
 

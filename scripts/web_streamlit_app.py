@@ -5,8 +5,10 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import sys
 import time
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -15,6 +17,10 @@ from uuid import uuid4
 ALLOWED_UPLOAD_SUFFIXES = {".jpg", ".jpeg", ".png"}
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 MAX_UPLOAD_BASENAME_LENGTH = 120
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+PNG_IEND_CHUNK = b"\x00\x00\x00\x00IEND\xaeB`\x82"
+JPEG_SOI = b"\xff\xd8"
+JPEG_EOI = b"\xff\xd9"
 WINDOWS_RESERVED_BASENAMES = {
     "con",
     "prn",
@@ -27,16 +33,16 @@ WINDOWS_RESERVED_BASENAMES = {
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from img2dwg.strategies.base import ConversionInput  # type: ignore[import-untyped]
-from img2dwg.strategies.consensus_qa import ConsensusQAStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry  # type: ignore[import-untyped]
-from img2dwg.strategies.two_stage import TwoStageBaselineStrategy  # type: ignore[import-untyped]
+from img2dwg.strategies.base import ConversionInput
+from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
+from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy
+from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
+from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
 
 
 def import_streamlit() -> Any:
     try:
-        import streamlit as st  # type: ignore[import-not-found]
+        return importlib.import_module("streamlit")
     except ModuleNotFoundError as exc:
         if exc.name == "streamlit":
             raise SystemExit(
@@ -45,7 +51,6 @@ def import_streamlit() -> Any:
                 "Run with: uv run --frozen --extra web python scripts/web_streamlit.py"
             ) from exc
         raise
-    return st
 
 
 def parse_runtime_args() -> argparse.Namespace:
@@ -102,7 +107,9 @@ def format_result_markdown(
     return "\n".join(lines)
 
 
-def assert_path_within_output_root(target_path: Path, output_root: Path, error_message: str) -> None:
+def assert_path_within_output_root(
+    target_path: Path, output_root: Path, error_message: str
+) -> None:
     resolved_root = output_root.resolve()
     resolved_target = target_path.resolve()
     try:
@@ -112,11 +119,16 @@ def assert_path_within_output_root(target_path: Path, output_root: Path, error_m
 
 
 def sanitize_upload_filename(filename: str) -> str:
-    raw = filename.strip().replace("\x00", "")
+    raw = filename.strip()
     if not raw:
         raise ValueError("업로드 파일명이 비어 있습니다.")
 
-    normalized = raw.replace("\\", "/")
+    if any(unicodedata.category(char) in {"Cc", "Cf", "Cs", "Co", "Cn"} for char in raw):
+        raise ValueError("업로드 파일명에 제어/포맷 문자가 포함되어 있습니다.")
+
+    normalized = unicodedata.normalize("NFKC", raw).replace("\\", "/")
+    if any(unicodedata.category(char) in {"Cc", "Cf", "Cs", "Co", "Cn"} for char in normalized):
+        raise ValueError("정규화 후 파일명에 제어/포맷 문자가 포함되어 있습니다.")
 
     if normalized.startswith("/"):
         raise ValueError("절대 경로 업로드 파일명은 허용되지 않습니다.")
@@ -129,8 +141,13 @@ def sanitize_upload_filename(filename: str) -> str:
     if safe_name in {"", ".", ".."} or ".." in safe_name:
         raise ValueError("상대 경로 토큰('..')이 포함된 파일명은 허용되지 않습니다.")
 
+    if safe_name.startswith("."):
+        raise ValueError("숨김 파일(dotfile) 형태의 업로드 파일명은 허용되지 않습니다.")
+
     if len(safe_name) > MAX_UPLOAD_BASENAME_LENGTH:
-        raise ValueError(f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다.")
+        raise ValueError(
+            f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다."
+        )
 
     if any(char in safe_name for char in {":", "*", "?", '"', "<", ">", "|"}):
         raise ValueError("업로드 파일명에 허용되지 않은 특수문자가 포함되어 있습니다.")
@@ -146,7 +163,42 @@ def sanitize_upload_filename(filename: str) -> str:
     return safe_name
 
 
-def validate_upload_payload(payload: bytes, max_upload_bytes: int = MAX_UPLOAD_BYTES) -> None:
+def detect_image_signature(payload: bytes) -> str | None:
+    if payload.startswith(PNG_SIGNATURE):
+        return "png"
+    if payload.startswith(JPEG_SOI):
+        return "jpeg"
+    return None
+
+
+def validate_upload_signature(payload: bytes, filename_suffix: str) -> None:
+    detected = detect_image_signature(payload)
+
+    expected_by_suffix = {
+        ".png": "png",
+        ".jpg": "jpeg",
+        ".jpeg": "jpeg",
+    }
+    expected = expected_by_suffix.get(filename_suffix.lower())
+    if expected is None:
+        raise ValueError("허용되지 않은 파일 확장자입니다. (.jpg/.jpeg/.png만 허용)")
+
+    if detected != expected:
+        raise ValueError("파일 내용 시그니처가 확장자와 일치하지 않습니다.")
+
+    if detected == "png" and not payload.endswith(PNG_IEND_CHUNK):
+        raise ValueError("PNG 파일 종료 시그니처(IEND)가 없어 손상된 파일로 판단됩니다.")
+
+    if detected == "jpeg" and not payload.endswith(JPEG_EOI):
+        raise ValueError("JPEG 파일 종료 시그니처(EOI)가 없어 손상된 파일로 판단됩니다.")
+
+
+def validate_upload_payload(
+    payload: bytes,
+    *,
+    filename_suffix: str,
+    max_upload_bytes: int = MAX_UPLOAD_BYTES,
+) -> None:
     if not payload:
         raise ValueError("업로드 파일 내용이 비어 있습니다.")
 
@@ -154,9 +206,12 @@ def validate_upload_payload(payload: bytes, max_upload_bytes: int = MAX_UPLOAD_B
         max_mb = max_upload_bytes // (1024 * 1024)
         raise ValueError(f"업로드 파일 크기는 {max_mb}MB를 초과할 수 없습니다.")
 
+    validate_upload_signature(payload, filename_suffix)
+
 
 def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filename: str) -> Path:
     safe_filename = sanitize_upload_filename(uploaded_filename)
+    safe_suffix = Path(safe_filename).suffix.lower()
 
     assert_path_within_output_root(
         upload_dir,
@@ -164,7 +219,8 @@ def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filenam
         "업로드 저장 디렉터리가 output-root를 벗어났습니다.",
     )
 
-    upload_path = upload_dir / f"{uuid4().hex[:8]}-{safe_filename}"
+    # 사용자 제공 basename에 의존하지 않고 랜덤 + 허용 확장자만 사용한다.
+    upload_path = upload_dir / f"{uuid4().hex[:8]}{safe_suffix}"
     assert_path_within_output_root(
         upload_path,
         output_root,
@@ -174,7 +230,7 @@ def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filenam
 
 
 def write_upload_payload(upload_path: Path, output_root: Path, payload: bytes) -> None:
-    validate_upload_payload(payload)
+    validate_upload_payload(payload, filename_suffix=upload_path.suffix)
 
     assert_path_within_output_root(
         upload_path.parent,
