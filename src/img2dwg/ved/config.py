@@ -203,9 +203,7 @@ def resolve_inference_max_length(
     else:
         policy_default = default_training_max_length
         source = "ved-default"
-        warnings.append(
-            "Training max_length metadata not found; fallback to VEDConfig.max_length."
-        )
+        warnings.append("Training max_length metadata not found; fallback to VEDConfig.max_length.")
 
     if cli_max_length is not None:
         resolved = _validate_max_length(cli_max_length)
