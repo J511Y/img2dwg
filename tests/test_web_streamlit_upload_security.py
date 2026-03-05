@@ -88,10 +88,12 @@ def test_build_safe_upload_path_returns_internal_path(module: ModuleType, tmp_pa
     upload_dir = output_root / "_uploads" / "20260305"
     upload_dir.mkdir(parents=True, exist_ok=True)
 
-    path = module.build_safe_upload_path(upload_dir, output_root, "ok.png")
+    path = module.build_safe_upload_path(upload_dir, output_root, "ok.PNG")
 
     assert path.parent == upload_dir
-    assert path.name.endswith("-ok.png")
+    assert path.suffix == ".png"
+    assert path.stem != "ok"
+    assert len(path.stem) == 8
     assert path.resolve().is_relative_to(output_root.resolve())
 
 
