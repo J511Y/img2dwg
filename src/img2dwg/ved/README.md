@@ -66,6 +66,40 @@ src/img2dwg/ved/
 └── utils.py                     # 유틸리티 함수
 ```
 
+## 🔒 원격 이미지 로딩 정책
+
+`dataset.py`의 `RemoteImagePolicy`로 원격 이미지 로딩을 제어합니다.
+
+- timeout + retry(backoff)로 무한 대기 방지
+- URL 해시 기반 캐시로 재다운로드 방지
+- offline 모드에서 캐시/로컬만 허용
+
+```python
+from pathlib import Path
+
+from img2dwg.ved.dataset import ImageToJSONDataset, RemoteImagePolicy
+
+dataset = ImageToJSONDataset(
+    jsonl_path=Path("output/finetune_train.jsonl"),
+    tokenizer=tokenizer,
+    remote_policy=RemoteImagePolicy(
+        timeout_seconds=10.0,
+        max_retries=2,
+        backoff_seconds=0.5,
+        cache_dir=Path("output/.ved_image_cache"),
+        offline=False,
+    ),
+)
+```
+
+사전 접근성/캐시 검증:
+
+```bash
+uv run python scripts/validate_ved_dataset_images.py \
+  --jsonl output/finetune_train.jsonl \
+  --cache-dir output/.ved_image_cache
+```
+
 ## 🚀 진행 방향
 
 ### Phase 1: 데이터 준비 (완료)

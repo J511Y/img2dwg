@@ -1,0 +1,10 @@
+{
+  "nested/a.png": {
+    "consensus_score": 0.77,
+    "source": "human-review"
+  },
+  "nested/b.png": {
+    "consensus_score": 0.64,
+    "source": "auto-eval"
+  }
+}

@@ -162,7 +162,14 @@ git clone https://huggingface.co/gradientai/Llama-3-8B-Instruct-262k
 
 학습이 완료되면:
 
-1. **모델 평가**: `scripts/evaluate_ved.py` (작성 예정)
+1. **모델 평가**: `scripts/evaluate_ved.py`
+   ```bash
+   python scripts/evaluate_ved.py \
+     --model-path output/ved_checkpoints/best \
+     --data-file output/finetune_val.jsonl \
+     --output output/ved_eval
+   ```
+   - 산출물: `output/ved_eval/metrics.json`, `output/ved_eval/failures.jsonl`
 2. **프로덕션 배포**: FastAPI 서버 구축
 3. **A/B 테스트**: GPT-4V vs VED 비교
 4. **최적화**: ONNX 변환, Quantization
