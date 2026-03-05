@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, NamedTuple
 
-import requests
+import requests  # type: ignore[import-untyped]
 from PIL import Image
 
 # 프로젝트 루트를 Python 경로에 추가
@@ -326,12 +326,12 @@ def main() -> None:
 
     import torch
     from torchvision import transforms
-    from tqdm import tqdm
+    from tqdm import tqdm  # type: ignore[import-untyped]
 
-    from img2dwg.utils.logger import get_logger, setup_logging
-    from img2dwg.ved.config import InferenceConfig
-    from img2dwg.ved.model import VEDModel
-    from img2dwg.ved.utils import get_device
+    from img2dwg.utils.logger import get_logger, setup_logging  # type: ignore[import-untyped]
+    from img2dwg.ved.config import InferenceConfig  # type: ignore[import-untyped]
+    from img2dwg.ved.model import VEDModel  # type: ignore[import-untyped]
+    from img2dwg.ved.utils import get_device  # type: ignore[import-untyped]
 
     setup_logging(log_level="INFO")
     logger = get_logger(__name__)
