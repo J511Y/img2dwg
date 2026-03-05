@@ -34,10 +34,22 @@ def resolve_output_root(path: Path) -> Path:
     return (project_root / path).resolve()
 
 
+def normalize_host_input(host: str) -> str:
+    """Normalize host CLI input and reject ambiguous control-character payloads."""
+    normalized = host.strip()
+    if not normalized:
+        raise RuntimeError("Host must not be empty.")
+    if host != normalized:
+        raise RuntimeError("Host must not include surrounding whitespace.")
+    if any(ord(char) < 32 for char in normalized):
+        raise RuntimeError("Host contains control characters; provide a plain hostname or IP.")
+    return normalized
+
+
 def resolve_probe_host(host: str) -> str:
     """Normalize wildcard hosts to loopback for local smoke probes."""
-    normalized = host.strip()
-    if normalized in {"0.0.0.0", "::", "[::]", ""}:
+    normalized = normalize_host_input(host)
+    if normalized in {"0.0.0.0", "::", "[::]"}:
         return "127.0.0.1"
     return normalized
 
@@ -66,11 +78,13 @@ def ensure_port_available(host: str, port: int) -> None:
 
 def requires_remote_access_ack(host: str) -> bool:
     """Return True when host binding may expose the publisher beyond loopback."""
-    normalized = host.strip().lower()
-    if normalized in {"", "localhost", "127.0.0.1", "::1", "[::1]"}:
+    normalized = normalize_host_input(host).lower()
+    if normalized in {"localhost", "127.0.0.1", "::1", "[::1]"}:
         return False
 
-    candidate = normalized[1:-1] if normalized.startswith("[") and normalized.endswith("]") else normalized
+    candidate = (
+        normalized[1:-1] if normalized.startswith("[") and normalized.endswith("]") else normalized
+    )
     try:
         return not ipaddress.ip_address(candidate).is_loopback
     except ValueError:
@@ -235,11 +249,11 @@ def build_streamlit_command(args: argparse.Namespace) -> list[str]:
 
 
 def run_smoke_test(args: argparse.Namespace) -> None:
+    ensure_access_policy(args.host, args.allow_remote)
+    ensure_port_available(args.host, args.port)
     args.output_root = resolve_output_root(args.output_root)
     args.output_root.mkdir(parents=True, exist_ok=True)
     run_startup_cleanup(args)
-    ensure_access_policy(args.host, args.allow_remote)
-    ensure_port_available(args.host, args.port)
 
     command = build_streamlit_command(args)
     probe_url = f"http://{resolve_probe_host(args.host)}:{args.port}"
@@ -301,11 +315,11 @@ def run_smoke_test(args: argparse.Namespace) -> None:
 
 
 def run_server(args: argparse.Namespace) -> None:
+    ensure_access_policy(args.host, args.allow_remote)
+    ensure_port_available(args.host, args.port)
     args.output_root = resolve_output_root(args.output_root)
     args.output_root.mkdir(parents=True, exist_ok=True)
     run_startup_cleanup(args)
-    ensure_access_policy(args.host, args.allow_remote)
-    ensure_port_available(args.host, args.port)
     command = build_streamlit_command(args)
     completed = subprocess.run(command, cwd=str(project_root), check=False)
     raise SystemExit(completed.returncode)

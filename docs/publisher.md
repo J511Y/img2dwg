@@ -36,6 +36,7 @@ uv run --frozen --extra web python scripts/web_gradio.py --host 127.0.0.1 --port
 - `--port`: 포트 (기본 `7860`)
 - `--allow-remote`: non-loopback host(예: `0.0.0.0`, 사내 IP) 바인딩을 명시적으로 허용
 - `--output-root`: 결과 저장 경로 (기본 `output/web`, 상대 경로는 프로젝트 루트 기준으로 고정 해석)
+- host 입력 검증: 빈 문자열, 앞뒤 공백, 제어문자(`NUL`/개행/탭 등) 포함 host는 실행 전에 거부
 - `--share`: Gradio share URL 사용
 
 > 실행 전 포트 사용 여부를 사전 점검합니다. 이미 점유된 포트면 즉시 에러를 반환합니다.
@@ -72,6 +73,7 @@ uv run --frozen --extra web python scripts/web_streamlit.py --host 127.0.0.1 --p
 - `--port`: 포트 (기본 `8501`)
 - `--allow-remote`: non-loopback host(예: `0.0.0.0`, 사내 IP) 바인딩을 명시적으로 허용
 - `--output-root`: 결과 저장 경로 (기본 `output/web-streamlit`, 상대 경로는 프로젝트 루트 기준으로 고정 해석)
+- host 입력 검증: 빈 문자열, 앞뒤 공백, 제어문자(`NUL`/개행/탭 등) 포함 host는 실행 전에 거부
 - `--smoke-log-lines`: 스모크 실패 시 출력할 Streamlit 로그 tail 라인 수 (기본 `80`)
 - `--smoke-keep-log`: 스모크 성공 시에도 임시 로그 파일 유지
 
@@ -234,6 +236,13 @@ uv run --frozen --extra web python scripts/web_streamlit.py \
 - Strategy 실행 중 오류가 난 경우 Summary의 Notes 확인
 - 입력 이미지 업로드 확인
 - 필요 시 CLI 파이프라인으로 동일 이미지 재현
+
+### Q6. `Host must not be empty` / `Host contains control characters` 에러가 발생합니다
+
+host 인자에 공백만 전달되었거나 앞뒤 공백/개행/탭/NUL 같은 제어문자가 포함된 경우입니다.
+
+- `--host 127.0.0.1` 또는 `--host 0.0.0.0 --allow-remote`처럼 **명시적인 host 문자열**을 사용하세요.
+- 자동화 스크립트에서 환경변수 치환 시 개행이 섞이지 않았는지 확인하세요.
 
 ---
 
