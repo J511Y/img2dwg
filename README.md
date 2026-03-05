@@ -184,7 +184,7 @@ uv run --extra web streamlit run scripts/web_streamlit_app.py \
 
 운영 가드레일:
 - **접근 정책**: 기본 바인딩은 `127.0.0.1`(로컬 전용)으로 유지합니다. 외부 접근이 꼭 필요할 때만 리버스 프록시/방화벽 뒤에서 공개하세요.
-- **업로드 정책**: 업로드 파일명은 경로 토큰(`..`, `/`, `\\`)·OS 예약 이름·비허용 특수문자를 거부하며, 확장자는 `.jpg/.jpeg/.png`만 허용됩니다.
+- **업로드 정책**: 업로드 파일명은 경로 토큰(`..`, `/`, `\\`)·OS 예약 이름·비허용 특수문자를 거부하며, 확장자는 `.jpg/.jpeg/.png`만 허용됩니다. 저장 시에는 사용자 basename을 버리고 `8hex + 확장자` 랜덤 이름으로 기록해 경로/이름 기반 리스크를 줄입니다.
 - **용량 정책**: 단일 업로드는 최대 `10MB`까지만 허용됩니다.
 - **개발 검증 스모크**: 업로드 보안 헬퍼 심볼/모듈 로드 확인
   ```bash
@@ -359,7 +359,7 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 
 ## 🔐 Streamlit 업로드 보안 스모크
 
-`web_streamlit_app.py`는 파일명 검증(경로 이탈 차단) 외에도 **유니코드 제어/포맷 문자 + confusable 경로 구분자(NFKC 정규화) 차단**, **확장자-파일시그니처 일치 + 종료 시그니처(IEND/EOI) 검증**을 수행합니다.
+`web_streamlit_app.py`는 파일명 검증(경로 이탈 차단) 외에도 **유니코드 제어/포맷 문자 + confusable 경로 구분자(NFKC 정규화) 차단**, **저장 시 사용자 basename 제거(랜덤 파일명)**, **확장자-파일시그니처 일치 + 종료 시그니처(IEND/EOI) 검증**을 수행합니다.
 
 빠른 확인 예시:
 
@@ -388,6 +388,13 @@ try:
     mod.sanitize_upload_filename('a／evil.png')
 except ValueError:
     print('streamlit upload filename unicode-separator guard: ok')
+
+root = Path('output/_smoke')
+upload_dir = root / '_uploads' / '20260305'
+upload_dir.mkdir(parents=True, exist_ok=True)
+path = mod.build_safe_upload_path(upload_dir, root, 'floorplan.png')
+assert path.suffix == '.png' and 'floorplan' not in path.name
+print('streamlit upload randomized-save-name guard: ok')
 
 print('streamlit upload signature+footer guard: ok')
 PY

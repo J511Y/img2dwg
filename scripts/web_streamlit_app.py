@@ -127,6 +127,8 @@ def sanitize_upload_filename(filename: str) -> str:
         raise ValueError("업로드 파일명에 제어/포맷 문자가 포함되어 있습니다.")
 
     normalized = unicodedata.normalize("NFKC", raw).replace("\\", "/")
+    if any(unicodedata.category(char) in {"Cc", "Cf", "Cs", "Co", "Cn"} for char in normalized):
+        raise ValueError("정규화 후 파일명에 제어/포맷 문자가 포함되어 있습니다.")
 
     if normalized.startswith("/"):
         raise ValueError("절대 경로 업로드 파일명은 허용되지 않습니다.")
@@ -209,6 +211,7 @@ def validate_upload_payload(
 
 def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filename: str) -> Path:
     safe_filename = sanitize_upload_filename(uploaded_filename)
+    safe_suffix = Path(safe_filename).suffix.lower()
 
     assert_path_within_output_root(
         upload_dir,
@@ -216,7 +219,8 @@ def build_safe_upload_path(upload_dir: Path, output_root: Path, uploaded_filenam
         "업로드 저장 디렉터리가 output-root를 벗어났습니다.",
     )
 
-    upload_path = upload_dir / f"{uuid4().hex[:8]}-{safe_filename}"
+    # 사용자 제공 basename에 의존하지 않고 랜덤 + 허용 확장자만 사용한다.
+    upload_path = upload_dir / f"{uuid4().hex[:8]}{safe_suffix}"
     assert_path_within_output_root(
         upload_path,
         output_root,
