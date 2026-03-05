@@ -409,11 +409,12 @@ PY
 uv run --extra dev ruff format --check scripts/web_streamlit_app.py tests/test_web_streamlit_upload_security.py tests/test_web_streamlit_gate_regressions.py
 uv run --extra dev ruff check scripts/web_streamlit_app.py tests/test_web_streamlit_upload_security.py tests/test_web_streamlit_gate_regressions.py
 uv run --extra dev mypy scripts/web_streamlit_app.py
-PYTHONPATH=src uv run --extra dev pytest -q tests/test_web_streamlit_gate_regressions.py tests/test_web_streamlit_upload_security.py
+uv run --extra dev pytest -q tests/test_web_streamlit_gate_regressions.py tests/test_web_streamlit_upload_security.py
 ```
 
 `tests/test_web_streamlit_gate_regressions.py`는 아래 항목을 자동 점검합니다.
-- `# type: ignore[import-untyped]` 재유입 여부
+- `# type: ignore[import-untyped]`/`# mypy: disable-error-code=import-untyped` 재유입 여부
+- `pyproject.toml`의 `[tool.mypy].mypy_path = "src"` 유지 여부
 - Streamlit 업로드 관련 `ruff format --check` / `ruff check`
 - `mypy scripts/web_streamlit_app.py`
 - 업로드 보안 테스트 스위트(`tests/test_web_streamlit_upload_security.py`)

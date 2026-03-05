@@ -1,7 +1,6 @@
 """Streamlit app for quick image -> DXF testing."""
 
 # ruff: noqa: E402, I001
-# mypy: disable-error-code=import-untyped
 
 from __future__ import annotations
 
