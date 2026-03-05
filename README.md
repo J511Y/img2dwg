@@ -47,6 +47,13 @@ img2dwg/
 └── README.md
 ```
 
+## 📌 운영 규칙
+
+- PR 본문에는 반드시 `Closes #<issue>` 또는 `Refs #<issue>`를 포함합니다.
+- 상태 라벨은 `status:triage → status:in-progress → status:in-review → status:done` 순으로 전환합니다.
+- `develop` 대상 PR merge 시, `.github/workflows/sync-issue-status-on-develop-merge.yml`이 `Closes` 이슈를 자동으로 `closed + status:done` 처리합니다.
+- 상세 운영 가이드: [`docs/issue-status-lifecycle.md`](docs/issue-status-lifecycle.md)
+
 ## 🚀 시작하기
 
 ### 필수 요구사항
