@@ -130,6 +130,46 @@ def test_scan_with_invalid_path_raises_error():
         scanner.scan()
 ```
 
+#### VED 원격 이미지 로딩 안정화 옵션
+
+`ImageToJSONDataset`는 원격 이미지(URL) 로딩 시 아래 정책을 지원합니다.
+
+- `timeout_seconds`: HTTP 요청 타임아웃(초)
+- `max_retries`: 재시도 횟수
+- `backoff_seconds`: 재시도 백오프 기본값 (지수 증가)
+- `cache_dir`: URL 해시 기반 캐시 디렉토리
+- `offline`: 네트워크 차단 모드 (캐시/로컬만 허용)
+
+```python
+from img2dwg.ved.dataset import ImageToJSONDataset, RemoteImagePolicy
+
+policy = RemoteImagePolicy(
+    timeout_seconds=10.0,
+    max_retries=2,
+    backoff_seconds=0.5,
+    cache_dir=Path("output/.ved_image_cache"),
+    offline=False,
+)
+
+dataset = ImageToJSONDataset(
+    jsonl_path=Path("output/finetune_train.jsonl"),
+    tokenizer=tokenizer,
+    remote_policy=policy,
+)
+```
+
+사전 검증/캐시 준비:
+
+```bash
+uv run python scripts/validate_ved_dataset_images.py \
+  --jsonl output/finetune_train.jsonl \
+  --cache-dir output/.ved_image_cache \
+  --timeout 10 \
+  --max-retries 2
+```
+
+- `--offline` 사용 시 캐시 미존재 URL은 `[FAIL]`로 보고되고 non-zero 종료됩니다.
+
 ### 4. 로깅
 
 - **레벨**: DEBUG, INFO, WARNING, ERROR, CRITICAL
