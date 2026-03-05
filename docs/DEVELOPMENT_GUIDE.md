@@ -75,9 +75,27 @@ src/img2dwg/
 ### 3. 테스트
 
 - **프레임워크**: pytest
-- **커버리지**: 최소 80% 이상
+- **커버리지 게이트**: `--cov-fail-under=60` (pyproject 기본 설정)
+- **핵심 smoke 커버리지**: `src/img2dwg/ved/*`, `models/converter.py`, `models/schema.py`, `utils/tiling.py`, `utils/image_uploader.py`
 - **명명 규칙**: `test_<모듈명>.py`
 - **테스트 구조**: Arrange-Act-Assert (AAA) 패턴
+
+권장 실행:
+
+```bash
+uv run pytest -q
+```
+
+핵심 모듈만 빠르게 확인:
+
+```bash
+uv run pytest -q \
+  tests/test_ved_*.py \
+  tests/test_models_converter.py \
+  tests/test_models_schema.py \
+  tests/test_utils_tiling.py \
+  tests/test_utils_image_uploader.py
+```
 
 #### 예시
 

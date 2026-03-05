@@ -81,6 +81,7 @@ addopts = [
     "--cov=src/img2dwg",
     "--cov-report=term-missing",
     "--cov-report=html",
+    "--cov-fail-under=60",
 ]
 
 [tool.mypy]
