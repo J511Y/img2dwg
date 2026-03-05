@@ -33,11 +33,11 @@ WINDOWS_RESERVED_BASENAMES = {
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from img2dwg.strategies.base import ConversionInput  # type: ignore[import-untyped]
-from img2dwg.strategies.consensus_qa import ConsensusQAStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy  # type: ignore[import-untyped]
-from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry  # type: ignore[import-untyped]
-from img2dwg.strategies.two_stage import TwoStageBaselineStrategy  # type: ignore[import-untyped]
+from img2dwg.strategies.base import ConversionInput
+from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
+from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy
+from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
+from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
 
 
 def import_streamlit() -> Any:

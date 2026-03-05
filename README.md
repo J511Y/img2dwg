@@ -400,6 +400,25 @@ print('streamlit upload signature+footer guard: ok')
 PY
 ```
 
+## 🧪 Streamlit 업로드 리뷰 게이트 회귀 방지
+
+리뷰 사이클에서 반복된 FAIL 원인(`ruff format/check` 드리프트, `mypy unused-ignore`)을
+한 번에 재현/차단하려면 아래 순서로 실행하세요.
+
+```bash
+uv run --extra dev ruff format --check scripts/web_streamlit_app.py tests/test_web_streamlit_upload_security.py tests/test_web_streamlit_gate_regressions.py
+uv run --extra dev ruff check scripts/web_streamlit_app.py tests/test_web_streamlit_upload_security.py tests/test_web_streamlit_gate_regressions.py
+uv run --extra dev mypy scripts/web_streamlit_app.py
+uv run --extra dev pytest -q tests/test_web_streamlit_gate_regressions.py tests/test_web_streamlit_upload_security.py
+```
+
+`tests/test_web_streamlit_gate_regressions.py`는 아래 항목을 자동 점검합니다.
+- `# type: ignore[import-untyped]`/`# mypy: disable-error-code=import-untyped` 재유입 여부
+- `pyproject.toml`의 `[tool.mypy].mypy_path = "src"` 유지 여부
+- Streamlit 업로드 관련 `ruff format --check` / `ruff check`
+- `mypy scripts/web_streamlit_app.py`
+- 업로드 보안 테스트 스위트(`tests/test_web_streamlit_upload_security.py`)
+
 ## 🤝 기여 가이드
 
 1. 이 저장소를 포크합니다
