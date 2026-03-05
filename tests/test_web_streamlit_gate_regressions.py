@@ -31,18 +31,36 @@ def _run_tool(command: list[str]) -> subprocess.CompletedProcess[str]:
     )
 
 
-def test_streamlit_script_has_no_import_untyped_ignore() -> None:
-    marker = "type: ignore[import-untyped]"
+def test_streamlit_script_has_no_import_untyped_suppressions() -> None:
     script_path = REPO_ROOT / "scripts" / "web_streamlit_app.py"
-    offending_lines = [
-        line_number
-        for line_number, line in enumerate(script_path.read_text(encoding="utf-8").splitlines(), 1)
-        if marker in line
+    lines = script_path.read_text(encoding="utf-8").splitlines()
+
+    line_level_marker = "type: ignore[import-untyped]"
+    line_level_offenders = [
+        line_number for line_number, line in enumerate(lines, 1) if line_level_marker in line
     ]
 
-    assert not offending_lines, (
+    file_level_marker = "mypy: disable-error-code=import-untyped"
+    file_level_offenders = [
+        line_number for line_number, line in enumerate(lines, 1) if file_level_marker in line
+    ]
+
+    assert not line_level_offenders, (
         "Remove stale type: ignore[import-untyped] comments in web_streamlit_app.py: "
-        f"{offending_lines}"
+        f"{line_level_offenders}"
+    )
+    assert not file_level_offenders, (
+        "Do not use file-level mypy import-untyped suppression in web_streamlit_app.py: "
+        f"{file_level_offenders}"
+    )
+
+
+def test_mypy_config_sets_src_path_for_script_import_resolution() -> None:
+    config_text = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+
+    assert "[tool.mypy]" in config_text and 'mypy_path = "src"' in config_text, (
+        "Set [tool.mypy].mypy_path to 'src' in pyproject.toml "
+        "so script-level mypy checks resolve local imports consistently."
     )
 
 
