@@ -171,6 +171,27 @@ $env:GITHUB_REPO_NAME="img2dwg-images"
 
 **토큰 필터링**: 각 레코드는 tiktoken을 사용하여 토큰 수가 계산되며, 지정된 최대 토큰 수를 초과하는 레코드는 자동으로 필터링됩니다.
 
+## 🌐 Streamlit Publisher 실행/접근/보존 정책
+
+Streamlit 기반 빠른 검증 UI는 아래처럼 실행합니다.
+
+```bash
+uv run --extra web streamlit run scripts/web_streamlit_app.py \
+  --server.address 127.0.0.1 \
+  --server.port 8501 \
+  -- --output-root output/web-streamlit
+```
+
+운영 가드레일:
+- **접근 정책**: 기본 바인딩은 `127.0.0.1`(로컬 전용)으로 유지합니다. 외부 접근이 꼭 필요할 때만 리버스 프록시/방화벽 뒤에서 공개하세요.
+- **업로드 정책**: 업로드 파일명은 경로 토큰(`..`, `/`, `\\`)·OS 예약 이름·비허용 특수문자를 거부하며, 확장자는 `.jpg/.jpeg/.png`만 허용됩니다.
+- **용량 정책**: 단일 업로드는 최대 `10MB`까지만 허용됩니다.
+- **보존 정책(권장)**: `output/web-streamlit`은 7일 또는 5GB 기준으로 정리 정책을 적용하세요.
+  - 예시(7일 초과 파일 정리):
+    ```bash
+    find output/web-streamlit -type f -mtime +7 -delete
+    ```
+
 ## 📊 데이터 구조
 
 ### 원본 데이터
