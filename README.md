@@ -47,6 +47,13 @@ img2dwg/
 └── README.md
 ```
 
+## 📌 운영 규칙
+
+- PR 본문에는 반드시 `Closes #<issue>` 또는 `Refs #<issue>`를 포함합니다.
+- 상태 라벨은 `status:triage → status:in-progress → status:in-review → status:done` 순으로 전환합니다.
+- `develop` 대상 PR merge 시, `.github/workflows/sync-issue-status-on-develop-merge.yml`이 `Closes` 이슈를 자동으로 `closed + status:done` 처리합니다.
+- 상세 운영 가이드: [`docs/issue-status-lifecycle.md`](docs/issue-status-lifecycle.md)
+
 ## 🚀 시작하기
 
 ### 필수 요구사항
@@ -79,6 +86,37 @@ uv pip install -e .
    ```bash
    uv run python examples/test_odafc.py
    ```
+
+### 🌐 웹에서 바로 테스트 (Gradio / Streamlit Publisher)
+
+```bash
+# 웹 실행 전용 의존성 설치
+uv sync --frozen --extra web
+
+# Gradio
+uv run --frozen --extra web python scripts/web_gradio.py --host 127.0.0.1 --port 7860
+
+# Streamlit
+uv run --frozen --extra web python scripts/web_streamlit.py --host 127.0.0.1 --port 8501
+```
+
+> 보안 기본값: non-loopback host(예: `0.0.0.0`) 바인딩 시 `--allow-remote`를 명시해야 실행됩니다.
+> 또한 빈 host, 앞뒤 공백, 제어/포맷 문자(host에 개행·탭·NUL·DEL·bidi 숨김문자 포함)는 실행 전에 거부됩니다.
+
+통합 스모크 테스트:
+
+```bash
+uv run --frozen --extra web python scripts/smoke_web_publishers.py
+```
+
+퍼블리셔 변경 후 정적 게이트(리뷰 FAIL 방지) 빠른 점검:
+
+```bash
+uv run --extra dev ruff format --check scripts/web_gradio.py scripts/web_streamlit.py scripts/web_streamlit_app.py
+uv run --extra dev mypy scripts/smoke_web_publishers.py scripts/web_gradio.py scripts/web_streamlit.py scripts/web_streamlit_app.py src/img2dwg/web/__init__.py src/img2dwg/web/retention.py
+```
+
+- 실행/접속/보존정책(run/access + cleanup) 상세 문서: [docs/publisher.md](docs/publisher.md)
 
 ### 사용 방법
 
@@ -318,6 +356,22 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 4. **파인튜닝**: OpenAI API를 통한 모델 학습
 5. **검증**: 생성된 JSON→DWG 변환 및 정확도 평가
 
+## 📏 VED 평가 실행
+
+학습 완료 모델은 `scripts/evaluate_ved.py`로 표준 metric을 산출할 수 있습니다.
+
+```bash
+python scripts/evaluate_ved.py \
+  --model-path output/ved_checkpoints/best \
+  --data-file output/finetune_val.jsonl \
+  --output output/ved_eval
+```
+
+- 주요 출력: `parse_success_rate`, `exact_match`, `entity_type_accuracy`
+- 산출물:
+  - `output/ved_eval/metrics.json`
+  - `output/ved_eval/failures.jsonl`
+
 ## 📝 Windsurf 워크플로우
 
 프로젝트에서 사용 가능한 Windsurf 워크플로우:
@@ -346,3 +400,60 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 - [OpenAI Fine-tuning Guide](https://platform.openai.com/docs/guides/fine-tuning)
 - [ezdxf Documentation](https://ezdxf.readthedocs.io/)
 - [AutoCAD DXF Reference](https://help.autodesk.com/view/OARX/2024/ENU/)
+
+## 🌐 Web Benchmark Asset Downloader
+
+공개 라이선스 웹 자산(JPG/PNG + DXF 후보)을 로컬 벤치마크 입력으로 동기화하려면 아래 스크립트를 사용하세요.
+
+```bash
+python scripts/fetch_web_benchmark_assets.py \
+  --manifest eval/datasets/web_image2cad_v1/manifest.csv \
+  --output-dir output/web_image2cad_v1
+```
+
+보안 규칙:
+- `case_id`, `image_filename`, `dxf_candidate_filename`에 `..`, 절대경로, path separator 포함 금지
+- 다운로드 결과는 항상 `output_dir/images`, `output_dir/dxf_candidates` 하위로만 저장
+- SHA256 검증 실패 시 즉시 에러 처리
+
+## 📊 Benchmark Metadata Manifest (per-image)
+
+`benchmark_strategies.py` 실행 시 이미지별 메타데이터(예: `consensus_score`)를 JSON manifest로 주입할 수 있습니다.
+
+```bash
+uv run python scripts/benchmark_strategies.py \
+  --images output/web_image2cad_v1/images \
+  --output output/benchmark \
+  --metadata-manifest eval/examples/benchmark_metadata.json
+```
+
+manifest 형식:
+
+```json
+{
+  "nested/a.png": {"consensus_score": 0.77},
+  "nested/b.png": {"consensus_score": 0.64}
+}
+```
+
+### Key 매칭 우선순위
+
+입력 이미지 한 건에 대해 아래 순서대로 key를 조회합니다.
+
+1. absolute path
+2. `--images` root-relative path (예: `nested/a.png`)
+3. 입력 시점의 상대/원본 path 문자열
+4. filename (`a.png`)
+5. stem (`a`)
+
+> `filename`/`stem` fallback은 동명이인 충돌(예: `x/a.png`, `y/a.png`) 시 자동 비활성화되고 warning을 출력합니다.
+
+### 관측/검증 옵션
+
+- 결과 파일(`benchmark_results.json`, `benchmark_summary.json`)에 아래 통계가 포함됩니다.
+  - total/matched/unmatched key 수
+  - match mode별 사용 횟수(absolute/root_relative/relative/name/stem)
+  - fallback(name/stem) 사용 횟수
+  - unmatched key 샘플
+- `--strict-metadata-manifest`: unmatched key가 있으면 즉시 실패
+- `--metadata-warning-sample-size N`: warning에 노출할 unmatched key 샘플 개수 조정
