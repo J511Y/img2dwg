@@ -7,11 +7,14 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from img2dwg.pipeline.benchmark import run_benchmark
-from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
-from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy
-from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
-from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
+from img2dwg.pipeline.benchmark import run_benchmark  # type: ignore[import-untyped]
+from img2dwg.strategies.consensus_qa import ConsensusQAStrategy  # type: ignore[import-untyped]
+from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy  # type: ignore[import-untyped]
+from img2dwg.strategies.registry import (  # type: ignore[import-untyped]
+    FeatureFlags,
+    StrategyRegistry,
+)
+from img2dwg.strategies.two_stage import TwoStageBaselineStrategy  # type: ignore[import-untyped]
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 DEFAULT_RECURSIVE_SCAN_LIMIT = 2_000
@@ -86,6 +89,15 @@ def _safe_resolve(path: Path) -> Path:
         return path.resolve()
     except OSError:
         return path.absolute()
+
+
+def _canonicalize_manifest_key(key: str) -> str:
+    normalized = key.strip().replace("\\", "/")
+    while "//" in normalized:
+        normalized = normalized.replace("//", "/")
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    return normalized
 
 
 def _collect_recursive_image_paths(
@@ -195,7 +207,7 @@ def load_metadata_manifest(manifest_path: Path) -> dict[str, dict[str, Any]]:
 
     metadata_by_image: dict[str, dict[str, Any]] = {}
     for raw_key, raw_value in payload.items():
-        key = str(raw_key).strip()
+        key = _canonicalize_manifest_key(str(raw_key))
         if not key:
             raise ValueError("metadata manifest key must not be empty")
 
@@ -216,17 +228,19 @@ def build_metadata_key_candidates(
 
     for image_path in image_paths:
         resolved_image = _safe_resolve(image_path)
-        candidates: list[tuple[str, str]] = [("absolute", resolved_image.as_posix())]
+        candidates: list[tuple[str, str]] = [
+            ("absolute", _canonicalize_manifest_key(resolved_image.as_posix()))
+        ]
 
         try:
             root_relative = resolved_image.relative_to(root_resolved).as_posix()
         except ValueError:
             root_relative = ""
         if root_relative:
-            candidates.append(("root_relative", root_relative))
+            candidates.append(("root_relative", _canonicalize_manifest_key(root_relative)))
 
-        as_given = image_path.as_posix()
-        resolved_key = resolved_image.as_posix()
+        as_given = _canonicalize_manifest_key(image_path.as_posix())
+        resolved_key = _canonicalize_manifest_key(resolved_image.as_posix())
         if as_given and as_given != resolved_key:
             candidates.append(("relative", as_given))
 

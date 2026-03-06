@@ -141,3 +141,19 @@ def test_load_metadata_manifest_rejects_non_object_values(tmp_path: Path) -> Non
 
     with pytest.raises(ValueError, match="must be an object"):
         module.load_metadata_manifest(manifest_path)
+
+
+def test_load_metadata_manifest_canonicalizes_relative_and_windows_style_keys(
+    tmp_path: Path,
+) -> None:
+    module = _load_script_module()
+
+    manifest_path = tmp_path / "metadata.json"
+    manifest_path.write_text(
+        '{"./nested\\\\a.png": {"consensus_score": 0.9}}',
+        encoding="utf-8",
+    )
+
+    loaded = module.load_metadata_manifest(manifest_path)
+    assert "nested/a.png" in loaded
+    assert loaded["nested/a.png"]["consensus_score"] == 0.9
