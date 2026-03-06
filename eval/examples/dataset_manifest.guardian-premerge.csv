@@ -1,0 +1,7 @@
+case_id,image_path
+case_001,/tmp/img2dwg-bench-images/구조변경확인서.jpg
+case_002,/tmp/img2dwg-bench-images/단면도-1모형.jpg
+case_003,/tmp/img2dwg-bench-images/단면도-모형.jpg
+case_004,/tmp/img2dwg-bench-images/단면도1-모형.jpg
+case_005,/tmp/img2dwg-bench-images/변경전-모형.jpg
+case_006,/tmp/img2dwg-bench-images/변경후-모형.jpg

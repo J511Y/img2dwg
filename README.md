@@ -415,3 +415,45 @@ PY
 - [OpenAI Fine-tuning Guide](https://platform.openai.com/docs/guides/fine-tuning)
 - [ezdxf Documentation](https://ezdxf.readthedocs.io/)
 - [AutoCAD DXF Reference](https://help.autodesk.com/view/OARX/2024/ENU/)
+
+## 📊 Benchmark Metadata Manifest (per-image)
+
+`benchmark_strategies.py` 실행 시 이미지별 메타데이터(예: `consensus_score`)를 JSON manifest로 주입할 수 있습니다.
+
+```bash
+uv run python scripts/benchmark_strategies.py \
+  --images output/web_image2cad_v1/images \
+  --output output/benchmark \
+  --metadata-manifest eval/examples/benchmark_metadata.json
+```
+
+manifest 형식:
+
+```json
+{
+  "nested/a.png": {"consensus_score": 0.77},
+  "nested/b.png": {"consensus_score": 0.64}
+}
+```
+
+### Key 매칭 우선순위
+
+입력 이미지 한 건에 대해 아래 순서대로 key를 조회합니다.
+
+1. absolute path
+2. `--images` root-relative path (예: `nested/a.png`)
+3. 입력 시점의 상대/원본 path 문자열
+4. filename (`a.png`)
+5. stem (`a`)
+
+> `filename`/`stem` fallback은 동명이인 충돌(예: `x/a.png`, `y/a.png`) 시 자동 비활성화되고 warning을 출력합니다.
+
+### 관측/검증 옵션
+
+- 결과 파일(`benchmark_results.json`, `benchmark_summary.json`)에 아래 통계가 포함됩니다.
+  - total/matched/unmatched key 수
+  - match mode별 사용 횟수(absolute/root_relative/relative/name/stem)
+  - fallback(name/stem) 사용 횟수
+  - unmatched key 샘플
+- `--strict-metadata-manifest`: unmatched key가 있으면 즉시 실패
+- `--metadata-warning-sample-size N`: warning에 노출할 unmatched key 샘플 개수 조정
