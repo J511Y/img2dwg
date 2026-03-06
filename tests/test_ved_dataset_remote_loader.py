@@ -150,3 +150,31 @@ def test_remote_loader_does_not_retry_hard_4xx(
     with pytest.raises(RuntimeError, match="failed to load remote image"):
         dataset._load_image(url)
     assert attempts["n"] == 1
+
+
+def test_getitem_returns_zero_tensor_when_image_load_fails(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    jsonl = tmp_path / "samples.jsonl"
+    url = "https://example.com/fail.png"
+    _write_jsonl(jsonl, url)
+
+    def _raise_get(_target: str, timeout: float) -> _Resp:
+        assert timeout == 10.0
+        raise RuntimeError("network down")
+
+    monkeypatch.setattr("img2dwg.ved.dataset.requests.get", _raise_get)
+    monkeypatch.setattr("img2dwg.ved.dataset.time.sleep", lambda _s: None)
+
+    dataset = ImageToJSONDataset(
+        jsonl_path=jsonl,
+        tokenizer=_DummyTokenizer(),
+        image_size=16,
+        remote_max_retries=0,
+    )
+
+    sample = dataset[0]
+
+    assert tuple(sample["pixel_values"].shape) == (3, 16, 16)
+    assert float(sample["pixel_values"].sum().item()) == 0.0
+    assert tuple(sample["labels"].shape) == (4,)
