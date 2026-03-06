@@ -50,6 +50,12 @@ def sanitize_upload_filename(filename: str) -> str:
             f"업로드 파일명 길이는 {MAX_UPLOAD_BASENAME_LENGTH}자를 초과할 수 없습니다."
         )
 
+    if safe_name.startswith("."):
+        raise ValueError("dotfile 형식 업로드 파일명은 허용되지 않습니다.")
+
+    if any(ord(char) < 32 or ord(char) == 127 for char in safe_name):
+        raise ValueError("업로드 파일명에 제어문자가 포함되어 있습니다.")
+
     if any(char in safe_name for char in {":", "*", "?", '"', "<", ">", "|"}):
         raise ValueError("업로드 파일명에 허용되지 않은 특수문자가 포함되어 있습니다.")
 

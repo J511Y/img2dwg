@@ -31,6 +31,9 @@ def test_sanitize_upload_filename_accepts_safe_inputs(name: str) -> None:
         "",
         "nul.jpg",
         "bad.gif",
+        ".hidden.jpg",
+        "bad\x1fname.png",
+        "bad\x7fname.png",
     ],
 )
 def test_sanitize_upload_filename_blocks_unsafe_inputs(name: str) -> None:
