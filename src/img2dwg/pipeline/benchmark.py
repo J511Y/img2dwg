@@ -7,8 +7,13 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from img2dwg.pipeline.schema import build_report
-from img2dwg.strategies import ConversionInput, ConversionOutput, FeatureFlags, StrategyRegistry
+from img2dwg.pipeline.schema import build_report  # type: ignore[import-untyped]
+from img2dwg.strategies import (  # type: ignore[import-untyped]
+    ConversionInput,
+    ConversionOutput,
+    FeatureFlags,
+    StrategyRegistry,
+)
 
 MetadataCandidate = tuple[str, str]
 DEFAULT_METADATA_WARNING_SAMPLE_SIZE = 5
@@ -35,7 +40,7 @@ def _resolve_strategy_names(
     requested_names = strategy_names or []
     selected = registry.resolve_requested_names(requested_names, feature_flags)
     if selected:
-        return selected
+        return [str(name) for name in selected]
 
     # Keep benchmark runnable even when the enabled set is empty by falling back
     # to one safe strategy (matches CLI behavior).
@@ -316,6 +321,17 @@ def _build_final_summary(report: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def _benchmark_case_output_dir(base_dir: Path, image_path: Path, index: int) -> Path:
+    """Return collision-safe per-case output directory.
+
+    Prevent same-stem images from writing into the same location within one strategy run.
+    """
+    token = _canonicalize_manifest_key(image_path.as_posix()).replace("/", "__")
+    if not token:
+        token = image_path.name or "image"
+    return base_dir / f"{index:04d}-{token}"
+
+
 def run_benchmark(
     image_paths: list[Path],
     registry: StrategyRegistry,
@@ -407,14 +423,15 @@ def run_benchmark(
     legacy_results: dict[str, list[dict[str, Any]]] = {name: [] for name in target_names}
     outputs_map: dict[str, list[ConversionOutput]] = {name: [] for name in target_names}
 
-    for image_path in image_paths:
+    for index, image_path in enumerate(image_paths):
         conv_input = ConversionInput(
             image_path=image_path,
             metadata=resolved_metadata_by_image.get(image_path, {}),
         )
         for name in target_names:
             strategy = registry.get(name)
-            out = strategy.timed_run(conv_input, output_dir / name)
+            case_output_dir = _benchmark_case_output_dir(output_dir / name, image_path, index)
+            out = strategy.timed_run(conv_input, case_output_dir)
             outputs_map[name].append(out)
             legacy_results[name].append(_to_legacy_dict(out))
 
@@ -426,7 +443,7 @@ def run_benchmark(
         legacy=legacy_results,
     )
 
-    serialized = report.to_dict()
+    serialized: dict[str, Any] = dict(report.to_dict())
     if metadata_manifest_stats is not None:
         serialized["metadata_manifest"] = metadata_manifest_stats
 
