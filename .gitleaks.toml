@@ -1,0 +1,7 @@
+title = "img2dwg gitleaks config"
+
+[allowlist]
+description = "Test fixtures containing synthetic tokens"
+paths = [
+  '''tests/test_secret_masking.py''',
+]
