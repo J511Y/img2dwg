@@ -19,6 +19,7 @@ class _FakeTokenizer:
         self.eos_token_id = eos_token_id
         self.bos_token_id = 1
         self.added_tokens: list[str] = []
+        self.saved_to: str | None = None
 
     def add_tokens(self, tokens: list[str]) -> int:
         self.added_tokens.extend(tokens)
@@ -37,6 +38,7 @@ class _FakeTokenizer:
         return [str(x) for x in token_ids_list]
 
     def save_pretrained(self, save_directory: str) -> str:
+        self.saved_to = save_directory
         return save_directory
 
     def __len__(self) -> int:
@@ -67,3 +69,22 @@ def test_cad_tokenizer_wrapper_methods(monkeypatch: Any) -> None:
     assert tokenizer.decode([1, 2]) == "decoded:[1, 2]"
     assert tokenizer.batch_encode(["a", "b"], truncation=True)["kwargs"]["truncation"] is True
     assert tokenizer.batch_decode([[1], [2]]) == ["[1]", "[2]"]
+
+
+def test_cad_tokenizer_save_and_from_pretrained(monkeypatch: Any, tmp_path: Any) -> None:
+    fake = _FakeTokenizer()
+
+    class _LocalAutoTokenizer:
+        @staticmethod
+        def from_pretrained(_model_name: str) -> _FakeTokenizer:
+            return fake
+
+    monkeypatch.setattr("img2dwg.ved.tokenizer.AutoTokenizer", _LocalAutoTokenizer)
+
+    tokenizer = CADTokenizer(base_model="fake", add_special_tokens=False)
+    tokenizer.save_pretrained(str(tmp_path))
+
+    reloaded = CADTokenizer.from_pretrained(str(tmp_path))
+
+    assert fake.saved_to == str(tmp_path)
+    assert reloaded.tokenizer is fake
