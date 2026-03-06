@@ -128,3 +128,15 @@ def test_evaluate_custom_keys_with_blank_lines(tmp_path: Path) -> None:
     assert report["samples"] == 2
     assert report["prediction_key"] == "pred_json"
     assert report["reference_key"] == "ref_json"
+
+
+def test_evaluate_accepts_rows_with_trailing_whitespace(tmp_path: Path) -> None:
+    input_path = tmp_path / "trailing_space.jsonl"
+    output_path = tmp_path / "report.json"
+    input_path.write_text(
+        '{"prediction": "{}", "reference": "{}"}   \n{"prediction": "{}", "reference": "{}"}\t\n',
+        encoding="utf-8",
+    )
+
+    report = evaluate(input_path, output_path, "prediction", "reference")
+    assert report["samples"] == 2
