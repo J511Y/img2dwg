@@ -257,6 +257,10 @@ uv run --extra dev pytest -q tests/test_mypy_publisher_gate_config.py
 `pyproject.toml`의 `[tool.mypy].mypy_path = "src"`를 기준으로 local package import를 해석하므로,
 `PYTHONPATH=src` 환경변수 우회 없이 동일 명령을 재현할 수 있습니다.
 
+추가로 wheel 패키징 단계에서 `src/img2dwg/py.typed`를 강제로 포함하므로,
+설치형 실행 환경에서도 `module is installed, but missing py.typed marker` 계열
+`import-untyped` 실패가 재발하지 않습니다.
+
 또한 `unused "type: ignore"`가 뜨면 해당 import 라인에서 불필요한
 `# type: ignore[import-untyped]` 또는 파일 레벨 `disable-error-code=import-untyped`를 제거합니다.
 
