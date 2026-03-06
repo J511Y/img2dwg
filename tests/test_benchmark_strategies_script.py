@@ -133,6 +133,24 @@ def test_build_metadata_key_candidates_includes_root_relative_key(tmp_path: Path
     assert ("root_relative", "nested/a.png") in key_candidates[image_path]
 
 
+def test_build_metadata_key_candidates_normalizes_duplicate_separators(tmp_path: Path) -> None:
+    module = _load_script_module()
+
+    images_root = tmp_path / "images"
+    nested = images_root / "nested"
+    nested.mkdir(parents=True)
+    image_path = nested / "a.png"
+    image_path.write_bytes(b"img")
+
+    key_candidates = module.build_metadata_key_candidates([image_path], images_root)
+    assert image_path in key_candidates
+
+    candidates = key_candidates[image_path]
+    assert ("root_relative", "nested/a.png") in candidates
+    for _kind, key in candidates:
+        assert "//" not in key
+
+
 def test_load_metadata_manifest_rejects_non_object_values(tmp_path: Path) -> None:
     module = _load_script_module()
 
