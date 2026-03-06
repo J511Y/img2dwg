@@ -97,12 +97,12 @@ class _FakeDecoder:
     def resize_token_embeddings(self, size: int) -> None:
         self.resized_to = size
 
-    def parameters(self):
+    def parameters(self) -> list[torch.nn.Parameter]:
         return [torch.nn.Parameter(torch.ones(1))]
 
 
 class _FakeEncoder:
-    def parameters(self):
+    def parameters(self) -> list[torch.nn.Parameter]:
         return [torch.nn.Parameter(torch.ones(1))]
 
 
@@ -121,7 +121,7 @@ class _FakeVisionModel:
         self.to_device: str | None = None
         self.mode = "eval"
 
-    def parameters(self):
+    def parameters(self) -> list[torch.nn.Parameter]:
         return [torch.nn.Parameter(torch.ones(1)), torch.nn.Parameter(torch.ones(1))]
 
     def __call__(self, **kwargs: Any) -> SimpleNamespace:
@@ -135,7 +135,7 @@ class _FakeVisionModel:
     def save_pretrained(self, save_directory: Path) -> None:
         self.saved_to = Path(save_directory)
 
-    def to(self, device: str):
+    def to(self, device: str) -> _FakeVisionModel:
         self.to_device = device
         return self
 
@@ -319,7 +319,7 @@ def test_scoped_coverage_smoke_for_ved_config_and_dataset(
     )
     assert http_ds[0]["pixel_values"].shape == (3, 8, 8)
 
-    def _raise_timeout(url: str):
+    def _raise_timeout(url: str) -> None:
         del url
         raise RuntimeError("timeout")
 
