@@ -347,6 +347,14 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 4. **파인튜닝**: OpenAI API를 통한 모델 학습
 5. **검증**: 생성된 JSON→DWG 변환 및 정확도 평가
 
+## 📏 VED max_length 정책
+
+- 학습 기본값: `VEDConfig.max_length = 131072`
+- 추론 기본값: 체크포인트의 `ved_training_config.json`에서 학습 max_length 자동 로드
+- 메타데이터가 없으면 학습 기본값(131072)으로 fallback
+- `--max-length`를 지정하면 최우선 적용 (양수/상한선 검증 포함)
+- 생성 토큰이 `max_length`에 도달하면 truncation 가능성을 경고 로그로 출력
+
 ## 📝 Windsurf 워크플로우
 
 프로젝트에서 사용 가능한 Windsurf 워크플로우:
@@ -357,6 +365,13 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 - `/lint-fix`: 코드 린트 및 포맷 자동 수정
 
 자세한 내용은 `.windsurf/workflows/` 참조
+
+## 🔐 보안 가드레일
+
+- PR/Push 시 GitHub Actions `secret-scan`(gitleaks) 실행
+- `setup_logging()` 기본값으로 토큰 마스킹 필터 적용
+- 인증/시크릿 운영 가이드: [docs/security/authentication-and-secret-safety.md](docs/security/authentication-and-secret-safety.md)
+- 유출 대응 절차: [docs/security/secret-leak-response-runbook.md](docs/security/secret-leak-response-runbook.md)
 
 ## 🔐 Streamlit 업로드 보안 스모크
 

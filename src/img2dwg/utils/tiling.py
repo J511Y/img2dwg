@@ -1,11 +1,13 @@
 """타일링 유틸리티 모듈."""
 
-import json
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+import logging
+from collections.abc import Callable
+from typing import Any
 
-from ..data.dwg_parser import DWGParser, ParseOptions
 from .geometry import calculate_tiles, intersects_aabb
+
+logger = logging.getLogger(__name__)
+TokenCounter = Callable[[dict[str, Any]], int]
 
 
 class TileGenerator:
@@ -36,8 +38,8 @@ class TileGenerator:
 
     def generate_tiles(
         self,
-        json_data: Dict[str, Any],
-    ) -> List[Dict[str, Any]]:
+        json_data: dict[str, Any],
+    ) -> list[dict[str, Any]]:
         """
         JSON 데이터를 타일로 분할한다.
 
@@ -56,7 +58,18 @@ class TileGenerator:
         bbox = self._calculate_bbox(entities)
 
         # 타일 생성
-        tiles = calculate_tiles(bbox, self.tile_size, self.overlap)
+        try:
+            tiles = calculate_tiles(bbox, self.tile_size, self.overlap)
+        except ValueError as exc:
+            logger.warning(
+                "Invalid tiling configuration. Fallback to original JSON without tiling "
+                "(tile_size=%s, overlap=%s, bbox=%s): %s",
+                self.tile_size,
+                self.overlap,
+                bbox,
+                exc,
+            )
+            return [json_data]
 
         # 각 타일에 속하는 엔티티 분류
         tile_data_list = []
@@ -87,7 +100,7 @@ class TileGenerator:
 
         return tile_data_list
 
-    def _calculate_bbox(self, entities: List[Dict[str, Any]]) -> Tuple[float, float, float, float]:
+    def _calculate_bbox(self, entities: list[dict[str, Any]]) -> tuple[float, float, float, float]:
         """
         엔티티들의 전체 바운딩박스를 계산한다.
 
@@ -97,10 +110,10 @@ class TileGenerator:
         Returns:
             (xmin, ymin, xmax, ymax) 튜플
         """
-        min_x = float('inf')
-        min_y = float('inf')
-        max_x = float('-inf')
-        max_y = float('-inf')
+        min_x = float("inf")
+        min_y = float("inf")
+        max_x = float("-inf")
+        max_y = float("-inf")
 
         for entity in entities:
             # LINE
@@ -137,9 +150,9 @@ class TileGenerator:
 
     def _filter_entities_by_bbox(
         self,
-        entities: List[Dict[str, Any]],
-        tile_bbox: Tuple[float, float, float, float],
-    ) -> List[Dict[str, Any]]:
+        entities: list[dict[str, Any]],
+        tile_bbox: tuple[float, float, float, float],
+    ) -> list[dict[str, Any]]:
         """
         타일 바운딩박스와 교차하는 엔티티만 필터링한다.
 
@@ -159,7 +172,7 @@ class TileGenerator:
 
         return filtered
 
-    def _get_entity_bbox(self, entity: Dict[str, Any]) -> Optional[Tuple[float, float, float, float]]:
+    def _get_entity_bbox(self, entity: dict[str, Any]) -> tuple[float, float, float, float] | None:
         """
         엔티티의 바운딩박스를 계산한다.
 
@@ -197,10 +210,10 @@ class TileGenerator:
 
 
 def split_by_token_budget(
-    json_data: Dict[str, Any],
+    json_data: dict[str, Any],
     max_tokens: int,
-    token_counter,
-) -> List[Dict[str, Any]]:
+    token_counter: TokenCounter,
+) -> list[dict[str, Any]]:
     """
     토큰 예산에 맞게 JSON 데이터를 분할한다.
 
@@ -226,10 +239,7 @@ def split_by_token_budget(
         tiles = generator.generate_tiles(json_data)
 
         # 모든 타일이 토큰 제한 내인지 확인
-        all_within_budget = all(
-            token_counter(tile) <= max_tokens
-            for tile in tiles
-        )
+        all_within_budget = all(token_counter(tile) <= max_tokens for tile in tiles)
 
         if all_within_budget:
             return tiles
@@ -239,10 +249,10 @@ def split_by_token_budget(
 
 
 def _split_by_entity_groups(
-    json_data: Dict[str, Any],
+    json_data: dict[str, Any],
     max_tokens: int,
-    token_counter,
-) -> List[Dict[str, Any]]:
+    token_counter: TokenCounter,
+) -> list[dict[str, Any]]:
     """
     엔티티를 그룹으로 나누어 분할한다.
 
@@ -257,8 +267,8 @@ def _split_by_entity_groups(
     entities = json_data.get("entities", [])
     metadata = json_data.get("metadata", {})
 
-    chunks = []
-    current_chunk = []
+    chunks: list[dict[str, Any]] = []
+    current_chunk: list[dict[str, Any]] = []
 
     for entity in entities:
         # 임시로 엔티티 추가
@@ -274,10 +284,12 @@ def _split_by_entity_groups(
             chunk_metadata["chunk_index"] = len(chunks)
             chunk_metadata["entity_count"] = len(current_chunk)
 
-            chunks.append({
-                "metadata": chunk_metadata,
-                "entities": current_chunk,
-            })
+            chunks.append(
+                {
+                    "metadata": chunk_metadata,
+                    "entities": current_chunk,
+                }
+            )
 
             current_chunk = [entity]
         else:
@@ -289,9 +301,11 @@ def _split_by_entity_groups(
         chunk_metadata["chunk_index"] = len(chunks)
         chunk_metadata["entity_count"] = len(current_chunk)
 
-        chunks.append({
-            "metadata": chunk_metadata,
-            "entities": current_chunk,
-        })
+        chunks.append(
+            {
+                "metadata": chunk_metadata,
+                "entities": current_chunk,
+            }
+        )
 
     return chunks if chunks else [json_data]
