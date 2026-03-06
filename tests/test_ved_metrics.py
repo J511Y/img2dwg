@@ -2,7 +2,11 @@
 
 import pytest
 
-from img2dwg.ved.metrics import compute_json_accuracy, compute_metrics
+from img2dwg.ved.metrics import (  # type: ignore[import-untyped]
+    compute_entity_accuracy,
+    compute_json_accuracy,
+    compute_metrics,
+)
 
 
 class TestVEDMetrics:
@@ -62,3 +66,14 @@ class TestVEDMetrics:
         assert result["entity_type_accuracy"] == 0.5
         assert result["avg_entities_pred"] == 1.0
         assert result["avg_entities_ref"] == 1.0
+
+    def test_compute_entity_accuracy_accepts_short_entity_key_fallback(self) -> None:
+        predictions = ['{"entities": [{"t": "LINE"}, {"type": "ARC"}]}']
+        references = ['{"entities": [{"type": "LINE"}, {"t": "ARC"}]}']
+
+        result = compute_entity_accuracy(predictions, references)
+
+        assert result["entity_count_accuracy"] == 1.0
+        assert result["entity_type_accuracy"] == 1.0
+        assert result["avg_entities_pred"] == 2.0
+        assert result["avg_entities_ref"] == 2.0
