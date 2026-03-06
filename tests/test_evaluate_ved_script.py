@@ -93,3 +93,12 @@ def test_evaluate_raises_on_non_object_json_line(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="expected object JSON"):
         evaluate(input_path, output_path, "prediction", "reference")
+
+
+def test_evaluate_raises_on_invalid_json_line(tmp_path: Path) -> None:
+    input_path = tmp_path / "broken.jsonl"
+    output_path = tmp_path / "report.json"
+    input_path.write_text('{"prediction": "{}", "reference": "{}"\n', encoding="utf-8")
+
+    with pytest.raises(json.JSONDecodeError):
+        evaluate(input_path, output_path, "prediction", "reference")
