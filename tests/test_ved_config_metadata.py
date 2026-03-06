@@ -3,7 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from img2dwg.ved.config import (  # type: ignore[import-untyped]
+    MAX_LENGTH_HARD_LIMIT,
     TRAINING_METADATA_FILENAME,
     VEDConfig,
     load_training_max_length,
@@ -34,3 +37,22 @@ def test_resolve_inference_max_length_prefers_cli_override(tmp_path: Path) -> No
     assert resolved.source == "cli-override"
     assert resolved.training_value == 4096
     assert any("overrides checkpoint" in warning for warning in resolved.warnings)
+
+
+def test_resolve_inference_max_length_falls_back_without_metadata(tmp_path: Path) -> None:
+    resolved = resolve_inference_max_length(
+        tmp_path, cli_max_length=None, default_training_max_length=777
+    )
+
+    assert resolved.value == 777
+    assert resolved.source == "ved-default"
+    assert resolved.training_value is None
+    assert any("metadata not found" in warning for warning in resolved.warnings)
+
+
+def test_resolve_inference_max_length_rejects_over_hard_limit(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="exceeds hard limit"):
+        resolve_inference_max_length(
+            tmp_path,
+            cli_max_length=MAX_LENGTH_HARD_LIMIT + 1,
+        )
