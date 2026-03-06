@@ -84,3 +84,12 @@ def test_evaluate_supports_custom_prediction_and_reference_keys(tmp_path: Path) 
     assert report["prediction_key"] == "pred_json"
     assert report["reference_key"] == "ref_json"
     assert report["metrics"]["exact_match"] == pytest.approx(1.0)
+
+
+def test_evaluate_raises_on_non_object_json_line(tmp_path: Path) -> None:
+    input_path = tmp_path / "bad_line.jsonl"
+    output_path = tmp_path / "report.json"
+    input_path.write_text('"not-an-object"\n', encoding="utf-8")
+
+    with pytest.raises(ValueError, match="expected object JSON"):
+        evaluate(input_path, output_path, "prediction", "reference")
