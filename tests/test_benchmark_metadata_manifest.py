@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# mypy: disable-error-code=import-untyped
 import json
 from pathlib import Path
 from typing import Any
@@ -126,6 +127,38 @@ def test_run_benchmark_strict_metadata_manifest_raises_on_unmatched_key(tmp_path
             metadata_by_image={"orphan.png": {"consensus_score": 0.11}},
             strict_metadata_manifest=True,
         )
+
+
+def test_run_benchmark_matches_relative_manifest_key_for_absolute_image_path(
+    tmp_path: Path,
+) -> None:
+    image_path = tmp_path / "images" / "nested" / "a.png"
+    image_path.parent.mkdir(parents=True)
+    image_path.write_bytes(b"fake")
+
+    absolute_image_path = image_path.resolve()
+    key_candidates = {
+        absolute_image_path: [
+            ("absolute", absolute_image_path.as_posix()),
+            ("relative", "nested/a.png"),
+            ("name", "a.png"),
+        ]
+    }
+
+    result = run_benchmark(
+        image_paths=[absolute_image_path],
+        registry=_registry(),
+        output_dir=tmp_path / "out-relative",
+        metadata_by_image={"nested/a.png": {"consensus_score": 0.66}},
+        metadata_key_candidates_by_image=key_candidates,
+    )
+
+    case = result["strategies"][0]["cases"][0]
+    assert case["notes"] == ["consensus_score:0.66"]
+
+    stats = result["metadata_manifest"]
+    assert stats["matched_keys"] == 1
+    assert stats["match_mode_counts"]["relative"] == 1
 
 
 def test_run_benchmark_warns_and_skips_ambiguous_name_fallback_collision(tmp_path: Path) -> None:
