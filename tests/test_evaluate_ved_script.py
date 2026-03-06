@@ -69,3 +69,18 @@ def test_evaluate_raises_on_non_string_prediction_or_reference(tmp_path: Path) -
 
     with pytest.raises(ValueError, match="must be strings"):
         evaluate(input_path, output_path, "prediction", "reference")
+
+
+def test_evaluate_supports_custom_prediction_and_reference_keys(tmp_path: Path) -> None:
+    input_path = tmp_path / "custom.jsonl"
+    output_path = tmp_path / "report.json"
+    _write_jsonl(
+        input_path,
+        [{"pred_json": '{"entities": []}', "ref_json": '{"entities": []}'}],
+    )
+
+    report = evaluate(input_path, output_path, "pred_json", "ref_json")
+    assert report["samples"] == 1
+    assert report["prediction_key"] == "pred_json"
+    assert report["reference_key"] == "ref_json"
+    assert report["metrics"]["exact_match"] == pytest.approx(1.0)
