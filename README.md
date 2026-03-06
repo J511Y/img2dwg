@@ -114,6 +114,7 @@ DWG 파일을 중간 표현 JSON 형태로 변환합니다.
 - `--optimize`: 기본 최적화 (좌표 반올림, 기본값 제거, DXF R2000)
 - `--rdp-tolerance`: 폴리라인 간소화 허용 오차 (0.5=보수적, 1.0=권장, 2.0=공격적)
 - `--compact-schema`: Compact 스키마 사용 (키 단축, 배열 평탄화)
+  - 빈 엔티티 입력에서는 원점(`o`)을 생략해 strict JSON 호환성을 유지
 
 ⚠️ **중요**: 대부분의 DWG 파일은 40만+ 토큰을 생성하므로, **`--layout-analysis` 옵션 사용을 강력히 권장**합니다.
 
@@ -170,6 +171,34 @@ $env:GITHUB_REPO_NAME="img2dwg-images"
 자세한 내용은 [이미지 URL 가이드](docs/image-url-guide.md)를 참조하세요.
 
 **토큰 필터링**: 각 레코드는 tiktoken을 사용하여 토큰 수가 계산되며, 지정된 최대 토큰 수를 초과하는 레코드는 자동으로 필터링됩니다.
+
+## 🌐 Streamlit Publisher 실행/접근/보존 정책
+
+Streamlit 기반 빠른 검증 UI는 아래처럼 실행합니다.
+
+```bash
+uv run --extra web streamlit run scripts/web_streamlit_app.py \
+  --server.address 127.0.0.1 \
+  --server.port 8501 \
+  -- --output-root output/web-streamlit
+```
+
+운영 가드레일:
+- **접근 정책**: 기본 바인딩은 `127.0.0.1`(로컬 전용)으로 유지합니다. 외부 접근이 꼭 필요할 때만 리버스 프록시/방화벽 뒤에서 공개하세요.
+- **업로드 정책**: 업로드 파일명은 경로 토큰(`..`, `/`, `\\`)·제어문자(`NUL`, 개행 등)·dotfile(`.hidden.png`)·OS 예약 이름·비허용 특수문자를 거부하며, 확장자는 `.jpg/.jpeg/.png`만 허용됩니다.
+- **용량 정책**: 단일 업로드는 최대 `10MB`까지만 허용됩니다.
+- **개발 검증 스모크**: 업로드 보안 헬퍼 심볼/모듈 로드 확인
+  ```bash
+  uv run python - <<'PY'
+  from scripts.web_streamlit_app import sanitize_upload_filename
+  print("smoke:module-load=ok safe_filename=", sanitize_upload_filename("floorplan.png"))
+  PY
+  ```
+- **보존 정책(권장)**: `output/web-streamlit`은 7일 또는 5GB 기준으로 정리 정책을 적용하세요.
+  - 예시(7일 초과 파일 정리):
+    ```bash
+    find output/web-streamlit -type f -mtime +7 -delete
+    ```
 
 ## 📊 데이터 구조
 
@@ -343,6 +372,31 @@ python scripts/benchmark_compaction.py --input path/to/file.dwg
 - `setup_logging()` 기본값으로 토큰 마스킹 필터 적용
 - 인증/시크릿 운영 가이드: [docs/security/authentication-and-secret-safety.md](docs/security/authentication-and-secret-safety.md)
 - 유출 대응 절차: [docs/security/secret-leak-response-runbook.md](docs/security/secret-leak-response-runbook.md)
+
+## 🔐 Streamlit 업로드 보안 스모크
+
+`web_streamlit_app.py`는 파일명 검증(경로 이탈 + 제어문자/dotfile 차단) 외에도 **확장자-파일시그니처 일치 + 종료 시그니처(IEND/EOI) 검증**을 수행합니다.
+
+빠른 확인 예시:
+
+```bash
+uv run python - <<'PY'
+import importlib.util
+from pathlib import Path
+
+path = Path('scripts/web_streamlit_app.py')
+spec = importlib.util.spec_from_file_location('web_streamlit_smoke', path)
+mod = importlib.util.module_from_spec(spec)
+assert spec and spec.loader
+spec.loader.exec_module(mod)
+
+mod.validate_upload_payload(
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x00IEND\xaeB`\x82',
+    filename_suffix='.png',
+)
+print('streamlit upload signature+footer guard: ok')
+PY
+```
 
 ## 🤝 기여 가이드
 
