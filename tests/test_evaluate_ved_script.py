@@ -47,3 +47,14 @@ def test_evaluate_raises_on_missing_keys(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="missing keys"):
         evaluate(input_path, output_path, "prediction", "reference")
+
+
+def test_evaluate_handles_empty_input_as_zero_metrics(tmp_path: Path) -> None:
+    input_path = tmp_path / "empty.jsonl"
+    output_path = tmp_path / "report.json"
+    input_path.write_text("", encoding="utf-8")
+
+    report = evaluate(input_path, output_path, "prediction", "reference")
+    assert report["samples"] == 0
+    assert report["metrics"]["parse_success_rate"] == 0.0
+    assert report["metrics"]["exact_match"] == 0.0
