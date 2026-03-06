@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -58,3 +59,13 @@ def test_evaluate_handles_empty_input_as_zero_metrics(tmp_path: Path) -> None:
     assert report["samples"] == 0
     assert report["metrics"]["parse_success_rate"] == 0.0
     assert report["metrics"]["exact_match"] == 0.0
+
+
+def test_evaluate_raises_on_non_string_prediction_or_reference(tmp_path: Path) -> None:
+    input_path = tmp_path / "bad_type.jsonl"
+    output_path = tmp_path / "report.json"
+    bad_row: dict[str, Any] = {"prediction": {}, "reference": "{}"}
+    _write_jsonl(input_path, [bad_row])
+
+    with pytest.raises(ValueError, match="must be strings"):
+        evaluate(input_path, output_path, "prediction", "reference")
