@@ -102,3 +102,15 @@ def test_evaluate_raises_on_invalid_json_line(tmp_path: Path) -> None:
 
     with pytest.raises(json.JSONDecodeError):
         evaluate(input_path, output_path, "prediction", "reference")
+
+
+def test_evaluate_ignores_blank_lines_between_valid_rows(tmp_path: Path) -> None:
+    input_path = tmp_path / "mixed_blank.jsonl"
+    output_path = tmp_path / "report.json"
+    input_path.write_text(
+        '{"prediction": "{}", "reference": "{}"}\n\n{"prediction": "{}", "reference": "{}"}\n',
+        encoding="utf-8",
+    )
+
+    report = evaluate(input_path, output_path, "prediction", "reference")
+    assert report["samples"] == 2
