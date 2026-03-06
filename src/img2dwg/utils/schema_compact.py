@@ -80,7 +80,7 @@ class CompactSchemaConverter:
         # 4단계: 메타데이터 변환
         compact_metadata = self._compact_metadata(data.get("metadata", {}))
 
-        result = {
+        result: dict[str, Any] = {
             "m": compact_metadata,
             "e": compact_entities,
         }
@@ -93,7 +93,7 @@ class CompactSchemaConverter:
 
         # 원점 추가
         if self.origin is not None:
-            result["o"] = list(self.origin)
+            result["o"] = [self.origin[0], self.origin[1]]
 
         return result
 
