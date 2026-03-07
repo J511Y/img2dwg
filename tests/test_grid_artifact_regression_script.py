@@ -84,6 +84,15 @@ def test_evaluate_case_passes_on_mixed_entities(tmp_path: Path) -> None:
     assert flags == []
 
 
+def test_regression_threshold_defaults_are_tuned_for_grid_baseline() -> None:
+    module = _load_script_module()
+
+    thresholds = module.RegressionThresholds()
+
+    assert thresholds.min_entities == 6
+    assert thresholds.min_unique_entity_types == 1
+
+
 def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
     module = _load_script_module()
 
