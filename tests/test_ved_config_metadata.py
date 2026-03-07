@@ -7,6 +7,7 @@ import pytest
 
 from img2dwg.ved.config import (  # type: ignore[import-untyped]
     MAX_LENGTH_HARD_LIMIT,
+    MAX_LENGTH_SOFT_LIMIT,
     TRAINING_METADATA_FILENAME,
     VEDConfig,
     load_training_max_length,
@@ -56,3 +57,14 @@ def test_resolve_inference_max_length_rejects_over_hard_limit(tmp_path: Path) ->
             tmp_path,
             cli_max_length=MAX_LENGTH_HARD_LIMIT + 1,
         )
+
+
+def test_resolve_inference_max_length_warns_when_over_soft_limit(tmp_path: Path) -> None:
+    resolved = resolve_inference_max_length(
+        tmp_path,
+        cli_max_length=MAX_LENGTH_SOFT_LIMIT + 1,
+    )
+
+    assert resolved.value == MAX_LENGTH_SOFT_LIMIT + 1
+    assert resolved.source == "cli-override"
+    assert any("very large" in warning for warning in resolved.warnings)
