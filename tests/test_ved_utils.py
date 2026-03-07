@@ -32,3 +32,15 @@ def test_format_time_and_count_parameters() -> None:
 
     model = torch.nn.Linear(3, 2, bias=True)
     assert count_parameters(model) == 8
+
+
+def test_count_parameters_excludes_frozen_params() -> None:
+    model = torch.nn.Sequential(
+        torch.nn.Linear(3, 2, bias=True),
+        torch.nn.Linear(2, 1, bias=False),
+    )
+
+    for param in model[1].parameters():
+        param.requires_grad = False
+
+    assert count_parameters(model) == 8
