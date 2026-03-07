@@ -93,10 +93,30 @@ def test_hybrid_strategy_avoids_diagonal_lines_for_floorplan_like_inputs(tmp_pat
 
     doc = ezdxf.readfile(str(hybrid.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) == 6
+    assert len(lines) >= 6
 
     for line in lines:
         start = line.dxf.start
         end = line.dxf.end
         is_axis_aligned = abs(start.x - end.x) < 1e-6 or abs(start.y - end.y) < 1e-6
         assert is_axis_aligned
+
+
+
+def test_hybrid_strategy_adds_adaptive_detail_line_on_high_edge_density(tmp_path: Path) -> None:
+    image_path = tmp_path / "high_edge.png"
+    image = Image.new("L", (96, 96), color=255)
+    draw = ImageDraw.Draw(image)
+    for x in range(0, 96, 8):
+        draw.line((x, 0, x, 95), fill=0, width=1)
+    for y in range(0, 96, 8):
+        draw.line((0, y, 95, y), fill=0, width=1)
+    image.convert("RGB").save(image_path)
+
+    hybrid = HybridMVPStrategy().run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
+        tmp_path / "hybrid",
+    )
+
+    assert hybrid.success is True
+    assert any("adaptive_detail_line:on" in note for note in hybrid.notes)

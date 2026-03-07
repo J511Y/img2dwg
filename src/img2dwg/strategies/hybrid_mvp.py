@@ -66,6 +66,15 @@ class HybridMVPStrategy(ConversionStrategy):
         )
 
         plan = build_vector_plan(signals, self._synthesis_preset)
+        if signals.edge_density >= 0.08 and len(plan.segments) >= 4:
+            left = plan.segments[0][0][0]
+            right = plan.segments[0][1][0]
+            top = plan.segments[0][0][1]
+            bottom = plan.segments[2][0][1]
+            detail_y = round(top + ((bottom - top) * 0.25), 2)
+            plan.segments.append(((left, detail_y), (right, detail_y)))
+            plan.notes.append("adaptive_detail_line:on")
+
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="SYNTHESIS")
 
