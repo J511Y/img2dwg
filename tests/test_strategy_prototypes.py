@@ -120,3 +120,19 @@ def test_hybrid_strategy_adds_adaptive_detail_line_on_high_edge_density(tmp_path
 
     assert hybrid.success is True
     assert any("adaptive_detail_line:on" in note for note in hybrid.notes)
+
+    doc = ezdxf.readfile(str(hybrid.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+
+    has_inset_vertical = False
+    for line in lines:
+        start = line.dxf.start
+        end = line.dxf.end
+        if abs(start.x - end.x) < 1e-6 and abs(start.y - end.y) > 1e-6:
+            y_min = min(start.y, end.y)
+            y_max = max(start.y, end.y)
+            if y_min > 3.0 and y_max < 93.0:
+                has_inset_vertical = True
+                break
+
+    assert has_inset_vertical
