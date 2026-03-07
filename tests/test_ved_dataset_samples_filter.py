@@ -77,6 +77,18 @@ def test_load_samples_keeps_only_records_with_user_image_and_assistant(tmp_path:
                 {"role": "assistant", "content": None},
             ]
         ),
+        # assistant content is empty string
+        _line(
+            [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": "data:image/png;base64,DD=="}}
+                    ],
+                },
+                {"role": "assistant", "content": ""},
+            ]
+        ),
         # valid
         _line(
             [
