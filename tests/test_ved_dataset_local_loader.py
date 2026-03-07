@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+import io
 import json
 from pathlib import Path
 from typing import Any
@@ -29,6 +31,14 @@ def _write_jsonl(path: Path, image_url: str) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+def _data_url_png() -> str:
+    image = Image.new("RGB", (8, 8), (99, 88, 77))
+    buf = io.BytesIO()
+    image.save(buf, format="PNG")
+    encoded = base64.b64encode(buf.getvalue()).decode("ascii")
+    return f"data:image/png;base64,{encoded}"
+
+
 def test_load_image_resolves_relative_path_with_image_dir(tmp_path: Path) -> None:
     image_dir = tmp_path / "images"
     image_dir.mkdir(parents=True)
@@ -43,6 +53,21 @@ def test_load_image_resolves_relative_path_with_image_dir(tmp_path: Path) -> Non
         jsonl_path=jsonl,
         tokenizer=_DummyTokenizer(),
         image_dir=image_dir,
+        image_size=8,
+    )
+
+    sample = dataset[0]
+    assert tuple(sample["pixel_values"].shape) == (3, 8, 8)
+    assert tuple(sample["labels"].shape) == (4,)
+
+
+def test_load_image_supports_data_url(tmp_path: Path) -> None:
+    jsonl = tmp_path / "samples.jsonl"
+    _write_jsonl(jsonl, _data_url_png())
+
+    dataset = ImageToJSONDataset(
+        jsonl_path=jsonl,
+        tokenizer=_DummyTokenizer(),
         image_size=8,
     )
 
