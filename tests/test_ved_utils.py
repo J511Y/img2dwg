@@ -24,8 +24,10 @@ def test_validate_and_parse_json_helpers(capsys: Any) -> None:
 
 
 def test_format_time_and_count_parameters() -> None:
+    assert format_time(0) == "0s"
     assert format_time(59) == "59s"
     assert format_time(61) == "1m 1s"
+    assert format_time(3600) == "1h 0m 0s"
     assert format_time(3661) == "1h 1m 1s"
 
     model = torch.nn.Linear(3, 2, bias=True)
