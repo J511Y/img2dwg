@@ -124,6 +124,37 @@ def test_remote_loader_retries_then_succeeds(
     assert attempts["n"] == 2
 
 
+def test_remote_loader_retries_on_429_then_succeeds(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    jsonl = tmp_path / "samples.jsonl"
+    url = "https://example.com/rate-limited.png"
+    _write_jsonl(jsonl, url)
+
+    attempts = {"n": 0}
+
+    def _fake_get(_target: str, timeout: float) -> _Resp:
+        assert timeout == 10.0
+        attempts["n"] += 1
+        if attempts["n"] == 1:
+            return _Resp(b"", status_code=429)
+        return _Resp(_png_bytes())
+
+    monkeypatch.setattr("img2dwg.ved.dataset.requests.get", _fake_get)
+    monkeypatch.setattr("img2dwg.ved.dataset.time.sleep", lambda _s: None)
+
+    dataset = ImageToJSONDataset(
+        jsonl_path=jsonl,
+        tokenizer=_DummyTokenizer(),
+        remote_max_retries=2,
+        remote_backoff_seconds=0.01,
+    )
+
+    image = dataset._load_image(url)
+    assert image.mode == "RGB"
+    assert attempts["n"] == 2
+
+
 def test_remote_loader_does_not_retry_hard_4xx(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
