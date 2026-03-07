@@ -121,19 +121,18 @@ def test_hybrid_strategy_adds_adaptive_detail_line_on_high_edge_density(tmp_path
     assert hybrid.success is True
     assert any("adaptive_detail_line:on" in note for note in hybrid.notes)
 
-    assert any("adaptive_detail_type:diag" in note for note in hybrid.notes)
+    assert any("adaptive_detail_type:diag_pair" in note for note in hybrid.notes)
 
     doc = ezdxf.readfile(str(hybrid.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
 
-    has_short_diagonal = False
+    short_diagonal_count = 0
     for line in lines:
         start = line.dxf.start
         end = line.dxf.end
         dx = abs(start.x - end.x)
         dy = abs(start.y - end.y)
         if dx > 1e-6 and dy > 1e-6 and dx < 30 and dy < 30:
-            has_short_diagonal = True
-            break
+            short_diagonal_count += 1
 
-    assert has_short_diagonal
+    assert short_diagonal_count >= 2
