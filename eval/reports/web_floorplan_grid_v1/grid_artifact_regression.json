@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-07T19:47:53.510162+00:00",
+  "generated_at": "2026-03-07T20:17:27.011736+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -39,8 +39,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -58,8 +58,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -77,8 +77,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -96,8 +96,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -115,8 +115,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -134,8 +134,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -153,8 +153,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -172,8 +172,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -191,8 +191,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -210,8 +210,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -229,8 +229,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {
@@ -248,8 +248,8 @@
         "unique_entity_types": 1,
         "line_count": 7,
         "axis_aligned_line_ratio": 1.0,
-        "unique_x_count": 3,
-        "unique_y_count": 4
+        "unique_x_count": 4,
+        "unique_y_count": 3
       }
     },
     {

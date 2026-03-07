@@ -71,8 +71,8 @@ class HybridMVPStrategy(ConversionStrategy):
             right = plan.segments[0][1][0]
             top = plan.segments[0][0][1]
             bottom = plan.segments[2][0][1]
-            detail_y = round(top + ((bottom - top) * 0.25), 2)
-            plan.segments.append(((left, detail_y), (right, detail_y)))
+            detail_x = round(left + ((right - left) * 0.25), 2)
+            plan.segments.append(((detail_x, top), (detail_x, bottom)))
             plan.notes.append("adaptive_detail_line:on")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
