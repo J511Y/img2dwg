@@ -72,6 +72,9 @@ def test_remote_loader_uses_cache_after_first_download(
     )
 
     dataset._load_image(url)
+    cache_path = dataset._cache_path_for_url(url)
+    assert cache_path is not None and cache_path.exists()
+
     dataset._load_image(url)
     assert len(calls) == 1
 
