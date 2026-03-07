@@ -83,6 +83,9 @@ class ImageToJSONDataset(Dataset):
                     continue
 
                 content = user_msg.get("content", [])
+                if not isinstance(content, list):
+                    continue
+
                 image_url: str | None = None
                 for item in content:
                     if item.get("type") == "image_url":
