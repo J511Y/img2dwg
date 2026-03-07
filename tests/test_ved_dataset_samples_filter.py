@@ -14,13 +14,15 @@ class _DummyTokenizer:
         return {"input_ids": torch.ones((1, 4), dtype=torch.long)}
 
 
-def _line(messages: list[dict[str, Any]]) -> str:
+def _line(messages: Any) -> str:
     return json.dumps({"messages": messages}, ensure_ascii=False)
 
 
 def test_load_samples_keeps_only_records_with_user_image_and_assistant(tmp_path: Path) -> None:
     jsonl = tmp_path / "samples.jsonl"
     lines = [
+        # malformed messages type (non-list)
+        _line("bad-messages"),
         # valid
         _line(
             [

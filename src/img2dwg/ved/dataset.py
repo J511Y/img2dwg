@@ -73,12 +73,19 @@ class ImageToJSONDataset(Dataset):
             for line in f:
                 record = json.loads(line)
                 messages = record.get("messages", [])
+                if not isinstance(messages, list):
+                    continue
 
-                user_msg = next((m for m in messages if m["role"] == "user"), None)
+                user_msg = next(
+                    (m for m in messages if isinstance(m, dict) and m.get("role") == "user"), None
+                )
                 if not user_msg:
                     continue
 
-                assistant_msg = next((m for m in messages if m["role"] == "assistant"), None)
+                assistant_msg = next(
+                    (m for m in messages if isinstance(m, dict) and m.get("role") == "assistant"),
+                    None,
+                )
                 if not assistant_msg:
                     continue
 
