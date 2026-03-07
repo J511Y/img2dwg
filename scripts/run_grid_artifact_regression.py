@@ -57,6 +57,7 @@ class RegressionThresholds:
     min_entities: int = 6
     min_unique_entity_types: int = 1
     min_axis_aligned_ratio_for_grid: float = 0.9
+    min_line_count_for_grid_pattern: int = 8
     max_unique_x_for_grid: int = 4
     max_unique_y_for_grid: int = 4
     coord_round_digits: int = 3
@@ -213,7 +214,7 @@ def evaluate_case(diagnostics: DxfDiagnostics, thresholds: RegressionThresholds)
         flags.append("low_entity_diversity")
 
     suspicious_grid_pattern = (
-        diagnostics.line_count > 0
+        diagnostics.line_count >= thresholds.min_line_count_for_grid_pattern
         and diagnostics.axis_aligned_line_ratio >= thresholds.min_axis_aligned_ratio_for_grid
         and diagnostics.unique_x_count <= thresholds.max_unique_x_for_grid
         and diagnostics.unique_y_count <= thresholds.max_unique_y_for_grid
@@ -403,6 +404,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-entities", type=int, default=6)
     parser.add_argument("--min-unique-entity-types", type=int, default=1)
     parser.add_argument("--min-axis-aligned-ratio-for-grid", type=float, default=0.9)
+    parser.add_argument("--min-line-count-for-grid-pattern", type=int, default=8)
     parser.add_argument("--max-unique-x-for-grid", type=int, default=4)
     parser.add_argument("--max-unique-y-for-grid", type=int, default=4)
     return parser.parse_args()
@@ -441,6 +443,7 @@ def main() -> int:
         min_entities=args.min_entities,
         min_unique_entity_types=args.min_unique_entity_types,
         min_axis_aligned_ratio_for_grid=args.min_axis_aligned_ratio_for_grid,
+        min_line_count_for_grid_pattern=args.min_line_count_for_grid_pattern,
         max_unique_x_for_grid=args.max_unique_x_for_grid,
         max_unique_y_for_grid=args.max_unique_y_for_grid,
     )
