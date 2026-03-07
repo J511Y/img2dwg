@@ -23,14 +23,13 @@ from uuid import uuid4
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from img2dwg.web.retention import RetentionStats, cleanup_expired_files
-
 from img2dwg.strategies.base import ConversionInput
 from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
 from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy
 from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
 from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
 from img2dwg.web.dxf_validation import DxfInspectionResult, inspect_dxf
+from img2dwg.web.retention import cleanup_output_root, format_cleanup_report
 
 
 def import_gradio() -> Any:
@@ -124,15 +123,6 @@ def resolve_output_root(path: Path) -> Path:
     return (project_root / path).resolve()
 
 
-def format_cleanup_report(stats: RetentionStats, *, max_age_days: float, dry_run: bool) -> str:
-    mode = "dry-run" if dry_run else "active"
-    return (
-        f"[cleanup:{mode}] max_age_days={max_age_days} "
-        f"scanned={stats.scanned_files} deleted={stats.deleted_files} "
-        f"reclaimed_bytes={stats.reclaimed_bytes}"
-    )
-
-
 def run_startup_cleanup(args: argparse.Namespace) -> None:
     if args.no_cleanup:
         print(
@@ -141,19 +131,13 @@ def run_startup_cleanup(args: argparse.Namespace) -> None:
         )
         return
 
-    max_age_seconds = max(0.0, args.cleanup_max_age_days) * 24.0 * 60.0 * 60.0
-    stats = cleanup_expired_files(
+    report = cleanup_output_root(
         args.output_root,
-        max_age_seconds=max_age_seconds,
+        max_age_days=args.cleanup_max_age_days,
+        max_size_gb=args.cleanup_max_size_gb,
         dry_run=args.cleanup_dry_run,
     )
-    print(
-        format_cleanup_report(
-            stats,
-            max_age_days=args.cleanup_max_age_days,
-            dry_run=args.cleanup_dry_run,
-        )
-    )
+    print(format_cleanup_report(report))
 
 
 def format_result_markdown(
@@ -389,6 +373,12 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=float,
         default=7.0,
         help="Retention threshold (days); files older than this are deleted",
+    )
+    parser.add_argument(
+        "--cleanup-max-size-gb",
+        type=float,
+        default=5.0,
+        help="Retention cap (GB); oldest files are removed when exceeded",
     )
     parser.add_argument(
         "--cleanup-dry-run",
