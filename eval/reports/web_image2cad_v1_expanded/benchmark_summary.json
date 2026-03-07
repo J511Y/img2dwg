@@ -2,10 +2,10 @@
   "summary_schema_version": 1,
   "source_schema_version": 2,
   "run": {
-    "run_id": "2026-03-07T17:12:04.326061+00:00",
+    "run_id": "2026-03-07T17:13:00.136055+00:00",
     "dataset_id": "web_image2cad_v1-expanded",
-    "git_ref": "0c1c953",
-    "generated_at": "2026-03-07T17:12:04.326070+00:00"
+    "git_ref": "bd7273d",
+    "generated_at": "2026-03-07T17:13:00.136063+00:00"
   },
   "winner": {
     "strategy_name": "hybrid_mvp",
@@ -27,20 +27,20 @@
       "cad_loadable_rate": 1.0,
       "mean_iou": 0.7319,
       "mean_topology_f1": 0.6596,
-      "median_elapsed_ms": 53.11,
-      "p95_elapsed_ms": 70.29
+      "median_elapsed_ms": 53.22,
+      "p95_elapsed_ms": 69.96
     },
     {
       "strategy_name": "consensus_qa",
       "rank": 2,
-      "composite_score": 0.6738,
+      "composite_score": 0.6739,
       "success_rate": 1.0,
       "cad_loadable_count": 11,
       "cad_loadable_rate": 1.0,
       "mean_iou": 0.6807,
       "mean_topology_f1": 0.6034,
-      "median_elapsed_ms": 52.2,
-      "p95_elapsed_ms": 76.34
+      "median_elapsed_ms": 52.03,
+      "p95_elapsed_ms": 76.39
     },
     {
       "strategy_name": "two_stage_baseline",
@@ -51,8 +51,8 @@
       "cad_loadable_rate": 1.0,
       "mean_iou": 0.6367,
       "mean_topology_f1": 0.5534,
-      "median_elapsed_ms": 52.69,
-      "p95_elapsed_ms": 69.91
+      "median_elapsed_ms": 53.22,
+      "p95_elapsed_ms": 70.19
     }
   ]
 }

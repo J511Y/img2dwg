@@ -38,14 +38,14 @@ uv run python scripts/benchmark_strategies.py \
 
 ## 4) 전략별 성능 비교 (expanded eval=11)
 출처:
-- `eval/reports/web_image2cad_v1_expanded/benchmark_summary.json` (run.git_ref=`0c1c953`)
+- `eval/reports/web_image2cad_v1_expanded/benchmark_summary.json` (run.git_ref=`bd7273d`)
 - `eval/reports/web_image2cad_v1_expanded/strategy_comparison.csv`
 
 | strategy | rank | composite | success_rate | cad_loadable_rate | mean_iou | mean_topology_f1 | median_ms | p95_ms |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| hybrid_mvp | 1 | 0.7006 | 1.0000 | 1.0000 | 0.7319 | 0.6596 | 53.11 | 70.29 |
-| consensus_qa | 2 | 0.6738 | 1.0000 | 1.0000 | 0.6807 | 0.6034 | 52.20 | 76.34 |
-| two_stage_baseline | 3 | 0.6503 | 1.0000 | 1.0000 | 0.6367 | 0.5534 | 52.69 | 69.91 |
+| hybrid_mvp | 1 | 0.7006 | 1.0000 | 1.0000 | 0.7319 | 0.6596 | 53.22 | 69.96 |
+| consensus_qa | 2 | 0.6739 | 1.0000 | 1.0000 | 0.6807 | 0.6034 | 52.03 | 76.39 |
+| two_stage_baseline | 3 | 0.6503 | 1.0000 | 1.0000 | 0.6367 | 0.5534 | 53.22 | 70.19 |
 
 ## 5) 해석
 - 품질 지표(`mean_iou`, `mean_topology_f1`) 기준으로 `hybrid_mvp`가 확장 셋에서도 1위 유지.

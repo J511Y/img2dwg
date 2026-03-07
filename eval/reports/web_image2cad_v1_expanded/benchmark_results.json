@@ -1,10 +1,10 @@
 {
   "schema_version": 2,
   "run": {
-    "run_id": "2026-03-07T17:12:04.326061+00:00",
-    "git_ref": "0c1c953",
+    "run_id": "2026-03-07T17:13:00.136055+00:00",
+    "git_ref": "bd7273d",
     "dataset_id": "web_image2cad_v1-expanded",
-    "generated_at": "2026-03-07T17:12:04.326070+00:00"
+    "generated_at": "2026-03-07T17:13:00.136063+00:00"
   },
   "standards": {
     "metric_units": {
@@ -82,7 +82,7 @@
           "cad_loadable_rate": 0.0,
           "mean_iou": 0.0952,
           "mean_topology_f1": 0.1062,
-          "median_elapsed_ms": 0.42
+          "median_elapsed_ms": 0.0
         },
         "synthesis_vs_antithesis": {
           "success_rate": 0.0,
@@ -90,7 +90,7 @@
           "cad_loadable_rate": 0.0,
           "mean_iou": 0.0512,
           "mean_topology_f1": 0.0562,
-          "median_elapsed_ms": 0.91
+          "median_elapsed_ms": 1.19
         }
       }
     }
@@ -108,7 +108,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_001__image1.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 44.93,
+          "elapsed_ms": 44.82,
           "metrics": {
             "iou": 0.7688,
             "topology_f1": 0.6539
@@ -126,7 +126,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_002__image2.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 47.26,
+          "elapsed_ms": 47.82,
           "metrics": {
             "iou": 0.8724,
             "topology_f1": 0.7085
@@ -144,7 +144,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_003__image3.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 27.18,
+          "elapsed_ms": 27.39,
           "metrics": {
             "iou": 0.7686,
             "topology_f1": 0.6535
@@ -162,7 +162,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_004__gebaeude_3395_3_1.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 76.34,
+          "elapsed_ms": 76.39,
           "metrics": {
             "iou": 0.562,
             "topology_f1": 0.5255
@@ -180,7 +180,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_005__gebaeude_3395_3_2.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 55.35,
+          "elapsed_ms": 55.3,
           "metrics": {
             "iou": 0.5584,
             "topology_f1": 0.528
@@ -198,7 +198,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_006__gebaeude_3395_3_3.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 52.2,
+          "elapsed_ms": 52.03,
           "metrics": {
             "iou": 0.553,
             "topology_f1": 0.5237
@@ -216,7 +216,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_007__gebaeude_3395_3_4.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 45.44,
+          "elapsed_ms": 44.11,
           "metrics": {
             "iou": 0.5636,
             "topology_f1": 0.534
@@ -234,7 +234,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_008__strassen_3395_3_1.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 68.91,
+          "elapsed_ms": 69.05,
           "metrics": {
             "iou": 0.6922,
             "topology_f1": 0.6172
@@ -252,7 +252,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_009__strassen_3395_3_2.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 55.31,
+          "elapsed_ms": 55.4,
           "metrics": {
             "iou": 0.6932,
             "topology_f1": 0.6218
@@ -270,7 +270,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_010__strassen_3395_3_3.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 52.86,
+          "elapsed_ms": 52.95,
           "metrics": {
             "iou": 0.7112,
             "topology_f1": 0.6253
@@ -288,7 +288,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_011__strassen_3395_3_4.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 42.73,
+          "elapsed_ms": 43.02,
           "metrics": {
             "iou": 0.7442,
             "topology_f1": 0.646
@@ -307,8 +307,8 @@
         "success_rate": 1.0,
         "cad_loadable_count": 11,
         "cad_loadable_rate": 1.0,
-        "median_elapsed_ms": 52.2,
-        "p95_elapsed_ms": 76.34,
+        "median_elapsed_ms": 52.03,
+        "p95_elapsed_ms": 76.39,
         "mean_iou": 0.6807,
         "mean_topology_f1": 0.6034
       }
@@ -325,7 +325,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_001__image1.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 35.88,
+          "elapsed_ms": 35.68,
           "metrics": {
             "iou": 0.82,
             "topology_f1": 0.7101
@@ -345,7 +345,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_002__image2.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 46.53,
+          "elapsed_ms": 47.86,
           "metrics": {
             "iou": 0.9236,
             "topology_f1": 0.7647
@@ -365,7 +365,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_003__image3.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 27.06,
+          "elapsed_ms": 27.29,
           "metrics": {
             "iou": 0.8198,
             "topology_f1": 0.7097
@@ -385,7 +385,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_004__gebaeude_3395_3_1.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 70.29,
+          "elapsed_ms": 69.96,
           "metrics": {
             "iou": 0.6132,
             "topology_f1": 0.5817
@@ -425,7 +425,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_006__gebaeude_3395_3_3.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 53.11,
+          "elapsed_ms": 53.22,
           "metrics": {
             "iou": 0.6042,
             "topology_f1": 0.5799
@@ -445,7 +445,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_007__gebaeude_3395_3_4.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 42.54,
+          "elapsed_ms": 42.47,
           "metrics": {
             "iou": 0.6148,
             "topology_f1": 0.5902
@@ -465,7 +465,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_008__strassen_3395_3_1.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 69.13,
+          "elapsed_ms": 69.81,
           "metrics": {
             "iou": 0.7434,
             "topology_f1": 0.6734
@@ -485,7 +485,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_009__strassen_3395_3_2.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 54.23,
+          "elapsed_ms": 54.41,
           "metrics": {
             "iou": 0.7444,
             "topology_f1": 0.678
@@ -505,7 +505,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_010__strassen_3395_3_3.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 53.95,
+          "elapsed_ms": 54.95,
           "metrics": {
             "iou": 0.7624,
             "topology_f1": 0.6815
@@ -525,7 +525,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_011__strassen_3395_3_4.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 42.89,
+          "elapsed_ms": 42.98,
           "metrics": {
             "iou": 0.7954,
             "topology_f1": 0.7022
@@ -546,8 +546,8 @@
         "success_rate": 1.0,
         "cad_loadable_count": 11,
         "cad_loadable_rate": 1.0,
-        "median_elapsed_ms": 53.11,
-        "p95_elapsed_ms": 70.29,
+        "median_elapsed_ms": 53.22,
+        "p95_elapsed_ms": 69.96,
         "mean_iou": 0.7319,
         "mean_topology_f1": 0.6596
       }
@@ -564,7 +564,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_001__image1.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 35.21,
+          "elapsed_ms": 34.89,
           "metrics": {
             "iou": 0.7248,
             "topology_f1": 0.6039
@@ -581,7 +581,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_002__image2.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 45.59,
+          "elapsed_ms": 46.53,
           "metrics": {
             "iou": 0.8284,
             "topology_f1": 0.6585
@@ -598,7 +598,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_003__image3.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 27.73,
+          "elapsed_ms": 27.78,
           "metrics": {
             "iou": 0.7246,
             "topology_f1": 0.6035
@@ -615,7 +615,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_004__gebaeude_3395_3_1.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 69.91,
+          "elapsed_ms": 69.95,
           "metrics": {
             "iou": 0.518,
             "topology_f1": 0.4755
@@ -632,7 +632,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_005__gebaeude_3395_3_2.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 53.78,
+          "elapsed_ms": 54.27,
           "metrics": {
             "iou": 0.5144,
             "topology_f1": 0.478
@@ -649,7 +649,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_006__gebaeude_3395_3_3.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 52.05,
+          "elapsed_ms": 52.01,
           "metrics": {
             "iou": 0.509,
             "topology_f1": 0.4737
@@ -666,7 +666,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_007__gebaeude_3395_3_4.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 42.96,
+          "elapsed_ms": 42.98,
           "metrics": {
             "iou": 0.5196,
             "topology_f1": 0.484
@@ -683,7 +683,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_008__strassen_3395_3_1.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 68.45,
+          "elapsed_ms": 70.19,
           "metrics": {
             "iou": 0.6482,
             "topology_f1": 0.5672
@@ -700,7 +700,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_009__strassen_3395_3_2.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 54.19,
+          "elapsed_ms": 54.29,
           "metrics": {
             "iou": 0.6492,
             "topology_f1": 0.5718
@@ -717,7 +717,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_010__strassen_3395_3_3.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 52.69,
+          "elapsed_ms": 53.22,
           "metrics": {
             "iou": 0.6672,
             "topology_f1": 0.5753
@@ -734,7 +734,7 @@
           "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_011__strassen_3395_3_4.dxf",
           "cad_loadable": true,
           "success": true,
-          "elapsed_ms": 57.66,
+          "elapsed_ms": 59.8,
           "metrics": {
             "iou": 0.7002,
             "topology_f1": 0.596
@@ -752,8 +752,8 @@
         "success_rate": 1.0,
         "cad_loadable_count": 11,
         "cad_loadable_rate": 1.0,
-        "median_elapsed_ms": 52.69,
-        "p95_elapsed_ms": 69.91,
+        "median_elapsed_ms": 53.22,
+        "p95_elapsed_ms": 70.19,
         "mean_iou": 0.6367,
         "mean_topology_f1": 0.5534
       }
@@ -767,7 +767,7 @@
     },
     {
       "strategy_name": "consensus_qa",
-      "composite_score": 0.6738,
+      "composite_score": 0.6739,
       "rank": 2
     },
     {
@@ -782,7 +782,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_001__image1.dxf",
         "success": true,
-        "elapsed_ms": 44.93,
+        "elapsed_ms": 44.82,
         "metrics": {
           "iou": 0.7688,
           "topology_f1": 0.6539
@@ -798,7 +798,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_002__image2.dxf",
         "success": true,
-        "elapsed_ms": 47.26,
+        "elapsed_ms": 47.82,
         "metrics": {
           "iou": 0.8724,
           "topology_f1": 0.7085
@@ -814,7 +814,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_003__image3.dxf",
         "success": true,
-        "elapsed_ms": 27.18,
+        "elapsed_ms": 27.39,
         "metrics": {
           "iou": 0.7686,
           "topology_f1": 0.6535
@@ -830,7 +830,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_004__gebaeude_3395_3_1.dxf",
         "success": true,
-        "elapsed_ms": 76.34,
+        "elapsed_ms": 76.39,
         "metrics": {
           "iou": 0.562,
           "topology_f1": 0.5255
@@ -846,7 +846,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_005__gebaeude_3395_3_2.dxf",
         "success": true,
-        "elapsed_ms": 55.35,
+        "elapsed_ms": 55.3,
         "metrics": {
           "iou": 0.5584,
           "topology_f1": 0.528
@@ -862,7 +862,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_006__gebaeude_3395_3_3.dxf",
         "success": true,
-        "elapsed_ms": 52.2,
+        "elapsed_ms": 52.03,
         "metrics": {
           "iou": 0.553,
           "topology_f1": 0.5237
@@ -878,7 +878,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_007__gebaeude_3395_3_4.dxf",
         "success": true,
-        "elapsed_ms": 45.44,
+        "elapsed_ms": 44.11,
         "metrics": {
           "iou": 0.5636,
           "topology_f1": 0.534
@@ -894,7 +894,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_008__strassen_3395_3_1.dxf",
         "success": true,
-        "elapsed_ms": 68.91,
+        "elapsed_ms": 69.05,
         "metrics": {
           "iou": 0.6922,
           "topology_f1": 0.6172
@@ -910,7 +910,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_009__strassen_3395_3_2.dxf",
         "success": true,
-        "elapsed_ms": 55.31,
+        "elapsed_ms": 55.4,
         "metrics": {
           "iou": 0.6932,
           "topology_f1": 0.6218
@@ -926,7 +926,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_010__strassen_3395_3_3.dxf",
         "success": true,
-        "elapsed_ms": 52.86,
+        "elapsed_ms": 52.95,
         "metrics": {
           "iou": 0.7112,
           "topology_f1": 0.6253
@@ -942,7 +942,7 @@
         "strategy_name": "consensus_qa",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/consensus_qa/ezdxf_mit_011__strassen_3395_3_4.dxf",
         "success": true,
-        "elapsed_ms": 42.73,
+        "elapsed_ms": 43.02,
         "metrics": {
           "iou": 0.7442,
           "topology_f1": 0.646
@@ -960,7 +960,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_001__image1.dxf",
         "success": true,
-        "elapsed_ms": 35.88,
+        "elapsed_ms": 35.68,
         "metrics": {
           "iou": 0.82,
           "topology_f1": 0.7101
@@ -978,7 +978,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_002__image2.dxf",
         "success": true,
-        "elapsed_ms": 46.53,
+        "elapsed_ms": 47.86,
         "metrics": {
           "iou": 0.9236,
           "topology_f1": 0.7647
@@ -996,7 +996,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_003__image3.dxf",
         "success": true,
-        "elapsed_ms": 27.06,
+        "elapsed_ms": 27.29,
         "metrics": {
           "iou": 0.8198,
           "topology_f1": 0.7097
@@ -1014,7 +1014,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_004__gebaeude_3395_3_1.dxf",
         "success": true,
-        "elapsed_ms": 70.29,
+        "elapsed_ms": 69.96,
         "metrics": {
           "iou": 0.6132,
           "topology_f1": 0.5817
@@ -1050,7 +1050,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_006__gebaeude_3395_3_3.dxf",
         "success": true,
-        "elapsed_ms": 53.11,
+        "elapsed_ms": 53.22,
         "metrics": {
           "iou": 0.6042,
           "topology_f1": 0.5799
@@ -1068,7 +1068,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_007__gebaeude_3395_3_4.dxf",
         "success": true,
-        "elapsed_ms": 42.54,
+        "elapsed_ms": 42.47,
         "metrics": {
           "iou": 0.6148,
           "topology_f1": 0.5902
@@ -1086,7 +1086,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_008__strassen_3395_3_1.dxf",
         "success": true,
-        "elapsed_ms": 69.13,
+        "elapsed_ms": 69.81,
         "metrics": {
           "iou": 0.7434,
           "topology_f1": 0.6734
@@ -1104,7 +1104,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_009__strassen_3395_3_2.dxf",
         "success": true,
-        "elapsed_ms": 54.23,
+        "elapsed_ms": 54.41,
         "metrics": {
           "iou": 0.7444,
           "topology_f1": 0.678
@@ -1122,7 +1122,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_010__strassen_3395_3_3.dxf",
         "success": true,
-        "elapsed_ms": 53.95,
+        "elapsed_ms": 54.95,
         "metrics": {
           "iou": 0.7624,
           "topology_f1": 0.6815
@@ -1140,7 +1140,7 @@
         "strategy_name": "hybrid_mvp",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/hybrid_mvp/ezdxf_mit_011__strassen_3395_3_4.dxf",
         "success": true,
-        "elapsed_ms": 42.89,
+        "elapsed_ms": 42.98,
         "metrics": {
           "iou": 0.7954,
           "topology_f1": 0.7022
@@ -1160,7 +1160,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_001__image1.dxf",
         "success": true,
-        "elapsed_ms": 35.21,
+        "elapsed_ms": 34.89,
         "metrics": {
           "iou": 0.7248,
           "topology_f1": 0.6039
@@ -1175,7 +1175,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_002__image2.dxf",
         "success": true,
-        "elapsed_ms": 45.59,
+        "elapsed_ms": 46.53,
         "metrics": {
           "iou": 0.8284,
           "topology_f1": 0.6585
@@ -1190,7 +1190,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_003__image3.dxf",
         "success": true,
-        "elapsed_ms": 27.73,
+        "elapsed_ms": 27.78,
         "metrics": {
           "iou": 0.7246,
           "topology_f1": 0.6035
@@ -1205,7 +1205,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_004__gebaeude_3395_3_1.dxf",
         "success": true,
-        "elapsed_ms": 69.91,
+        "elapsed_ms": 69.95,
         "metrics": {
           "iou": 0.518,
           "topology_f1": 0.4755
@@ -1220,7 +1220,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_005__gebaeude_3395_3_2.dxf",
         "success": true,
-        "elapsed_ms": 53.78,
+        "elapsed_ms": 54.27,
         "metrics": {
           "iou": 0.5144,
           "topology_f1": 0.478
@@ -1235,7 +1235,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_006__gebaeude_3395_3_3.dxf",
         "success": true,
-        "elapsed_ms": 52.05,
+        "elapsed_ms": 52.01,
         "metrics": {
           "iou": 0.509,
           "topology_f1": 0.4737
@@ -1250,7 +1250,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_007__gebaeude_3395_3_4.dxf",
         "success": true,
-        "elapsed_ms": 42.96,
+        "elapsed_ms": 42.98,
         "metrics": {
           "iou": 0.5196,
           "topology_f1": 0.484
@@ -1265,7 +1265,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_008__strassen_3395_3_1.dxf",
         "success": true,
-        "elapsed_ms": 68.45,
+        "elapsed_ms": 70.19,
         "metrics": {
           "iou": 0.6482,
           "topology_f1": 0.5672
@@ -1280,7 +1280,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_009__strassen_3395_3_2.dxf",
         "success": true,
-        "elapsed_ms": 54.19,
+        "elapsed_ms": 54.29,
         "metrics": {
           "iou": 0.6492,
           "topology_f1": 0.5718
@@ -1295,7 +1295,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_010__strassen_3395_3_3.dxf",
         "success": true,
-        "elapsed_ms": 52.69,
+        "elapsed_ms": 53.22,
         "metrics": {
           "iou": 0.6672,
           "topology_f1": 0.5753
@@ -1310,7 +1310,7 @@
         "strategy_name": "two_stage_baseline",
         "dxf_path": "/tmp/img2dwg-benchmark-web_image2cad_v1-expanded/two_stage_baseline/ezdxf_mit_011__strassen_3395_3_4.dxf",
         "success": true,
-        "elapsed_ms": 57.66,
+        "elapsed_ms": 59.8,
         "metrics": {
           "iou": 0.7002,
           "topology_f1": 0.596
