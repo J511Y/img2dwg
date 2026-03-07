@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import ezdxf
 from PIL import Image, ImageDraw
 
 from img2dwg.strategies.base import ConversionInput
@@ -76,3 +77,26 @@ def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Pat
     assert hybrid.dxf_path.exists()
     assert hybrid.metrics["iou"] >= baseline.metrics["iou"]
     assert hybrid.metrics["topology_f1"] >= baseline.metrics["topology_f1"]
+
+
+def test_hybrid_strategy_avoids_diagonal_lines_for_floorplan_like_inputs(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    hybrid = HybridMVPStrategy().run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
+        tmp_path / "hybrid",
+    )
+
+    assert hybrid.success is True
+    assert hybrid.dxf_path is not None
+
+    doc = ezdxf.readfile(str(hybrid.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+    assert len(lines) == 6
+
+    for line in lines:
+        start = line.dxf.start
+        end = line.dxf.end
+        is_axis_aligned = abs(start.x - end.x) < 1e-6 or abs(start.y - end.y) < 1e-6
+        assert is_axis_aligned

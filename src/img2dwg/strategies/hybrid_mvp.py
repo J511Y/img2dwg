@@ -36,7 +36,7 @@ class HybridMVPStrategy(ConversionStrategy):
     _synthesis_preset = StrategyPreset(
         margin_ratio=0.04,
         include_center_cross=True,
-        include_diagonals=True,
+        include_diagonals=False,
         quality_bias=0.64,
         topology_bias=0.66,
     )
