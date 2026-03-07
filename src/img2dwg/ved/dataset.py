@@ -71,7 +71,11 @@ class ImageToJSONDataset(Dataset):
 
         with self.jsonl_path.open("r", encoding="utf-8") as f:
             for line in f:
-                record = json.loads(line)
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+
                 messages = record.get("messages", [])
                 if not isinstance(messages, list):
                     continue
