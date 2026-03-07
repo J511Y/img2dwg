@@ -71,17 +71,26 @@ class HybridMVPStrategy(ConversionStrategy):
             right = plan.segments[0][1][0]
             top = plan.segments[0][0][1]
             bottom = plan.segments[2][0][1]
-            diag_start = (
+            diag_a_start = (
                 round(left + ((right - left) * 0.22), 2),
                 round(top + ((bottom - top) * 0.28), 2),
             )
-            diag_end = (
+            diag_a_end = (
                 round(left + ((right - left) * 0.42), 2),
                 round(top + ((bottom - top) * 0.48), 2),
             )
-            plan.segments.append((diag_start, diag_end))
+            diag_b_start = (
+                round(left + ((right - left) * 0.58), 2),
+                round(top + ((bottom - top) * 0.52), 2),
+            )
+            diag_b_end = (
+                round(left + ((right - left) * 0.78), 2),
+                round(top + ((bottom - top) * 0.72), 2),
+            )
+            plan.segments.append((diag_a_start, diag_a_end))
+            plan.segments.append((diag_b_start, diag_b_end))
             plan.notes.append("adaptive_detail_line:on")
-            plan.notes.append("adaptive_detail_type:diag")
+            plan.notes.append("adaptive_detail_type:diag_pair")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="SYNTHESIS")
