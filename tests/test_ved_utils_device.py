@@ -14,6 +14,12 @@ def test_get_device_returns_cpu_when_cuda_unavailable(monkeypatch: Any) -> None:
     assert get_device() == "cpu"
 
 
+def test_get_device_returns_cuda_when_available(monkeypatch: Any) -> None:
+    monkeypatch.setattr("img2dwg.ved.utils.torch.cuda.is_available", lambda: True)
+
+    assert get_device() == "cuda"
+
+
 def test_print_gpu_memory_outputs_expected_message(monkeypatch: Any, capsys: Any) -> None:
     monkeypatch.setattr("img2dwg.ved.utils.torch.cuda.is_available", lambda: True)
     monkeypatch.setattr("img2dwg.ved.utils.torch.cuda.memory_allocated", lambda: float(2 * 1024**3))
@@ -25,3 +31,12 @@ def test_print_gpu_memory_outputs_expected_message(monkeypatch: Any, capsys: Any
     assert "GPU Memory:" in captured.out
     assert "2.00GB allocated" in captured.out
     assert "3.00GB reserved" in captured.out
+
+
+def test_print_gpu_memory_is_silent_when_cuda_unavailable(monkeypatch: Any, capsys: Any) -> None:
+    monkeypatch.setattr("img2dwg.ved.utils.torch.cuda.is_available", lambda: False)
+
+    print_gpu_memory()
+    captured = capsys.readouterr()
+
+    assert captured.out == ""
