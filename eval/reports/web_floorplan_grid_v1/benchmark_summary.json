@@ -1,0 +1,58 @@
+{
+  "summary_schema_version": 1,
+  "source_schema_version": 2,
+  "run": {
+    "run_id": "2026-03-07T17:39:13.715321+00:00",
+    "dataset_id": "web_floorplan_grid_v1",
+    "git_ref": "adc1699edc3a2ad18cb15afede553676297f4167",
+    "generated_at": "2026-03-07T17:39:13.715330+00:00"
+  },
+  "winner": {
+    "strategy_name": "hybrid_mvp",
+    "rank": 1,
+    "composite_score": 0.7662
+  },
+  "triad_gate": {
+    "available": true,
+    "passed": true,
+    "missing": []
+  },
+  "strategies": [
+    {
+      "strategy_name": "hybrid_mvp",
+      "rank": 1,
+      "composite_score": 0.7662,
+      "success_rate": 1.0,
+      "cad_loadable_count": 12,
+      "cad_loadable_rate": 1.0,
+      "mean_iou": 0.8852,
+      "mean_topology_f1": 0.768,
+      "median_elapsed_ms": 50.94,
+      "p95_elapsed_ms": 79.03
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "rank": 2,
+      "composite_score": 0.7396,
+      "success_rate": 1.0,
+      "cad_loadable_count": 12,
+      "cad_loadable_rate": 1.0,
+      "mean_iou": 0.834,
+      "mean_topology_f1": 0.7118,
+      "median_elapsed_ms": 46.36,
+      "p95_elapsed_ms": 76.1
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "rank": 3,
+      "composite_score": 0.7161,
+      "success_rate": 1.0,
+      "cad_loadable_count": 12,
+      "cad_loadable_rate": 1.0,
+      "mean_iou": 0.79,
+      "mean_topology_f1": 0.6618,
+      "median_elapsed_ms": 46.22,
+      "p95_elapsed_ms": 76.7
+    }
+  ]
+}
