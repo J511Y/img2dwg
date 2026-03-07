@@ -23,13 +23,14 @@ from uuid import uuid4
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
+from img2dwg.web.retention import RetentionStats, cleanup_expired_files
+
 from img2dwg.strategies.base import ConversionInput
 from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
 from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy
 from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
 from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
 from img2dwg.web.dxf_validation import DxfInspectionResult, inspect_dxf
-from img2dwg.web.retention import RetentionStats, cleanup_expired_files
 
 
 def import_gradio() -> Any:
