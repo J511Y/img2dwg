@@ -68,6 +68,30 @@ def test_load_samples_keeps_only_records_with_user_image_and_assistant(tmp_path:
                 {"role": "assistant", "content": "{}"},
             ]
         ),
+        # malformed image_url object (non-dict)
+        _line(
+            [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": "not-a-dict"},
+                    ],
+                },
+                {"role": "assistant", "content": "{}"},
+            ]
+        ),
+        # malformed image_url url (non-string)
+        _line(
+            [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": 123}},
+                    ],
+                },
+                {"role": "assistant", "content": "{}"},
+            ]
+        ),
         # missing user content field
         _line(
             [

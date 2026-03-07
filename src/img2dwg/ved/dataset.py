@@ -98,7 +98,13 @@ class ImageToJSONDataset(Dataset):
                     if not isinstance(item, dict):
                         continue
                     if item.get("type") == "image_url":
-                        image_url = item["image_url"]["url"]
+                        image_url_obj = item.get("image_url")
+                        if not isinstance(image_url_obj, dict):
+                            continue
+                        candidate = image_url_obj.get("url")
+                        if not isinstance(candidate, str) or not candidate:
+                            continue
+                        image_url = candidate
                         break
 
                 if not image_url:
