@@ -82,3 +82,37 @@ def test_load_samples_uses_first_user_and_first_assistant_message(tmp_path: Path
     assert len(dataset.samples) == 1
     assert dataset.samples[0]["image_url"] == "data:image/png;base64,AA=="
     assert dataset.samples[0]["json_str"] == '{"from": "first-assistant"}'
+
+
+def test_load_samples_does_not_fallback_to_later_assistant_when_first_invalid(
+    tmp_path: Path,
+) -> None:
+    payload = {
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": "data:image/png;base64,AA=="}}
+                ],
+            },
+            {
+                "role": "assistant",
+                "content": "   ",
+            },
+            {
+                "role": "assistant",
+                "content": '{"from": "later-valid-assistant"}',
+            },
+        ]
+    }
+
+    jsonl = tmp_path / "samples.jsonl"
+    jsonl.write_text(json.dumps(payload, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    dataset = ImageToJSONDataset(
+        jsonl_path=jsonl,
+        tokenizer=_DummyTokenizer(),
+        image_size=8,
+    )
+
+    assert len(dataset.samples) == 0
