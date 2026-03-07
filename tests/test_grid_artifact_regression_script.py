@@ -163,3 +163,4 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
     assert report["summary"]["failed_cases"] == 1
     assert report["summary"]["passed_cases"] == 1
     assert "suspicious_grid_pattern" in report["summary"]["failures_by_reason"]
+    assert "hybrid_mvp" in report["strategy_failures_by_reason"]

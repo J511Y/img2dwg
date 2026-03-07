@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-07T18:19:40.252574+00:00",
+  "generated_at": "2026-03-07T18:48:46.324790+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -16,6 +16,11 @@
     "max_unique_x_for_grid": 4,
     "max_unique_y_for_grid": 4,
     "coord_round_digits": 3
+  },
+  "strategy_failures_by_reason": {
+    "consensus_qa": {},
+    "hybrid_mvp": {},
+    "two_stage_baseline": {}
   },
   "top_problematic": [],
   "cases": [
