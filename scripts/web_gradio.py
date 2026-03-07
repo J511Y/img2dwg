@@ -1,10 +1,12 @@
-"""Gradio web entrypoint for quick image -> DXF testing."""
+"""Gradio web app for image->DXF conversion with validation + preview."""
 
 # ruff: noqa: E402
+# mypy: disable-error-code=import-untyped
 
 from __future__ import annotations
 
 import argparse
+import html
 import ipaddress
 import socket
 import sys
@@ -18,26 +20,21 @@ from urllib.error import URLError
 from urllib.request import urlopen
 from uuid import uuid4
 
-# 프로젝트 루트를 Python 경로에 추가
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root / "src"))
+
+from img2dwg.web.retention import RetentionStats, cleanup_expired_files
 
 from img2dwg.strategies.base import ConversionInput
 from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
 from img2dwg.strategies.hybrid_mvp import HybridMVPStrategy
-from img2dwg.strategies.registry import (
-    FeatureFlags,
-    StrategyRegistry,
-)
+from img2dwg.strategies.registry import FeatureFlags, StrategyRegistry
 from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
-from img2dwg.web.retention import (
-    cleanup_output_root,
-    format_cleanup_report,
-)
+from img2dwg.web.dxf_validation import DxfInspectionResult, inspect_dxf
 
 
 def import_gradio() -> Any:
-    """Import Gradio with a friendly setup hint when missing."""
+    """Import Gradio with a clear installation hint."""
     try:
         import gradio as gr
     except ModuleNotFoundError as exc:
@@ -52,7 +49,6 @@ def import_gradio() -> Any:
 
 
 def normalize_host_input(host: str) -> str:
-    """Normalize host CLI input and reject ambiguous control/format-character payloads."""
     normalized = host.strip()
     if not normalized:
         raise RuntimeError("Host must not be empty.")
@@ -66,7 +62,6 @@ def normalize_host_input(host: str) -> str:
 
 
 def resolve_probe_host(host: str) -> str:
-    """Normalize wildcard hosts to loopback for local smoke probes."""
     normalized = normalize_host_input(host)
     if normalized in {"0.0.0.0", "::", "[::]"}:
         return "127.0.0.1"
@@ -74,7 +69,6 @@ def resolve_probe_host(host: str) -> str:
 
 
 def is_port_open(host: str, port: int, timeout_seconds: float = 0.3) -> bool:
-    """Return True when TCP port already accepts connections."""
     if port <= 0:
         return False
 
@@ -87,7 +81,6 @@ def is_port_open(host: str, port: int, timeout_seconds: float = 0.3) -> bool:
 
 
 def ensure_port_available(host: str, port: int) -> None:
-    """Fail fast with a clear hint when target port is already occupied."""
     if is_port_open(host, port):
         raise RuntimeError(
             f"Port {port} is already in use on {resolve_probe_host(host)}. "
@@ -96,7 +89,6 @@ def ensure_port_available(host: str, port: int) -> None:
 
 
 def requires_remote_access_ack(host: str) -> bool:
-    """Return True when host binding may expose the publisher beyond loopback."""
     normalized = normalize_host_input(host).lower()
     if normalized in {"localhost", "127.0.0.1", "::1", "[::1]"}:
         return False
@@ -107,12 +99,10 @@ def requires_remote_access_ack(host: str) -> bool:
     try:
         return not ipaddress.ip_address(candidate).is_loopback
     except ValueError:
-        # Hostnames other than localhost are treated as remotely reachable by default.
         return True
 
 
 def ensure_access_policy(host: str, allow_remote: bool) -> None:
-    """Require explicit opt-in before exposing publisher on non-loopback hosts."""
     if requires_remote_access_ack(host) and not allow_remote:
         raise RuntimeError(
             "Refusing non-loopback host binding without explicit acknowledgement. "
@@ -121,7 +111,6 @@ def ensure_access_policy(host: str, allow_remote: bool) -> None:
 
 
 def build_registry() -> StrategyRegistry:
-    """Create and populate strategy registry."""
     registry = StrategyRegistry()
     registry.register(HybridMVPStrategy())
     registry.register(TwoStageBaselineStrategy())
@@ -130,10 +119,18 @@ def build_registry() -> StrategyRegistry:
 
 
 def resolve_output_root(path: Path) -> Path:
-    """Resolve output path deterministically from project root when relative."""
     if path.is_absolute():
         return path
     return (project_root / path).resolve()
+
+
+def format_cleanup_report(stats: RetentionStats, *, max_age_days: float, dry_run: bool) -> str:
+    mode = "dry-run" if dry_run else "active"
+    return (
+        f"[cleanup:{mode}] max_age_days={max_age_days} "
+        f"scanned={stats.scanned_files} deleted={stats.deleted_files} "
+        f"reclaimed_bytes={stats.reclaimed_bytes}"
+    )
 
 
 def run_startup_cleanup(args: argparse.Namespace) -> None:
@@ -144,13 +141,19 @@ def run_startup_cleanup(args: argparse.Namespace) -> None:
         )
         return
 
-    report = cleanup_output_root(
+    max_age_seconds = max(0.0, args.cleanup_max_age_days) * 24.0 * 60.0 * 60.0
+    stats = cleanup_expired_files(
         args.output_root,
-        max_age_days=args.cleanup_max_age_days,
-        max_size_gb=args.cleanup_max_size_gb,
+        max_age_seconds=max_age_seconds,
         dry_run=args.cleanup_dry_run,
     )
-    print(format_cleanup_report(report))
+    print(
+        format_cleanup_report(
+            stats,
+            max_age_days=args.cleanup_max_age_days,
+            dry_run=args.cleanup_dry_run,
+        )
+    )
 
 
 def format_result_markdown(
@@ -161,7 +164,6 @@ def format_result_markdown(
     metrics: dict[str, float],
     notes: list[str],
 ) -> str:
-    """Build markdown summary shown in UI."""
     lines = [
         "## Conversion Result",
         f"- Strategy: `{strategy_name}`",
@@ -183,8 +185,68 @@ def format_result_markdown(
     return "\n".join(lines)
 
 
+def format_validation_markdown(inspection: DxfInspectionResult) -> str:
+    result = inspection.validation
+    status = "✅ PASS" if result.is_valid else "❌ FAIL"
+
+    lines = [
+        "## DXF Validation",
+        f"- Status: **{status}**",
+        f"- Parse: `{result.parse_ok}`",
+        f"- Entities: `{result.entity_count}`",
+        f"- Drawable entities: `{result.drawable_entity_count}`",
+    ]
+
+    if result.bbox_available and result.bbox_min and result.bbox_max:
+        lines.append(f"- BBox: `{result.bbox_min} -> {result.bbox_max}`")
+
+    if result.entity_types:
+        lines.append("\n### Entity Types")
+        for entity_name, count in result.entity_types.items():
+            lines.append(f"- `{entity_name}`: {count}")
+
+    if result.errors:
+        lines.append("\n### Errors (Action Required)")
+        for error in result.errors:
+            lines.append(f"- {error}")
+
+    if result.warnings:
+        lines.append("\n### Warnings")
+        for warning in result.warnings:
+            lines.append(f"- {warning}")
+
+    if not result.errors and result.drawable_entity_count <= 0:
+        lines.append("\n### Next step")
+        lines.append(
+            "- 입력 이미지 대비선이 옅거나 감지되지 않을 수 있습니다. 다른 전략으로 재시도하세요."
+        )
+
+    return "\n".join(lines)
+
+
+def format_preview_html(inspection: DxfInspectionResult) -> str:
+    preview = inspection.preview
+    if preview.kind == "svg":
+        return (
+            "<div style='border:1px solid #ddd;padding:8px;border-radius:8px;background:#111;'>"
+            f"{preview.content}"
+            "</div>"
+        )
+
+    text_content = preview.content
+    if preview.message:
+        text_content = f"{preview.message}\n\n{text_content}"
+
+    escaped = html.escape(text_content)
+    return (
+        "<div style='border:1px solid #ddd;padding:8px;border-radius:8px;'>"
+        "<p><strong>텍스트 미리보기</strong></p>"
+        f"<pre style='white-space:pre-wrap'>{escaped}</pre>"
+        "</div>"
+    )
+
+
 def wait_for_http_ready(url: str, timeout_seconds: float, interval_seconds: float = 0.25) -> bool:
-    """Wait until a HTTP endpoint starts responding."""
     deadline = time.time() + max(0.0, timeout_seconds)
     while time.time() < deadline:
         try:
@@ -196,7 +258,6 @@ def wait_for_http_ready(url: str, timeout_seconds: float, interval_seconds: floa
 
 
 def build_app(output_root: Path, gr: Any) -> Any:
-    """Build Gradio Blocks app."""
     registry = build_registry()
     enabled_names = registry.get_enabled_names(FeatureFlags())
     if not enabled_names:
@@ -209,17 +270,16 @@ def build_app(output_root: Path, gr: Any) -> Any:
         uploaded_image_path: str,
         strategy_name: str,
         consensus_score: float,
-    ) -> tuple[str | None, str]:
-        """Run conversion strategy and return generated DXF path + markdown summary."""
+    ) -> tuple[str | None, str, str, str]:
         if not uploaded_image_path:
-            return None, "이미지를 업로드해 주세요."
+            return None, "이미지를 업로드해 주세요.", "", ""
 
         image_path = Path(uploaded_image_path)
         if not image_path.exists():
-            return None, f"업로드된 이미지 파일을 찾을 수 없습니다: {image_path}"
+            return None, f"업로드된 이미지 파일을 찾을 수 없습니다: {image_path}", "", ""
 
         if strategy_name not in enabled_names:
-            return None, f"유효하지 않은 전략입니다: {strategy_name}"
+            return None, f"유효하지 않은 전략입니다: {strategy_name}", "", ""
 
         run_dir = output_root / datetime.now().strftime("%Y%m%d-%H%M%S") / uuid4().hex[:8]
         conv_input = ConversionInput(
@@ -231,7 +291,7 @@ def build_app(output_root: Path, gr: Any) -> Any:
         try:
             strategy = registry.get(strategy_name)
             output = strategy.timed_run(conv_input, run_dir)
-        except Exception as exc:  # pragma: no cover - runtime safety fallback
+        except Exception as exc:  # pragma: no cover - UI runtime safety fallback
             elapsed_ms = (time.perf_counter() - start) * 1000
             summary = format_result_markdown(
                 strategy_name=strategy_name,
@@ -241,7 +301,7 @@ def build_app(output_root: Path, gr: Any) -> Any:
                 metrics={},
                 notes=[f"Conversion failed with unexpected error: {exc!r}"],
             )
-            return None, summary
+            return None, summary, "", ""
 
         summary = format_result_markdown(
             strategy_name=output.strategy_name,
@@ -252,10 +312,17 @@ def build_app(output_root: Path, gr: Any) -> Any:
             notes=output.notes,
         )
 
-        if not output.success or output.dxf_path is None:
-            return None, summary
+        if output.dxf_path is None or not output.dxf_path.exists():
+            validation = "## DXF Validation\n- ❌ DXF 출력 파일을 찾지 못했습니다."
+            preview_html = ""
+            return None, summary, validation, preview_html
 
-        return str(output.dxf_path), summary
+        inspection = inspect_dxf(output.dxf_path)
+        validation_md = format_validation_markdown(inspection)
+        preview_html = format_preview_html(inspection)
+        download_path = str(output.dxf_path)
+
+        return download_path, summary, validation_md, preview_html
 
     with gr.Blocks(title="img2dwg Web Publisher") as app:
         gr.Markdown(
@@ -263,20 +330,18 @@ def build_app(output_root: Path, gr: Any) -> Any:
 # img2dwg Web Publisher
 
 평면도 이미지를 업로드하고 전략 기반으로 **DXF 출력**을 빠르게 테스트합니다.
-- 기본 출력: DXF (`.dxf`)
-- 전략: `hybrid_mvp`, `two_stage_baseline`, `consensus_qa`
+- 변환 후 DXF를 자동 검증(parse + audit + drawable check)
+- SVG 미리보기(불가 시 텍스트 요약) 제공
+- DXF 다운로드 전 결과를 눈으로 확인 가능
             """.strip()
         )
 
         with gr.Row():
             with gr.Column(scale=1):
-                image_input = gr.Image(
-                    type="filepath",
-                    label="Input Image (JPG/PNG)",
-                )
+                image_input = gr.Image(type="filepath", label="Input Image (JPG/PNG)")
                 strategy_input = gr.Dropdown(
                     choices=enabled_names,
-                    value=enabled_names[0] if enabled_names else None,
+                    value=enabled_names[0],
                     label="Strategy",
                 )
                 consensus_input = gr.Slider(
@@ -290,12 +355,14 @@ def build_app(output_root: Path, gr: Any) -> Any:
 
             with gr.Column(scale=1):
                 dxf_output = gr.File(label="Generated DXF")
-                summary_output = gr.Markdown(label="Summary")
+                summary_output = gr.Markdown(label="Conversion Summary")
+                validation_output = gr.Markdown(label="Validation")
+                preview_output = gr.HTML(label="DXF Preview")
 
         run_button.click(
             fn=convert_image,
             inputs=[image_input, strategy_input, consensus_input],
-            outputs=[dxf_output, summary_output],
+            outputs=[dxf_output, summary_output, validation_output, preview_output],
         )
 
     return app
@@ -322,12 +389,6 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=float,
         default=7.0,
         help="Retention threshold (days); files older than this are deleted",
-    )
-    parser.add_argument(
-        "--cleanup-max-size-gb",
-        type=float,
-        default=5.0,
-        help="Retention cap (GB); oldest files are removed when exceeded",
     )
     parser.add_argument(
         "--cleanup-dry-run",
@@ -389,7 +450,8 @@ def main() -> None:
             )
             if not is_ready:
                 raise RuntimeError(
-                    f"Smoke test failed: web endpoint not ready within {args.smoke_timeout_seconds}s"
+                    "Smoke test failed: "
+                    f"web endpoint not ready within {args.smoke_timeout_seconds}s"
                 )
             time.sleep(max(0.0, args.smoke_wait_seconds))
             print(f"Smoke test passed: {probe_url}")
