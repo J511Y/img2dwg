@@ -79,6 +79,27 @@ def test_remote_loader_uses_cache_after_first_download(
     assert len(calls) == 1
 
 
+def test_remote_loader_offline_uses_existing_cache(tmp_path: Path) -> None:
+    jsonl = tmp_path / "samples.jsonl"
+    url = "https://example.com/a.png"
+    _write_jsonl(jsonl, url)
+
+    cache_dir = tmp_path / "cache"
+    dataset = ImageToJSONDataset(
+        jsonl_path=jsonl,
+        tokenizer=_DummyTokenizer(),
+        cache_dir=cache_dir,
+        offline=True,
+    )
+
+    cache_path = dataset._cache_path_for_url(url)
+    assert cache_path is not None
+    cache_path.write_bytes(_png_bytes())
+
+    image = dataset._load_image(url)
+    assert image.mode == "RGB"
+
+
 def test_remote_loader_offline_requires_cache(tmp_path: Path) -> None:
     jsonl = tmp_path / "samples.jsonl"
     url = "https://example.com/a.png"
