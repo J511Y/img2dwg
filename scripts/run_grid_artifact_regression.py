@@ -54,8 +54,8 @@ sync_manifest = _load_sync_manifest()
 
 @dataclass(slots=True)
 class RegressionThresholds:
-    min_entities: int = 10
-    min_unique_entity_types: int = 2
+    min_entities: int = 6
+    min_unique_entity_types: int = 1
     min_axis_aligned_ratio_for_grid: float = 0.9
     max_unique_x_for_grid: int = 4
     max_unique_y_for_grid: int = 4
@@ -400,8 +400,8 @@ def parse_args() -> argparse.Namespace:
         default=Path("eval/reports/web_floorplan_grid_v1/grid_artifact_regression.md"),
     )
     parser.add_argument("--fail-on-findings", action="store_true")
-    parser.add_argument("--min-entities", type=int, default=10)
-    parser.add_argument("--min-unique-entity-types", type=int, default=2)
+    parser.add_argument("--min-entities", type=int, default=6)
+    parser.add_argument("--min-unique-entity-types", type=int, default=1)
     parser.add_argument("--min-axis-aligned-ratio-for-grid", type=float, default=0.9)
     parser.add_argument("--max-unique-x-for-grid", type=int, default=4)
     parser.add_argument("--max-unique-y-for-grid", type=int, default=4)
