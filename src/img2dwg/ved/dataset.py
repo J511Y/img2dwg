@@ -95,7 +95,10 @@ class ImageToJSONDataset(Dataset):
                 if not image_url:
                     continue
 
-                json_str = assistant_msg["content"]
+                json_str = assistant_msg.get("content")
+                if not isinstance(json_str, str) or not json_str:
+                    continue
+
                 samples.append({"image_url": image_url, "json_str": json_str})
 
         return samples
