@@ -183,6 +183,36 @@ def test_remote_loader_does_not_retry_hard_4xx(
     assert attempts["n"] == 1
 
 
+def test_remote_loader_retries_on_5xx_then_raises(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    jsonl = tmp_path / "samples.jsonl"
+    url = "https://example.com/server-error.png"
+    _write_jsonl(jsonl, url)
+
+    attempts = {"n": 0}
+
+    def _fake_get(_target: str, timeout: float) -> _Resp:
+        assert timeout == 10.0
+        attempts["n"] += 1
+        return _Resp(b"", status_code=503)
+
+    monkeypatch.setattr("img2dwg.ved.dataset.requests.get", _fake_get)
+    monkeypatch.setattr("img2dwg.ved.dataset.time.sleep", lambda _s: None)
+
+    dataset = ImageToJSONDataset(
+        jsonl_path=jsonl,
+        tokenizer=_DummyTokenizer(),
+        remote_max_retries=2,
+        remote_backoff_seconds=0.01,
+    )
+
+    with pytest.raises(RuntimeError, match="failed to load remote image"):
+        dataset._load_image(url)
+
+    assert attempts["n"] == 3
+
+
 def test_getitem_returns_zero_tensor_when_image_load_fails(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
