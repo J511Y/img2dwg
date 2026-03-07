@@ -23,6 +23,8 @@ def test_load_samples_keeps_only_records_with_user_image_and_assistant(tmp_path:
     lines = [
         # malformed messages type (non-list)
         _line("bad-messages"),
+        # malformed messages entries (non-dict items)
+        _line(["not-a-dict", 123, None]),
         # valid
         _line(
             [
