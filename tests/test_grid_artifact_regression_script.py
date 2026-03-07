@@ -30,7 +30,25 @@ def _write_grid_like_dxf(path: Path) -> None:
     doc = ezdxf.new("R2018")
     msp = doc.modelspace()
 
-    # rectangle + center cross
+    # dense axis-aligned grid-like pattern (>=8 lines)
+    msp.add_line((0, 0), (100, 0))
+    msp.add_line((100, 0), (100, 60))
+    msp.add_line((100, 60), (0, 60))
+    msp.add_line((0, 60), (0, 0))
+    msp.add_line((0, 20), (100, 20))
+    msp.add_line((0, 40), (100, 40))
+    msp.add_line((33, 0), (33, 60))
+    msp.add_line((66, 0), (66, 60))
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    doc.saveas(path)
+
+
+def _write_sparse_axis_aligned_dxf(path: Path) -> None:
+    doc = ezdxf.new("R2018")
+    msp = doc.modelspace()
+
+    # 6 axis-aligned lines (below min_line_count_for_grid_pattern=8)
     msp.add_line((0, 0), (100, 0))
     msp.add_line((100, 0), (100, 60))
     msp.add_line((100, 60), (0, 60))
@@ -71,6 +89,19 @@ def test_evaluate_case_flags_grid_like_low_diversity(tmp_path: Path) -> None:
     assert "suspicious_grid_pattern" in flags
 
 
+def test_evaluate_case_does_not_flag_sparse_axis_aligned_as_grid(tmp_path: Path) -> None:
+    module = _load_script_module()
+
+    dxf_path = tmp_path / "sparse_axis_aligned.dxf"
+    _write_sparse_axis_aligned_dxf(dxf_path)
+
+    diagnostics = module.analyze_dxf(str(dxf_path))
+    thresholds = module.RegressionThresholds(min_entities=6, min_unique_entity_types=1)
+    flags = module.evaluate_case(diagnostics, thresholds)
+
+    assert "suspicious_grid_pattern" not in flags
+
+
 def test_evaluate_case_passes_on_mixed_entities(tmp_path: Path) -> None:
     module = _load_script_module()
 
@@ -91,6 +122,7 @@ def test_regression_threshold_defaults_are_tuned_for_grid_baseline() -> None:
 
     assert thresholds.min_entities == 6
     assert thresholds.min_unique_entity_types == 1
+    assert thresholds.min_line_count_for_grid_pattern == 8
 
 
 def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
