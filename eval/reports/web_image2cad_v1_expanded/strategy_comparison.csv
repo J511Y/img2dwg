@@ -1,0 +1,4 @@
+strategy_name,rank,composite_score,success_rate,cad_loadable_count,cad_loadable_rate,mean_iou,mean_topology_f1,median_elapsed_ms,p95_elapsed_ms
+hybrid_mvp,1,0.7006,1.0,11,1.0,0.7319,0.6596,53.11,70.29
+consensus_qa,2,0.6738,1.0,11,1.0,0.6807,0.6034,52.2,76.34
+two_stage_baseline,3,0.6503,1.0,11,1.0,0.6367,0.5534,52.69,69.91
