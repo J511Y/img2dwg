@@ -95,6 +95,8 @@ class ImageToJSONDataset(Dataset):
 
                 image_url: str | None = None
                 for item in content:
+                    if not isinstance(item, dict):
+                        continue
                     if item.get("type") == "image_url":
                         image_url = item["image_url"]["url"]
                         break

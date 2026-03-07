@@ -48,6 +48,19 @@ def test_load_samples_keeps_only_records_with_user_image_and_assistant(tmp_path:
                 }
             ]
         ),
+        # user content contains non-dict item before valid image_url
+        _line(
+            [
+                {
+                    "role": "user",
+                    "content": [
+                        "bad-item",
+                        {"type": "image_url", "image_url": {"url": "data:image/png;base64,AB=="}},
+                    ],
+                },
+                {"role": "assistant", "content": "{}"},
+            ]
+        ),
         # missing user image_url
         _line(
             [
@@ -126,4 +139,4 @@ def test_load_samples_keeps_only_records_with_user_image_and_assistant(tmp_path:
         image_size=8,
     )
 
-    assert len(dataset) == 2
+    assert len(dataset) == 3
