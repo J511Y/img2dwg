@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import torch
@@ -55,10 +56,14 @@ class _FakeVisionEncoderDecoderModel:
     def from_encoder_decoder_pretrained(_enc: str, _dec: str) -> _FakeModel:
         return _FakeModel()
 
+    @staticmethod
+    def from_pretrained(_model_path: Path) -> _FakeModel:
+        return _FakeModel()
+
 
 class _FakeImageProcessor:
     @staticmethod
-    def from_pretrained(_name: str) -> dict[str, str]:
+    def from_pretrained(_name: str | Path) -> dict[str, str]:
         return {"ok": "yes"}
 
 
@@ -89,3 +94,25 @@ def test_build_model_resizes_decoder_embeddings(monkeypatch: Any) -> None:
     model = VEDModel(VEDConfig(), _FakeTokenizer())
 
     assert model.model.decoder.last_size == 777
+
+
+def test_from_pretrained_wires_components(monkeypatch: Any, tmp_path: Path) -> None:
+    fake_tokenizer = _FakeTokenizer()
+
+    class _FakeCADTokenizer:
+        @staticmethod
+        def from_pretrained(_model_path: str) -> _FakeTokenizer:
+            return fake_tokenizer
+
+    monkeypatch.setattr("img2dwg.ved.model.CADTokenizer", _FakeCADTokenizer)
+    monkeypatch.setattr("img2dwg.ved.model.AutoImageProcessor", _FakeImageProcessor)
+    monkeypatch.setattr(
+        "img2dwg.ved.model.VisionEncoderDecoderModel",
+        _FakeVisionEncoderDecoderModel,
+    )
+
+    loaded = VEDModel.from_pretrained(tmp_path)
+
+    assert loaded.tokenizer is fake_tokenizer
+    assert loaded.image_processor == {"ok": "yes"}
+    assert isinstance(loaded.model, _FakeModel)
