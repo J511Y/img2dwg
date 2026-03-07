@@ -58,6 +58,13 @@ def test_load_samples_keeps_only_records_with_user_image_and_assistant(tmp_path:
                 {"role": "assistant", "content": "{}"},
             ]
         ),
+        # non-list user content
+        _line(
+            [
+                {"role": "user", "content": None},
+                {"role": "assistant", "content": "{}"},
+            ]
+        ),
         # valid
         _line(
             [
