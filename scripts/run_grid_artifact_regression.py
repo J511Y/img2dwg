@@ -232,9 +232,11 @@ def analyze_benchmark_results(
 ) -> dict[str, Any]:
     findings: list[CaseFinding] = []
     failures_by_reason: Counter[str] = Counter()
+    strategy_failures: dict[str, Counter[str]] = {}
 
     for strategy in benchmark_results.get("strategies", []):
         strategy_name = str(strategy.get("strategy_name", ""))
+        strategy_counter = strategy_failures.setdefault(strategy_name, Counter())
         for case in strategy.get("cases", []):
             dxf_path = case.get("dxf_path")
             diagnostics = analyze_dxf(
@@ -243,6 +245,7 @@ def analyze_benchmark_results(
             )
             flags = evaluate_case(diagnostics, thresholds)
             failures_by_reason.update(flags)
+            strategy_counter.update(flags)
             findings.append(
                 CaseFinding(
                     strategy_name=strategy_name,
@@ -264,6 +267,10 @@ def analyze_benchmark_results(
         reverse=True,
     )[:10]
 
+    strategy_breakdown = {
+        name: dict(sorted(counter.items())) for name, counter in sorted(strategy_failures.items())
+    }
+
     payload = {
         "report_schema_version": 1,
         "generated_at": _utc_now_iso(),
@@ -275,6 +282,7 @@ def analyze_benchmark_results(
             "failures_by_reason": dict(sorted(failures_by_reason.items())),
         },
         "thresholds": asdict(thresholds),
+        "strategy_failures_by_reason": strategy_breakdown,
         "top_problematic": [
             {
                 "strategy_name": item.strategy_name,
