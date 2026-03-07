@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import torch
 
 from img2dwg.ved.utils import (  # type: ignore[import-untyped]
@@ -10,12 +12,15 @@ from img2dwg.ved.utils import (  # type: ignore[import-untyped]
 )
 
 
-def test_validate_and_parse_json_helpers() -> None:
+def test_validate_and_parse_json_helpers(capsys: Any) -> None:
     assert validate_json('{"ok": true}') is True
     assert validate_json("{bad json}") is False
 
     assert parse_json_safe('{"x": 1}') == {"x": 1}
     assert parse_json_safe("not-json") == {}
+
+    captured = capsys.readouterr()
+    assert "JSON parsing error" in captured.out
 
 
 def test_format_time_and_count_parameters() -> None:
