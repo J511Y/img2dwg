@@ -271,6 +271,21 @@ def analyze_benchmark_results(
         name: dict(sorted(counter.items())) for name, counter in sorted(strategy_failures.items())
     }
 
+    strategy_diagnostics: dict[str, dict[str, float]] = {}
+    for strategy_name in sorted({item.strategy_name for item in findings}):
+        strategy_cases = [item for item in findings if item.strategy_name == strategy_name]
+        if not strategy_cases:
+            continue
+        axis_values = [item.diagnostics.axis_aligned_line_ratio for item in strategy_cases]
+        line_values = [item.diagnostics.line_count for item in strategy_cases]
+        avg_axis_ratio = sum(axis_values) / len(axis_values)
+        avg_axis_margin = thresholds.min_axis_aligned_ratio_for_grid - avg_axis_ratio
+        strategy_diagnostics[strategy_name] = {
+            "avg_line_count": round(sum(line_values) / len(line_values), 4),
+            "avg_axis_aligned_ratio": round(avg_axis_ratio, 4),
+            "avg_axis_margin_to_grid_threshold": round(avg_axis_margin, 4),
+        }
+
     payload = {
         "report_schema_version": 1,
         "generated_at": _utc_now_iso(),
@@ -283,6 +298,7 @@ def analyze_benchmark_results(
         },
         "thresholds": asdict(thresholds),
         "strategy_failures_by_reason": strategy_breakdown,
+        "strategy_diagnostics": strategy_diagnostics,
         "top_problematic": [
             {
                 "strategy_name": item.strategy_name,
@@ -327,6 +343,18 @@ def _render_markdown_report(report: dict[str, Any]) -> str:
     if failures:
         for reason, count in failures.items():
             lines.append(f"- `{reason}`: {count}")
+    else:
+        lines.append("- none")
+
+    strategy_diagnostics = report.get("strategy_diagnostics", {})
+    lines.extend(["", "## Strategy diagnostics", ""])
+    if strategy_diagnostics:
+        for strategy, diag in strategy_diagnostics.items():
+            lines.append(
+                f"- `{strategy}`: avg_line_count={diag.get('avg_line_count')}, "
+                f"avg_axis_aligned_ratio={diag.get('avg_axis_aligned_ratio')}, "
+                f"avg_axis_margin_to_grid_threshold={diag.get('avg_axis_margin_to_grid_threshold')}"
+            )
     else:
         lines.append("- none")
 
