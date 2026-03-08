@@ -171,6 +171,8 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
         "strategy_diagnostics": {
             "hybrid_mvp": {
                 "avg_axis_margin_score": 10.0,
+                "avg_axis_aligned_ratio": 0.8,
+                "avg_axis_margin_to_grid_threshold": 0.1,
             }
         },
     }
@@ -196,3 +198,5 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
     assert "delta_vs_previous" in report
     assert report["delta_vs_previous"]["failed_cases"]["previous"] == 2
     assert report["delta_vs_previous"]["hybrid_avg_axis_margin_score"]["previous"] == 10.0
+    assert report["delta_vs_previous"]["hybrid_avg_axis_aligned_ratio"]["previous"] == 0.8
+    assert report["delta_vs_previous"]["hybrid_avg_axis_margin_to_grid_threshold"]["previous"] == 0.1

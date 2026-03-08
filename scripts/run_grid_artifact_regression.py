@@ -381,6 +381,18 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
     if current_margin_score is not None and previous_margin_score is not None:
         margin_score_delta = round(current_margin_score - previous_margin_score, 4)
 
+    current_avg_axis_ratio = _to_float(current_hybrid, "avg_axis_aligned_ratio")
+    previous_avg_axis_ratio = _to_float(previous_hybrid, "avg_axis_aligned_ratio")
+    avg_axis_ratio_delta = None
+    if current_avg_axis_ratio is not None and previous_avg_axis_ratio is not None:
+        avg_axis_ratio_delta = round(current_avg_axis_ratio - previous_avg_axis_ratio, 4)
+
+    current_avg_axis_margin = _to_float(current_hybrid, "avg_axis_margin_to_grid_threshold")
+    previous_avg_axis_margin = _to_float(previous_hybrid, "avg_axis_margin_to_grid_threshold")
+    avg_axis_margin_delta = None
+    if current_avg_axis_margin is not None and previous_avg_axis_margin is not None:
+        avg_axis_margin_delta = round(current_avg_axis_margin - previous_avg_axis_margin, 4)
+
     report["delta_vs_previous"] = {
         "failed_cases": {
             "previous": int(previous_summary.get("failed_cases", 0)),
@@ -409,6 +421,16 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
             "previous": previous_margin_score,
             "current": current_margin_score,
             "delta": margin_score_delta,
+        },
+        "hybrid_avg_axis_aligned_ratio": {
+            "previous": previous_avg_axis_ratio,
+            "current": current_avg_axis_ratio,
+            "delta": avg_axis_ratio_delta,
+        },
+        "hybrid_avg_axis_margin_to_grid_threshold": {
+            "previous": previous_avg_axis_margin,
+            "current": current_avg_axis_margin,
+            "delta": avg_axis_margin_delta,
         },
     }
     return report
