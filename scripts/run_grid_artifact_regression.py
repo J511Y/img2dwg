@@ -284,8 +284,12 @@ def analyze_benchmark_results(
         unique_y_values = [item.diagnostics.unique_y_count for item in strategy_cases]
         max_axis_ratio = max(axis_values)
         min_axis_ratio = min(axis_values)
+        sorted_axis_values = sorted(axis_values)
+        p95_index = max(0, math.ceil(len(sorted_axis_values) * 0.95) - 1)
+        p95_axis_ratio = sorted_axis_values[p95_index]
         max_axis_margin = thresholds.min_axis_aligned_ratio_for_grid - max_axis_ratio
         min_axis_margin = thresholds.min_axis_aligned_ratio_for_grid - min_axis_ratio
+        p95_axis_margin = thresholds.min_axis_aligned_ratio_for_grid - p95_axis_ratio
         if len(axis_values) > 1:
             variance = sum((value - avg_axis_ratio) ** 2 for value in axis_values) / len(axis_values)
             std_axis_ratio = math.sqrt(variance)
@@ -298,6 +302,8 @@ def analyze_benchmark_results(
             "avg_axis_margin_to_grid_threshold": round(avg_axis_margin, 4),
             "max_axis_aligned_ratio": round(max_axis_ratio, 4),
             "max_axis_margin_to_grid_threshold": round(max_axis_margin, 4),
+            "p95_axis_aligned_ratio": round(p95_axis_ratio, 4),
+            "p95_axis_margin_to_grid_threshold": round(p95_axis_margin, 4),
             "min_axis_aligned_ratio": round(min_axis_ratio, 4),
             "min_axis_margin_to_grid_threshold": round(min_axis_margin, 4),
             "avg_unique_x_count": round(sum(unique_x_values) / len(unique_x_values), 4),
@@ -375,6 +381,8 @@ def _render_markdown_report(report: dict[str, Any]) -> str:
                 f"avg_axis_margin_to_grid_threshold={diag.get('avg_axis_margin_to_grid_threshold')}, "
                 f"max_axis_aligned_ratio={diag.get('max_axis_aligned_ratio')}, "
                 f"max_axis_margin_to_grid_threshold={diag.get('max_axis_margin_to_grid_threshold')}, "
+                f"p95_axis_aligned_ratio={diag.get('p95_axis_aligned_ratio')}, "
+                f"p95_axis_margin_to_grid_threshold={diag.get('p95_axis_margin_to_grid_threshold')}, "
                 f"min_axis_aligned_ratio={diag.get('min_axis_aligned_ratio')}, "
                 f"min_axis_margin_to_grid_threshold={diag.get('min_axis_margin_to_grid_threshold')}, "
                 f"avg_unique_x_count={diag.get('avg_unique_x_count')}, "
