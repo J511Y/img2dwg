@@ -280,10 +280,14 @@ def analyze_benchmark_results(
         line_values = [item.diagnostics.line_count for item in strategy_cases]
         avg_axis_ratio = sum(axis_values) / len(axis_values)
         avg_axis_margin = thresholds.min_axis_aligned_ratio_for_grid - avg_axis_ratio
+        unique_x_values = [item.diagnostics.unique_x_count for item in strategy_cases]
+        unique_y_values = [item.diagnostics.unique_y_count for item in strategy_cases]
         strategy_diagnostics[strategy_name] = {
             "avg_line_count": round(sum(line_values) / len(line_values), 4),
             "avg_axis_aligned_ratio": round(avg_axis_ratio, 4),
             "avg_axis_margin_to_grid_threshold": round(avg_axis_margin, 4),
+            "avg_unique_x_count": round(sum(unique_x_values) / len(unique_x_values), 4),
+            "avg_unique_y_count": round(sum(unique_y_values) / len(unique_y_values), 4),
         }
 
     payload = {
@@ -353,7 +357,9 @@ def _render_markdown_report(report: dict[str, Any]) -> str:
             lines.append(
                 f"- `{strategy}`: avg_line_count={diag.get('avg_line_count')}, "
                 f"avg_axis_aligned_ratio={diag.get('avg_axis_aligned_ratio')}, "
-                f"avg_axis_margin_to_grid_threshold={diag.get('avg_axis_margin_to_grid_threshold')}"
+                f"avg_axis_margin_to_grid_threshold={diag.get('avg_axis_margin_to_grid_threshold')}, "
+                f"avg_unique_x_count={diag.get('avg_unique_x_count')}, "
+                f"avg_unique_y_count={diag.get('avg_unique_y_count')}"
             )
     else:
         lines.append("- none")
