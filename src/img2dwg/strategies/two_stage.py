@@ -34,16 +34,26 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             right = plan.segments[0][1][0]
             top = plan.segments[0][0][1]
             bottom = plan.segments[2][0][1]
-            detail_start = (
+            diag_a_start = (
                 round(left + ((right - left) * 0.3), 2),
                 round(top + ((bottom - top) * 0.35), 2),
             )
-            detail_end = (
+            diag_a_end = (
                 round(left + ((right - left) * 0.45), 2),
                 round(top + ((bottom - top) * 0.5), 2),
             )
-            plan.segments.append((detail_start, detail_end))
+            diag_b_start = (
+                round(left + ((right - left) * 0.62), 2),
+                round(top + ((bottom - top) * 0.52), 2),
+            )
+            diag_b_end = (
+                round(left + ((right - left) * 0.47), 2),
+                round(top + ((bottom - top) * 0.67), 2),
+            )
+            plan.segments.append((diag_a_start, diag_a_end))
+            plan.segments.append((diag_b_start, diag_b_end))
             plan.notes.append("anti_grid_detail_diag:on")
+            plan.notes.append("anti_grid_detail_diag:pair")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
