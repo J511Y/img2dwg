@@ -1,6 +1,6 @@
 # Grid Artifact Regression Report
 
-- generated_at: `2026-03-08T07:47:40.764838+00:00`
+- generated_at: `2026-03-08T08:17:15.851956+00:00`
 - total_cases: `36`
 - passed_cases: `36`
 - failed_cases: `0`
@@ -13,6 +13,7 @@
 ## Delta vs previous
 
 - `failed_cases`: previous=0, current=0, delta=0
+- `pass_rate`: previous=1.0, current=1.0, delta=0.0
 - `suspicious_grid_pattern`: previous=0, current=0, delta=0
 - `low_entity_count`: previous=0, current=0, delta=0
 - `low_entity_diversity`: previous=0, current=0, delta=0
