@@ -32,6 +32,22 @@ def test_two_stage_strategy_exports_dxf(tmp_path: Path) -> None:
     assert any("정(thesis)" in note for note in out.notes)
 
 
+def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    strategy = TwoStageBaselineStrategy()
+    out = strategy.run(ConversionInput(image_path=image_path), tmp_path / "out")
+
+    assert out.success is True
+    assert any("anti_grid_detail_diag:on" in note for note in out.notes)
+
+    doc = ezdxf.readfile(str(out.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+    assert len(lines) >= 7
+    assert any(abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6 for line in lines)
+
+
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
