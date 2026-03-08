@@ -427,6 +427,24 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
     if current_std_axis_ratio is not None and previous_std_axis_ratio is not None:
         std_axis_ratio_delta = round(current_std_axis_ratio - previous_std_axis_ratio, 4)
 
+    current_max_axis_margin = _to_float(current_hybrid, "max_axis_margin_to_grid_threshold")
+    previous_max_axis_margin = _to_float(previous_hybrid, "max_axis_margin_to_grid_threshold")
+    max_axis_margin_delta = None
+    if current_max_axis_margin is not None and previous_max_axis_margin is not None:
+        max_axis_margin_delta = round(current_max_axis_margin - previous_max_axis_margin, 4)
+
+    current_p95_axis_margin = _to_float(current_hybrid, "p95_axis_margin_to_grid_threshold")
+    previous_p95_axis_margin = _to_float(previous_hybrid, "p95_axis_margin_to_grid_threshold")
+    p95_axis_margin_delta = None
+    if current_p95_axis_margin is not None and previous_p95_axis_margin is not None:
+        p95_axis_margin_delta = round(current_p95_axis_margin - previous_p95_axis_margin, 4)
+
+    current_min_axis_margin = _to_float(current_hybrid, "min_axis_margin_to_grid_threshold")
+    previous_min_axis_margin = _to_float(previous_hybrid, "min_axis_margin_to_grid_threshold")
+    min_axis_margin_delta = None
+    if current_min_axis_margin is not None and previous_min_axis_margin is not None:
+        min_axis_margin_delta = round(current_min_axis_margin - previous_min_axis_margin, 4)
+
     report["delta_vs_previous"] = {
         "failed_cases": {
             "previous": int(previous_summary.get("failed_cases", 0)),
@@ -485,6 +503,21 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
             "previous": previous_std_axis_ratio,
             "current": current_std_axis_ratio,
             "delta": std_axis_ratio_delta,
+        },
+        "hybrid_max_axis_margin_to_grid_threshold": {
+            "previous": previous_max_axis_margin,
+            "current": current_max_axis_margin,
+            "delta": max_axis_margin_delta,
+        },
+        "hybrid_p95_axis_margin_to_grid_threshold": {
+            "previous": previous_p95_axis_margin,
+            "current": current_p95_axis_margin,
+            "delta": p95_axis_margin_delta,
+        },
+        "hybrid_min_axis_margin_to_grid_threshold": {
+            "previous": previous_min_axis_margin,
+            "current": current_min_axis_margin,
+            "delta": min_axis_margin_delta,
         },
     }
     return report
