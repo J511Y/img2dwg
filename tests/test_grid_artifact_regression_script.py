@@ -125,6 +125,17 @@ def test_regression_threshold_defaults_are_tuned_for_grid_baseline() -> None:
     assert thresholds.min_line_count_for_grid_pattern == 8
 
 
+def test_resolve_previous_report_path_defaults_to_report_output(tmp_path: Path) -> None:
+    module = _load_script_module()
+
+    report_json = tmp_path / "report.json"
+    report_json.write_text("{}", encoding="utf-8")
+
+    resolved = module._resolve_previous_report_path(requested=None, report_json_path=report_json)
+
+    assert resolved == report_json
+
+
 def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
     module = _load_script_module()
 
@@ -176,6 +187,7 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
                 "avg_unique_x_count": 3.0,
                 "avg_unique_y_count": 4.0,
                 "avg_line_count": 5.0,
+                "std_axis_aligned_ratio": 0.2,
             }
         },
     }
@@ -206,3 +218,4 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
     assert report["delta_vs_previous"]["hybrid_avg_unique_x_count"]["previous"] == 3.0
     assert report["delta_vs_previous"]["hybrid_avg_unique_y_count"]["previous"] == 4.0
     assert report["delta_vs_previous"]["hybrid_avg_line_count"]["previous"] == 5.0
+    assert report["delta_vs_previous"]["hybrid_std_axis_aligned_ratio"]["previous"] == 0.2

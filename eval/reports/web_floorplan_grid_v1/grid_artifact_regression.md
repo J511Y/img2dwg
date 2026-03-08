@@ -1,6 +1,6 @@
 # Grid Artifact Regression Report
 
-- generated_at: `2026-03-08T06:17:24.144391+00:00`
+- generated_at: `2026-03-08T06:47:46.027032+00:00`
 - total_cases: `36`
 - passed_cases: `36`
 - failed_cases: `0`
@@ -22,6 +22,7 @@
 - `hybrid_avg_unique_x_count`: previous=19.0, current=19.0, delta=0.0
 - `hybrid_avg_unique_y_count`: previous=18.0, current=18.0, delta=0.0
 - `hybrid_avg_line_count`: previous=14.0, current=14.0, delta=0.0
+- `hybrid_std_axis_aligned_ratio`: previous=0.0, current=0.0, delta=0.0
 
 ## Strategy diagnostics
 
