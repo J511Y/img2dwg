@@ -166,3 +166,5 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
     assert "hybrid_mvp" in report["strategy_failures_by_reason"]
     assert "hybrid_mvp" in report["strategy_diagnostics"]
     assert "avg_axis_margin_to_grid_threshold" in report["strategy_diagnostics"]["hybrid_mvp"]
+    assert "avg_unique_x_count" in report["strategy_diagnostics"]["hybrid_mvp"]
+    assert "avg_unique_y_count" in report["strategy_diagnostics"]["hybrid_mvp"]
