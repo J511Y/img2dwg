@@ -159,6 +159,23 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
         thresholds=module.RegressionThresholds(min_entities=10, min_unique_entity_types=2),
     )
 
+    previous = {
+        "summary": {
+            "failed_cases": 2,
+            "failures_by_reason": {
+                "suspicious_grid_pattern": 1,
+                "low_entity_count": 1,
+                "low_entity_diversity": 1,
+            },
+        },
+        "strategy_diagnostics": {
+            "hybrid_mvp": {
+                "avg_axis_margin_score": 10.0,
+            }
+        },
+    }
+    report = module._attach_previous_delta(report, previous)
+
     assert report["summary"]["total_cases"] == 2
     assert report["summary"]["failed_cases"] == 1
     assert report["summary"]["passed_cases"] == 1
@@ -176,3 +193,6 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
     assert "min_axis_aligned_ratio" in report["strategy_diagnostics"]["hybrid_mvp"]
     assert "min_axis_margin_to_grid_threshold" in report["strategy_diagnostics"]["hybrid_mvp"]
     assert "std_axis_aligned_ratio" in report["strategy_diagnostics"]["hybrid_mvp"]
+    assert "delta_vs_previous" in report
+    assert report["delta_vs_previous"]["failed_cases"]["previous"] == 2
+    assert report["delta_vs_previous"]["hybrid_avg_axis_margin_score"]["previous"] == 10.0
