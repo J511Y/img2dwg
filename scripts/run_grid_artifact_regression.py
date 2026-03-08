@@ -393,6 +393,18 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
     if current_avg_axis_margin is not None and previous_avg_axis_margin is not None:
         avg_axis_margin_delta = round(current_avg_axis_margin - previous_avg_axis_margin, 4)
 
+    current_avg_unique_x = _to_float(current_hybrid, "avg_unique_x_count")
+    previous_avg_unique_x = _to_float(previous_hybrid, "avg_unique_x_count")
+    avg_unique_x_delta = None
+    if current_avg_unique_x is not None and previous_avg_unique_x is not None:
+        avg_unique_x_delta = round(current_avg_unique_x - previous_avg_unique_x, 4)
+
+    current_avg_unique_y = _to_float(current_hybrid, "avg_unique_y_count")
+    previous_avg_unique_y = _to_float(previous_hybrid, "avg_unique_y_count")
+    avg_unique_y_delta = None
+    if current_avg_unique_y is not None and previous_avg_unique_y is not None:
+        avg_unique_y_delta = round(current_avg_unique_y - previous_avg_unique_y, 4)
+
     report["delta_vs_previous"] = {
         "failed_cases": {
             "previous": int(previous_summary.get("failed_cases", 0)),
@@ -431,6 +443,16 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
             "previous": previous_avg_axis_margin,
             "current": current_avg_axis_margin,
             "delta": avg_axis_margin_delta,
+        },
+        "hybrid_avg_unique_x_count": {
+            "previous": previous_avg_unique_x,
+            "current": current_avg_unique_x,
+            "delta": avg_unique_x_delta,
+        },
+        "hybrid_avg_unique_y_count": {
+            "previous": previous_avg_unique_y,
+            "current": current_avg_unique_y,
+            "delta": avg_unique_y_delta,
         },
     }
     return report
