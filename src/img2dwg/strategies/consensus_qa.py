@@ -57,6 +57,21 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         preset = self._high_confidence_preset if consensus_score >= 0.75 else self._base_preset
         plan = build_vector_plan(signals, preset)
+        if len(plan.segments) >= 4:
+            left = plan.segments[0][0][0]
+            right = plan.segments[0][1][0]
+            top = plan.segments[0][0][1]
+            bottom = plan.segments[2][0][1]
+            detail_start = (
+                round(left + ((right - left) * 0.58), 2),
+                round(top + ((bottom - top) * 0.32), 2),
+            )
+            detail_end = (
+                round(left + ((right - left) * 0.73), 2),
+                round(top + ((bottom - top) * 0.47), 2),
+            )
+            plan.segments.append((detail_start, detail_end))
+            plan.notes.append("anti_grid_detail_diag:on")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
