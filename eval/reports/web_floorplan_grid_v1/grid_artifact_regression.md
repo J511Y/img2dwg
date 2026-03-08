@@ -1,6 +1,6 @@
 # Grid Artifact Regression Report
 
-- generated_at: `2026-03-08T07:17:36.621371+00:00`
+- generated_at: `2026-03-08T07:47:40.764838+00:00`
 - total_cases: `36`
 - passed_cases: `36`
 - failed_cases: `0`
@@ -24,8 +24,11 @@
 - `hybrid_avg_line_count`: previous=14.0, current=14.0, delta=0.0
 - `hybrid_std_axis_aligned_ratio`: previous=0.0, current=0.0, delta=0.0
 - `hybrid_max_axis_margin_to_grid_threshold`: previous=0.4714, current=0.4714, delta=0.0
+- `hybrid_max_axis_aligned_ratio`: previous=0.4286, current=0.4286, delta=0.0
 - `hybrid_p95_axis_margin_to_grid_threshold`: previous=0.4714, current=0.4714, delta=0.0
+- `hybrid_p95_axis_aligned_ratio`: previous=0.4286, current=0.4286, delta=0.0
 - `hybrid_min_axis_margin_to_grid_threshold`: previous=0.4714, current=0.4714, delta=0.0
+- `hybrid_min_axis_aligned_ratio`: previous=0.4286, current=0.4286, delta=0.0
 
 ## Strategy diagnostics
 

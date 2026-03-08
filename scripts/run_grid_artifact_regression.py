@@ -433,17 +433,35 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
     if current_max_axis_margin is not None and previous_max_axis_margin is not None:
         max_axis_margin_delta = round(current_max_axis_margin - previous_max_axis_margin, 4)
 
+    current_max_axis_ratio = _to_float(current_hybrid, "max_axis_aligned_ratio")
+    previous_max_axis_ratio = _to_float(previous_hybrid, "max_axis_aligned_ratio")
+    max_axis_ratio_delta = None
+    if current_max_axis_ratio is not None and previous_max_axis_ratio is not None:
+        max_axis_ratio_delta = round(current_max_axis_ratio - previous_max_axis_ratio, 4)
+
     current_p95_axis_margin = _to_float(current_hybrid, "p95_axis_margin_to_grid_threshold")
     previous_p95_axis_margin = _to_float(previous_hybrid, "p95_axis_margin_to_grid_threshold")
     p95_axis_margin_delta = None
     if current_p95_axis_margin is not None and previous_p95_axis_margin is not None:
         p95_axis_margin_delta = round(current_p95_axis_margin - previous_p95_axis_margin, 4)
 
+    current_p95_axis_ratio = _to_float(current_hybrid, "p95_axis_aligned_ratio")
+    previous_p95_axis_ratio = _to_float(previous_hybrid, "p95_axis_aligned_ratio")
+    p95_axis_ratio_delta = None
+    if current_p95_axis_ratio is not None and previous_p95_axis_ratio is not None:
+        p95_axis_ratio_delta = round(current_p95_axis_ratio - previous_p95_axis_ratio, 4)
+
     current_min_axis_margin = _to_float(current_hybrid, "min_axis_margin_to_grid_threshold")
     previous_min_axis_margin = _to_float(previous_hybrid, "min_axis_margin_to_grid_threshold")
     min_axis_margin_delta = None
     if current_min_axis_margin is not None and previous_min_axis_margin is not None:
         min_axis_margin_delta = round(current_min_axis_margin - previous_min_axis_margin, 4)
+
+    current_min_axis_ratio = _to_float(current_hybrid, "min_axis_aligned_ratio")
+    previous_min_axis_ratio = _to_float(previous_hybrid, "min_axis_aligned_ratio")
+    min_axis_ratio_delta = None
+    if current_min_axis_ratio is not None and previous_min_axis_ratio is not None:
+        min_axis_ratio_delta = round(current_min_axis_ratio - previous_min_axis_ratio, 4)
 
     report["delta_vs_previous"] = {
         "failed_cases": {
@@ -509,15 +527,30 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
             "current": current_max_axis_margin,
             "delta": max_axis_margin_delta,
         },
+        "hybrid_max_axis_aligned_ratio": {
+            "previous": previous_max_axis_ratio,
+            "current": current_max_axis_ratio,
+            "delta": max_axis_ratio_delta,
+        },
         "hybrid_p95_axis_margin_to_grid_threshold": {
             "previous": previous_p95_axis_margin,
             "current": current_p95_axis_margin,
             "delta": p95_axis_margin_delta,
         },
+        "hybrid_p95_axis_aligned_ratio": {
+            "previous": previous_p95_axis_ratio,
+            "current": current_p95_axis_ratio,
+            "delta": p95_axis_ratio_delta,
+        },
         "hybrid_min_axis_margin_to_grid_threshold": {
             "previous": previous_min_axis_margin,
             "current": current_min_axis_margin,
             "delta": min_axis_margin_delta,
+        },
+        "hybrid_min_axis_aligned_ratio": {
+            "previous": previous_min_axis_ratio,
+            "current": current_min_axis_ratio,
+            "delta": min_axis_ratio_delta,
         },
     }
     return report
