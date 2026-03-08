@@ -349,6 +349,71 @@ def analyze_benchmark_results(
     return payload
 
 
+def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, Any]) -> dict[str, Any]:
+    current_summary = report.get("summary", {})
+    previous_summary = previous_report.get("summary", {})
+
+    current_failures = current_summary.get("failures_by_reason", {}) or {}
+    previous_failures = previous_summary.get("failures_by_reason", {}) or {}
+
+    def _failure_count(payload: dict[str, Any], key: str) -> int:
+        value = payload.get(key, 0)
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return 0
+
+    current_hybrid = (report.get("strategy_diagnostics", {}) or {}).get("hybrid_mvp", {}) or {}
+    previous_hybrid = (previous_report.get("strategy_diagnostics", {}) or {}).get("hybrid_mvp", {}) or {}
+
+    def _to_float(payload: dict[str, Any], key: str) -> float | None:
+        value = payload.get(key)
+        if value is None:
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    current_margin_score = _to_float(current_hybrid, "avg_axis_margin_score")
+    previous_margin_score = _to_float(previous_hybrid, "avg_axis_margin_score")
+    margin_score_delta = None
+    if current_margin_score is not None and previous_margin_score is not None:
+        margin_score_delta = round(current_margin_score - previous_margin_score, 4)
+
+    report["delta_vs_previous"] = {
+        "failed_cases": {
+            "previous": int(previous_summary.get("failed_cases", 0)),
+            "current": int(current_summary.get("failed_cases", 0)),
+            "delta": int(current_summary.get("failed_cases", 0)) - int(previous_summary.get("failed_cases", 0)),
+        },
+        "suspicious_grid_pattern": {
+            "previous": _failure_count(previous_failures, "suspicious_grid_pattern"),
+            "current": _failure_count(current_failures, "suspicious_grid_pattern"),
+            "delta": _failure_count(current_failures, "suspicious_grid_pattern")
+            - _failure_count(previous_failures, "suspicious_grid_pattern"),
+        },
+        "low_entity_count": {
+            "previous": _failure_count(previous_failures, "low_entity_count"),
+            "current": _failure_count(current_failures, "low_entity_count"),
+            "delta": _failure_count(current_failures, "low_entity_count")
+            - _failure_count(previous_failures, "low_entity_count"),
+        },
+        "low_entity_diversity": {
+            "previous": _failure_count(previous_failures, "low_entity_diversity"),
+            "current": _failure_count(current_failures, "low_entity_diversity"),
+            "delta": _failure_count(current_failures, "low_entity_diversity")
+            - _failure_count(previous_failures, "low_entity_diversity"),
+        },
+        "hybrid_avg_axis_margin_score": {
+            "previous": previous_margin_score,
+            "current": current_margin_score,
+            "delta": margin_score_delta,
+        },
+    }
+    return report
+
+
 def _render_markdown_report(report: dict[str, Any]) -> str:
     summary = report.get("summary", {})
     lines = [
@@ -370,6 +435,14 @@ def _render_markdown_report(report: dict[str, Any]) -> str:
             lines.append(f"- `{reason}`: {count}")
     else:
         lines.append("- none")
+
+    delta_vs_previous = report.get("delta_vs_previous")
+    if delta_vs_previous:
+        lines.extend(["", "## Delta vs previous", ""])
+        for key, payload in delta_vs_previous.items():
+            lines.append(
+                f"- `{key}`: previous={payload.get('previous')}, current={payload.get('current')}, delta={payload.get('delta')}"
+            )
 
     strategy_diagnostics = report.get("strategy_diagnostics", {})
     lines.extend(["", "## Strategy diagnostics", ""])
@@ -472,6 +545,12 @@ def parse_args() -> argparse.Namespace:
         default=Path("eval/reports/web_floorplan_grid_v1/grid_artifact_regression.md"),
     )
     parser.add_argument("--fail-on-findings", action="store_true")
+    parser.add_argument(
+        "--previous-report-json",
+        type=Path,
+        default=None,
+        help="optional previous report JSON path for delta comparison",
+    )
     parser.add_argument("--min-entities", type=int, default=6)
     parser.add_argument("--min-unique-entity-types", type=int, default=1)
     parser.add_argument("--min-axis-aligned-ratio-for-grid", type=float, default=0.9)
@@ -523,6 +602,10 @@ def main() -> int:
     report["dataset_id"] = args.dataset_id
     report["manifest"] = str(args.manifest)
     report["benchmark_results_path"] = str(benchmark_results_path)
+
+    if args.previous_report_json and args.previous_report_json.exists():
+        previous_report = json.loads(args.previous_report_json.read_text(encoding="utf-8"))
+        report = _attach_previous_delta(report, previous_report)
 
     args.report_json.parent.mkdir(parents=True, exist_ok=True)
     args.report_json.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
