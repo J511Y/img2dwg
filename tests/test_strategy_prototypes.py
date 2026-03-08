@@ -78,6 +78,24 @@ def test_consensus_strategy_accepts_vote_list(tmp_path: Path) -> None:
     assert out.dxf_path.exists()
 
 
+def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    out = ConsensusQAStrategy().run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
+        tmp_path / "out",
+    )
+
+    assert out.success is True
+    assert any("anti_grid_detail_diag:on" in note for note in out.notes)
+
+    doc = ezdxf.readfile(str(out.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+    assert len(lines) >= 7
+    assert any(abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6 for line in lines)
+
+
 def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
