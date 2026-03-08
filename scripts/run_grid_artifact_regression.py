@@ -463,11 +463,25 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
     if current_min_axis_ratio is not None and previous_min_axis_ratio is not None:
         min_axis_ratio_delta = round(current_min_axis_ratio - previous_min_axis_ratio, 4)
 
+    previous_pass_rate = previous_summary.get("pass_rate")
+    current_pass_rate = current_summary.get("pass_rate")
+    pass_rate_delta = None
+    try:
+        if previous_pass_rate is not None and current_pass_rate is not None:
+            pass_rate_delta = round(float(current_pass_rate) - float(previous_pass_rate), 4)
+    except (TypeError, ValueError):
+        pass_rate_delta = None
+
     report["delta_vs_previous"] = {
         "failed_cases": {
             "previous": int(previous_summary.get("failed_cases", 0)),
             "current": int(current_summary.get("failed_cases", 0)),
             "delta": int(current_summary.get("failed_cases", 0)) - int(previous_summary.get("failed_cases", 0)),
+        },
+        "pass_rate": {
+            "previous": previous_pass_rate,
+            "current": current_pass_rate,
+            "delta": pass_rate_delta,
         },
         "suspicious_grid_pattern": {
             "previous": _failure_count(previous_failures, "suspicious_grid_pattern"),
