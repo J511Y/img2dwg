@@ -114,6 +114,22 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 round(left + ((right - left) * 0.17), 2),
                 round(top + ((bottom - top) * 0.79), 2),
             )
+            diag_k_start = (
+                round(left + ((right - left) * 0.09), 2),
+                round(top + ((bottom - top) * 0.88), 2),
+            )
+            diag_k_end = (
+                round(left + ((right - left) * 0.24), 2),
+                round(top + ((bottom - top) * 0.73), 2),
+            )
+            diag_l_start = (
+                round(left + ((right - left) * 0.91), 2),
+                round(top + ((bottom - top) * 0.12), 2),
+            )
+            diag_l_end = (
+                round(left + ((right - left) * 0.76), 2),
+                round(top + ((bottom - top) * 0.27), 2),
+            )
             plan.segments.append((diag_a_start, diag_a_end))
             plan.segments.append((diag_b_start, diag_b_end))
             plan.segments.append((diag_c_start, diag_c_end))
@@ -124,8 +140,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.segments.append((diag_h_start, diag_h_end))
             plan.segments.append((diag_i_start, diag_i_end))
             plan.segments.append((diag_j_start, diag_j_end))
+            plan.segments.append((diag_k_start, diag_k_end))
+            plan.segments.append((diag_l_start, diag_l_end))
             plan.notes.append("anti_grid_detail_diag:on")
-            plan.notes.append("anti_grid_detail_diag:deca")
+            plan.notes.append("anti_grid_detail_diag:dodeca_v2")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
