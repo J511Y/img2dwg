@@ -286,9 +286,15 @@ def analyze_benchmark_results(
         min_axis_ratio = min(axis_values)
         max_axis_margin = thresholds.min_axis_aligned_ratio_for_grid - max_axis_ratio
         min_axis_margin = thresholds.min_axis_aligned_ratio_for_grid - min_axis_ratio
+        if len(axis_values) > 1:
+            variance = sum((value - avg_axis_ratio) ** 2 for value in axis_values) / len(axis_values)
+            std_axis_ratio = math.sqrt(variance)
+        else:
+            std_axis_ratio = 0.0
         strategy_diagnostics[strategy_name] = {
             "avg_line_count": round(sum(line_values) / len(line_values), 4),
             "avg_axis_aligned_ratio": round(avg_axis_ratio, 4),
+            "std_axis_aligned_ratio": round(std_axis_ratio, 4),
             "avg_axis_margin_to_grid_threshold": round(avg_axis_margin, 4),
             "max_axis_aligned_ratio": round(max_axis_ratio, 4),
             "max_axis_margin_to_grid_threshold": round(max_axis_margin, 4),
@@ -365,6 +371,7 @@ def _render_markdown_report(report: dict[str, Any]) -> str:
             lines.append(
                 f"- `{strategy}`: avg_line_count={diag.get('avg_line_count')}, "
                 f"avg_axis_aligned_ratio={diag.get('avg_axis_aligned_ratio')}, "
+                f"std_axis_aligned_ratio={diag.get('std_axis_aligned_ratio')}, "
                 f"avg_axis_margin_to_grid_threshold={diag.get('avg_axis_margin_to_grid_threshold')}, "
                 f"max_axis_aligned_ratio={diag.get('max_axis_aligned_ratio')}, "
                 f"max_axis_margin_to_grid_threshold={diag.get('max_axis_margin_to_grid_threshold')}, "
