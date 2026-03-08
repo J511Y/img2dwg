@@ -300,6 +300,7 @@ def analyze_benchmark_results(
             "avg_axis_aligned_ratio": round(avg_axis_ratio, 4),
             "std_axis_aligned_ratio": round(std_axis_ratio, 4),
             "avg_axis_margin_to_grid_threshold": round(avg_axis_margin, 4),
+            "avg_axis_margin_score": round(avg_axis_margin * 100.0, 2),
             "max_axis_aligned_ratio": round(max_axis_ratio, 4),
             "max_axis_margin_to_grid_threshold": round(max_axis_margin, 4),
             "p95_axis_aligned_ratio": round(p95_axis_ratio, 4),
@@ -379,6 +380,7 @@ def _render_markdown_report(report: dict[str, Any]) -> str:
                 f"avg_axis_aligned_ratio={diag.get('avg_axis_aligned_ratio')}, "
                 f"std_axis_aligned_ratio={diag.get('std_axis_aligned_ratio')}, "
                 f"avg_axis_margin_to_grid_threshold={diag.get('avg_axis_margin_to_grid_threshold')}, "
+                f"avg_axis_margin_score={diag.get('avg_axis_margin_score')}, "
                 f"max_axis_aligned_ratio={diag.get('max_axis_aligned_ratio')}, "
                 f"max_axis_margin_to_grid_threshold={diag.get('max_axis_margin_to_grid_threshold')}, "
                 f"p95_axis_aligned_ratio={diag.get('p95_axis_aligned_ratio')}, "
