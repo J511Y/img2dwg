@@ -29,6 +29,21 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
         plan = build_vector_plan(signals, self._preset)
+        if len(plan.segments) >= 4:
+            left = plan.segments[0][0][0]
+            right = plan.segments[0][1][0]
+            top = plan.segments[0][0][1]
+            bottom = plan.segments[2][0][1]
+            detail_start = (
+                round(left + ((right - left) * 0.3), 2),
+                round(top + ((bottom - top) * 0.35), 2),
+            )
+            detail_end = (
+                round(left + ((right - left) * 0.45), 2),
+                round(top + ((bottom - top) * 0.5), 2),
+            )
+            plan.segments.append((detail_start, detail_end))
+            plan.notes.append("anti_grid_detail_diag:on")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
