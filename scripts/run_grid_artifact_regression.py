@@ -405,6 +405,12 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
     if current_avg_unique_y is not None and previous_avg_unique_y is not None:
         avg_unique_y_delta = round(current_avg_unique_y - previous_avg_unique_y, 4)
 
+    current_avg_line_count = _to_float(current_hybrid, "avg_line_count")
+    previous_avg_line_count = _to_float(previous_hybrid, "avg_line_count")
+    avg_line_count_delta = None
+    if current_avg_line_count is not None and previous_avg_line_count is not None:
+        avg_line_count_delta = round(current_avg_line_count - previous_avg_line_count, 4)
+
     report["delta_vs_previous"] = {
         "failed_cases": {
             "previous": int(previous_summary.get("failed_cases", 0)),
@@ -453,6 +459,11 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
             "previous": previous_avg_unique_y,
             "current": current_avg_unique_y,
             "delta": avg_unique_y_delta,
+        },
+        "hybrid_avg_line_count": {
+            "previous": previous_avg_line_count,
+            "current": current_avg_line_count,
+            "delta": avg_line_count_delta,
         },
     }
     return report
