@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-08T06:17:24.144391+00:00",
+  "generated_at": "2026-03-08T06:47:46.027032+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -808,6 +808,11 @@
     "hybrid_avg_line_count": {
       "previous": 14.0,
       "current": 14.0,
+      "delta": 0.0
+    },
+    "hybrid_std_axis_aligned_ratio": {
+      "previous": 0.0,
+      "current": 0.0,
       "delta": 0.0
     }
   }

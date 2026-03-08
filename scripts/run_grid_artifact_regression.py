@@ -349,6 +349,16 @@ def analyze_benchmark_results(
     return payload
 
 
+def _resolve_previous_report_path(
+    *,
+    requested: Path | None,
+    report_json_path: Path,
+) -> Path | None:
+    if requested is not None:
+        return requested if requested.exists() else None
+    return report_json_path if report_json_path.exists() else None
+
+
 def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, Any]) -> dict[str, Any]:
     current_summary = report.get("summary", {})
     previous_summary = previous_report.get("summary", {})
@@ -411,6 +421,12 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
     if current_avg_line_count is not None and previous_avg_line_count is not None:
         avg_line_count_delta = round(current_avg_line_count - previous_avg_line_count, 4)
 
+    current_std_axis_ratio = _to_float(current_hybrid, "std_axis_aligned_ratio")
+    previous_std_axis_ratio = _to_float(previous_hybrid, "std_axis_aligned_ratio")
+    std_axis_ratio_delta = None
+    if current_std_axis_ratio is not None and previous_std_axis_ratio is not None:
+        std_axis_ratio_delta = round(current_std_axis_ratio - previous_std_axis_ratio, 4)
+
     report["delta_vs_previous"] = {
         "failed_cases": {
             "previous": int(previous_summary.get("failed_cases", 0)),
@@ -464,6 +480,11 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
             "previous": previous_avg_line_count,
             "current": current_avg_line_count,
             "delta": avg_line_count_delta,
+        },
+        "hybrid_std_axis_aligned_ratio": {
+            "previous": previous_std_axis_ratio,
+            "current": current_std_axis_ratio,
+            "delta": std_axis_ratio_delta,
         },
     }
     return report
@@ -658,8 +679,12 @@ def main() -> int:
     report["manifest"] = str(args.manifest)
     report["benchmark_results_path"] = str(benchmark_results_path)
 
-    if args.previous_report_json and args.previous_report_json.exists():
-        previous_report = json.loads(args.previous_report_json.read_text(encoding="utf-8"))
+    previous_report_path = _resolve_previous_report_path(
+        requested=args.previous_report_json,
+        report_json_path=args.report_json,
+    )
+    if previous_report_path is not None:
+        previous_report = json.loads(previous_report_path.read_text(encoding="utf-8"))
         report = _attach_previous_delta(report, previous_report)
 
     args.report_json.parent.mkdir(parents=True, exist_ok=True)
