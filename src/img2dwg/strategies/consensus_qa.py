@@ -86,11 +86,20 @@ class ConsensusQAStrategy(ConversionStrategy):
                 round(left + ((right - left) * 0.40), 2),
                 round(top + ((bottom - top) * 0.37), 2),
             )
+            diag_d_start = (
+                round(left + ((right - left) * 0.70), 2),
+                round(top + ((bottom - top) * 0.70), 2),
+            )
+            diag_d_end = (
+                round(left + ((right - left) * 0.55), 2),
+                round(top + ((bottom - top) * 0.55), 2),
+            )
             plan.segments.append((diag_a_start, diag_a_end))
             plan.segments.append((diag_b_start, diag_b_end))
             plan.segments.append((diag_c_start, diag_c_end))
+            plan.segments.append((diag_d_start, diag_d_end))
             plan.notes.append("anti_grid_detail_diag:on")
-            plan.notes.append("anti_grid_detail_diag:triple")
+            plan.notes.append("anti_grid_detail_diag:quad")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
