@@ -233,3 +233,6 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
     assert report["delta_vs_previous"]["hybrid_p95_axis_aligned_ratio"]["previous"] == 0.72
     assert report["delta_vs_previous"]["hybrid_min_axis_margin_to_grid_threshold"]["previous"] == 0.08
     assert report["delta_vs_previous"]["hybrid_min_axis_aligned_ratio"]["previous"] == 0.68
+    assert "strategy_delta_vs_previous" in report
+    assert "hybrid_mvp" in report["strategy_delta_vs_previous"]
+    assert "avg_line_count" in report["strategy_delta_vs_previous"]["hybrid_mvp"]

@@ -472,6 +472,32 @@ def _attach_previous_delta(report: dict[str, Any], previous_report: dict[str, An
     except (TypeError, ValueError):
         pass_rate_delta = None
 
+    strategy_delta_vs_previous: dict[str, dict[str, dict[str, float | None]]] = {}
+    current_strategies = (report.get("strategy_diagnostics", {}) or {})
+    previous_strategies = (previous_report.get("strategy_diagnostics", {}) or {})
+    for strategy_name, current_payload in current_strategies.items():
+        previous_payload = previous_strategies.get(strategy_name, {}) or {}
+
+        def _build_metric_delta(metric_key: str) -> dict[str, float | None]:
+            current_value = _to_float(current_payload, metric_key)
+            previous_value = _to_float(previous_payload, metric_key)
+            delta_value = None
+            if current_value is not None and previous_value is not None:
+                delta_value = round(current_value - previous_value, 4)
+            return {
+                "previous": previous_value,
+                "current": current_value,
+                "delta": delta_value,
+            }
+
+        strategy_delta_vs_previous[strategy_name] = {
+            "avg_axis_aligned_ratio": _build_metric_delta("avg_axis_aligned_ratio"),
+            "avg_axis_margin_to_grid_threshold": _build_metric_delta("avg_axis_margin_to_grid_threshold"),
+            "avg_line_count": _build_metric_delta("avg_line_count"),
+        }
+
+    report["strategy_delta_vs_previous"] = strategy_delta_vs_previous
+
     report["delta_vs_previous"] = {
         "failed_cases": {
             "previous": int(previous_summary.get("failed_cases", 0)),
@@ -599,6 +625,17 @@ def _render_markdown_report(report: dict[str, Any]) -> str:
             lines.append(
                 f"- `{key}`: previous={payload.get('previous')}, current={payload.get('current')}, delta={payload.get('delta')}"
             )
+
+    strategy_delta_vs_previous = report.get("strategy_delta_vs_previous")
+    if strategy_delta_vs_previous:
+        lines.extend(["", "## Strategy delta vs previous", ""])
+        for strategy, metrics in strategy_delta_vs_previous.items():
+            parts = []
+            for metric_name, payload in metrics.items():
+                parts.append(
+                    f"{metric_name}: prev={payload.get('previous')}, cur={payload.get('current')}, delta={payload.get('delta')}"
+                )
+            lines.append(f"- `{strategy}`: " + "; ".join(parts))
 
     strategy_diagnostics = report.get("strategy_diagnostics", {})
     lines.extend(["", "## Strategy diagnostics", ""])
