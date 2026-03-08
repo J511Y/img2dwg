@@ -188,6 +188,9 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
                 "avg_unique_y_count": 4.0,
                 "avg_line_count": 5.0,
                 "std_axis_aligned_ratio": 0.2,
+                "max_axis_margin_to_grid_threshold": 0.15,
+                "p95_axis_margin_to_grid_threshold": 0.12,
+                "min_axis_margin_to_grid_threshold": 0.08,
             }
         },
     }
@@ -219,3 +222,6 @@ def test_analyze_benchmark_results_summarizes_failures(tmp_path: Path) -> None:
     assert report["delta_vs_previous"]["hybrid_avg_unique_y_count"]["previous"] == 4.0
     assert report["delta_vs_previous"]["hybrid_avg_line_count"]["previous"] == 5.0
     assert report["delta_vs_previous"]["hybrid_std_axis_aligned_ratio"]["previous"] == 0.2
+    assert report["delta_vs_previous"]["hybrid_max_axis_margin_to_grid_threshold"]["previous"] == 0.15
+    assert report["delta_vs_previous"]["hybrid_p95_axis_margin_to_grid_threshold"]["previous"] == 0.12
+    assert report["delta_vs_previous"]["hybrid_min_axis_margin_to_grid_threshold"]["previous"] == 0.08
