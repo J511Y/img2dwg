@@ -114,6 +114,38 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 round(left + ((right - left) * 0.17), 2),
                 round(top + ((bottom - top) * 0.79), 2),
             )
+            diag_k_start = (
+                round(left + ((right - left) * 0.88), 2),
+                round(top + ((bottom - top) * 0.48), 2),
+            )
+            diag_k_end = (
+                round(left + ((right - left) * 0.73), 2),
+                round(top + ((bottom - top) * 0.33), 2),
+            )
+            diag_l_start = (
+                round(left + ((right - left) * 0.16), 2),
+                round(top + ((bottom - top) * 0.84), 2),
+            )
+            diag_l_end = (
+                round(left + ((right - left) * 0.31), 2),
+                round(top + ((bottom - top) * 0.69), 2),
+            )
+            diag_m_start = (
+                round(left + ((right - left) * 0.08), 2),
+                round(top + ((bottom - top) * 0.56), 2),
+            )
+            diag_m_end = (
+                round(left + ((right - left) * 0.23), 2),
+                round(top + ((bottom - top) * 0.41), 2),
+            )
+            diag_n_start = (
+                round(left + ((right - left) * 0.92), 2),
+                round(top + ((bottom - top) * 0.44), 2),
+            )
+            diag_n_end = (
+                round(left + ((right - left) * 0.77), 2),
+                round(top + ((bottom - top) * 0.29), 2),
+            )
             plan.segments.append((diag_a_start, diag_a_end))
             plan.segments.append((diag_b_start, diag_b_end))
             plan.segments.append((diag_c_start, diag_c_end))
@@ -124,8 +156,12 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.segments.append((diag_h_start, diag_h_end))
             plan.segments.append((diag_i_start, diag_i_end))
             plan.segments.append((diag_j_start, diag_j_end))
+            plan.segments.append((diag_k_start, diag_k_end))
+            plan.segments.append((diag_l_start, diag_l_end))
+            plan.segments.append((diag_m_start, diag_m_end))
+            plan.segments.append((diag_n_start, diag_n_end))
             plan.notes.append("anti_grid_detail_diag:on")
-            plan.notes.append("anti_grid_detail_diag:deca")
+            plan.notes.append("anti_grid_detail_diag:tetradeca")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
