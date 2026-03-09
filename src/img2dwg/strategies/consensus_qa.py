@@ -206,6 +206,22 @@ class ConsensusQAStrategy(ConversionStrategy):
                 round(left + ((right - left) * 0.81), 2),
                 round(top + ((bottom - top) * 0.17), 2),
             )
+            diag_s_start = (
+                round(left + ((right - left) * 0.10), 2),
+                round(top + ((bottom - top) * 0.96), 2),
+            )
+            diag_s_end = (
+                round(left + ((right - left) * 0.25), 2),
+                round(top + ((bottom - top) * 0.81), 2),
+            )
+            diag_t_start = (
+                round(left + ((right - left) * 0.90), 2),
+                round(top + ((bottom - top) * 0.04), 2),
+            )
+            diag_t_end = (
+                round(left + ((right - left) * 0.75), 2),
+                round(top + ((bottom - top) * 0.19), 2),
+            )
             plan.segments.append((diag_a_start, diag_a_end))
             plan.segments.append((diag_b_start, diag_b_end))
             plan.segments.append((diag_c_start, diag_c_end))
@@ -224,8 +240,10 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.segments.append((diag_p_start, diag_p_end))
             plan.segments.append((diag_q_start, diag_q_end))
             plan.segments.append((diag_r_start, diag_r_end))
+            plan.segments.append((diag_s_start, diag_s_end))
+            plan.segments.append((diag_t_start, diag_t_end))
             plan.notes.append("anti_grid_detail_diag:on")
-            plan.notes.append("anti_grid_detail_diag:octadeca_v4")
+            plan.notes.append("anti_grid_detail_diag:icosa_v5")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
