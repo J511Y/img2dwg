@@ -95,17 +95,17 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
 
     assert out.success is True
     assert any("anti_grid_detail_diag:on" in note for note in out.notes)
-    assert any("anti_grid_detail_diag:hexacosa_v8" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:octacosa_v9" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) >= 32
+    assert len(lines) >= 34
     diagonal_count = sum(
         1
         for line in lines
         if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
-    assert diagonal_count >= 26
+    assert diagonal_count >= 28
 
 
 def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Path) -> None:
