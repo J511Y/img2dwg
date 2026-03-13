@@ -290,6 +290,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             anti_grid_spread_pairs = [
                 ((0.13, 0.41), (0.31, 0.59)),
                 ((0.41, 0.11), (0.59, 0.29)),
+                ((0.19, 0.73), (0.37, 0.55)),
+                ((0.69, 0.27), (0.87, 0.45)),
+                ((0.09, 0.57), (0.27, 0.39)),
+                ((0.73, 0.91), (0.55, 0.73)),
             ]
             for (sx, sy), (ex, ey) in anti_grid_spread_pairs:
                 start = (
@@ -303,7 +307,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 plan.segments.append((start, end))
 
             plan.notes.append("anti_grid_detail_diag:on")
-            plan.notes.append("anti_grid_detail_diag:hexacosa_v10_spread")
+            plan.notes.append("anti_grid_detail_diag:hexacosa_v11_spread")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
