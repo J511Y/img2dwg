@@ -422,12 +422,35 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_staggered_pairs = [
+                ((0.093, 0.813), (0.266, 0.641)),
+                ((0.287, 0.169), (0.462, 0.343)),
+                ((0.487, 0.743), (0.664, 0.569)),
+                ((0.692, 0.261), (0.869, 0.437)),
+                ((0.119, 0.493), (0.296, 0.321)),
+                ((0.543, 0.893), (0.721, 0.719)),
+                ((0.803, 0.579), (0.627, 0.753)),
+                ((0.371, 0.951), (0.195, 0.775)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_staggered_pairs):
+                phase = (index - 3.5) * 0.0012
+                start = (
+                    round(left + ((right - left) * (sx + phase)), 4),
+                    round(top + ((bottom - top) * (sy - phase)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase)), 4),
+                    round(top + ((bottom - top) * (ey + phase)), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")
             plan.notes.append("anti_grid_detail_diag:octa_v13_debias")
             plan.notes.append("anti_grid_detail_diag:tetra_v14_entropy")
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
+            plan.notes.append("anti_grid_detail_diag:octa_v16_staggered")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
