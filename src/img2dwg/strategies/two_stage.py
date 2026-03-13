@@ -66,6 +66,13 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             ((0.094, 0.297), (0.248, 0.451)),
             ((0.506, 0.861), (0.659, 0.709)),
             ((0.318, 0.583), (0.472, 0.736)),
+            # v19: add extra oblique anchors to further de-bias grid-like axis concentration.
+            ((0.162, 0.836), (0.347, 0.619)),
+            ((0.403, 0.092), (0.589, 0.276)),
+            ((0.676, 0.889), (0.861, 0.671)),
+            ((0.812, 0.402), (0.596, 0.588)),
+            ((0.257, 0.955), (0.441, 0.734)),
+            ((0.538, 0.183), (0.723, 0.367)),
         ]
 
         for index, ((sx, sy), (ex, ey)) in enumerate(guide_pairs):
