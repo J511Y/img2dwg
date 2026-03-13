@@ -413,6 +413,27 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_entropy_weave_pairs = [
+                ((0.048, 0.364), (0.226, 0.519)),
+                ((0.241, 0.948), (0.418, 0.771)),
+                ((0.486, 0.087), (0.664, 0.266)),
+                ((0.711, 0.842), (0.889, 0.664)),
+                ((0.153, 0.598), (0.331, 0.776)),
+                ((0.557, 0.429), (0.735, 0.607)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_entropy_weave_pairs):
+                phase = (index - 2.5) * 0.0014
+                weave = ((index % 2) * 2 - 1) * 0.0011
+                start = (
+                    round(left + ((right - left) * (sx + phase + weave)), 4),
+                    round(top + ((bottom - top) * (sy - phase + (weave * 0.8))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase - weave)), 4),
+                    round(top + ((bottom - top) * (ey + phase - (weave * 0.8))), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
@@ -420,6 +441,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
             plan.notes.append("anti_grid_detail_diag:hexa_v16_entropy")
             plan.notes.append("anti_grid_detail_diag:tetra_v17_phase_shift")
+            plan.notes.append("anti_grid_detail_diag:hexa_v24_entropy_weave")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
