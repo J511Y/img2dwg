@@ -83,6 +83,37 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         return len(guide_pairs)
 
+    @staticmethod
+    def _debias_axis_aligned_segments(
+        *,
+        plan_segments: list[tuple[tuple[float, float], tuple[float, float]]],
+        max_adjusted: int = 10,
+    ) -> int:
+        adjusted = 0
+        for index, (start, end) in enumerate(plan_segments):
+            if adjusted >= max_adjusted:
+                break
+
+            sx, sy = start
+            ex, ey = end
+            is_vertical = abs(sx - ex) < 1e-6
+            is_horizontal = abs(sy - ey) < 1e-6
+            if not (is_vertical or is_horizontal):
+                continue
+
+            skew = 0.17 + ((index % 4) * 0.021)
+            if is_vertical:
+                new_start = (round(sx, 4), round(sy - (skew * 0.33), 4))
+                new_end = (round(ex + skew, 4), round(ey, 4))
+            else:
+                new_start = (round(sx - (skew * 0.33), 4), round(sy, 4))
+                new_end = (round(ex, 4), round(ey + skew, 4))
+
+            plan_segments[index] = (new_start, new_end)
+            adjusted += 1
+
+        return adjusted
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -535,6 +566,10 @@ class ConsensusQAStrategy(ConversionStrategy):
                     end = (round(end[0] + 0.121, 4), round(end[1] + 0.137, 4))
                 plan.segments.append((start, end))
 
+            axis_debias_count = self._debias_axis_aligned_segments(
+                plan_segments=plan.segments,
+                max_adjusted=12,
+            )
             skew_count = self._append_signal_guided_skews(
                 plan_segments=plan.segments,
                 left=left,
@@ -544,6 +579,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 signals=signals,
             )
 
+            plan.notes.append(f"anti_grid_axis_debias_v20:{axis_debias_count}")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")
