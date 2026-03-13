@@ -402,11 +402,32 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_micro_jitter_pairs = [
+                ((0.141, 0.709), (0.284, 0.566)),
+                ((0.331, 0.183), (0.474, 0.324)),
+                ((0.571, 0.851), (0.716, 0.704)),
+                ((0.776, 0.297), (0.631, 0.446)),
+                ((0.206, 0.928), (0.352, 0.789)),
+                ((0.618, 0.129), (0.762, 0.278)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_micro_jitter_pairs):
+                jitter = ((index % 2) * 2 - 1) * 0.0018
+                start = (
+                    round(left + ((right - left) * (sx + jitter)), 4),
+                    round(top + ((bottom - top) * (sy - jitter)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - jitter)), 4),
+                    round(top + ((bottom - top) * (ey + jitter)), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")
             plan.notes.append("anti_grid_detail_diag:octa_v13_debias")
             plan.notes.append("anti_grid_detail_diag:tetra_v14_entropy")
+            plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
