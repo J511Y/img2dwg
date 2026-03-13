@@ -41,7 +41,7 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
 
     assert out.success is True
     assert any("anti_grid_detail_diag:on" in note for note in out.notes)
-    assert any("anti_grid_detail_diag:hexacosa_v10_spread" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:hexacosa_v11_spread" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -52,6 +52,37 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
         if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
     assert diagonal_count >= 28
+
+
+def test_two_stage_strategy_reduces_axis_alignment_bias(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    out = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "out")
+    assert out.success is True
+    assert out.dxf_path is not None
+
+    doc = ezdxf.readfile(str(out.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+    assert len(lines) >= 40
+
+    axis_aligned = 0
+    unique_x: set[float] = set()
+    unique_y: set[float] = set()
+    for line in lines:
+        start = line.dxf.start
+        end = line.dxf.end
+        unique_x.add(round(float(start.x), 2))
+        unique_x.add(round(float(end.x), 2))
+        unique_y.add(round(float(start.y), 2))
+        unique_y.add(round(float(end.y), 2))
+        if abs(start.x - end.x) < 1e-6 or abs(start.y - end.y) < 1e-6:
+            axis_aligned += 1
+
+    axis_ratio = axis_aligned / len(lines)
+    assert axis_ratio <= 0.15
+    assert len(unique_x) >= 55
+    assert len(unique_y) >= 45
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
