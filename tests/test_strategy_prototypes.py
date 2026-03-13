@@ -197,3 +197,26 @@ def test_hybrid_strategy_adds_adaptive_detail_line_on_high_edge_density(tmp_path
             short_diagonal_count += 1
 
     assert short_diagonal_count >= 8
+
+def test_two_stage_strategy_uses_high_precision_for_primary_diagonals(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    out = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "out")
+    assert out.success is True
+    assert out.dxf_path is not None
+
+    doc = ezdxf.readfile(str(out.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+
+    points = {
+        (round(float(line.dxf.start.x), 4), round(float(line.dxf.start.y), 4))
+        for line in lines
+    } | {
+        (round(float(line.dxf.end.x), 4), round(float(line.dxf.end.y), 4))
+        for line in lines
+    }
+
+    # 96x96 샘플에서 diag_a_start = (30.336, 34.752) 이어야 한다.
+    # 이전 2dp 라운딩에서는 (30.34, 34.75)로 절삭되어 전략 다양성이 줄었다.
+    assert (30.336, 34.752) in points

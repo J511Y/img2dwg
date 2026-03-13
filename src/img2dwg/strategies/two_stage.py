@@ -52,6 +52,12 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             ((0.547, 0.934), (0.695, 0.783)),
             ((0.119, 0.531), (0.268, 0.684)),
             ((0.833, 0.603), (0.684, 0.752)),
+            ((0.067, 0.761), (0.216, 0.612)),
+            ((0.286, 0.407), (0.435, 0.556)),
+            ((0.564, 0.959), (0.713, 0.808)),
+            ((0.908, 0.184), (0.759, 0.333)),
+            ((0.149, 0.119), (0.298, 0.268)),
+            ((0.642, 0.526), (0.791, 0.675)),
         ]
 
         for index, ((sx, sy), (ex, ey)) in enumerate(guide_pairs):
@@ -82,228 +88,228 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             top = plan.segments[0][0][1]
             bottom = plan.segments[2][0][1]
             diag_a_start = (
-                round(left + ((right - left) * 0.3), 2),
-                round(top + ((bottom - top) * 0.35), 2),
+                round(left + ((right - left) * 0.3), 4),
+                round(top + ((bottom - top) * 0.35), 4),
             )
             diag_a_end = (
-                round(left + ((right - left) * 0.45), 2),
-                round(top + ((bottom - top) * 0.5), 2),
+                round(left + ((right - left) * 0.45), 4),
+                round(top + ((bottom - top) * 0.5), 4),
             )
             diag_b_start = (
-                round(left + ((right - left) * 0.62), 2),
-                round(top + ((bottom - top) * 0.52), 2),
+                round(left + ((right - left) * 0.62), 4),
+                round(top + ((bottom - top) * 0.52), 4),
             )
             diag_b_end = (
-                round(left + ((right - left) * 0.47), 2),
-                round(top + ((bottom - top) * 0.67), 2),
+                round(left + ((right - left) * 0.47), 4),
+                round(top + ((bottom - top) * 0.67), 4),
             )
             diag_c_start = (
-                round(left + ((right - left) * 0.22), 2),
-                round(top + ((bottom - top) * 0.70), 2),
+                round(left + ((right - left) * 0.22), 4),
+                round(top + ((bottom - top) * 0.70), 4),
             )
             diag_c_end = (
-                round(left + ((right - left) * 0.37), 2),
-                round(top + ((bottom - top) * 0.55), 2),
+                round(left + ((right - left) * 0.37), 4),
+                round(top + ((bottom - top) * 0.55), 4),
             )
             diag_d_start = (
-                round(left + ((right - left) * 0.68), 2),
-                round(top + ((bottom - top) * 0.24), 2),
+                round(left + ((right - left) * 0.68), 4),
+                round(top + ((bottom - top) * 0.24), 4),
             )
             diag_d_end = (
-                round(left + ((right - left) * 0.53), 2),
-                round(top + ((bottom - top) * 0.39), 2),
+                round(left + ((right - left) * 0.53), 4),
+                round(top + ((bottom - top) * 0.39), 4),
             )
             diag_e_start = (
-                round(left + ((right - left) * 0.18), 2),
-                round(top + ((bottom - top) * 0.18), 2),
+                round(left + ((right - left) * 0.18), 4),
+                round(top + ((bottom - top) * 0.18), 4),
             )
             diag_e_end = (
-                round(left + ((right - left) * 0.33), 2),
-                round(top + ((bottom - top) * 0.33), 2),
+                round(left + ((right - left) * 0.33), 4),
+                round(top + ((bottom - top) * 0.33), 4),
             )
             diag_f_start = (
-                round(left + ((right - left) * 0.78), 2),
-                round(top + ((bottom - top) * 0.82), 2),
+                round(left + ((right - left) * 0.78), 4),
+                round(top + ((bottom - top) * 0.82), 4),
             )
             diag_f_end = (
-                round(left + ((right - left) * 0.63), 2),
-                round(top + ((bottom - top) * 0.67), 2),
+                round(left + ((right - left) * 0.63), 4),
+                round(top + ((bottom - top) * 0.67), 4),
             )
             diag_g_start = (
-                round(left + ((right - left) * 0.82), 2),
-                round(top + ((bottom - top) * 0.44), 2),
+                round(left + ((right - left) * 0.82), 4),
+                round(top + ((bottom - top) * 0.44), 4),
             )
             diag_g_end = (
-                round(left + ((right - left) * 0.67), 2),
-                round(top + ((bottom - top) * 0.29), 2),
+                round(left + ((right - left) * 0.67), 4),
+                round(top + ((bottom - top) * 0.29), 4),
             )
             diag_h_start = (
-                round(left + ((right - left) * 0.44), 2),
-                round(top + ((bottom - top) * 0.90), 2),
+                round(left + ((right - left) * 0.44), 4),
+                round(top + ((bottom - top) * 0.90), 4),
             )
             diag_h_end = (
-                round(left + ((right - left) * 0.29), 2),
-                round(top + ((bottom - top) * 0.75), 2),
+                round(left + ((right - left) * 0.29), 4),
+                round(top + ((bottom - top) * 0.75), 4),
             )
             diag_i_start = (
-                round(left + ((right - left) * 0.12), 2),
-                round(top + ((bottom - top) * 0.48), 2),
+                round(left + ((right - left) * 0.12), 4),
+                round(top + ((bottom - top) * 0.48), 4),
             )
             diag_i_end = (
-                round(left + ((right - left) * 0.27), 2),
-                round(top + ((bottom - top) * 0.33), 2),
+                round(left + ((right - left) * 0.27), 4),
+                round(top + ((bottom - top) * 0.33), 4),
             )
             diag_j_start = (
-                round(left + ((right - left) * 0.32), 2),
-                round(top + ((bottom - top) * 0.94), 2),
+                round(left + ((right - left) * 0.32), 4),
+                round(top + ((bottom - top) * 0.94), 4),
             )
             diag_j_end = (
-                round(left + ((right - left) * 0.17), 2),
-                round(top + ((bottom - top) * 0.79), 2),
+                round(left + ((right - left) * 0.17), 4),
+                round(top + ((bottom - top) * 0.79), 4),
             )
             diag_k_start = (
-                round(left + ((right - left) * 0.09), 2),
-                round(top + ((bottom - top) * 0.88), 2),
+                round(left + ((right - left) * 0.09), 4),
+                round(top + ((bottom - top) * 0.88), 4),
             )
             diag_k_end = (
-                round(left + ((right - left) * 0.24), 2),
-                round(top + ((bottom - top) * 0.73), 2),
+                round(left + ((right - left) * 0.24), 4),
+                round(top + ((bottom - top) * 0.73), 4),
             )
             diag_l_start = (
-                round(left + ((right - left) * 0.91), 2),
-                round(top + ((bottom - top) * 0.12), 2),
+                round(left + ((right - left) * 0.91), 4),
+                round(top + ((bottom - top) * 0.12), 4),
             )
             diag_l_end = (
-                round(left + ((right - left) * 0.76), 2),
-                round(top + ((bottom - top) * 0.27), 2),
+                round(left + ((right - left) * 0.76), 4),
+                round(top + ((bottom - top) * 0.27), 4),
             )
             diag_m_start = (
-                round(left + ((right - left) * 0.05), 2),
-                round(top + ((bottom - top) * 0.56), 2),
+                round(left + ((right - left) * 0.05), 4),
+                round(top + ((bottom - top) * 0.56), 4),
             )
             diag_m_end = (
-                round(left + ((right - left) * 0.20), 2),
-                round(top + ((bottom - top) * 0.41), 2),
+                round(left + ((right - left) * 0.20), 4),
+                round(top + ((bottom - top) * 0.41), 4),
             )
             diag_n_start = (
-                round(left + ((right - left) * 0.95), 2),
-                round(top + ((bottom - top) * 0.44), 2),
+                round(left + ((right - left) * 0.95), 4),
+                round(top + ((bottom - top) * 0.44), 4),
             )
             diag_n_end = (
-                round(left + ((right - left) * 0.80), 2),
-                round(top + ((bottom - top) * 0.29), 2),
+                round(left + ((right - left) * 0.80), 4),
+                round(top + ((bottom - top) * 0.29), 4),
             )
             diag_o_start = (
-                round(left + ((right - left) * 0.12), 2),
-                round(top + ((bottom - top) * 0.12), 2),
+                round(left + ((right - left) * 0.12), 4),
+                round(top + ((bottom - top) * 0.12), 4),
             )
             diag_o_end = (
-                round(left + ((right - left) * 0.27), 2),
-                round(top + ((bottom - top) * 0.27), 2),
+                round(left + ((right - left) * 0.27), 4),
+                round(top + ((bottom - top) * 0.27), 4),
             )
             diag_p_start = (
-                round(left + ((right - left) * 0.88), 2),
-                round(top + ((bottom - top) * 0.88), 2),
+                round(left + ((right - left) * 0.88), 4),
+                round(top + ((bottom - top) * 0.88), 4),
             )
             diag_p_end = (
-                round(left + ((right - left) * 0.73), 2),
-                round(top + ((bottom - top) * 0.73), 2),
+                round(left + ((right - left) * 0.73), 4),
+                round(top + ((bottom - top) * 0.73), 4),
             )
             diag_q_start = (
-                round(left + ((right - left) * 0.04), 2),
-                round(top + ((bottom - top) * 0.68), 2),
+                round(left + ((right - left) * 0.04), 4),
+                round(top + ((bottom - top) * 0.68), 4),
             )
             diag_q_end = (
-                round(left + ((right - left) * 0.19), 2),
-                round(top + ((bottom - top) * 0.53), 2),
+                round(left + ((right - left) * 0.19), 4),
+                round(top + ((bottom - top) * 0.53), 4),
             )
             diag_r_start = (
-                round(left + ((right - left) * 0.96), 2),
-                round(top + ((bottom - top) * 0.32), 2),
+                round(left + ((right - left) * 0.96), 4),
+                round(top + ((bottom - top) * 0.32), 4),
             )
             diag_r_end = (
-                round(left + ((right - left) * 0.81), 2),
-                round(top + ((bottom - top) * 0.17), 2),
+                round(left + ((right - left) * 0.81), 4),
+                round(top + ((bottom - top) * 0.17), 4),
             )
             diag_s_start = (
-                round(left + ((right - left) * 0.10), 2),
-                round(top + ((bottom - top) * 0.96), 2),
+                round(left + ((right - left) * 0.10), 4),
+                round(top + ((bottom - top) * 0.96), 4),
             )
             diag_s_end = (
-                round(left + ((right - left) * 0.25), 2),
-                round(top + ((bottom - top) * 0.81), 2),
+                round(left + ((right - left) * 0.25), 4),
+                round(top + ((bottom - top) * 0.81), 4),
             )
             diag_t_start = (
-                round(left + ((right - left) * 0.90), 2),
-                round(top + ((bottom - top) * 0.04), 2),
+                round(left + ((right - left) * 0.90), 4),
+                round(top + ((bottom - top) * 0.04), 4),
             )
             diag_t_end = (
-                round(left + ((right - left) * 0.75), 2),
-                round(top + ((bottom - top) * 0.19), 2),
+                round(left + ((right - left) * 0.75), 4),
+                round(top + ((bottom - top) * 0.19), 4),
             )
             diag_u_start = (
-                round(left + ((right - left) * 0.02), 2),
-                round(top + ((bottom - top) * 0.78), 2),
+                round(left + ((right - left) * 0.02), 4),
+                round(top + ((bottom - top) * 0.78), 4),
             )
             diag_u_end = (
-                round(left + ((right - left) * 0.17), 2),
-                round(top + ((bottom - top) * 0.63), 2),
+                round(left + ((right - left) * 0.17), 4),
+                round(top + ((bottom - top) * 0.63), 4),
             )
             diag_v_start = (
-                round(left + ((right - left) * 0.98), 2),
-                round(top + ((bottom - top) * 0.22), 2),
+                round(left + ((right - left) * 0.98), 4),
+                round(top + ((bottom - top) * 0.22), 4),
             )
             diag_v_end = (
-                round(left + ((right - left) * 0.83), 2),
-                round(top + ((bottom - top) * 0.07), 2),
+                round(left + ((right - left) * 0.83), 4),
+                round(top + ((bottom - top) * 0.07), 4),
             )
             diag_w_start = (
-                round(left + ((right - left) * 0.15), 2),
-                round(top + ((bottom - top) * 0.98), 2),
+                round(left + ((right - left) * 0.15), 4),
+                round(top + ((bottom - top) * 0.98), 4),
             )
             diag_w_end = (
-                round(left + ((right - left) * 0.30), 2),
-                round(top + ((bottom - top) * 0.83), 2),
+                round(left + ((right - left) * 0.30), 4),
+                round(top + ((bottom - top) * 0.83), 4),
             )
             diag_x_start = (
-                round(left + ((right - left) * 0.85), 2),
-                round(top + ((bottom - top) * 0.02), 2),
+                round(left + ((right - left) * 0.85), 4),
+                round(top + ((bottom - top) * 0.02), 4),
             )
             diag_x_end = (
-                round(left + ((right - left) * 0.70), 2),
-                round(top + ((bottom - top) * 0.17), 2),
+                round(left + ((right - left) * 0.70), 4),
+                round(top + ((bottom - top) * 0.17), 4),
             )
             diag_y_start = (
-                round(left + ((right - left) * 0.00), 2),
-                round(top + ((bottom - top) * 0.88), 2),
+                round(left + ((right - left) * 0.00), 4),
+                round(top + ((bottom - top) * 0.88), 4),
             )
             diag_y_end = (
-                round(left + ((right - left) * 0.15), 2),
-                round(top + ((bottom - top) * 0.73), 2),
+                round(left + ((right - left) * 0.15), 4),
+                round(top + ((bottom - top) * 0.73), 4),
             )
             diag_z_start = (
-                round(left + ((right - left) * 1.00), 2),
-                round(top + ((bottom - top) * 0.12), 2),
+                round(left + ((right - left) * 1.00), 4),
+                round(top + ((bottom - top) * 0.12), 4),
             )
             diag_z_end = (
-                round(left + ((right - left) * 0.85), 2),
-                round(top + ((bottom - top) * 0.27), 2),
+                round(left + ((right - left) * 0.85), 4),
+                round(top + ((bottom - top) * 0.27), 4),
             )
             diag_aa_start = (
-                round(left + ((right - left) * 0.06), 2),
-                round(top + ((bottom - top) * 1.00), 2),
+                round(left + ((right - left) * 0.06), 4),
+                round(top + ((bottom - top) * 1.00), 4),
             )
             diag_aa_end = (
-                round(left + ((right - left) * 0.21), 2),
-                round(top + ((bottom - top) * 0.85), 2),
+                round(left + ((right - left) * 0.21), 4),
+                round(top + ((bottom - top) * 0.85), 4),
             )
             diag_ab_start = (
-                round(left + ((right - left) * 0.94), 2),
-                round(top + ((bottom - top) * 0.00), 2),
+                round(left + ((right - left) * 0.94), 4),
+                round(top + ((bottom - top) * 0.00), 4),
             )
             diag_ab_end = (
-                round(left + ((right - left) * 0.79), 2),
-                round(top + ((bottom - top) * 0.15), 2),
+                round(left + ((right - left) * 0.79), 4),
+                round(top + ((bottom - top) * 0.15), 4),
             )
             plan.segments.append((diag_a_start, diag_a_end))
             plan.segments.append((diag_b_start, diag_b_end))
