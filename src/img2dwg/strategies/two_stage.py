@@ -434,6 +434,24 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_asymmetric_pairs = [
+                ((0.066, 0.412), (0.247, 0.583)),
+                ((0.338, 0.944), (0.521, 0.756)),
+                ((0.607, 0.093), (0.788, 0.267)),
+                ((0.902, 0.642), (0.721, 0.824)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_asymmetric_pairs):
+                skew = (index - 1.5) * 0.0015
+                start = (
+                    round(left + ((right - left) * (sx + skew)), 4),
+                    round(top + ((bottom - top) * (sy - (skew * 0.9))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (skew * 0.7))), 4),
+                    round(top + ((bottom - top) * (ey + (skew * 1.1))), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
@@ -442,6 +460,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v16_entropy")
             plan.notes.append("anti_grid_detail_diag:tetra_v17_phase_shift")
             plan.notes.append("anti_grid_detail_diag:hexa_v24_entropy_weave")
+            plan.notes.append("anti_grid_detail_diag:tetra_v25_asymmetric")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
