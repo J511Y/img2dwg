@@ -48,7 +48,7 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:hexa_v16_entropy" in note for note in out.notes)
     assert any("anti_grid_detail_diag:tetra_v17_phase_shift" in note for note in out.notes)
     skew_note = next(note for note in out.notes if "anti_grid_detail_diag:signal_guided_skew_v18" in note)
-    assert int(skew_note.rsplit(":", maxsplit=1)[-1]) >= 10
+    assert int(skew_note.rsplit(":", maxsplit=1)[-1]) >= 20
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
