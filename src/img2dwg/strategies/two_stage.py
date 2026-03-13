@@ -4,6 +4,7 @@ from pathlib import Path
 
 from .base import ConversionInput, ConversionOutput, ConversionStrategy
 from .prototype_engine import (
+    ImageSignals,
     StrategyPreset,
     build_vector_plan,
     estimate_metrics,
@@ -24,6 +25,50 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         quality_bias=0.42,
         topology_bias=0.40,
     )
+
+    @staticmethod
+    def _append_signal_guided_skews(
+        *,
+        plan_segments: list[tuple[tuple[float, float], tuple[float, float]]],
+        left: float,
+        right: float,
+        top: float,
+        bottom: float,
+        signals: ImageSignals,
+    ) -> int:
+        span_x = max(1.0, right - left)
+        span_y = max(1.0, bottom - top)
+        edge_bias = max(0.0, min(1.0, signals.edge_density))
+        contrast_bias = max(0.0, min(1.0, signals.contrast))
+
+        guide_pairs = [
+            ((0.052, 0.224), (0.201, 0.369)),
+            ((0.238, 0.874), (0.386, 0.723)),
+            ((0.427, 0.137), (0.575, 0.287)),
+            ((0.611, 0.812), (0.759, 0.661)),
+            ((0.794, 0.291), (0.646, 0.441)),
+            ((0.176, 0.642), (0.324, 0.491)),
+            ((0.352, 0.468), (0.501, 0.617)),
+            ((0.547, 0.934), (0.695, 0.783)),
+        ]
+
+        for index, ((sx, sy), (ex, ey)) in enumerate(guide_pairs):
+            phase = (index - 3.5) * 0.0009
+            edge_jitter = (edge_bias - 0.5) * 0.008
+            contrast_jitter = (contrast_bias - 0.5) * 0.006
+            start = (
+                round(left + (span_x * (sx + phase + edge_jitter)), 4),
+                round(top + (span_y * (sy - phase + contrast_jitter)), 4),
+            )
+            end = (
+                round(left + (span_x * (ex - phase - contrast_jitter)), 4),
+                round(top + (span_y * (ey + phase - edge_jitter)), 4),
+            )
+            if abs(start[0] - end[0]) < 1e-6 or abs(start[1] - end[1]) < 1e-6:
+                end = (round(end[0] + 0.137, 4), round(end[1] + 0.163, 4))
+            plan_segments.append((start, end))
+
+        return len(guide_pairs)
 
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -413,6 +458,15 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            skew_count = self._append_signal_guided_skews(
+                plan_segments=plan.segments,
+                left=left,
+                right=right,
+                top=top,
+                bottom=bottom,
+                signals=signals,
+            )
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
@@ -420,6 +474,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
             plan.notes.append("anti_grid_detail_diag:hexa_v16_entropy")
             plan.notes.append("anti_grid_detail_diag:tetra_v17_phase_shift")
+            plan.notes.append(f"anti_grid_detail_diag:signal_guided_skew_v18:{skew_count}")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
