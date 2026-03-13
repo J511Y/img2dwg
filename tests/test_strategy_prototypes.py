@@ -101,10 +101,11 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:dodeca_v11_spread" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v12_irregular" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v13_debias" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:tetra_v14_entropy" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) >= 62
+    assert len(lines) >= 66
     diagonal_count = sum(
         1
         for line in lines

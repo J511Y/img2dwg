@@ -384,10 +384,29 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_entropy_pairs = [
+                ((0.118, 0.672), (0.301, 0.507)),
+                ((0.352, 0.224), (0.539, 0.411)),
+                ((0.612, 0.804), (0.797, 0.637)),
+                ((0.821, 0.338), (0.646, 0.521)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_entropy_pairs):
+                jitter = ((index % 4) - 1.5) * 0.0014
+                start = (
+                    round(left + ((right - left) * (sx + jitter)), 4),
+                    round(top + ((bottom - top) * (sy - jitter)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - jitter)), 4),
+                    round(top + ((bottom - top) * (ey + jitter)), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")
             plan.notes.append("anti_grid_detail_diag:octa_v13_debias")
+            plan.notes.append("anti_grid_detail_diag:tetra_v14_entropy")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
