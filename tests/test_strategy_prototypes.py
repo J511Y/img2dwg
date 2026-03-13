@@ -46,10 +46,11 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:hexa_v14_debias" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v15_micro_jitter" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v16_entropy" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:tetra_v17_phase_shift" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) >= 60
+    assert len(lines) >= 64
     diagonal_count = sum(
         1
         for line in lines

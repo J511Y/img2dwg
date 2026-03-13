@@ -395,12 +395,31 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_phase_shift_pairs = [
+                ((0.062, 0.788), (0.184, 0.652)),
+                ((0.286, 0.168), (0.412, 0.312)),
+                ((0.517, 0.824), (0.649, 0.678)),
+                ((0.734, 0.298), (0.866, 0.442)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_phase_shift_pairs):
+                phase = ((index % 2) * 2 - 1) * 0.0019
+                start = (
+                    round(left + ((right - left) * (sx + phase)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.7))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase)), 4),
+                    round(top + ((bottom - top) * (ey + (phase * 0.7))), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
             plan.notes.append("anti_grid_detail_diag:hexa_v14_debias")
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
             plan.notes.append("anti_grid_detail_diag:hexa_v16_entropy")
+            plan.notes.append("anti_grid_detail_diag:tetra_v17_phase_shift")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
