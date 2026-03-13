@@ -4,6 +4,7 @@ from pathlib import Path
 
 from .base import ConversionInput, ConversionOutput, ConversionStrategy
 from .prototype_engine import (
+    ImageSignals,
     StrategyPreset,
     build_vector_plan,
     estimate_metrics,
@@ -35,6 +36,52 @@ class ConsensusQAStrategy(ConversionStrategy):
     )
 
     _min_consensus = 0.35
+
+    @staticmethod
+    def _append_signal_guided_skews(
+        *,
+        plan_segments: list[tuple[tuple[float, float], tuple[float, float]]],
+        left: float,
+        right: float,
+        top: float,
+        bottom: float,
+        signals: ImageSignals,
+    ) -> int:
+        span_x = max(1.0, right - left)
+        span_y = max(1.0, bottom - top)
+        edge_bias = max(0.0, min(1.0, signals.edge_density))
+        contrast_bias = max(0.0, min(1.0, signals.contrast))
+
+        guide_pairs = [
+            ((0.082, 0.214), (0.257, 0.391)),
+            ((0.294, 0.874), (0.469, 0.699)),
+            ((0.531, 0.126), (0.706, 0.303)),
+            ((0.748, 0.827), (0.923, 0.652)),
+            ((0.137, 0.593), (0.312, 0.768)),
+            ((0.423, 0.351), (0.598, 0.526)),
+            ((0.639, 0.082), (0.814, 0.258)),
+            ((0.862, 0.557), (0.687, 0.732)),
+            ((0.176, 0.467), (0.351, 0.642)),
+            ((0.587, 0.923), (0.762, 0.748)),
+        ]
+
+        for index, ((sx, sy), (ex, ey)) in enumerate(guide_pairs):
+            phase = (index - 3.5) * 0.0011
+            edge_jitter = (edge_bias - 0.5) * 0.009
+            contrast_jitter = (contrast_bias - 0.5) * 0.007
+            start = (
+                round(left + (span_x * (sx + phase + edge_jitter)), 4),
+                round(top + (span_y * (sy - phase + contrast_jitter)), 4),
+            )
+            end = (
+                round(left + (span_x * (ex - phase - contrast_jitter)), 4),
+                round(top + (span_y * (ey + phase - edge_jitter)), 4),
+            )
+            if abs(start[0] - end[0]) < 1e-6 or abs(start[1] - end[1]) < 1e-6:
+                end = (round(end[0] + 0.141, 4), round(end[1] + 0.167, 4))
+            plan_segments.append((start, end))
+
+        return len(guide_pairs)
 
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -464,6 +511,15 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            skew_count = self._append_signal_guided_skews(
+                plan_segments=plan.segments,
+                left=left,
+                right=right,
+                top=top,
+                bottom=bottom,
+                signals=signals,
+            )
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")
@@ -472,6 +528,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
             plan.notes.append("anti_grid_detail_diag:octa_v16_staggered")
             plan.notes.append("anti_grid_detail_diag:hexa_v17_golden_skew")
+            plan.notes.append(f"anti_grid_detail_diag:signal_guided_skew_v18:{skew_count}")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
