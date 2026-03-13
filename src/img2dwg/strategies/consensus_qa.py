@@ -464,6 +464,28 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            adaptive_seed = (signals.contrast * 0.61) + (signals.edge_density * 0.39)
+            adaptive_diag_pairs = [
+                ((0.073, 0.267), (0.231, 0.451)),
+                ((0.247, 0.901), (0.413, 0.717)),
+                ((0.489, 0.137), (0.653, 0.321)),
+                ((0.721, 0.853), (0.889, 0.669)),
+                ((0.163, 0.601), (0.331, 0.785)),
+                ((0.571, 0.417), (0.739, 0.603)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(adaptive_diag_pairs):
+                direction = -1.0 if (index % 2) == 0 else 1.0
+                spread = 0.0012 + (adaptive_seed * 0.0011) + ((index % 3) * 0.00025)
+                start = (
+                    round(left + ((right - left) * (sx + (direction * spread))), 4),
+                    round(top + ((bottom - top) * (sy - (direction * spread * 0.85))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (direction * spread * 0.7))), 4),
+                    round(top + ((bottom - top) * (ey + (direction * spread * 0.9))), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")
@@ -472,6 +494,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
             plan.notes.append("anti_grid_detail_diag:octa_v16_staggered")
             plan.notes.append("anti_grid_detail_diag:hexa_v17_golden_skew")
+            plan.notes.append("anti_grid_detail_diag:hexa_v18_adaptive_seed")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
