@@ -50,6 +50,8 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             ((0.176, 0.642), (0.324, 0.491)),
             ((0.352, 0.468), (0.501, 0.617)),
             ((0.547, 0.934), (0.695, 0.783)),
+            ((0.119, 0.531), (0.268, 0.684)),
+            ((0.833, 0.603), (0.684, 0.752)),
         ]
 
         for index, ((sx, sy), (ex, ey)) in enumerate(guide_pairs):
