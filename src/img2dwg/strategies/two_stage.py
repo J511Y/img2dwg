@@ -294,20 +294,50 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 ((0.69, 0.27), (0.87, 0.45)),
                 ((0.09, 0.57), (0.27, 0.39)),
                 ((0.73, 0.91), (0.55, 0.73)),
+                ((0.16, 0.47), (0.34, 0.65)),
+                ((0.36, 0.07), (0.54, 0.25)),
+                ((0.57, 0.79), (0.75, 0.61)),
+                ((0.79, 0.36), (0.61, 0.18)),
+                ((0.23, 0.83), (0.41, 0.69)),
+                ((0.87, 0.63), (0.69, 0.49)),
             ]
-            for (sx, sy), (ex, ey) in anti_grid_spread_pairs:
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_spread_pairs):
+                offset = (index % 3) * 0.001
                 start = (
-                    round(left + ((right - left) * sx), 2),
-                    round(top + ((bottom - top) * sy), 2),
+                    round(left + ((right - left) * (sx + offset)), 3),
+                    round(top + ((bottom - top) * (sy - offset)), 3),
                 )
                 end = (
-                    round(left + ((right - left) * ex), 2),
-                    round(top + ((bottom - top) * ey), 2),
+                    round(left + ((right - left) * (ex - offset)), 3),
+                    round(top + ((bottom - top) * (ey + offset)), 3),
+                )
+                plan.segments.append((start, end))
+
+            anti_grid_irregular_pairs = [
+                ((0.037, 0.286), (0.214, 0.463)),
+                ((0.267, 0.902), (0.444, 0.729)),
+                ((0.511, 0.143), (0.688, 0.321)),
+                ((0.742, 0.842), (0.919, 0.664)),
+                ((0.184, 0.618), (0.362, 0.794)),
+                ((0.428, 0.344), (0.606, 0.522)),
+                ((0.653, 0.082), (0.831, 0.258)),
+                ((0.876, 0.556), (0.699, 0.734)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_irregular_pairs):
+                jitter = ((index % 4) - 1.5) * 0.0007
+                start = (
+                    round(left + ((right - left) * (sx + jitter)), 4),
+                    round(top + ((bottom - top) * (sy - jitter)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - jitter)), 4),
+                    round(top + ((bottom - top) * (ey + jitter)), 4),
                 )
                 plan.segments.append((start, end))
 
             plan.notes.append("anti_grid_detail_diag:on")
-            plan.notes.append("anti_grid_detail_diag:hexacosa_v11_spread")
+            plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
+            plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
