@@ -335,9 +335,30 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_debias_pairs = [
+                ((0.071, 0.237), (0.249, 0.419)),
+                ((0.301, 0.883), (0.479, 0.701)),
+                ((0.529, 0.109), (0.707, 0.291)),
+                ((0.761, 0.827), (0.939, 0.645)),
+                ((0.219, 0.541), (0.397, 0.723)),
+                ((0.447, 0.299), (0.625, 0.481)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_debias_pairs):
+                jitter = ((index % 3) - 1) * 0.0013
+                start = (
+                    round(left + ((right - left) * (sx + jitter)), 4),
+                    round(top + ((bottom - top) * (sy - jitter)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - jitter)), 4),
+                    round(top + ((bottom - top) * (ey + jitter)), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
+            plan.notes.append("anti_grid_detail_diag:hexa_v14_debias")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
