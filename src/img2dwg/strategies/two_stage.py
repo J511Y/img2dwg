@@ -93,6 +93,45 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return len(guide_pairs)
 
+    @staticmethod
+    def _debias_axis_aligned_segments(
+        *,
+        plan_segments: list[tuple[tuple[float, float], tuple[float, float]]],
+        left: float,
+        right: float,
+        top: float,
+        bottom: float,
+        max_adjusted: int = 6,
+    ) -> int:
+        span_x = max(1.0, right - left)
+        span_y = max(1.0, bottom - top)
+        base_skew = min(span_x, span_y) * 0.0024
+        adjusted = 0
+
+        for index, (start, end) in enumerate(plan_segments):
+            if adjusted >= max_adjusted:
+                break
+
+            sx, sy = start
+            ex, ey = end
+            is_vertical = abs(sx - ex) < 1e-6
+            is_horizontal = abs(sy - ey) < 1e-6
+            if not (is_vertical or is_horizontal):
+                continue
+
+            skew = base_skew * (1.0 + ((index % 3) * 0.22))
+            if is_vertical:
+                new_start = (round(sx, 4), round(sy - (skew * 0.31), 4))
+                new_end = (round(ex + skew, 4), round(ey, 4))
+            else:
+                new_start = (round(sx - (skew * 0.31), 4), round(sy, 4))
+                new_end = (round(ex, 4), round(ey + skew, 4))
+
+            plan_segments[index] = (new_start, new_end)
+            adjusted += 1
+
+        return adjusted
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -102,6 +141,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             right = plan.segments[0][1][0]
             top = plan.segments[0][0][1]
             bottom = plan.segments[2][0][1]
+            axis_debias_count = self._debias_axis_aligned_segments(
+                plan_segments=plan.segments,
+                left=left,
+                right=right,
+                top=top,
+                bottom=bottom,
+            )
+
             diag_a_start = (
                 round(left + ((right - left) * 0.3), 4),
                 round(top + ((bottom - top) * 0.35), 4),
@@ -490,6 +537,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 signals=signals,
             )
 
+            plan.notes.append(f"anti_grid_axis_debias_v23:{axis_debias_count}")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")

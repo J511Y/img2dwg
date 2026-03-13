@@ -221,3 +221,26 @@ def test_two_stage_strategy_uses_high_precision_for_primary_diagonals(tmp_path: 
     # 96x96 샘플에서 diag_a_start = (30.336, 34.752) 이어야 한다.
     # 이전 2dp 라운딩에서는 (30.34, 34.75)로 절삭되어 전략 다양성이 줄었다.
     assert (30.336, 34.752) in points
+
+
+def test_two_stage_strategy_records_axis_debias_and_reduces_axis_ratio(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    out = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "out")
+    assert out.success is True
+    assert any(note.startswith("anti_grid_axis_debias_v23:") for note in out.notes)
+
+    doc = ezdxf.readfile(str(out.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+    assert len(lines) >= 90
+
+    axis_aligned_count = 0
+    for line in lines:
+        start = line.dxf.start
+        end = line.dxf.end
+        if abs(float(start.x) - float(end.x)) < 1e-6 or abs(float(start.y) - float(end.y)) < 1e-6:
+            axis_aligned_count += 1
+
+    axis_ratio = axis_aligned_count / len(lines)
+    assert axis_ratio < 0.0566
