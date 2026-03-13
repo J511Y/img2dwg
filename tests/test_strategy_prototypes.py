@@ -49,6 +49,7 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:tetra_v17_phase_shift" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v24_entropy_weave" in note for note in out.notes)
     assert any("anti_grid_detail_diag:tetra_v25_asymmetric" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:deca_v26_lattice_breaker" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))

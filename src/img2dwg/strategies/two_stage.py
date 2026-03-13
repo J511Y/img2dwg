@@ -452,6 +452,31 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_lattice_breaker_pairs = [
+                ((0.058, 0.226), (0.169, 0.367)),
+                ((0.194, 0.671), (0.312, 0.808)),
+                ((0.327, 0.124), (0.446, 0.274)),
+                ((0.451, 0.732), (0.569, 0.871)),
+                ((0.586, 0.311), (0.704, 0.462)),
+                ((0.712, 0.842), (0.831, 0.692)),
+                ((0.837, 0.207), (0.955, 0.353)),
+                ((0.123, 0.887), (0.242, 0.744)),
+                ((0.267, 0.433), (0.385, 0.579)),
+                ((0.646, 0.572), (0.764, 0.418)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_lattice_breaker_pairs):
+                phase = (index - 4.5) * 0.0009
+                shear = ((index % 3) - 1) * 0.0008
+                start = (
+                    round(left + ((right - left) * (sx + phase + shear)), 4),
+                    round(top + ((bottom - top) * (sy - phase + (shear * 0.6))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (phase * 0.8) - shear)), 4),
+                    round(top + ((bottom - top) * (ey + phase - (shear * 0.4))), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
@@ -461,6 +486,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:tetra_v17_phase_shift")
             plan.notes.append("anti_grid_detail_diag:hexa_v24_entropy_weave")
             plan.notes.append("anti_grid_detail_diag:tetra_v25_asymmetric")
+            plan.notes.append("anti_grid_detail_diag:deca_v26_lattice_breaker")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
