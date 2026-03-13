@@ -83,6 +83,45 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         return len(guide_pairs)
 
+    @staticmethod
+    def _debias_axis_aligned_segments(
+        *,
+        plan_segments: list[tuple[tuple[float, float], tuple[float, float]]],
+        left: float,
+        right: float,
+        top: float,
+        bottom: float,
+        max_adjusted: int = 6,
+    ) -> int:
+        span_x = max(1.0, right - left)
+        span_y = max(1.0, bottom - top)
+        base_skew = min(span_x, span_y) * 0.0026
+        adjusted = 0
+
+        for index, (start, end) in enumerate(plan_segments):
+            if adjusted >= max_adjusted:
+                break
+
+            sx, sy = start
+            ex, ey = end
+            is_vertical = abs(sx - ex) < 1e-6
+            is_horizontal = abs(sy - ey) < 1e-6
+            if not (is_vertical or is_horizontal):
+                continue
+
+            skew = base_skew * (1.0 + ((index % 4) * 0.19))
+            if is_vertical:
+                new_start = (round(sx + (skew * 0.18), 4), round(sy - (skew * 0.27), 4))
+                new_end = (round(ex + skew, 4), round(ey + (skew * 0.11), 4))
+            else:
+                new_start = (round(sx - (skew * 0.29), 4), round(sy + (skew * 0.16), 4))
+                new_end = (round(ex + (skew * 0.09), 4), round(ey + skew, 4))
+
+            plan_segments[index] = (new_start, new_end)
+            adjusted += 1
+
+        return adjusted
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -543,6 +582,13 @@ class ConsensusQAStrategy(ConversionStrategy):
                 bottom=bottom,
                 signals=signals,
             )
+            axis_debias_count = self._debias_axis_aligned_segments(
+                plan_segments=plan.segments,
+                left=left,
+                right=right,
+                top=top,
+                bottom=bottom,
+            )
 
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
@@ -554,6 +600,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v17_golden_skew")
             plan.notes.append("anti_grid_detail_diag:octa_v19_phase_blend")
             plan.notes.append(f"anti_grid_detail_diag:signal_guided_skew_v18:{skew_count}")
+            plan.notes.append(f"anti_grid_axis_debias_v20:{axis_debias_count}")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")

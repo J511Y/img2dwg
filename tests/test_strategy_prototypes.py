@@ -124,6 +124,33 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert diagonal_count >= 62
 
 
+def test_consensus_strategy_records_axis_debias_and_reduces_axis_ratio(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    out = ConsensusQAStrategy().run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
+        tmp_path / "out",
+    )
+
+    assert out.success is True
+    assert any(note.startswith("anti_grid_axis_debias_v20:") for note in out.notes)
+
+    doc = ezdxf.readfile(str(out.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+    assert len(lines) >= 78
+
+    axis_aligned_count = 0
+    for line in lines:
+        start = line.dxf.start
+        end = line.dxf.end
+        if abs(float(start.x) - float(end.x)) < 1e-6 or abs(float(start.y) - float(end.y)) < 1e-6:
+            axis_aligned_count += 1
+
+    axis_ratio = axis_aligned_count / len(lines)
+    assert axis_ratio < 0.0577
+
+
 def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)

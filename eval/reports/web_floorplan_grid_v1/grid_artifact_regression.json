@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-13T19:40:57.839259+00:00",
+  "generated_at": "2026-03-13T21:09:18.401617+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -25,18 +25,18 @@
   "strategy_diagnostics": {
     "consensus_qa": {
       "avg_line_count": 104.0,
-      "avg_axis_aligned_ratio": 0.0577,
+      "avg_axis_aligned_ratio": 0.0,
       "std_axis_aligned_ratio": 0.0,
-      "avg_axis_margin_to_grid_threshold": 0.8423,
-      "avg_axis_margin_score": 84.23,
-      "max_axis_aligned_ratio": 0.0577,
-      "max_axis_margin_to_grid_threshold": 0.8423,
-      "p95_axis_aligned_ratio": 0.0577,
-      "p95_axis_margin_to_grid_threshold": 0.8423,
-      "min_axis_aligned_ratio": 0.0577,
-      "min_axis_margin_to_grid_threshold": 0.8423,
-      "avg_unique_x_count": 175.0,
-      "avg_unique_y_count": 180.0
+      "avg_axis_margin_to_grid_threshold": 0.9,
+      "avg_axis_margin_score": 90.0,
+      "max_axis_aligned_ratio": 0.0,
+      "max_axis_margin_to_grid_threshold": 0.9,
+      "p95_axis_aligned_ratio": 0.0,
+      "p95_axis_margin_to_grid_threshold": 0.9,
+      "min_axis_aligned_ratio": 0.0,
+      "min_axis_margin_to_grid_threshold": 0.9,
+      "avg_unique_x_count": 184.0,
+      "avg_unique_y_count": 189.0
     },
     "hybrid_mvp": {
       "avg_line_count": 14.0,
@@ -55,18 +55,18 @@
     },
     "two_stage_baseline": {
       "avg_line_count": 106.0,
-      "avg_axis_aligned_ratio": 0.0566,
+      "avg_axis_aligned_ratio": 0.0,
       "std_axis_aligned_ratio": 0.0,
-      "avg_axis_margin_to_grid_threshold": 0.8434,
-      "avg_axis_margin_score": 84.34,
-      "max_axis_aligned_ratio": 0.0566,
-      "max_axis_margin_to_grid_threshold": 0.8434,
-      "p95_axis_aligned_ratio": 0.0566,
-      "p95_axis_margin_to_grid_threshold": 0.8434,
-      "min_axis_aligned_ratio": 0.0566,
-      "min_axis_margin_to_grid_threshold": 0.8434,
-      "avg_unique_x_count": 194.0,
-      "avg_unique_y_count": 184.0
+      "avg_axis_margin_to_grid_threshold": 0.9,
+      "avg_axis_margin_score": 90.0,
+      "max_axis_aligned_ratio": 0.0,
+      "max_axis_margin_to_grid_threshold": 0.9,
+      "p95_axis_aligned_ratio": 0.0,
+      "p95_axis_margin_to_grid_threshold": 0.9,
+      "min_axis_aligned_ratio": 0.0,
+      "min_axis_margin_to_grid_threshold": 0.9,
+      "avg_unique_x_count": 200.0,
+      "avg_unique_y_count": 190.0
     }
   },
   "top_problematic": [],
@@ -313,9 +313,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -332,9 +332,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -351,9 +351,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -370,9 +370,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -389,9 +389,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -408,9 +408,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -427,9 +427,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -446,9 +446,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -465,9 +465,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -484,9 +484,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -503,9 +503,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -522,9 +522,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 106,
-        "axis_aligned_line_ratio": 0.0566,
-        "unique_x_count": 194,
-        "unique_y_count": 184
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 200,
+        "unique_y_count": 190
       }
     },
     {
@@ -541,9 +541,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -560,9 +560,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -579,9 +579,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -598,9 +598,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -617,9 +617,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -636,9 +636,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -655,9 +655,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -674,9 +674,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -693,9 +693,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -712,9 +712,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -731,9 +731,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     },
     {
@@ -750,9 +750,9 @@
         },
         "unique_entity_types": 1,
         "line_count": 104,
-        "axis_aligned_line_ratio": 0.0577,
-        "unique_x_count": 175,
-        "unique_y_count": 180
+        "axis_aligned_line_ratio": 0.0,
+        "unique_x_count": 184,
+        "unique_y_count": 189
       }
     }
   ],
@@ -763,13 +763,13 @@
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
         "previous": 0.0577,
-        "current": 0.0577,
-        "delta": 0.0
+        "current": 0.0,
+        "delta": -0.0577
       },
       "avg_axis_margin_to_grid_threshold": {
         "previous": 0.8423,
-        "current": 0.8423,
-        "delta": 0.0
+        "current": 0.9,
+        "delta": 0.0577
       },
       "avg_line_count": {
         "previous": 104.0,
@@ -796,13 +796,13 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0566,
-        "current": 0.0566,
+        "previous": 0.0,
+        "current": 0.0,
         "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8434,
-        "current": 0.8434,
+        "previous": 0.9,
+        "current": 0.9,
         "delta": 0.0
       },
       "avg_line_count": {
