@@ -444,6 +444,26 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_golden_skew_pairs = [
+                ((0.0618, 0.382), (0.2236, 0.5543)),
+                ((0.2846, 0.118), (0.4464, 0.2917)),
+                ((0.5179, 0.848), (0.6797, 0.6755)),
+                ((0.7361, 0.266), (0.8979, 0.4397)),
+                ((0.1297, 0.632), (0.2915, 0.4593)),
+                ((0.6033, 0.904), (0.7651, 0.7315)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_golden_skew_pairs):
+                phi_jitter = (index - 2.5) * 0.0017
+                start = (
+                    round(left + ((right - left) * (sx + phi_jitter)), 4),
+                    round(top + ((bottom - top) * (sy - (phi_jitter * 0.7))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (phi_jitter * 0.6))), 4),
+                    round(top + ((bottom - top) * (ey + phi_jitter)), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")
@@ -451,6 +471,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:tetra_v14_entropy")
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
             plan.notes.append("anti_grid_detail_diag:octa_v16_staggered")
+            plan.notes.append("anti_grid_detail_diag:hexa_v17_golden_skew")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
