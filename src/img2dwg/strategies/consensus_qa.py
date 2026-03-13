@@ -511,6 +511,30 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_phase_blend_pairs = [
+                ((0.073, 0.689), (0.244, 0.517)),
+                ((0.266, 0.111), (0.439, 0.283)),
+                ((0.488, 0.927), (0.661, 0.754)),
+                ((0.713, 0.347), (0.886, 0.521)),
+                ((0.157, 0.479), (0.331, 0.305)),
+                ((0.541, 0.862), (0.714, 0.689)),
+                ((0.804, 0.564), (0.631, 0.738)),
+                ((0.364, 0.973), (0.191, 0.801)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_phase_blend_pairs):
+                phase = (index - 3.5) * 0.0013
+                start = (
+                    round(left + ((right - left) * (sx + phase)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.8))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (phase * 0.7))), 4),
+                    round(top + ((bottom - top) * (ey + phase)), 4),
+                )
+                if abs(start[0] - end[0]) < 1e-6 or abs(start[1] - end[1]) < 1e-6:
+                    end = (round(end[0] + 0.121, 4), round(end[1] + 0.137, 4))
+                plan.segments.append((start, end))
+
             skew_count = self._append_signal_guided_skews(
                 plan_segments=plan.segments,
                 left=left,
@@ -528,6 +552,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
             plan.notes.append("anti_grid_detail_diag:octa_v16_staggered")
             plan.notes.append("anti_grid_detail_diag:hexa_v17_golden_skew")
+            plan.notes.append("anti_grid_detail_diag:octa_v19_phase_blend")
             plan.notes.append(f"anti_grid_detail_diag:signal_guided_skew_v18:{skew_count}")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
