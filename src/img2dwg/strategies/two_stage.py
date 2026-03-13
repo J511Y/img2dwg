@@ -355,10 +355,31 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_micro_jitter_pairs = [
+                ((0.083, 0.674), (0.196, 0.558)),
+                ((0.274, 0.214), (0.387, 0.326)),
+                ((0.463, 0.786), (0.576, 0.662)),
+                ((0.652, 0.372), (0.765, 0.486)),
+                ((0.218, 0.932), (0.336, 0.812)),
+                ((0.584, 0.152), (0.702, 0.268)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_micro_jitter_pairs):
+                jitter = ((index % 2) * 2 - 1) * 0.0016
+                start = (
+                    round(left + ((right - left) * (sx + jitter)), 4),
+                    round(top + ((bottom - top) * (sy - jitter)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - jitter)), 4),
+                    round(top + ((bottom - top) * (ey + jitter)), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
             plan.notes.append("anti_grid_detail_diag:hexa_v14_debias")
+            plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")

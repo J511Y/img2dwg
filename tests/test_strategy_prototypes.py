@@ -44,6 +44,7 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:hexacosa_v12_spread" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v13_irregular" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v14_debias" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:hexa_v15_micro_jitter" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
