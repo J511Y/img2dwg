@@ -574,6 +574,29 @@ class ConsensusQAStrategy(ConversionStrategy):
                     end = (round(end[0] + 0.121, 4), round(end[1] + 0.137, 4))
                 plan.segments.append((start, end))
 
+            anti_grid_entropy_weave_pairs = [
+                ((0.028, 0.154), (0.211, 0.348)),
+                ((0.347, 0.062), (0.529, 0.247)),
+                ((0.582, 0.941), (0.764, 0.756)),
+                ((0.915, 0.289), (0.731, 0.473)),
+                ((0.143, 0.889), (0.327, 0.703)),
+                ((0.661, 0.428), (0.844, 0.612)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_entropy_weave_pairs):
+                phase = (index - 2.5) * 0.0015
+                weave = 0.0008 if index % 2 == 0 else -0.0008
+                start = (
+                    round(left + ((right - left) * (sx + phase + weave)), 4),
+                    round(top + ((bottom - top) * (sy - phase + weave)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase - weave)), 4),
+                    round(top + ((bottom - top) * (ey + phase - weave)), 4),
+                )
+                if abs(start[0] - end[0]) < 1e-6 or abs(start[1] - end[1]) < 1e-6:
+                    end = (round(end[0] + 0.149, 4), round(end[1] + 0.131, 4))
+                plan.segments.append((start, end))
+
             skew_count = self._append_signal_guided_skews(
                 plan_segments=plan.segments,
                 left=left,
@@ -599,6 +622,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:octa_v16_staggered")
             plan.notes.append("anti_grid_detail_diag:hexa_v17_golden_skew")
             plan.notes.append("anti_grid_detail_diag:octa_v19_phase_blend")
+            plan.notes.append("anti_grid_detail_diag:hexa_v21_entropy_weave")
             plan.notes.append(f"anti_grid_detail_diag:signal_guided_skew_v18:{skew_count}")
             plan.notes.append(f"anti_grid_axis_debias_v20:{axis_debias_count}")
 
