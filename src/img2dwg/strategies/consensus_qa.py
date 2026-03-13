@@ -317,11 +317,17 @@ class ConsensusQAStrategy(ConversionStrategy):
 
             anti_grid_spread_pairs = [
                 ((0.11, 0.41), (0.29, 0.59)),
-                ((0.39, 0.13), (0.57, 0.31)),
-                ((0.63, 0.71), (0.81, 0.89)),
-                ((0.17, 0.87), (0.35, 0.69)),
-                ((0.71, 0.21), (0.89, 0.39)),
-                ((0.43, 0.79), (0.61, 0.61)),
+                ((0.39, 0.13), (0.58, 0.30)),
+                ((0.63, 0.71), (0.82, 0.87)),
+                ((0.17, 0.87), (0.36, 0.68)),
+                ((0.71, 0.21), (0.90, 0.38)),
+                ((0.43, 0.79), (0.61, 0.60)),
+                ((0.08, 0.56), (0.27, 0.74)),
+                ((0.24, 0.18), (0.46, 0.33)),
+                ((0.54, 0.66), (0.76, 0.83)),
+                ((0.69, 0.49), (0.88, 0.64)),
+                ((0.14, 0.28), (0.33, 0.45)),
+                ((0.47, 0.24), (0.66, 0.41)),
             ]
             for (sx, sy), (ex, ey) in anti_grid_spread_pairs:
                 start = (
@@ -335,7 +341,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 plan.segments.append((start, end))
 
             plan.notes.append("anti_grid_detail_diag:on")
-            plan.notes.append("anti_grid_detail_diag:octacosa_v10_spread")
+            plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
