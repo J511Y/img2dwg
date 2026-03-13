@@ -314,8 +314,28 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.segments.append((diag_z_start, diag_z_end))
             plan.segments.append((diag_aa_start, diag_aa_end))
             plan.segments.append((diag_ab_start, diag_ab_end))
+
+            anti_grid_spread_pairs = [
+                ((0.11, 0.41), (0.29, 0.59)),
+                ((0.39, 0.13), (0.57, 0.31)),
+                ((0.63, 0.71), (0.81, 0.89)),
+                ((0.17, 0.87), (0.35, 0.69)),
+                ((0.71, 0.21), (0.89, 0.39)),
+                ((0.43, 0.79), (0.61, 0.61)),
+            ]
+            for (sx, sy), (ex, ey) in anti_grid_spread_pairs:
+                start = (
+                    round(left + ((right - left) * sx), 2),
+                    round(top + ((bottom - top) * sy), 2),
+                )
+                end = (
+                    round(left + ((right - left) * ex), 2),
+                    round(top + ((bottom - top) * ey), 2),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
-            plan.notes.append("anti_grid_detail_diag:octacosa_v9")
+            plan.notes.append("anti_grid_detail_diag:octacosa_v10_spread")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
