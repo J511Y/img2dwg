@@ -340,8 +340,31 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_irregular_pairs = [
+                ((0.057, 0.314), (0.236, 0.492)),
+                ((0.278, 0.887), (0.456, 0.709)),
+                ((0.496, 0.151), (0.674, 0.328)),
+                ((0.739, 0.844), (0.917, 0.667)),
+                ((0.171, 0.604), (0.349, 0.782)),
+                ((0.414, 0.356), (0.592, 0.533)),
+                ((0.647, 0.098), (0.825, 0.274)),
+                ((0.862, 0.541), (0.684, 0.719)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_irregular_pairs):
+                jitter = ((index % 4) - 1.5) * 0.0009
+                start = (
+                    round(left + ((right - left) * (sx + jitter)), 4),
+                    round(top + ((bottom - top) * (sy - jitter)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - jitter)), 4),
+                    round(top + ((bottom - top) * (ey + jitter)), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
+            plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
