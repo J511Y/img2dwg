@@ -145,6 +145,52 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_coordinate_diversity_microsegments(plan: object, signals: object) -> int:
+        segments = plan.segments
+        if len(segments) < 4:
+            return 0
+
+        left = segments[0][0][0]
+        right = segments[0][1][0]
+        top = segments[0][0][1]
+        bottom = segments[2][0][1]
+        span_x = right - left
+        span_y = bottom - top
+        if abs(span_x) < 1e-9 or abs(span_y) < 1e-9:
+            return 0
+
+        contrast = max(0.0, min(1.0, float(getattr(signals, "contrast", 0.0))))
+        edge_density = max(0.0, min(1.0, float(getattr(signals, "edge_density", 0.0))))
+        jitter = 0.0012 + (contrast * 0.0011) + (edge_density * 0.0007)
+
+        anchors = [
+            ((0.0813, 0.1827), (0.2369, 0.3471)),
+            ((0.3179, 0.9418), (0.4726, 0.7864)),
+            ((0.5634, 0.1129), (0.7191, 0.2687)),
+            ((0.7942, 0.8573), (0.9487, 0.7019)),
+            ((0.1376, 0.6415), (0.2924, 0.8068)),
+            ((0.6298, 0.2916), (0.7849, 0.4552)),
+        ]
+
+        appended = 0
+        for index, ((sx, sy), (ex, ey)) in enumerate(anchors):
+            phase = (index - 2.5) * jitter
+            wave = ((index % 2) * 2 - 1) * (jitter * 0.73)
+            drift = ((index % 3) - 1) * (jitter * 0.41)
+            start = (
+                round(left + (span_x * (sx + phase + wave + drift)), 4),
+                round(top + (span_y * (sy - (phase * 0.69) + wave - drift)), 4),
+            )
+            end = (
+                round(left + (span_x * (ex - phase - (wave * 0.79) - drift)), 4),
+                round(top + (span_y * (ey + (phase * 0.69) - wave + drift)), 4),
+            )
+            segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -692,6 +738,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 plan.segments.append((start, end))
 
             entropy_segments_added = self._inject_signal_entropy_segments(plan, signals)
+            diversity_segments_added = self._inject_coordinate_diversity_microsegments(plan, signals)
             residual_axis_debias_applied = self._debias_residual_axis_aligned_segments(
                 plan,
                 start_index=seed_segment_count,
@@ -717,6 +764,8 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:tetra_v31_prime_lattice")
             if entropy_segments_added:
                 plan.notes.append(f"anti_grid_detail_diag:octa_v30_signal_entropy:{entropy_segments_added}")
+            if diversity_segments_added:
+                plan.notes.append(f"anti_grid_detail_diag:hexa_v32_coord_diversity:{diversity_segments_added}")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
