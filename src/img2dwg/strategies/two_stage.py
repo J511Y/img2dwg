@@ -64,6 +64,43 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         return touched
 
     @staticmethod
+    def _append_quasi_lattice_scatter_pack(
+        plan: object,
+        *,
+        left: float,
+        right: float,
+        top: float,
+        bottom: float,
+    ) -> int:
+        if right <= left or bottom <= top:
+            return 0
+
+        quasi_lattice_pairs = [
+            ((0.0813, 0.5291), (0.2394, 0.7018)),
+            ((0.3279, 0.1185), (0.4868, 0.2927)),
+            ((0.5742, 0.9031), (0.7333, 0.7278)),
+            ((0.8198, 0.2846), (0.6611, 0.4583)),
+            ((0.1462, 0.3627), (0.3044, 0.5369)),
+            ((0.6947, 0.6124), (0.8536, 0.4382)),
+        ]
+
+        for index, ((sx, sy), (ex, ey)) in enumerate(quasi_lattice_pairs):
+            phase = (((index + 3) * 1.61803398875) % 1.0) - 0.5
+            weave = ((index % 2) * 2 - 1) * 0.0009
+            drift = ((index % 3) - 1) * 0.0006
+            start = (
+                round(left + ((right - left) * (sx + (phase * 0.0012) + weave + drift)), 4),
+                round(top + ((bottom - top) * (sy - (phase * 0.0010) - weave + drift)), 4),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.0011) - (weave * 0.8) - drift)), 4),
+                round(top + ((bottom - top) * (ey + (phase * 0.0009) + (weave * 0.8) - drift)), 4),
+            )
+            plan.segments.append((start, end))
+
+        return len(quasi_lattice_pairs)
+
+    @staticmethod
     def _inject_coordinate_entropy(plan: object, start_index: int = 0) -> int:
         segments = plan.segments
         if not segments or start_index >= len(segments):
@@ -82,6 +119,87 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             touched += 1
 
         return touched
+
+    @staticmethod
+    def _inject_axis_escape_microsegments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        adaptive = 0.00108 + (signals.edge_density * 0.00061) + (signals.contrast * 0.00049)
+        pairs = [
+            (0.0273, 0.3661, 0.1924, 0.5337),
+            (0.2419, 0.9448, 0.4066, 0.7782),
+            (0.4746, 0.0527, 0.6398, 0.2209),
+            (0.7232, 0.8621, 0.8886, 0.6947),
+            (0.1194, 0.6233, 0.2848, 0.7906),
+            (0.5561, 0.4217, 0.7215, 0.5899),
+            (0.9073, 0.2588, 0.7417, 0.4272),
+            (0.3364, 0.1439, 0.5018, 0.3114),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 1) * phi) % 1.0 - 0.5) * adaptive
+            weave = ((index % 3) - 1) * (adaptive * 0.67)
+            shear = ((index % 2) * 2 - 1) * (adaptive * 0.49)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + shear)), 4),
+                round(top + ((bottom - top) * (sy - (phase * 0.76) + weave - shear)), 4),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.72) - weave - shear)), 4),
+                round(top + ((bottom - top) * (ey + phase - (weave * 0.68) + shear)), 4),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
+    @staticmethod
+    def _inject_axis_escape_entropy_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        sqrt2 = 1.41421356237
+        adaptive = 0.00103 + (signals.edge_density * 0.00057) + (signals.contrast * 0.00053)
+        pairs = [
+            (0.0416, 0.5164, 0.2091, 0.6785),
+            (0.2867, 0.0861, 0.4523, 0.2514),
+            (0.5345, 0.9182, 0.7011, 0.7543),
+            (0.7873, 0.3249, 0.6218, 0.4896),
+            (0.1532, 0.7417, 0.3194, 0.5771),
+            (0.6291, 0.1795, 0.7948, 0.3442),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 1) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 2) * sqrt2) % 1.0 - 0.5) * (adaptive * 0.89)
+            shear = ((index % 3) - 1) * (adaptive * 0.63)
+            start = (
+                round(left + ((right - left) * (sx + phase + shear)), 4),
+                round(top + ((bottom - top) * (sy - warp + (shear * 0.72))), 4),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.71) - shear)), 4),
+                round(top + ((bottom - top) * (ey + warp - (shear * 0.65))), 4),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
 
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -561,12 +679,29 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            quasi_lattice_touched = self._append_quasi_lattice_scatter_pack(
+                plan,
+                left=left,
+                right=right,
+                top=top,
+                bottom=bottom,
+            )
+            axis_escape_micro_touched = self._inject_axis_escape_microsegments(plan, signals)
+            axis_escape_entropy_touched = self._inject_axis_escape_entropy_segments(plan, signals)
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v1")
             if entropy_touched:
-                plan.notes.append(f"anti_grid_detail_diag:entropy_coordinate_lift_v38:{entropy_touched}")
+                plan.notes.append(f"anti_grid_detail_diag:entropy_coordinate_lift_v41:{entropy_touched}")
+            if axis_escape_micro_touched:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v42_axis_escape_micro:{axis_escape_micro_touched}"
+                )
+            if axis_escape_entropy_touched:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v43_axis_escape_entropy:{axis_escape_entropy_touched}"
+                )
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
@@ -578,6 +713,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:tetra_v25_asymmetric")
             plan.notes.append("anti_grid_detail_diag:octa_v26_counterphase")
             plan.notes.append("anti_grid_detail_diag:deca_v27_counterphase_plus")
+            if quasi_lattice_touched:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v41_quasi_lattice_scatter:{quasi_lattice_touched}"
+                )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
