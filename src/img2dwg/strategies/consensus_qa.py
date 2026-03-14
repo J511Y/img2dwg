@@ -118,6 +118,46 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_residual_blue_noise_phase_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        silver = 2.41421356237
+        adaptive = 0.00102 + (signals.edge_density * 0.00063) + (signals.contrast * 0.00051)
+        anchors = [
+            (0.0523, 0.4729, 0.2178, 0.6441),
+            (0.2764, 0.9386, 0.4435, 0.7618),
+            (0.5196, 0.0742, 0.6847, 0.2486),
+            (0.7649, 0.8227, 0.5981, 0.6485),
+            (0.1468, 0.6114, 0.3139, 0.7862),
+            (0.6482, 0.1973, 0.8144, 0.3711),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(anchors):
+            phase = (((index + 1) * phi) % 1.0 - 0.5) * adaptive
+            drift = (((index + 2) * silver) % 1.0 - 0.5) * (adaptive * 0.86)
+            skew = ((index % 4) - 1.5) * (adaptive * 0.57)
+            start = (
+                round(left + ((right - left) * (sx + phase + skew)), 5),
+                round(top + ((bottom - top) * (sy - drift + (skew * 0.72))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.69) - skew)), 5),
+                round(top + ((bottom - top) * (ey + drift - (skew * 0.64))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -717,6 +757,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 axis_escape_added += 1
 
             irrational_subpixel_added = self._inject_irrational_subpixel_segments(plan, signals)
+            residual_blue_noise_added = self._inject_residual_blue_noise_phase_segments(plan, signals)
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
@@ -744,6 +785,10 @@ class ConsensusQAStrategy(ConversionStrategy):
             if irrational_subpixel_added:
                 plan.notes.append(
                     f"anti_grid_detail_diag:octa_v32_irrational_subpixel:{irrational_subpixel_added}"
+                )
+            if residual_blue_noise_added:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v33_residual_blue_noise_phase:{residual_blue_noise_added}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
