@@ -552,6 +552,25 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_phase_entropy_pairs = [
+                ((0.0371, 0.7063), (0.1927, 0.5489)),
+                ((0.2842, 0.0947), (0.4416, 0.2521)),
+                ((0.6183, 0.8734), (0.7748, 0.7166)),
+                ((0.9039, 0.3578), (0.7462, 0.5144)),
+            ]
+            phase_gain = 0.001 + (adaptive_seed * 0.0012)
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_phase_entropy_pairs):
+                phase = (index - 1.5) * phase_gain
+                start = (
+                    round(left + ((right - left) * (sx + phase)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.8))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (phase * 0.75))), 4),
+                    round(top + ((bottom - top) * (ey + phase)), 4),
+                )
+                plan.segments.append((start, end))
+
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
             plan.notes.append("anti_grid_detail_diag:on")
@@ -564,6 +583,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v17_golden_skew")
             plan.notes.append("anti_grid_detail_diag:deca_v19_precision_scatter")
             plan.notes.append("anti_grid_detail_diag:hexa_v18_adaptive_seed")
+            plan.notes.append("anti_grid_detail_diag:tetra_v25_phase_entropy")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
