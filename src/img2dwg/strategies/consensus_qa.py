@@ -646,6 +646,34 @@ class ConsensusQAStrategy(ConversionStrategy):
                 plan.segments.append((start, end))
                 coord_diversity_added += 1
 
+            anti_grid_axis_escape_phase_pairs = [
+                ((0.0316, 0.1842), (0.1879, 0.3468)),
+                ((0.2134, 0.9055), (0.3681, 0.7423)),
+                ((0.4462, 0.0617), (0.6025, 0.2244)),
+                ((0.6813, 0.7968), (0.8369, 0.6331)),
+                ((0.0975, 0.6249), (0.2526, 0.7872)),
+                ((0.5198, 0.4187), (0.6744, 0.5816)),
+                ((0.7581, 0.1394), (0.9135, 0.3018)),
+                ((0.2876, 0.5183), (0.4421, 0.6815)),
+            ]
+            axis_escape_added = 0
+            axis_escape_gain = 0.0014 + (adaptive_seed * 0.0012)
+            axis_escape_shear = 0.00061 + (adaptive_seed * 0.00027)
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_axis_escape_phase_pairs):
+                phase = (((index + 5) * phi) % 1.0 - 0.5) * axis_escape_gain
+                stagger = ((index % 4) - 1.5) * (axis_escape_gain * 0.54)
+                skew = (1.0 if index % 2 else -1.0) * axis_escape_shear
+                start = (
+                    round(left + ((right - left) * (sx + phase + stagger + skew)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.81) + stagger - skew)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (phase * 0.67) - stagger - skew)), 4),
+                    round(top + ((bottom - top) * (ey + phase - (stagger * 0.75) + skew)), 4),
+                )
+                plan.segments.append((start, end))
+                axis_escape_added += 1
+
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
             plan.notes.append("anti_grid_detail_diag:on")
@@ -664,6 +692,10 @@ class ConsensusQAStrategy(ConversionStrategy):
             if coord_diversity_added:
                 plan.notes.append(
                     f"anti_grid_detail_diag:octa_v28_coord_diversity:{coord_diversity_added}"
+                )
+            if axis_escape_added:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:octa_v31_axis_escape_phase:{axis_escape_added}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
