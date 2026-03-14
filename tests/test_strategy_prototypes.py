@@ -67,6 +67,9 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
         "anti_grid_detail_diag:dodeca_v36_aperiodic_coordinate_boost:14" in note
         for note in out.notes
     )
+    assert any(
+        "anti_grid_detail_diag:octa_v37_phase_shift_lattice:8" in note for note in out.notes
+    )
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -195,6 +198,31 @@ def test_two_stage_aperiodic_coordinate_boost_adds_non_axis_segments() -> None:
     rounded_y = {round(coord, 3) for start, end in injected for coord in (start[1], end[1])}
     assert len(rounded_x) >= 20
     assert len(rounded_y) >= 20
+
+
+def test_two_stage_phase_shift_lattice_breakers_expand_coordinate_diversity() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.69, edge_density=0.72)
+
+    appended = TwoStageBaselineStrategy._inject_phase_shift_lattice_breakers(plan, signals)
+
+    assert appended == 8
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 3) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 3) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 14
+    assert len(rounded_y) >= 14
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:

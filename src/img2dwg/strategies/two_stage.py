@@ -230,6 +230,51 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return len(anchors)
 
+    @staticmethod
+    def _inject_phase_shift_lattice_breakers(plan: object, signals: object) -> int:
+        segments = plan.segments
+        if len(segments) < 4:
+            return 0
+
+        left = min(min(start[0], end[0]) for start, end in segments)
+        right = max(max(start[0], end[0]) for start, end in segments)
+        top = min(min(start[1], end[1]) for start, end in segments)
+        bottom = max(max(start[1], end[1]) for start, end in segments)
+        span_x = max(right - left, 1.0)
+        span_y = max(bottom - top, 1.0)
+
+        contrast = float(getattr(signals, "contrast", 0.5))
+        edge_density = float(getattr(signals, "edge_density", 0.5))
+        gain = 0.001 + (contrast * 0.0009) + (edge_density * 0.0012)
+
+        anchors = [
+            ((0.0234, 0.5127), (0.1891, 0.6794)),
+            ((0.2718, 0.9472), (0.4387, 0.7813)),
+            ((0.5249, 0.0628), (0.6916, 0.2285)),
+            ((0.7473, 0.8739), (0.9148, 0.7072)),
+            ((0.1362, 0.7023), (0.3028, 0.8686)),
+            ((0.6041, 0.3319), (0.7715, 0.4974)),
+            ((0.8927, 0.1873), (0.7264, 0.3528)),
+            ((0.3615, 0.1246), (0.5279, 0.2897)),
+        ]
+
+        phi = 1.61803398875
+        for idx, ((sx, sy), (ex, ey)) in enumerate(anchors):
+            spiral = (((idx + 7) * phi) % 1.0 - 0.5) * gain
+            weave = ((idx % 3) - 1) * (gain * 0.71)
+            drift = ((idx % 2) * 2 - 1) * (gain * 0.49)
+            start = (
+                round(left + (span_x * (sx + spiral + weave + drift)), 4),
+                round(top + (span_y * (sy - (spiral * 0.74) + weave - drift)), 4),
+            )
+            end = (
+                round(left + (span_x * (ex - (spiral * 0.66) - weave - drift)), 4),
+                round(top + (span_y * (ey + spiral - (weave * 0.68) + drift)), 4),
+            )
+            segments.append((start, end))
+
+        return len(anchors)
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -836,6 +881,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             axis_escape_added = self._inject_axis_escape_microsegments(plan, signals)
             coordinate_scatter_added = self._inject_coordinate_scatter_microsegments(plan, signals)
             aperiodic_boost_added = self._inject_aperiodic_coordinate_boost(plan, signals)
+            phase_shift_lattice_added = self._inject_phase_shift_lattice_breakers(plan, signals)
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v1")
@@ -866,6 +912,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             )
             plan.notes.append(
                 f"anti_grid_detail_diag:dodeca_v36_aperiodic_coordinate_boost:{aperiodic_boost_added}"
+            )
+            plan.notes.append(
+                f"anti_grid_detail_diag:octa_v37_phase_shift_lattice:{phase_shift_lattice_added}"
             )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
