@@ -264,6 +264,8 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             ((0.68891, 0.88732), (0.84328, 0.73216)),
             ((0.12147, 0.70583), (0.27659, 0.86104)),
             ((0.91263, 0.27854), (0.75684, 0.43397)),
+            ((0.46352, 0.01973), (0.61894, 0.17381)),
+            ((0.95841, 0.52764), (0.80316, 0.68295)),
         ]
 
         phi = 1.61803398875
@@ -833,7 +835,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 plan.segments.append((start, end))
 
             entropy_segments_added = self._inject_signal_entropy_segments(plan, signals)
-            diversity_segments_added = self._inject_coordinate_diversity_microsegments(plan, signals)
+            diversity_segments_added = self._inject_coordinate_diversity_microsegments(
+                plan, signals
+            )
             irrational_segments_added = self._inject_irrational_subpixel_segments(plan, signals)
             axis_escape_segments_added = self._inject_axis_escape_microsegments(plan, signals)
             residual_axis_debias_applied = self._debias_residual_axis_aligned_segments(
@@ -860,9 +864,13 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:octa_v29_quasi_random")
             plan.notes.append("anti_grid_detail_diag:tetra_v31_prime_lattice")
             if entropy_segments_added:
-                plan.notes.append(f"anti_grid_detail_diag:octa_v30_signal_entropy:{entropy_segments_added}")
+                plan.notes.append(
+                    f"anti_grid_detail_diag:octa_v30_signal_entropy:{entropy_segments_added}"
+                )
             if diversity_segments_added:
-                plan.notes.append(f"anti_grid_detail_diag:hexa_v32_coord_diversity:{diversity_segments_added}")
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v32_coord_diversity:{diversity_segments_added}"
+                )
             if irrational_segments_added:
                 plan.notes.append(
                     f"anti_grid_detail_diag:tetra_v33_irrational_subpixel:{irrational_segments_added}"
