@@ -36,6 +36,42 @@ class ConsensusQAStrategy(ConversionStrategy):
 
     _min_consensus = 0.35
 
+    @staticmethod
+    def _debias_axis_aligned_seed_segments(plan: object, seed_segment_count: int) -> bool:
+        if seed_segment_count <= 0:
+            return False
+
+        segments = plan.segments
+        if not segments:
+            return False
+
+        x_span = abs(segments[0][1][0] - segments[0][0][0]) if len(segments) >= 1 else 0.0
+        y_span = abs(segments[2][0][1] - segments[0][0][1]) if len(segments) >= 3 else 0.0
+        base_span = max(x_span, y_span, 1.0)
+        skew = max(0.08, round(base_span * 0.0017, 4))
+
+        touched = False
+        for index in range(min(seed_segment_count, len(segments))):
+            (sx, sy), (ex, ey) = segments[index]
+            if abs(sx - ex) < 1e-9:
+                shift_x = ((index % 5) - 2) * skew
+                shift_y = ((index % 3) - 1) * (skew * 0.55)
+                segments[index] = (
+                    (round(sx, 4), round(sy, 4)),
+                    (round(ex + shift_x, 4), round(ey + shift_y, 4)),
+                )
+                touched = True
+            elif abs(sy - ey) < 1e-9:
+                shift_y = ((index % 5) - 2) * skew
+                shift_x = ((index % 3) - 1) * (skew * 0.55)
+                segments[index] = (
+                    (round(sx, 4), round(sy, 4)),
+                    (round(ex + shift_x, 4), round(ey + shift_y, 4)),
+                )
+                touched = True
+
+        return touched
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -57,6 +93,8 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         preset = self._high_confidence_preset if consensus_score >= 0.75 else self._base_preset
         plan = build_vector_plan(signals, preset)
+        seed_segment_count = len(plan.segments)
+        axis_debias_applied = self._debias_axis_aligned_seed_segments(plan, seed_segment_count)
         if len(plan.segments) >= 4:
             left = plan.segments[0][0][0]
             right = plan.segments[0][1][0]
@@ -486,6 +524,8 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            if axis_debias_applied:
+                plan.notes.append("anti_grid_axis_debias:v2")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")

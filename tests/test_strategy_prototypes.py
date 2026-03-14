@@ -111,6 +111,7 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     )
 
     assert out.success is True
+    assert any("anti_grid_axis_debias:v2" in note for note in out.notes)
     assert any("anti_grid_detail_diag:on" in note for note in out.notes)
     assert any("anti_grid_detail_diag:dodeca_v11_spread" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v12_irregular" in note for note in out.notes)
@@ -130,6 +131,13 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
         if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
     assert diagonal_count >= 62
+
+    seed_non_axis_count = sum(
+        1
+        for line in lines[:6]
+        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
+    )
+    assert seed_non_axis_count >= 2
 
 
 def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Path) -> None:
