@@ -97,6 +97,54 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return touched
 
+    @staticmethod
+    def _inject_signal_entropy_segments(plan: object, signals: object) -> int:
+        segments = plan.segments
+        if len(segments) < 4:
+            return 0
+
+        left = segments[0][0][0]
+        right = segments[0][1][0]
+        top = segments[0][0][1]
+        bottom = segments[2][0][1]
+        span_x = right - left
+        span_y = bottom - top
+        if abs(span_x) < 1e-9 or abs(span_y) < 1e-9:
+            return 0
+
+        contrast = max(0.0, min(1.0, float(getattr(signals, "contrast", 0.0))))
+        edge_density = max(0.0, min(1.0, float(getattr(signals, "edge_density", 0.0))))
+        phase = (contrast * 0.021) + (edge_density * 0.017) + 0.003
+        twist = (edge_density * 0.013) + 0.002
+
+        anchors = [
+            ((0.061, 0.214), (0.239, 0.396)),
+            ((0.286, 0.902), (0.462, 0.724)),
+            ((0.524, 0.118), (0.698, 0.294)),
+            ((0.766, 0.834), (0.938, 0.656)),
+            ((0.173, 0.634), (0.348, 0.808)),
+            ((0.614, 0.318), (0.786, 0.492)),
+            ((0.102, 0.482), (0.278, 0.658)),
+            ((0.842, 0.226), (0.666, 0.402)),
+        ]
+
+        appended = 0
+        for index, ((sx, sy), (ex, ey)) in enumerate(anchors):
+            drift = (index - 3.5) * phase
+            wobble = ((index % 2) * 2 - 1) * twist
+            start = (
+                round(left + (span_x * (sx + drift + wobble)), 4),
+                round(top + (span_y * (sy - (drift * 0.72) + wobble)), 4),
+            )
+            end = (
+                round(left + (span_x * (ex - drift - (wobble * 0.85))), 4),
+                round(top + (span_y * (ey + (drift * 0.72) - wobble)), 4),
+            )
+            segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -622,6 +670,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            entropy_segments_added = self._inject_signal_entropy_segments(plan, signals)
             residual_axis_debias_applied = self._debias_residual_axis_aligned_segments(
                 plan,
                 start_index=seed_segment_count,
@@ -644,6 +693,8 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:deca_v27_counterphase_plus")
             plan.notes.append("anti_grid_detail_diag:hexa_v28_frequency_break")
             plan.notes.append("anti_grid_detail_diag:octa_v29_quasi_random")
+            if entropy_segments_added:
+                plan.notes.append(f"anti_grid_detail_diag:octa_v30_signal_entropy:{entropy_segments_added}")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
