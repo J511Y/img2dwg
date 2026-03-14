@@ -49,16 +49,18 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:tetra_v17_phase_shift" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v24_entropy_weave" in note for note in out.notes)
     assert any("anti_grid_detail_diag:tetra_v25_asymmetric" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:octa_v26_counterphase" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:deca_v27_counterphase_plus" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) >= 64
+    assert len(lines) >= 72
     diagonal_count = sum(
         1
         for line in lines
         if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
-    assert diagonal_count >= 32
+    assert diagonal_count >= 40
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
