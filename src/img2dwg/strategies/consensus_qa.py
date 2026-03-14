@@ -615,6 +615,33 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_coord_diversity_pairs = [
+                ((0.0183, 0.4369), (0.1637, 0.5914)),
+                ((0.2428, 0.9671), (0.4016, 0.8049)),
+                ((0.4874, 0.0476), (0.6459, 0.2088)),
+                ((0.7281, 0.8763), (0.8868, 0.7135)),
+                ((0.1142, 0.6558), (0.2727, 0.8172)),
+                ((0.5623, 0.3846), (0.7208, 0.5483)),
+                ((0.9034, 0.2617), (0.7449, 0.4234)),
+                ((0.3365, 0.1374), (0.4952, 0.3029)),
+            ]
+            coord_diversity_gain = 0.0012 + (adaptive_seed * 0.0011)
+            coord_diversity_added = 0
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_coord_diversity_pairs):
+                phase = (((index + 3) * phi) % 1.0 - 0.5) * coord_diversity_gain
+                weave = ((index % 3) - 1) * (coord_diversity_gain * 0.77)
+                shear = ((index % 2) * 2 - 1) * (0.00043 + (adaptive_seed * 0.00031))
+                start = (
+                    round(left + ((right - left) * (sx + phase + weave + shear)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.73) + weave - shear)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (phase * 0.68) - weave - shear)), 4),
+                    round(top + ((bottom - top) * (ey + phase - (weave * 0.71) + shear)), 4),
+                )
+                plan.segments.append((start, end))
+                coord_diversity_added += 1
+
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
             plan.notes.append("anti_grid_detail_diag:on")
@@ -630,6 +657,10 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:tetra_v25_phase_entropy")
             plan.notes.append("anti_grid_detail_diag:tetra_v26_aperiodic_micro")
             plan.notes.append("anti_grid_detail_diag:hexa_v27_blue_noise")
+            if coord_diversity_added:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:octa_v28_coord_diversity:{coord_diversity_added}"
+                )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")

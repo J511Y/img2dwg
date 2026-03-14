@@ -150,17 +150,31 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:tetra_v25_phase_entropy" in note for note in out.notes)
     assert any("anti_grid_detail_diag:tetra_v26_aperiodic_micro" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v27_blue_noise" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:octa_v28_coord_diversity:8" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) >= 110
+    assert len(lines) >= 118
     diagonal_count = sum(
         1
         for line in lines
         if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6
         and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
-    assert diagonal_count >= 62
+    assert diagonal_count >= 70
+
+    rounded_x = {
+        round(coord, 3)
+        for line in lines
+        for coord in (line.dxf.start.x, line.dxf.end.x)
+    }
+    rounded_y = {
+        round(coord, 3)
+        for line in lines
+        for coord in (line.dxf.start.y, line.dxf.end.y)
+    }
+    assert len(rounded_x) >= 214
+    assert len(rounded_y) >= 220
 
 
 def test_consensus_strategy_seed_debias_diversifies_seed_coordinates(tmp_path: Path) -> None:
