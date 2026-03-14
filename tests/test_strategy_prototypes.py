@@ -62,6 +62,7 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
         "anti_grid_detail_diag:tetra_v33_irrational_subpixel:4" in note for note in out.notes
     )
     assert any("anti_grid_detail_diag:hexa_v34_axis_escape_micro:8" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:deca_v35_coordinate_scatter:10" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -140,6 +141,31 @@ def test_two_stage_axis_escape_microsegments_add_eight_non_axis_segments() -> No
     rounded_y = {round(coord, 3) for start, end in injected for coord in (start[1], end[1])}
     assert len(rounded_x) >= 14
     assert len(rounded_y) >= 14
+
+
+def test_two_stage_coordinate_scatter_microsegments_expand_coordinate_diversity() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.71, edge_density=0.63)
+
+    appended = TwoStageBaselineStrategy._inject_coordinate_scatter_microsegments(plan, signals)
+
+    assert appended == 10
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 3) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 3) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 18
+    assert len(rounded_y) >= 18
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:

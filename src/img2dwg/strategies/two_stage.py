@@ -132,6 +132,53 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return len(anchors)
 
+    @staticmethod
+    def _inject_coordinate_scatter_microsegments(plan: object, signals: object) -> int:
+        segments = plan.segments
+        if len(segments) < 4:
+            return 0
+
+        left = min(min(start[0], end[0]) for start, end in segments)
+        right = max(max(start[0], end[0]) for start, end in segments)
+        top = min(min(start[1], end[1]) for start, end in segments)
+        bottom = max(max(start[1], end[1]) for start, end in segments)
+        span_x = max(right - left, 1.0)
+        span_y = max(bottom - top, 1.0)
+
+        contrast = float(getattr(signals, "contrast", 0.5))
+        edge_density = float(getattr(signals, "edge_density", 0.5))
+        energy = 0.001 + (contrast * 0.0011) + (edge_density * 0.0009)
+
+        anchors = [
+            ((0.0273, 0.4419), (0.1914, 0.6072)),
+            ((0.2337, 0.9521), (0.3985, 0.7894)),
+            ((0.4861, 0.0536), (0.6518, 0.2197)),
+            ((0.7134, 0.8845), (0.8792, 0.7211)),
+            ((0.1189, 0.6317), (0.2836, 0.7968)),
+            ((0.5416, 0.3728), (0.7079, 0.5374)),
+            ((0.8673, 0.2461), (0.7027, 0.4125)),
+            ((0.3468, 0.1294), (0.5127, 0.2958)),
+            ((0.0795, 0.7423), (0.2438, 0.9076)),
+            ((0.7924, 0.1067), (0.9569, 0.2712)),
+        ]
+
+        phi = 1.61803398875
+        for idx, ((sx, sy), (ex, ey)) in enumerate(anchors):
+            phase = (((idx + 1) * phi) % 1.0 - 0.5) * energy
+            weave = ((idx % 3) - 1) * (energy * 0.77)
+            bias = ((idx % 2) * 2 - 1) * (energy * 0.53)
+            start = (
+                round(left + (span_x * (sx + phase + weave + bias)), 4),
+                round(top + (span_y * (sy - (phase * 0.74) + weave - bias)), 4),
+            )
+            end = (
+                round(left + (span_x * (ex - (phase * 0.69) - weave - bias)), 4),
+                round(top + (span_y * (ey + phase - (weave * 0.71) + bias)), 4),
+            )
+            segments.append((start, end))
+
+        return len(anchors)
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -736,6 +783,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 plan.segments.append((start, end))
 
             axis_escape_added = self._inject_axis_escape_microsegments(plan, signals)
+            coordinate_scatter_added = self._inject_coordinate_scatter_microsegments(plan, signals)
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v1")
@@ -761,6 +809,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 f"anti_grid_detail_diag:tetra_v33_irrational_subpixel:{irrational_subpixel_added}"
             )
             plan.notes.append("anti_grid_detail_diag:hexa_v34_axis_escape_micro:8")
+            plan.notes.append(
+                f"anti_grid_detail_diag:deca_v35_coordinate_scatter:{coordinate_scatter_added}"
+            )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
