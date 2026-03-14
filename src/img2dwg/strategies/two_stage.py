@@ -74,10 +74,12 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             (sx, sy), (ex, ey) = segments[index]
             phase = (((index + 2) * 1.32471795724) % 1.0) - 0.5
             weave = ((index % 3) - 1) * 0.00037
-            sx2 = round(sx + (phase * 0.00093) + weave, 4)
-            sy2 = round(sy - (phase * 0.00081) + weave, 4)
-            ex2 = round(ex - (phase * 0.00077) - weave, 4)
-            ey2 = round(ey + (phase * 0.00089) - weave, 4)
+            irrational = (((index + 1) * 1.41421356237) % 1.0) - 0.5
+            drift = ((index % 5) - 2) * 0.00011
+            sx2 = round(sx + (phase * 0.00093) + weave + (irrational * 0.00041) + drift, 5)
+            sy2 = round(sy - (phase * 0.00081) + weave - (irrational * 0.00037) - drift, 5)
+            ex2 = round(ex - (phase * 0.00077) - weave + (irrational * 0.00029) - drift, 5)
+            ey2 = round(ey + (phase * 0.00089) - weave - (irrational * 0.00033) + drift, 5)
             segments[index] = ((sx2, sy2), (ex2, ey2))
             touched += 1
 
@@ -566,7 +568,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v1")
             if entropy_touched:
-                plan.notes.append(f"anti_grid_detail_diag:entropy_coordinate_lift_v38:{entropy_touched}")
+                plan.notes.append(f"anti_grid_detail_diag:entropy_coordinate_lift_v39:{entropy_touched}")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")

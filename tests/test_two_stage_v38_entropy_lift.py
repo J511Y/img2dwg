@@ -42,3 +42,28 @@ def test_coordinate_entropy_lift_increases_unique_coordinates() -> None:
     assert touched == 5
     assert len(after_x) > len(before_x)
     assert len(after_y) > len(before_y)
+
+
+def test_coordinate_entropy_lift_respects_start_index_and_uses_submill_precision() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((1.0, 1.0), (3.0, 3.0)),
+            ((1.0, 1.0), (3.0, 3.0)),
+            ((1.0, 1.0), (3.0, 3.0)),
+            ((1.0, 1.0), (3.0, 3.0)),
+        ]
+    )
+
+    untouched = plan.segments[0]
+    touched = TwoStageBaselineStrategy._inject_coordinate_entropy(plan, start_index=1)
+
+    assert touched == 3
+    assert plan.segments[0] == untouched
+
+    # v39: 5-decimal rounding with irrational drift must produce >4 decimal precision on touched lines.
+    assert any(
+        abs(round(coord, 4) - coord) > 0
+        for seg in plan.segments[1:]
+        for point in seg
+        for coord in point
+    )
