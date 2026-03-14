@@ -202,6 +202,45 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_quasi_aperiodic_density_lift_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        tribonacci = 1.83928675521
+        adaptive = 0.00101 + (signals.edge_density * 0.00055) + (signals.contrast * 0.00047)
+        anchors = [
+            (0.0437, 0.5621, 0.2048, 0.7249),
+            (0.2916, 0.9824, 0.4527, 0.8193),
+            (0.6128, 0.0975, 0.7749, 0.2596),
+            (0.8614, 0.7042, 0.6991, 0.5428),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(anchors):
+            phase = (((index + 6) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 2) * tribonacci) % 1.0 - 0.5) * (adaptive * 0.91)
+            shear = ((index % 3) - 1) * (adaptive * 0.73)
+            density = ((index % 2) * 2 - 1) * (0.00041 + (signals.edge_density * 0.00029))
+            start = (
+                round(left + ((right - left) * (sx + phase + shear + density)), 5),
+                round(top + ((bottom - top) * (sy - warp + (shear * 0.71) - density)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.69) - shear - density)), 5),
+                round(top + ((bottom - top) * (ey + warp - (shear * 0.63) + density)), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -805,6 +844,9 @@ class ConsensusQAStrategy(ConversionStrategy):
             quasi_aperiodic_coord_lift_added = self._inject_quasi_aperiodic_coord_lift_segments(
                 plan, signals
             )
+            quasi_aperiodic_density_lift_added = (
+                self._inject_quasi_aperiodic_density_lift_segments(plan, signals)
+            )
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
@@ -841,6 +883,11 @@ class ConsensusQAStrategy(ConversionStrategy):
                 plan.notes.append(
                     "anti_grid_detail_diag:octa_v34_quasi_aperiodic_coord_lift:"
                     f"{quasi_aperiodic_coord_lift_added}"
+                )
+            if quasi_aperiodic_density_lift_added:
+                plan.notes.append(
+                    "anti_grid_detail_diag:deca_v35_quasi_aperiodic_density_lift:"
+                    f"{quasi_aperiodic_density_lift_added}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
