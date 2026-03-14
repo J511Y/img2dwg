@@ -592,6 +592,29 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_blue_noise_pairs = [
+                ((0.0417, 0.3179), (0.1962, 0.4725)),
+                ((0.2594, 0.7811), (0.4149, 0.6263)),
+                ((0.5472, 0.2146), (0.7034, 0.3698)),
+                ((0.7928, 0.6557), (0.9481, 0.5002)),
+                ((0.1365, 0.9024), (0.2929, 0.7471)),
+                ((0.6138, 0.4683), (0.7697, 0.3128)),
+            ]
+            blue_noise_gain = 0.001 + (adaptive_seed * 0.0009)
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_blue_noise_pairs):
+                micro_phase = (((index + 2) * phi) % 1.0 - 0.5) * blue_noise_gain
+                parity = -1.0 if index % 2 == 0 else 1.0
+                bias = parity * (0.00055 + ((index % 3) * 0.00011))
+                start = (
+                    round(left + ((right - left) * (sx + micro_phase + bias)), 4),
+                    round(top + ((bottom - top) * (sy - (micro_phase * 0.72) - bias)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (micro_phase * 0.64) - bias)), 4),
+                    round(top + ((bottom - top) * (ey + micro_phase + (bias * 0.82))), 4),
+                )
+                plan.segments.append((start, end))
+
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
             plan.notes.append("anti_grid_detail_diag:on")
@@ -606,6 +629,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v18_adaptive_seed")
             plan.notes.append("anti_grid_detail_diag:tetra_v25_phase_entropy")
             plan.notes.append("anti_grid_detail_diag:tetra_v26_aperiodic_micro")
+            plan.notes.append("anti_grid_detail_diag:hexa_v27_blue_noise")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
