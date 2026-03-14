@@ -158,6 +158,48 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_quasi_aperiodic_coord_lift_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        plastic = 1.32471795724
+        adaptive = 0.00109 + (signals.edge_density * 0.00058) + (signals.contrast * 0.00046)
+        anchors = [
+            (0.0219, 0.4382, 0.1887, 0.6061),
+            (0.2645, 0.9576, 0.4328, 0.7894),
+            (0.5083, 0.0413, 0.6764, 0.2095),
+            (0.7487, 0.8672, 0.9161, 0.6993),
+            (0.1368, 0.6364, 0.3049, 0.8046),
+            (0.5821, 0.3698, 0.7497, 0.5376),
+            (0.9072, 0.2467, 0.7394, 0.4149),
+            (0.3489, 0.1225, 0.5163, 0.2912),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(anchors):
+            phase = (((index + 4) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 1) * plastic) % 1.0 - 0.5) * (adaptive * 0.87)
+            weave = ((index % 3) - 1) * (adaptive * 0.69)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave)), 5),
+                round(top + ((bottom - top) * (sy - warp + (weave * 0.74))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.71) - weave)), 5),
+                round(top + ((bottom - top) * (ey + warp - (weave * 0.66))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -758,6 +800,9 @@ class ConsensusQAStrategy(ConversionStrategy):
 
             irrational_subpixel_added = self._inject_irrational_subpixel_segments(plan, signals)
             residual_blue_noise_added = self._inject_residual_blue_noise_phase_segments(plan, signals)
+            quasi_aperiodic_coord_lift_added = self._inject_quasi_aperiodic_coord_lift_segments(
+                plan, signals
+            )
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
@@ -789,6 +834,11 @@ class ConsensusQAStrategy(ConversionStrategy):
             if residual_blue_noise_added:
                 plan.notes.append(
                     f"anti_grid_detail_diag:hexa_v33_residual_blue_noise_phase:{residual_blue_noise_added}"
+                )
+            if quasi_aperiodic_coord_lift_added:
+                plan.notes.append(
+                    "anti_grid_detail_diag:octa_v34_quasi_aperiodic_coord_lift:"
+                    f"{quasi_aperiodic_coord_lift_added}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
