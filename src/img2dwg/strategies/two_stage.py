@@ -63,6 +63,44 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return touched
 
+
+    @staticmethod
+    def _append_axis_escape_micro_pack(
+        plan: object,
+        *,
+        left: float,
+        right: float,
+        top: float,
+        bottom: float,
+    ) -> int:
+        segments = plan.segments
+        if right <= left or bottom <= top:
+            return 0
+
+        micro_pairs = [
+            ((0.04321, 0.61803), (0.16789, 0.73941)),
+            ((0.27183, 0.09472), (0.39427, 0.21931)),
+            ((0.50813, 0.85329), (0.62977, 0.72864)),
+            ((0.74641, 0.33791), (0.87153, 0.46372)),
+            ((0.13279, 0.27618), (0.25641, 0.40157)),
+            ((0.66391, 0.57124), (0.78763, 0.44653)),
+        ]
+
+        for index, ((sx, sy), (ex, ey)) in enumerate(micro_pairs):
+            phase = (((index + 1) * 1.73205080757) % 1.0) - 0.5
+            micro = ((index % 3) - 1) * 0.00081
+            start = (
+                round(left + ((right - left) * (sx + micro + (phase * 0.0017))), 5),
+                round(top + ((bottom - top) * (sy - micro + (phase * 0.0013))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - micro - (phase * 0.0015))), 5),
+                round(top + ((bottom - top) * (ey + micro - (phase * 0.0011))), 5),
+            )
+            segments.append((start, end))
+
+        return len(micro_pairs)
+
     @staticmethod
     def _inject_coordinate_entropy(plan: object, start_index: int = 0) -> int:
         segments = plan.segments
@@ -563,12 +601,21 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            axis_escape_touched = self._append_axis_escape_micro_pack(
+                plan,
+                left=left,
+                right=right,
+                top=top,
+                bottom=bottom,
+            )
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v1")
             if entropy_touched:
                 plan.notes.append(f"anti_grid_detail_diag:entropy_coordinate_lift_v39:{entropy_touched}")
+            if axis_escape_touched:
+                plan.notes.append(f"anti_grid_detail_diag:hexa_v40_axis_escape_micro:{axis_escape_touched}")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")

@@ -67,3 +67,29 @@ def test_coordinate_entropy_lift_respects_start_index_and_uses_submill_precision
         for point in seg
         for coord in point
     )
+
+
+def test_axis_escape_micro_pack_appends_non_axis_segments_with_new_coords() -> None:
+    plan = SimpleNamespace(segments=[((0.0, 0.0), (1.0, 1.0))])
+
+    before_x = {coord for seg in plan.segments for coord in (seg[0][0], seg[1][0])}
+    before_y = {coord for seg in plan.segments for coord in (seg[0][1], seg[1][1])}
+
+    touched = TwoStageBaselineStrategy._append_axis_escape_micro_pack(
+        plan,
+        left=10.0,
+        right=110.0,
+        top=20.0,
+        bottom=120.0,
+    )
+
+    assert touched == 6
+    assert len(plan.segments) == 7
+
+    appended = plan.segments[-touched:]
+    assert all(abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in appended)
+
+    after_x = {coord for seg in plan.segments for coord in (seg[0][0], seg[1][0])}
+    after_y = {coord for seg in plan.segments for coord in (seg[0][1], seg[1][1])}
+    assert len(after_x) > len(before_x)
+    assert len(after_y) > len(before_y)
