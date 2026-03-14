@@ -76,6 +76,48 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         return touched
 
+    @staticmethod
+    def _inject_irrational_subpixel_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        sqrt2 = 1.41421356237
+        adaptive = 0.00083 + (signals.edge_density * 0.00049) + (signals.contrast * 0.00041)
+        anchors = [
+            (0.0271, 0.4315, 0.1932, 0.5984),
+            (0.2384, 0.9542, 0.4067, 0.7865),
+            (0.4836, 0.0397, 0.6529, 0.2081),
+            (0.7214, 0.8788, 0.8897, 0.7112),
+            (0.1173, 0.6449, 0.2865, 0.8134),
+            (0.5647, 0.3728, 0.7324, 0.5403),
+            (0.9026, 0.2471, 0.7354, 0.4159),
+            (0.3418, 0.1296, 0.5094, 0.2988),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(anchors):
+            phase = (((index + 1) * phi) % 1.0 - 0.5) * adaptive
+            offset = (((index + 2) * sqrt2) % 1.0 - 0.5) * (adaptive * 0.93)
+            skew = ((index % 3) - 1) * (adaptive * 0.61)
+            start = (
+                round(left + ((right - left) * (sx + phase + skew)), 5),
+                round(top + ((bottom - top) * (sy - offset + (skew * 0.7))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - phase - skew)), 5),
+                round(top + ((bottom - top) * (ey + offset - (skew * 0.6))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -674,6 +716,8 @@ class ConsensusQAStrategy(ConversionStrategy):
                 plan.segments.append((start, end))
                 axis_escape_added += 1
 
+            irrational_subpixel_added = self._inject_irrational_subpixel_segments(plan, signals)
+
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
             plan.notes.append("anti_grid_detail_diag:on")
@@ -696,6 +740,10 @@ class ConsensusQAStrategy(ConversionStrategy):
             if axis_escape_added:
                 plan.notes.append(
                     f"anti_grid_detail_diag:octa_v31_axis_escape_phase:{axis_escape_added}"
+                )
+            if irrational_subpixel_added:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:octa_v32_irrational_subpixel:{irrational_subpixel_added}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
