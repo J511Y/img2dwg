@@ -63,14 +63,16 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     diagonal_count = sum(
         1
         for line in lines
-        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
+        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6
+        and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
     assert diagonal_count >= 40
 
     seed_non_axis_count = sum(
         1
         for line in lines[:6]
-        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
+        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6
+        and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
     assert seed_non_axis_count >= 2
 
@@ -143,14 +145,16 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:hexa_v17_golden_skew" in note for note in out.notes)
     assert any("anti_grid_detail_diag:deca_v19_precision_scatter" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v18_adaptive_seed" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:tetra_v25_phase_entropy" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) >= 84
+    assert len(lines) >= 106
     diagonal_count = sum(
         1
         for line in lines
-        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
+        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6
+        and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
     assert diagonal_count >= 62
 
@@ -183,7 +187,9 @@ def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Pat
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
 
-    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+    baseline = TwoStageBaselineStrategy().run(
+        ConversionInput(image_path=image_path), tmp_path / "base"
+    )
     hybrid = HybridMVPStrategy().run(
         ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
         tmp_path / "hybrid",
@@ -217,7 +223,6 @@ def test_hybrid_strategy_avoids_diagonal_lines_for_floorplan_like_inputs(tmp_pat
         end = line.dxf.end
         is_axis_aligned = abs(start.x - end.x) < 1e-6 or abs(start.y - end.y) < 1e-6
         assert is_axis_aligned
-
 
 
 def test_hybrid_strategy_adds_adaptive_detail_line_on_high_edge_density(tmp_path: Path) -> None:
