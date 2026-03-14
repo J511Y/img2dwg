@@ -475,6 +475,32 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_counterphase_plus_pairs = [
+                ((0.057, 0.442), (0.231, 0.614)),
+                ((0.294, 0.972), (0.463, 0.786)),
+                ((0.531, 0.066), (0.702, 0.244)),
+                ((0.773, 0.836), (0.941, 0.648)),
+                ((0.164, 0.594), (0.338, 0.768)),
+                ((0.612, 0.406), (0.784, 0.588)),
+                ((0.087, 0.214), (0.258, 0.382)),
+                ((0.844, 0.722), (0.672, 0.898)),
+                ((0.372, 0.154), (0.546, 0.328)),
+                ((0.694, 0.286), (0.868, 0.458)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_counterphase_plus_pairs):
+                phase = (index - 4.5) * 0.0013
+                weave = ((index % 2) * 2 - 1) * 0.0011
+                drift = ((index % 4) - 1.5) * 0.0006
+                start = (
+                    round(left + ((right - left) * (sx + phase + weave + drift)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.7) + weave - drift)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase - (weave * 0.8) - drift)), 4),
+                    round(top + ((bottom - top) * (ey + (phase * 0.7) - weave + drift)), 4),
+                )
+                plan.segments.append((start, end))
+
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
@@ -485,6 +511,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v24_entropy_weave")
             plan.notes.append("anti_grid_detail_diag:tetra_v25_asymmetric")
             plan.notes.append("anti_grid_detail_diag:octa_v26_counterphase")
+            plan.notes.append("anti_grid_detail_diag:deca_v27_counterphase_plus")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
