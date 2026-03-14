@@ -64,7 +64,7 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:hexa_v34_axis_escape_micro:8" in note for note in out.notes)
     assert any("anti_grid_detail_diag:deca_v35_coordinate_scatter:10" in note for note in out.notes)
     assert any(
-        "anti_grid_detail_diag:dodeca_v36_aperiodic_coordinate_boost:12" in note
+        "anti_grid_detail_diag:dodeca_v36_aperiodic_coordinate_boost:14" in note
         for note in out.notes
     )
 
@@ -185,7 +185,7 @@ def test_two_stage_aperiodic_coordinate_boost_adds_non_axis_segments() -> None:
 
     appended = TwoStageBaselineStrategy._inject_aperiodic_coordinate_boost(plan, signals)
 
-    assert appended == 12
+    assert appended == 14
     injected = plan.segments[-appended:]
     assert all(
         abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
