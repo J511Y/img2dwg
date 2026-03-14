@@ -63,6 +63,10 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     )
     assert any("anti_grid_detail_diag:hexa_v34_axis_escape_micro:8" in note for note in out.notes)
     assert any("anti_grid_detail_diag:deca_v35_coordinate_scatter:10" in note for note in out.notes)
+    assert any(
+        "anti_grid_detail_diag:dodeca_v36_aperiodic_coordinate_boost:12" in note
+        for note in out.notes
+    )
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -166,6 +170,31 @@ def test_two_stage_coordinate_scatter_microsegments_expand_coordinate_diversity(
     rounded_y = {round(coord, 3) for start, end in injected for coord in (start[1], end[1])}
     assert len(rounded_x) >= 18
     assert len(rounded_y) >= 18
+
+
+def test_two_stage_aperiodic_coordinate_boost_adds_non_axis_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.73, edge_density=0.66)
+
+    appended = TwoStageBaselineStrategy._inject_aperiodic_coordinate_boost(plan, signals)
+
+    assert appended == 12
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 3) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 3) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 20
+    assert len(rounded_y) >= 20
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
