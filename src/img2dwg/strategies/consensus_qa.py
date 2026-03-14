@@ -36,6 +36,46 @@ class ConsensusQAStrategy(ConversionStrategy):
 
     _min_consensus = 0.35
 
+    @staticmethod
+    def _debias_axis_aligned_seed_segments(plan: object, seed_segment_count: int) -> bool:
+        if seed_segment_count <= 0:
+            return False
+
+        segments = plan.segments
+        if not segments:
+            return False
+
+        x_span = abs(segments[0][1][0] - segments[0][0][0]) if len(segments) >= 1 else 0.0
+        y_span = abs(segments[2][0][1] - segments[0][0][1]) if len(segments) >= 3 else 0.0
+        base_span = max(x_span, y_span, 1.0)
+        skew = max(0.08, round(base_span * 0.0017, 4))
+
+        touched = False
+        for index in range(min(seed_segment_count, len(segments))):
+            (sx, sy), (ex, ey) = segments[index]
+            phase = (index % 7) - 3
+            phase_minor = (index % 5) - 2
+            if abs(sx - ex) < 1e-9:
+                start_x = sx + (phase_minor * skew * 0.11)
+                end_x = ex + (phase * skew * 0.29)
+                end_y = ey + (phase_minor * skew * 0.63)
+                segments[index] = (
+                    (round(start_x, 4), round(sy, 4)),
+                    (round(end_x, 4), round(end_y, 4)),
+                )
+                touched = True
+            elif abs(sy - ey) < 1e-9:
+                start_y = sy + (phase_minor * skew * 0.11)
+                end_y = ey + (phase * skew * 0.29)
+                end_x = ex + (phase_minor * skew * 0.63)
+                segments[index] = (
+                    (round(sx, 4), round(start_y, 4)),
+                    (round(end_x, 4), round(end_y, 4)),
+                )
+                touched = True
+
+        return touched
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -57,6 +97,8 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         preset = self._high_confidence_preset if consensus_score >= 0.75 else self._base_preset
         plan = build_vector_plan(signals, preset)
+        seed_segment_count = len(plan.segments)
+        axis_debias_applied = self._debias_axis_aligned_seed_segments(plan, seed_segment_count)
         if len(plan.segments) >= 4:
             left = plan.segments[0][0][0]
             right = plan.segments[0][1][0]
@@ -464,6 +506,30 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_precision_scatter_pairs = [
+                ((0.0197, 0.4673), (0.1841, 0.6298)),
+                ((0.2639, 0.9631), (0.4317, 0.7965)),
+                ((0.5081, 0.0319), (0.6724, 0.1987)),
+                ((0.7476, 0.8137), (0.9129, 0.6491)),
+                ((0.1423, 0.5827), (0.3075, 0.7446)),
+                ((0.5894, 0.4128), (0.7548, 0.5769)),
+                ((0.0831, 0.2196), (0.2485, 0.3832)),
+                ((0.8167, 0.7014), (0.6513, 0.8649)),
+                ((0.3684, 0.1482), (0.5338, 0.3116)),
+                ((0.6942, 0.2795), (0.8596, 0.4439)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_precision_scatter_pairs):
+                drift = ((index % 5) - 2) * 0.0011
+                start = (
+                    round(left + ((right - left) * (sx + drift)), 4),
+                    round(top + ((bottom - top) * (sy - (drift * 0.8))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (drift * 0.7))), 4),
+                    round(top + ((bottom - top) * (ey + drift)), 4),
+                )
+                plan.segments.append((start, end))
+
             adaptive_seed = (signals.contrast * 0.61) + (signals.edge_density * 0.39)
             adaptive_diag_pairs = [
                 ((0.073, 0.267), (0.231, 0.451)),
@@ -486,6 +552,102 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_phase_entropy_pairs = [
+                ((0.0371, 0.7063), (0.1927, 0.5489)),
+                ((0.2842, 0.0947), (0.4416, 0.2521)),
+                ((0.6183, 0.8734), (0.7748, 0.7166)),
+                ((0.9039, 0.3578), (0.7462, 0.5144)),
+            ]
+            phase_gain = 0.001 + (adaptive_seed * 0.0012)
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_phase_entropy_pairs):
+                phase = (index - 1.5) * phase_gain
+                start = (
+                    round(left + ((right - left) * (sx + phase)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.8))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (phase * 0.75))), 4),
+                    round(top + ((bottom - top) * (ey + phase)), 4),
+                )
+                plan.segments.append((start, end))
+
+            anti_grid_aperiodic_micro_pairs = [
+                ((0.1123, 0.3847), (0.2879, 0.5631)),
+                ((0.3628, 0.9264), (0.5386, 0.7478)),
+                ((0.6559, 0.1582), (0.8317, 0.3366)),
+                ((0.8746, 0.5921), (0.6998, 0.7707)),
+            ]
+            phi = 1.61803398875
+            jitter_base = 0.0011 + (adaptive_seed * 0.001)
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_aperiodic_micro_pairs):
+                spiral = (((index + 1) * phi) % 1.0 - 0.5) * jitter_base
+                weave = ((index % 3) - 1) * (jitter_base * 0.75)
+                start = (
+                    round(left + ((right - left) * (sx + spiral + weave)), 4),
+                    round(top + ((bottom - top) * (sy - (spiral * 0.8) + weave)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (spiral * 0.7) - weave)), 4),
+                    round(top + ((bottom - top) * (ey + spiral - (weave * 0.6))), 4),
+                )
+                plan.segments.append((start, end))
+
+            anti_grid_blue_noise_pairs = [
+                ((0.0417, 0.3179), (0.1962, 0.4725)),
+                ((0.2594, 0.7811), (0.4149, 0.6263)),
+                ((0.5472, 0.2146), (0.7034, 0.3698)),
+                ((0.7928, 0.6557), (0.9481, 0.5002)),
+                ((0.1365, 0.9024), (0.2929, 0.7471)),
+                ((0.6138, 0.4683), (0.7697, 0.3128)),
+            ]
+            blue_noise_gain = 0.001 + (adaptive_seed * 0.0009)
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_blue_noise_pairs):
+                micro_phase = (((index + 2) * phi) % 1.0 - 0.5) * blue_noise_gain
+                parity = -1.0 if index % 2 == 0 else 1.0
+                bias = parity * (0.00055 + ((index % 3) * 0.00011))
+                start = (
+                    round(left + ((right - left) * (sx + micro_phase + bias)), 4),
+                    round(top + ((bottom - top) * (sy - (micro_phase * 0.72) - bias)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (micro_phase * 0.64) - bias)), 4),
+                    round(top + ((bottom - top) * (ey + micro_phase + (bias * 0.82))), 4),
+                )
+                plan.segments.append((start, end))
+
+            anti_grid_coord_diversity_pairs = [
+                ((0.0183, 0.4369), (0.1637, 0.5914)),
+                ((0.2428, 0.9671), (0.4016, 0.8049)),
+                ((0.4874, 0.0476), (0.6459, 0.2088)),
+                ((0.7281, 0.8763), (0.8868, 0.7135)),
+                ((0.1142, 0.6558), (0.2727, 0.8172)),
+                ((0.5623, 0.3846), (0.7208, 0.5483)),
+                ((0.9034, 0.2617), (0.7449, 0.4234)),
+                ((0.3365, 0.1374), (0.4952, 0.3029)),
+                ((0.0694, 0.7352), (0.2248, 0.8897)),
+                ((0.8147, 0.1126), (0.9685, 0.2698)),
+                ((0.1562, 0.5284), (0.3127, 0.6849)),
+                ((0.6721, 0.1987), (0.8276, 0.3561)),
+            ]
+            coord_diversity_gain = 0.0012 + (adaptive_seed * 0.0011)
+            coord_diversity_added = 0
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_coord_diversity_pairs):
+                phase = (((index + 3) * phi) % 1.0 - 0.5) * coord_diversity_gain
+                weave = ((index % 3) - 1) * (coord_diversity_gain * 0.77)
+                shear = ((index % 2) * 2 - 1) * (0.00043 + (adaptive_seed * 0.00031))
+                start = (
+                    round(left + ((right - left) * (sx + phase + weave + shear)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.73) + weave - shear)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (phase * 0.68) - weave - shear)), 4),
+                    round(top + ((bottom - top) * (ey + phase - (weave * 0.71) + shear)), 4),
+                )
+                plan.segments.append((start, end))
+                coord_diversity_added += 1
+
+            if axis_debias_applied:
+                plan.notes.append("anti_grid_axis_debias:v3")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:dodeca_v11_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v12_irregular")
@@ -494,7 +656,15 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
             plan.notes.append("anti_grid_detail_diag:octa_v16_staggered")
             plan.notes.append("anti_grid_detail_diag:hexa_v17_golden_skew")
+            plan.notes.append("anti_grid_detail_diag:deca_v19_precision_scatter")
             plan.notes.append("anti_grid_detail_diag:hexa_v18_adaptive_seed")
+            plan.notes.append("anti_grid_detail_diag:tetra_v25_phase_entropy")
+            plan.notes.append("anti_grid_detail_diag:tetra_v26_aperiodic_micro")
+            plan.notes.append("anti_grid_detail_diag:hexa_v27_blue_noise")
+            if coord_diversity_added:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:octa_v28_coord_diversity:{coord_diversity_added}"
+                )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")

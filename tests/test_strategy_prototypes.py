@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import ezdxf
 from PIL import Image, ImageDraw
@@ -52,23 +53,77 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:tetra_v25_asymmetric" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v26_counterphase" in note for note in out.notes)
     assert any("anti_grid_detail_diag:deca_v27_counterphase_plus" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:hexa_v28_frequency_break" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:octa_v29_quasi_random" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:tetra_v31_prime_lattice" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:octa_v30_signal_entropy:8" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:hexa_v32_coord_diversity:6" in note for note in out.notes)
+    assert any(
+        "anti_grid_detail_diag:tetra_v33_irrational_subpixel:4" in note for note in out.notes
+    )
+    assert any("anti_grid_detail_diag:hexa_v34_axis_escape_micro:8" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) >= 72
+    assert len(lines) >= 90
     diagonal_count = sum(
         1
         for line in lines
-        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
+        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6
+        and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
     assert diagonal_count >= 40
 
     seed_non_axis_count = sum(
         1
         for line in lines[:6]
-        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
+        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6
+        and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
     assert seed_non_axis_count >= 2
+
+
+def test_two_stage_residual_axis_debias_nudges_perfectly_aligned_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((10.0, 10.0), (10.0, 22.0)),
+            ((30.0, 40.0), (48.0, 40.0)),
+            ((1.0, 1.0), (5.0, 7.0)),
+        ]
+    )
+
+    touched = TwoStageBaselineStrategy._debias_residual_axis_aligned_segments(plan, start_index=0)
+
+    assert touched is True
+    first = plan.segments[0]
+    second = plan.segments[1]
+    assert abs(first[0][0] - first[1][0]) > 1e-6
+    assert abs(second[0][1] - second[1][1]) > 1e-6
+
+
+def test_two_stage_axis_escape_microsegments_add_eight_non_axis_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.67, edge_density=0.54)
+
+    appended = TwoStageBaselineStrategy._inject_axis_escape_microsegments(plan, signals)
+
+    assert appended == 8
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 3) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 3) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 14
+    assert len(rounded_y) >= 14
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
@@ -119,24 +174,61 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:hexa_v15_micro_jitter" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v16_staggered" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v17_golden_skew" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:deca_v19_precision_scatter" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v18_adaptive_seed" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:tetra_v25_phase_entropy" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:tetra_v26_aperiodic_micro" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:hexa_v27_blue_noise" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:octa_v28_coord_diversity:12" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) >= 84
+    assert len(lines) >= 118
     diagonal_count = sum(
         1
         for line in lines
-        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
+        if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6
+        and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
-    assert diagonal_count >= 62
+    assert diagonal_count >= 70
+
+    rounded_x = {round(coord, 3) for line in lines for coord in (line.dxf.start.x, line.dxf.end.x)}
+    rounded_y = {round(coord, 3) for line in lines for coord in (line.dxf.start.y, line.dxf.end.y)}
+    assert len(rounded_x) >= 214
+    assert len(rounded_y) >= 220
+
+
+def test_consensus_strategy_seed_debias_diversifies_seed_coordinates(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    out = ConsensusQAStrategy().run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
+        tmp_path / "out",
+    )
+
+    assert out.success is True
+    assert out.dxf_path is not None
+
+    doc = ezdxf.readfile(str(out.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+    seed_lines = lines[:6]
+    assert len(seed_lines) == 6
+
+    start_x_values = {round(line.dxf.start.x, 4) for line in seed_lines}
+    start_y_values = {round(line.dxf.start.y, 4) for line in seed_lines}
+
+    assert len(start_x_values) >= 4
+    assert len(start_y_values) >= 4
 
 
 def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
 
-    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+    baseline = TwoStageBaselineStrategy().run(
+        ConversionInput(image_path=image_path), tmp_path / "base"
+    )
     hybrid = HybridMVPStrategy().run(
         ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
         tmp_path / "hybrid",
@@ -170,7 +262,6 @@ def test_hybrid_strategy_avoids_diagonal_lines_for_floorplan_like_inputs(tmp_pat
         end = line.dxf.end
         is_axis_aligned = abs(start.x - end.x) < 1e-6 or abs(start.y - end.y) < 1e-6
         assert is_axis_aligned
-
 
 
 def test_hybrid_strategy_adds_adaptive_detail_line_on_high_edge_density(tmp_path: Path) -> None:
