@@ -151,6 +151,31 @@ def test_two_stage_axis_escape_entropy_segments_add_coordinate_diversity() -> No
     assert len(rounded_y) >= 11
 
 
+def test_two_stage_irrational_subpixel_segments_add_four_non_axis_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.66, edge_density=0.52)
+
+    appended = TwoStageBaselineStrategy._inject_irrational_subpixel_segments(plan, signals)
+
+    assert appended == 4
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 7
+    assert len(rounded_y) >= 7
+
+
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)

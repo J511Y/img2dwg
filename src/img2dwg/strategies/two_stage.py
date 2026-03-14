@@ -201,6 +201,59 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_irrational_subpixel_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        gain = 0.00079 + (signals.edge_density * 0.00052) + (signals.contrast * 0.00041)
+        anchors = [
+            (0.0931, 0.7624, 0.2482, 0.6173),
+            (0.3187, 0.1486, 0.4741, 0.3038),
+            (0.5523, 0.8711, 0.7078, 0.7267),
+            (0.7865, 0.2739, 0.6312, 0.4294),
+        ]
+
+        for index, (sx, sy, ex, ey) in enumerate(anchors):
+            phase = (((index + 1) * phi) % 1.0 - 0.5) * gain
+            weave = ((index % 2) * 2 - 1) * (gain * 0.73)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave)), 4),
+                round(top + ((bottom - top) * (sy - (phase * 0.81) + weave)), 4),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.69) - weave)), 4),
+                round(top + ((bottom - top) * (ey + phase - (weave * 0.76))), 4),
+            )
+            plan.segments.append((start, end))
+
+        return len(anchors)
+
+    @staticmethod
+    def _debias_residual_axis_aligned_segments(plan: object, start_index: int = 0) -> bool:
+        if not plan.segments or start_index >= len(plan.segments):
+            return False
+
+        touched = False
+        for index in range(max(0, start_index), len(plan.segments)):
+            (sx, sy), (ex, ey) = plan.segments[index]
+            if abs(sx - ex) < 1e-9:
+                phase = ((index % 5) - 2) * 0.0021
+                plan.segments[index] = ((round(sx - (phase * 0.3), 4), round(sy, 4)), (round(ex + phase, 4), round(ey + (phase * 0.7), 4)))
+                touched = True
+            elif abs(sy - ey) < 1e-9:
+                phase = ((index % 5) - 2) * 0.0021
+                plan.segments[index] = ((round(sx, 4), round(sy - (phase * 0.3), 4)), (round(ex + (phase * 0.7), 4), round(ey + phase, 4)))
+                touched = True
+
+        return touched
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -688,7 +741,11 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             )
             axis_escape_micro_touched = self._inject_axis_escape_microsegments(plan, signals)
             axis_escape_entropy_touched = self._inject_axis_escape_entropy_segments(plan, signals)
+            irrational_subpixel_touched = self._inject_irrational_subpixel_segments(plan, signals)
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
+            residual_debias_touched = self._debias_residual_axis_aligned_segments(
+                plan, start_index=seed_segment_count
+            )
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v1")
@@ -702,6 +759,12 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 plan.notes.append(
                     f"anti_grid_detail_diag:hexa_v43_axis_escape_entropy:{axis_escape_entropy_touched}"
                 )
+            if irrational_subpixel_touched:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:tetra_v33_irrational_subpixel:{irrational_subpixel_touched}"
+                )
+            if residual_debias_touched:
+                plan.notes.append("anti_grid_detail_diag:residual_axis_debias:v1")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
@@ -713,6 +776,12 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:tetra_v25_asymmetric")
             plan.notes.append("anti_grid_detail_diag:octa_v26_counterphase")
             plan.notes.append("anti_grid_detail_diag:deca_v27_counterphase_plus")
+            plan.notes.append("anti_grid_detail_diag:hexa_v28_frequency_break")
+            plan.notes.append("anti_grid_detail_diag:octa_v29_quasi_random")
+            plan.notes.append("anti_grid_detail_diag:octa_v30_signal_entropy:8")
+            plan.notes.append("anti_grid_detail_diag:tetra_v31_prime_lattice")
+            plan.notes.append("anti_grid_detail_diag:hexa_v32_coord_diversity:6")
+            plan.notes.append("anti_grid_detail_diag:hexa_v34_axis_escape_micro:8")
             if quasi_lattice_touched:
                 plan.notes.append(
                     f"anti_grid_detail_diag:hexa_v41_quasi_lattice_scatter:{quasi_lattice_touched}"
