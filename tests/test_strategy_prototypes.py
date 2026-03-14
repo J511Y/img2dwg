@@ -58,8 +58,10 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:tetra_v31_prime_lattice" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v30_signal_entropy:8" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v32_coord_diversity:6" in note for note in out.notes)
-    assert any("anti_grid_detail_diag:tetra_v33_irrational_subpixel:4" in note for note in out.notes)
-    assert any("anti_grid_detail_diag:hexa_v34_axis_escape_micro:6" in note for note in out.notes)
+    assert any(
+        "anti_grid_detail_diag:tetra_v33_irrational_subpixel:4" in note for note in out.notes
+    )
+    assert any("anti_grid_detail_diag:hexa_v34_axis_escape_micro:8" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -97,6 +99,31 @@ def test_two_stage_residual_axis_debias_nudges_perfectly_aligned_segments() -> N
     second = plan.segments[1]
     assert abs(first[0][0] - first[1][0]) > 1e-6
     assert abs(second[0][1] - second[1][1]) > 1e-6
+
+
+def test_two_stage_axis_escape_microsegments_add_eight_non_axis_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.67, edge_density=0.54)
+
+    appended = TwoStageBaselineStrategy._inject_axis_escape_microsegments(plan, signals)
+
+    assert appended == 8
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 3) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 3) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 14
+    assert len(rounded_y) >= 14
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
@@ -165,16 +192,8 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     )
     assert diagonal_count >= 70
 
-    rounded_x = {
-        round(coord, 3)
-        for line in lines
-        for coord in (line.dxf.start.x, line.dxf.end.x)
-    }
-    rounded_y = {
-        round(coord, 3)
-        for line in lines
-        for coord in (line.dxf.start.y, line.dxf.end.y)
-    }
+    rounded_x = {round(coord, 3) for line in lines for coord in (line.dxf.start.x, line.dxf.end.x)}
+    rounded_y = {round(coord, 3) for line in lines for coord in (line.dxf.start.y, line.dxf.end.y)}
     assert len(rounded_x) >= 214
     assert len(rounded_y) >= 220
 
