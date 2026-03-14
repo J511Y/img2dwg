@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import ezdxf
 from PIL import Image, ImageDraw
@@ -69,6 +70,24 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
         if abs(line.dxf.start.x - line.dxf.end.x) > 1e-6 and abs(line.dxf.start.y - line.dxf.end.y) > 1e-6
     )
     assert seed_non_axis_count >= 2
+
+
+def test_two_stage_residual_axis_debias_nudges_perfectly_aligned_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((10.0, 10.0), (10.0, 22.0)),
+            ((30.0, 40.0), (48.0, 40.0)),
+            ((1.0, 1.0), (5.0, 7.0)),
+        ]
+    )
+
+    touched = TwoStageBaselineStrategy._debias_residual_axis_aligned_segments(plan, start_index=0)
+
+    assert touched is True
+    first = plan.segments[0]
+    second = plan.segments[1]
+    assert abs(first[0][0] - first[1][0]) > 1e-6
+    assert abs(second[0][1] - second[1][1]) > 1e-6
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:

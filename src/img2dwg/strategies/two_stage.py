@@ -45,6 +45,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             if abs(sx - ex) < 1e-9:
                 shift_x = ((index % 5) - 2) * skew
                 shift_y = ((index % 3) - 1) * (skew * 0.6)
+                if abs(shift_x) < 1e-9:
+                    shift_x = skew * 0.45
+                if abs(shift_y) < 1e-9:
+                    shift_y = -skew * 0.27
                 segments[index] = (
                     (round(sx, 4), round(sy, 4)),
                     (round(ex + shift_x, 4), round(ey + shift_y, 4)),
@@ -53,9 +57,41 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             elif abs(sy - ey) < 1e-9:
                 shift_y = ((index % 5) - 2) * skew
                 shift_x = ((index % 3) - 1) * (skew * 0.6)
+                if abs(shift_y) < 1e-9:
+                    shift_y = skew * 0.45
+                if abs(shift_x) < 1e-9:
+                    shift_x = -skew * 0.27
                 segments[index] = (
                     (round(sx, 4), round(sy, 4)),
                     (round(ex + shift_x, 4), round(ey + shift_y, 4)),
+                )
+                touched = True
+
+        return touched
+
+    @staticmethod
+    def _debias_residual_axis_aligned_segments(plan: object, start_index: int = 0) -> bool:
+        segments = plan.segments
+        if not segments:
+            return False
+
+        touched = False
+        for index in range(max(start_index, 0), len(segments)):
+            (sx, sy), (ex, ey) = segments[index]
+            if abs(sx - ex) < 1e-9:
+                phase = (index % 7) - 3
+                shift_x = 0.017 * phase
+                segments[index] = (
+                    (round(sx + (shift_x * 0.2), 4), round(sy, 4)),
+                    (round(ex + shift_x, 4), round(ey + 0.013 * ((index % 5) - 2), 4)),
+                )
+                touched = True
+            elif abs(sy - ey) < 1e-9:
+                phase = (index % 7) - 3
+                shift_y = 0.017 * phase
+                segments[index] = (
+                    (round(sx, 4), round(sy + (shift_y * 0.2), 4)),
+                    (round(ex + 0.013 * ((index % 5) - 2), 4), round(ey + shift_y, 4)),
                 )
                 touched = True
 
@@ -67,6 +103,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         plan = build_vector_plan(signals, self._preset)
         seed_segment_count = len(plan.segments)
         axis_debias_applied = self._debias_axis_aligned_seed_segments(plan, seed_segment_count)
+        residual_axis_debias_applied = False
         if len(plan.segments) >= 4:
             left = plan.segments[0][0][0]
             right = plan.segments[0][1][0]
@@ -539,8 +576,15 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            residual_axis_debias_applied = self._debias_residual_axis_aligned_segments(
+                plan,
+                start_index=seed_segment_count,
+            )
+
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v1")
+            if residual_axis_debias_applied:
+                plan.notes.append("anti_grid_residual_axis_debias:v2")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
