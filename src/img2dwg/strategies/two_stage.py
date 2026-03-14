@@ -110,11 +110,11 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         for index in range(start_index, len(segments)):
             (sx, sy), (ex, ey) = segments[index]
             phase = (((index + 2) * 1.32471795724) % 1.0) - 0.5
-            weave = ((index % 3) - 1) * 0.00037
-            sx2 = round(sx + (phase * 0.00093) + weave, 4)
-            sy2 = round(sy - (phase * 0.00081) + weave, 4)
-            ex2 = round(ex - (phase * 0.00077) - weave, 4)
-            ey2 = round(ey + (phase * 0.00089) - weave, 4)
+            weave = ((index % 3) - 1) * 0.00091
+            sx2 = round(sx + (phase * 0.00183) + weave, 4)
+            sy2 = round(sy - (phase * 0.00161) + weave, 4)
+            ex2 = round(ex - (phase * 0.00149) - weave, 4)
+            ey2 = round(ey + (phase * 0.00173) - weave, 4)
             segments[index] = ((sx2, sy2), (ex2, ey2))
             touched += 1
 
