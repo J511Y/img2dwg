@@ -285,6 +285,53 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_axis_escape_unique_coord_lift_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        tribonacci = 1.83928675521
+        adaptive = 0.00124 + (signals.edge_density * 0.00061) + (signals.contrast * 0.00047)
+        pairs = [
+            (0.0248, 0.4817, 0.1883, 0.6461),
+            (0.2675, 0.9784, 0.4292, 0.8127),
+            (0.5112, 0.0413, 0.6754, 0.2068),
+            (0.7499, 0.8916, 0.9128, 0.7282),
+            (0.1364, 0.6189, 0.3018, 0.7864),
+            (0.5871, 0.3528, 0.7516, 0.5217),
+            (0.9246, 0.2235, 0.7593, 0.3892),
+            (0.3487, 0.1032, 0.5145, 0.2699),
+            (0.0719, 0.7415, 0.2378, 0.9086),
+            (0.8034, 0.0748, 0.6382, 0.2414),
+            (0.4186, 0.5532, 0.5837, 0.7196),
+            (0.6668, 0.1674, 0.8314, 0.3348),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 3) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 2) * tribonacci) % 1.0 - 0.5) * (adaptive * 0.87)
+            weave = ((index % 4) - 1.5) * (adaptive * 0.49)
+            bias = ((index % 2) * 2 - 1) * (0.00057 + (signals.edge_density * 0.00033))
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + bias)), 5),
+                round(top + ((bottom - top) * (sy - warp + (weave * 0.73) - bias)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.69) - weave - bias)), 5),
+                round(top + ((bottom - top) * (ey + warp - (weave * 0.67) + bias)), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -774,6 +821,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             axis_escape_entropy_touched = self._inject_axis_escape_entropy_segments(plan, signals)
             residual_phase_jitter_touched = self._inject_residual_phase_jitter_segments(plan, signals)
             aperiodic_coord_escape_touched = self._inject_aperiodic_coordinate_escape_segments(plan, signals)
+            axis_escape_unique_coord_lift_touched = self._inject_axis_escape_unique_coord_lift_segments(
+                plan, signals
+            )
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
@@ -795,6 +845,11 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             if aperiodic_coord_escape_touched:
                 plan.notes.append(
                     f"anti_grid_detail_diag:deca_v45_aperiodic_coord_escape:{aperiodic_coord_escape_touched}"
+                )
+            if axis_escape_unique_coord_lift_touched:
+                plan.notes.append(
+                    "anti_grid_detail_diag:hexa_v46_axis_escape_unique_coord_lift:"
+                    f"{axis_escape_unique_coord_lift_touched}"
                 )
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
