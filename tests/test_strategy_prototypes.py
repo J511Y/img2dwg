@@ -151,6 +151,31 @@ def test_two_stage_axis_escape_entropy_segments_add_coordinate_diversity() -> No
     assert len(rounded_y) >= 11
 
 
+def test_two_stage_residual_phase_jitter_segments_add_coordinate_diversity() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.61, edge_density=0.64)
+
+    appended = TwoStageBaselineStrategy._inject_residual_phase_jitter_segments(plan, signals)
+
+    assert appended == 6
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 11
+    assert len(rounded_y) >= 11
+
+
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
@@ -207,6 +232,8 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:octa_v28_coord_diversity:12" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v31_axis_escape_phase:8" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v32_irrational_subpixel:8" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:hexa_v33_residual_blue_noise_phase:6" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:octa_v34_quasi_aperiodic_coord_lift:10" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -239,6 +266,56 @@ def test_consensus_strategy_injects_irrational_subpixel_segments() -> None:
     appended = ConsensusQAStrategy._inject_irrational_subpixel_segments(plan, signals)
 
     assert appended == 8
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 14
+    assert len(rounded_y) >= 14
+
+
+def test_consensus_strategy_injects_residual_blue_noise_phase_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.62, edge_density=0.61)
+
+    appended = ConsensusQAStrategy._inject_residual_blue_noise_phase_segments(plan, signals)
+
+    assert appended == 6
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 10
+    assert len(rounded_y) >= 10
+
+
+def test_consensus_strategy_injects_quasi_aperiodic_coord_lift_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.65, edge_density=0.57)
+
+    appended = ConsensusQAStrategy._inject_quasi_aperiodic_coord_lift_segments(plan, signals)
+
+    assert appended == 10
     injected = plan.segments[-appended:]
     assert all(
         abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
