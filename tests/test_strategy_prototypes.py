@@ -374,3 +374,41 @@ def test_hybrid_strategy_adds_adaptive_detail_line_on_high_edge_density(tmp_path
             short_diagonal_count += 1
 
     assert short_diagonal_count >= 8
+
+
+def test_consensus_strategy_injects_prime_lattice_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.64, edge_density=0.58)
+
+    appended = ConsensusQAStrategy._inject_prime_lattice_segments(plan, signals)
+
+    assert appended == 6
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 10
+    assert len(rounded_y) >= 10
+
+
+def test_consensus_strategy_notes_prime_lattice_injection(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    out = ConsensusQAStrategy().run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
+        tmp_path / "out",
+    )
+
+    assert out.success is True
+    assert any("anti_grid_detail_diag:hexa_v33_prime_lattice:6" in note for note in out.notes)

@@ -118,6 +118,47 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_prime_lattice_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        prime_pairs = [
+            (2, 3, 5, 7),
+            (11, 13, 17, 19),
+            (23, 29, 31, 37),
+            (41, 43, 47, 53),
+            (59, 61, 67, 71),
+            (73, 79, 83, 89),
+        ]
+
+        gain = 0.0011 + (signals.edge_density * 0.0007) + (signals.contrast * 0.0006)
+        appended = 0
+        for index, (a, b, c, d) in enumerate(prime_pairs):
+            phase = ((index - 2.5) * gain)
+            sx = ((a % 97) / 97.0)
+            sy = ((b % 89) / 89.0)
+            ex = ((c % 83) / 83.0)
+            ey = ((d % 79) / 79.0)
+            skew = (((a * d) % 11) - 5) * (gain * 0.21)
+            start = (
+                round(left + ((right - left) * (sx + phase + skew)), 5),
+                round(top + ((bottom - top) * (sy - (phase * 0.79) + skew)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.67) - skew)), 5),
+                round(top + ((bottom - top) * (ey + phase - (skew * 0.73))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -717,6 +758,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 axis_escape_added += 1
 
             irrational_subpixel_added = self._inject_irrational_subpixel_segments(plan, signals)
+            prime_lattice_added = self._inject_prime_lattice_segments(plan, signals)
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
@@ -744,6 +786,10 @@ class ConsensusQAStrategy(ConversionStrategy):
             if irrational_subpixel_added:
                 plan.notes.append(
                     f"anti_grid_detail_diag:octa_v32_irrational_subpixel:{irrational_subpixel_added}"
+                )
+            if prime_lattice_added:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v33_prime_lattice:{prime_lattice_added}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
