@@ -53,10 +53,11 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:tetra_v25_asymmetric" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v26_counterphase" in note for note in out.notes)
     assert any("anti_grid_detail_diag:deca_v27_counterphase_plus" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:hexa_v28_frequency_break" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
-    assert len(lines) >= 72
+    assert len(lines) >= 78
     diagonal_count = sum(
         1
         for line in lines

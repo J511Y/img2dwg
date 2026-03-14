@@ -576,6 +576,27 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_frequency_break_pairs = [
+                ((0.041, 0.188), (0.217, 0.361)),
+                ((0.282, 0.908), (0.456, 0.731)),
+                ((0.519, 0.127), (0.693, 0.304)),
+                ((0.758, 0.782), (0.932, 0.607)),
+                ((0.149, 0.633), (0.324, 0.807)),
+                ((0.601, 0.339), (0.776, 0.514)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_frequency_break_pairs):
+                phase = (index - 2.5) * 0.0016
+                drift = ((index % 3) - 1) * 0.0012
+                start = (
+                    round(left + ((right - left) * (sx + phase + drift)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.65) + drift)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase - (drift * 0.85))), 4),
+                    round(top + ((bottom - top) * (ey + (phase * 0.65) - drift)), 4),
+                )
+                plan.segments.append((start, end))
+
             residual_axis_debias_applied = self._debias_residual_axis_aligned_segments(
                 plan,
                 start_index=seed_segment_count,
@@ -596,6 +617,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:tetra_v25_asymmetric")
             plan.notes.append("anti_grid_detail_diag:octa_v26_counterphase")
             plan.notes.append("anti_grid_detail_diag:deca_v27_counterphase_plus")
+            plan.notes.append("anti_grid_detail_diag:hexa_v28_frequency_break")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
