@@ -670,6 +670,27 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_prime_lattice_pairs = [
+                ((0.083, 0.271), (0.214, 0.438)),
+                ((0.297, 0.918), (0.463, 0.739)),
+                ((0.532, 0.106), (0.706, 0.289)),
+                ((0.764, 0.851), (0.941, 0.672)),
+            ]
+            prime_seed = (signals.edge_density * 0.57) + (signals.contrast * 0.43)
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_prime_lattice_pairs):
+                phi = 1.61803398875
+                harmonic = (((index + 1) * phi) % 1.0 - 0.5) * (0.001 + (prime_seed * 0.0009))
+                counter = ((index * 2) - 3) * 0.00047
+                start = (
+                    round(left + ((right - left) * (sx + harmonic + counter)), 4),
+                    round(top + ((bottom - top) * (sy - (harmonic * 0.74) + counter)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (harmonic * 0.71) - counter)), 4),
+                    round(top + ((bottom - top) * (ey + harmonic - (counter * 0.82))), 4),
+                )
+                plan.segments.append((start, end))
+
             entropy_segments_added = self._inject_signal_entropy_segments(plan, signals)
             residual_axis_debias_applied = self._debias_residual_axis_aligned_segments(
                 plan,
@@ -693,6 +714,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:deca_v27_counterphase_plus")
             plan.notes.append("anti_grid_detail_diag:hexa_v28_frequency_break")
             plan.notes.append("anti_grid_detail_diag:octa_v29_quasi_random")
+            plan.notes.append("anti_grid_detail_diag:tetra_v31_prime_lattice")
             if entropy_segments_added:
                 plan.notes.append(f"anti_grid_detail_diag:octa_v30_signal_entropy:{entropy_segments_added}")
 
