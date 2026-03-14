@@ -152,6 +152,7 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:tetra_v26_aperiodic_micro" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v27_blue_noise" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v28_coord_diversity:8" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:hexa_v29_subpixel_aperiodic:6" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -174,8 +175,8 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
         for line in lines
         for coord in (line.dxf.start.y, line.dxf.end.y)
     }
-    assert len(rounded_x) >= 214
-    assert len(rounded_y) >= 220
+    assert len(rounded_x) >= 218
+    assert len(rounded_y) >= 224
 
 
 def test_consensus_strategy_seed_debias_diversifies_seed_coordinates(tmp_path: Path) -> None:

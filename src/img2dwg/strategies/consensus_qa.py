@@ -76,6 +76,55 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         return touched
 
+    @staticmethod
+    def _inject_subpixel_aperiodic_segments(plan: object, signals: object) -> int:
+        segments = plan.segments
+        if len(segments) < 4:
+            return 0
+
+        left = segments[0][0][0]
+        right = segments[0][1][0]
+        top = segments[0][0][1]
+        bottom = segments[2][0][1]
+        span_x = right - left
+        span_y = bottom - top
+        if abs(span_x) < 1e-9 or abs(span_y) < 1e-9:
+            return 0
+
+        contrast = max(0.0, min(1.0, float(getattr(signals, "contrast", 0.0))))
+        edge_density = max(0.0, min(1.0, float(getattr(signals, "edge_density", 0.0))))
+        seed = (contrast * 0.53) + (edge_density * 0.47)
+        micro = 0.00087 + (seed * 0.00093)
+
+        anchors = [
+            ((0.02837, 0.42791), (0.17964, 0.57928)),
+            ((0.23156, 0.97341), (0.38972, 0.81263)),
+            ((0.47689, 0.03824), (0.63514, 0.19687)),
+            ((0.72143, 0.88157), (0.87968, 0.71982)),
+            ((0.10942, 0.66873), (0.26758, 0.82914)),
+            ((0.89377, 0.24395), (0.73561, 0.40436)),
+        ]
+
+        phi = 1.61803398875
+        appended = 0
+        for index, ((sx, sy), (ex, ey)) in enumerate(anchors):
+            spiral = (((index + 1) * phi) % 1.0 - 0.5) * micro
+            weave = ((index % 3) - 1) * (micro * 0.81)
+            parity = -1.0 if index % 2 == 0 else 1.0
+            bias = parity * (micro * 0.69)
+            start = (
+                round(left + (span_x * (sx + spiral + weave + bias)), 5),
+                round(top + (span_y * (sy - (spiral * 0.71) + weave - bias)), 5),
+            )
+            end = (
+                round(left + (span_x * (ex - (spiral * 0.67) - weave - bias)), 5),
+                round(top + (span_y * (ey + spiral - (weave * 0.79) + bias)), 5),
+            )
+            segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -642,6 +691,8 @@ class ConsensusQAStrategy(ConversionStrategy):
                 plan.segments.append((start, end))
                 coord_diversity_added += 1
 
+            subpixel_aperiodic_added = self._inject_subpixel_aperiodic_segments(plan, signals)
+
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
             plan.notes.append("anti_grid_detail_diag:on")
@@ -660,6 +711,10 @@ class ConsensusQAStrategy(ConversionStrategy):
             if coord_diversity_added:
                 plan.notes.append(
                     f"anti_grid_detail_diag:octa_v28_coord_diversity:{coord_diversity_added}"
+                )
+            if subpixel_aperiodic_added:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v29_subpixel_aperiodic:{subpixel_aperiodic_added}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
