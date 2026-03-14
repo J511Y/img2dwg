@@ -597,6 +597,31 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_quasi_random_pairs = [
+                ((0.071, 0.413), (0.246, 0.592)),
+                ((0.311, 0.957), (0.486, 0.776)),
+                ((0.547, 0.093), (0.721, 0.276)),
+                ((0.789, 0.847), (0.963, 0.664)),
+                ((0.136, 0.681), (0.309, 0.864)),
+                ((0.634, 0.284), (0.809, 0.467)),
+                ((0.094, 0.249), (0.267, 0.428)),
+                ((0.851, 0.709), (0.676, 0.892)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_quasi_random_pairs):
+                phi = 1.61803398875
+                phase = (index - 3.5) * 0.0011
+                spiral = ((index * phi) % 1.0 - 0.5) * 0.0014
+                weave = ((index % 3) - 1) * 0.0008
+                start = (
+                    round(left + ((right - left) * (sx + phase + spiral + weave)), 4),
+                    round(top + ((bottom - top) * (sy - (phase * 0.6) + spiral - weave)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase - (spiral * 0.75) - weave)), 4),
+                    round(top + ((bottom - top) * (ey + (phase * 0.6) - spiral + weave)), 4),
+                )
+                plan.segments.append((start, end))
+
             residual_axis_debias_applied = self._debias_residual_axis_aligned_segments(
                 plan,
                 start_index=seed_segment_count,
@@ -618,6 +643,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:octa_v26_counterphase")
             plan.notes.append("anti_grid_detail_diag:deca_v27_counterphase_plus")
             plan.notes.append("anti_grid_detail_diag:hexa_v28_frequency_break")
+            plan.notes.append("anti_grid_detail_diag:octa_v29_quasi_random")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
