@@ -180,6 +180,7 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:tetra_v26_aperiodic_micro" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v27_blue_noise" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v28_coord_diversity:12" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:octa_v31_axis_escape_phase:8" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
