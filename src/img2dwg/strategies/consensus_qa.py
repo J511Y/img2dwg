@@ -506,6 +506,30 @@ class ConsensusQAStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            anti_grid_precision_scatter_pairs = [
+                ((0.0197, 0.4673), (0.1841, 0.6298)),
+                ((0.2639, 0.9631), (0.4317, 0.7965)),
+                ((0.5081, 0.0319), (0.6724, 0.1987)),
+                ((0.7476, 0.8137), (0.9129, 0.6491)),
+                ((0.1423, 0.5827), (0.3075, 0.7446)),
+                ((0.5894, 0.4128), (0.7548, 0.5769)),
+                ((0.0831, 0.2196), (0.2485, 0.3832)),
+                ((0.8167, 0.7014), (0.6513, 0.8649)),
+                ((0.3684, 0.1482), (0.5338, 0.3116)),
+                ((0.6942, 0.2795), (0.8596, 0.4439)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(anti_grid_precision_scatter_pairs):
+                drift = ((index % 5) - 2) * 0.0011
+                start = (
+                    round(left + ((right - left) * (sx + drift)), 4),
+                    round(top + ((bottom - top) * (sy - (drift * 0.8))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - (drift * 0.7))), 4),
+                    round(top + ((bottom - top) * (ey + drift)), 4),
+                )
+                plan.segments.append((start, end))
+
             adaptive_seed = (signals.contrast * 0.61) + (signals.edge_density * 0.39)
             adaptive_diag_pairs = [
                 ((0.073, 0.267), (0.231, 0.451)),
@@ -538,6 +562,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:hexa_v15_micro_jitter")
             plan.notes.append("anti_grid_detail_diag:octa_v16_staggered")
             plan.notes.append("anti_grid_detail_diag:hexa_v17_golden_skew")
+            plan.notes.append("anti_grid_detail_diag:deca_v19_precision_scatter")
             plan.notes.append("anti_grid_detail_diag:hexa_v18_adaptive_seed")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
