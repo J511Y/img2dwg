@@ -237,6 +237,55 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_axis_escape_microsegments(plan: object, signals: object) -> int:
+        segments = plan.segments
+        if len(segments) < 4:
+            return 0
+
+        left = segments[0][0][0]
+        right = segments[0][1][0]
+        top = segments[0][0][1]
+        bottom = segments[2][0][1]
+        span_x = right - left
+        span_y = bottom - top
+        if abs(span_x) < 1e-9 or abs(span_y) < 1e-9:
+            return 0
+
+        contrast = max(0.0, min(1.0, float(getattr(signals, "contrast", 0.0))))
+        edge_density = max(0.0, min(1.0, float(getattr(signals, "edge_density", 0.0))))
+        seed = (contrast * 0.49) + (edge_density * 0.51)
+        micro = 0.00093 + (seed * 0.00107)
+
+        anchors = [
+            ((0.03419, 0.46371), (0.18137, 0.61752)),
+            ((0.21983, 0.97741), (0.37456, 0.82134)),
+            ((0.44762, 0.05486), (0.60247, 0.20973)),
+            ((0.68891, 0.88732), (0.84328, 0.73216)),
+            ((0.12147, 0.70583), (0.27659, 0.86104)),
+            ((0.91263, 0.27854), (0.75684, 0.43397)),
+        ]
+
+        phi = 1.61803398875
+        appended = 0
+        for index, ((sx, sy), (ex, ey)) in enumerate(anchors):
+            spiral = (((index + 1) * phi) % 1.0 - 0.5) * micro
+            weave = ((index % 3) - 1) * (micro * 0.79)
+            parity = -1.0 if index % 2 == 0 else 1.0
+            bias = parity * (micro * 0.66)
+            start = (
+                round(left + (span_x * (sx + spiral + weave + bias)), 5),
+                round(top + (span_y * (sy - (spiral * 0.7) + weave - bias)), 5),
+            )
+            end = (
+                round(left + (span_x * (ex - (spiral * 0.65) - weave - bias)), 5),
+                round(top + (span_y * (ey + spiral - (weave * 0.76) + bias)), 5),
+            )
+            segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -786,6 +835,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             entropy_segments_added = self._inject_signal_entropy_segments(plan, signals)
             diversity_segments_added = self._inject_coordinate_diversity_microsegments(plan, signals)
             irrational_segments_added = self._inject_irrational_subpixel_segments(plan, signals)
+            axis_escape_segments_added = self._inject_axis_escape_microsegments(plan, signals)
             residual_axis_debias_applied = self._debias_residual_axis_aligned_segments(
                 plan,
                 start_index=seed_segment_count,
@@ -816,6 +866,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             if irrational_segments_added:
                 plan.notes.append(
                     f"anti_grid_detail_diag:tetra_v33_irrational_subpixel:{irrational_segments_added}"
+                )
+            if axis_escape_segments_added:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v34_axis_escape_micro:{axis_escape_segments_added}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
