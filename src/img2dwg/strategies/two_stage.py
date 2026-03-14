@@ -37,27 +37,49 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         x_span = abs(segments[0][1][0] - segments[0][0][0]) if len(segments) >= 1 else 0.0
         y_span = abs(segments[2][0][1] - segments[0][0][1]) if len(segments) >= 3 else 0.0
         base_span = max(x_span, y_span, 1.0)
-        skew = max(0.08, round(base_span * 0.0015, 4))
+        skew = max(0.1, round(base_span * 0.0019, 4))
 
         touched = False
         for index in range(min(seed_segment_count, len(segments))):
             (sx, sy), (ex, ey) = segments[index]
+            phi_phase = (((index + 1) * 1.61803398875) % 1.0) - 0.5
+            skew_phase = ((index % 4) - 1.5) * (skew * 0.17)
             if abs(sx - ex) < 1e-9:
-                shift_x = ((index % 5) - 2) * skew
-                shift_y = ((index % 3) - 1) * (skew * 0.6)
+                shift_x = (((index % 5) - 2) * skew * 0.72) + (phi_phase * skew * 0.41)
+                shift_y = (((index % 3) - 1) * (skew * 0.61)) + skew_phase
                 segments[index] = (
-                    (round(sx, 4), round(sy, 4)),
+                    (round(sx - (phi_phase * skew * 0.13), 4), round(sy, 4)),
                     (round(ex + shift_x, 4), round(ey + shift_y, 4)),
                 )
                 touched = True
             elif abs(sy - ey) < 1e-9:
-                shift_y = ((index % 5) - 2) * skew
-                shift_x = ((index % 3) - 1) * (skew * 0.6)
+                shift_y = (((index % 5) - 2) * skew * 0.72) + (phi_phase * skew * 0.41)
+                shift_x = (((index % 3) - 1) * (skew * 0.61)) + skew_phase
                 segments[index] = (
-                    (round(sx, 4), round(sy, 4)),
+                    (round(sx, 4), round(sy - (phi_phase * skew * 0.13), 4)),
                     (round(ex + shift_x, 4), round(ey + shift_y, 4)),
                 )
                 touched = True
+
+        return touched
+
+    @staticmethod
+    def _inject_coordinate_entropy(plan: object, start_index: int = 0) -> int:
+        segments = plan.segments
+        if not segments or start_index >= len(segments):
+            return 0
+
+        touched = 0
+        for index in range(start_index, len(segments)):
+            (sx, sy), (ex, ey) = segments[index]
+            phase = (((index + 2) * 1.32471795724) % 1.0) - 0.5
+            weave = ((index % 3) - 1) * 0.00037
+            sx2 = round(sx + (phase * 0.00093) + weave, 4)
+            sy2 = round(sy - (phase * 0.00081) + weave, 4)
+            ex2 = round(ex - (phase * 0.00077) - weave, 4)
+            ey2 = round(ey + (phase * 0.00089) - weave, 4)
+            segments[index] = ((sx2, sy2), (ex2, ey2))
+            touched += 1
 
         return touched
 
@@ -539,8 +561,12 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
+
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v1")
+            if entropy_touched:
+                plan.notes.append(f"anti_grid_detail_diag:entropy_coordinate_lift_v38:{entropy_touched}")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
