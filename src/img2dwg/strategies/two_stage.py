@@ -191,6 +191,52 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_irrational_subpixel_segments(plan: object, signals: object) -> int:
+        segments = plan.segments
+        if len(segments) < 4:
+            return 0
+
+        left = segments[0][0][0]
+        right = segments[0][1][0]
+        top = segments[0][0][1]
+        bottom = segments[2][0][1]
+        span_x = right - left
+        span_y = bottom - top
+        if abs(span_x) < 1e-9 or abs(span_y) < 1e-9:
+            return 0
+
+        contrast = max(0.0, min(1.0, float(getattr(signals, "contrast", 0.0))))
+        edge_density = max(0.0, min(1.0, float(getattr(signals, "edge_density", 0.0))))
+        seed = (contrast * 0.57) + (edge_density * 0.43)
+        micro = 0.0011 + (seed * 0.0012)
+
+        anchors = [
+            ((0.0717, 0.4183), (0.2414, 0.5869)),
+            ((0.2941, 0.9626), (0.4668, 0.7895)),
+            ((0.5412, 0.0794), (0.7129, 0.2527)),
+            ((0.8126, 0.7031), (0.6398, 0.8764)),
+        ]
+
+        phi = 1.61803398875
+        appended = 0
+        for index, ((sx, sy), (ex, ey)) in enumerate(anchors):
+            spiral = (((index + 1) * phi) % 1.0 - 0.5) * micro
+            parity = -1.0 if index % 2 == 0 else 1.0
+            bias = parity * (micro * 0.71)
+            start = (
+                round(left + (span_x * (sx + spiral + bias)), 4),
+                round(top + (span_y * (sy - (spiral * 0.67) - bias)), 4),
+            )
+            end = (
+                round(left + (span_x * (ex - (spiral * 0.73) - bias)), 4),
+                round(top + (span_y * (ey + spiral + (bias * 0.82))), 4),
+            )
+            segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -739,6 +785,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
             entropy_segments_added = self._inject_signal_entropy_segments(plan, signals)
             diversity_segments_added = self._inject_coordinate_diversity_microsegments(plan, signals)
+            irrational_segments_added = self._inject_irrational_subpixel_segments(plan, signals)
             residual_axis_debias_applied = self._debias_residual_axis_aligned_segments(
                 plan,
                 start_index=seed_segment_count,
@@ -766,6 +813,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 plan.notes.append(f"anti_grid_detail_diag:octa_v30_signal_entropy:{entropy_segments_added}")
             if diversity_segments_added:
                 plan.notes.append(f"anti_grid_detail_diag:hexa_v32_coord_diversity:{diversity_segments_added}")
+            if irrational_segments_added:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:tetra_v33_irrational_subpixel:{irrational_segments_added}"
+                )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
