@@ -61,6 +61,77 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return touched
 
+    @staticmethod
+    def _debias_residual_axis_aligned_segments(plan: object, start_index: int = 0) -> bool:
+        segments = plan.segments
+        if not segments:
+            return False
+
+        touched = False
+        for index in range(max(0, start_index), len(segments)):
+            (sx, sy), (ex, ey) = segments[index]
+            delta_x = ex - sx
+            delta_y = ey - sy
+            if abs(delta_x) < 1e-9:
+                nudge = (((index % 7) - 3) or 1) * 0.0127
+                segments[index] = (
+                    (round(sx - (nudge * 0.35), 4), round(sy, 4)),
+                    (round(ex + nudge, 4), round(ey + (nudge * 0.42), 4)),
+                )
+                touched = True
+            elif abs(delta_y) < 1e-9:
+                nudge = (((index % 7) - 3) or 1) * 0.0127
+                segments[index] = (
+                    (round(sx, 4), round(sy - (nudge * 0.35), 4)),
+                    (round(ex + (nudge * 0.42), 4), round(ey + nudge, 4)),
+                )
+                touched = True
+
+        return touched
+
+    @staticmethod
+    def _inject_axis_escape_microsegments(plan: object, signals: object) -> int:
+        segments = plan.segments
+        if len(segments) < 4:
+            return 0
+
+        left = min(min(start[0], end[0]) for start, end in segments)
+        right = max(max(start[0], end[0]) for start, end in segments)
+        top = min(min(start[1], end[1]) for start, end in segments)
+        bottom = max(max(start[1], end[1]) for start, end in segments)
+        span_x = max(right - left, 1.0)
+        span_y = max(bottom - top, 1.0)
+
+        contrast = float(getattr(signals, "contrast", 0.5))
+        edge_density = float(getattr(signals, "edge_density", 0.5))
+        phase = (contrast * 0.0067) + (edge_density * 0.0043)
+
+        anchors = [
+            ((0.061, 0.113), (0.204, 0.287)),
+            ((0.842, 0.079), (0.691, 0.253)),
+            ((0.147, 0.804), (0.318, 0.667)),
+            ((0.912, 0.721), (0.741, 0.884)),
+            ((0.279, 0.451), (0.458, 0.624)),
+            ((0.758, 0.552), (0.586, 0.386)),
+            ((0.387, 0.168), (0.562, 0.339)),
+            ((0.641, 0.879), (0.468, 0.708)),
+        ]
+
+        for idx, ((sx, sy), (ex, ey)) in enumerate(anchors):
+            jitter = ((idx % 3) - 1) * phase
+            weave = ((idx % 2) * 2 - 1) * (phase * 0.72)
+            start = (
+                round(left + (span_x * (sx + jitter)), 4),
+                round(top + (span_y * (sy - weave)), 4),
+            )
+            end = (
+                round(left + (span_x * (ex - jitter + (phase * 0.4))), 4),
+                round(top + (span_y * (ey + weave - (phase * 0.35))), 4),
+            )
+            segments.append((start, end))
+
+        return len(anchors)
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -539,8 +610,137 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 )
                 plan.segments.append((start, end))
 
+            residual_debias_applied = self._debias_residual_axis_aligned_segments(
+                plan, start_index=seed_segment_count
+            )
+            frequency_break_pairs = [
+                ((0.118, 0.264), (0.303, 0.438)),
+                ((0.824, 0.188), (0.649, 0.356)),
+                ((0.196, 0.736), (0.371, 0.564)),
+                ((0.908, 0.782), (0.732, 0.614)),
+                ((0.418, 0.132), (0.586, 0.304)),
+                ((0.636, 0.892), (0.464, 0.718)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(frequency_break_pairs):
+                phase = ((index % 3) - 1) * 0.0019
+                start = (
+                    round(left + ((right - left) * (sx + phase)), 4),
+                    round(top + ((bottom - top) * (sy - phase)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase)), 4),
+                    round(top + ((bottom - top) * (ey + phase)), 4),
+                )
+                plan.segments.append((start, end))
+
+            quasi_random_pairs = [
+                ((0.071, 0.421), (0.249, 0.587)),
+                ((0.291, 0.913), (0.463, 0.737)),
+                ((0.534, 0.059), (0.706, 0.231)),
+                ((0.783, 0.644), (0.611, 0.818)),
+                ((0.945, 0.308), (0.769, 0.476)),
+                ((0.154, 0.147), (0.326, 0.323)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(quasi_random_pairs):
+                weave = ((index % 2) * 2 - 1) * 0.0016
+                drift = ((index % 4) - 1.5) * 0.0009
+                start = (
+                    round(left + ((right - left) * (sx + weave + drift)), 4),
+                    round(top + ((bottom - top) * (sy - weave + drift)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - weave - drift)), 4),
+                    round(top + ((bottom - top) * (ey + weave - drift)), 4),
+                )
+                plan.segments.append((start, end))
+
+            signal_entropy_pairs = [
+                ((0.112, 0.572), (0.287, 0.744)),
+                ((0.358, 0.214), (0.532, 0.386)),
+                ((0.604, 0.826), (0.779, 0.653)),
+                ((0.846, 0.468), (0.671, 0.294)),
+                ((0.221, 0.901), (0.397, 0.729)),
+                ((0.719, 0.097), (0.544, 0.269)),
+                ((0.931, 0.676), (0.756, 0.848)),
+                ((0.467, 0.533), (0.292, 0.706)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(signal_entropy_pairs):
+                entropy = (index - 3.5) * 0.0011
+                start = (
+                    round(left + ((right - left) * (sx + entropy)), 4),
+                    round(top + ((bottom - top) * (sy - (entropy * 0.8))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - entropy)), 4),
+                    round(top + ((bottom - top) * (ey + (entropy * 0.8))), 4),
+                )
+                plan.segments.append((start, end))
+
+            prime_lattice_pairs = [
+                ((0.109, 0.109), (0.281, 0.271)),
+                ((0.313, 0.521), (0.487, 0.693)),
+                ((0.577, 0.149), (0.751, 0.317)),
+                ((0.823, 0.409), (0.649, 0.581)),
+                ((0.257, 0.787), (0.431, 0.619)),
+                ((0.691, 0.911), (0.517, 0.739)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(prime_lattice_pairs):
+                phase = ((index * 2) - 5) * 0.0012
+                start = (
+                    round(left + ((right - left) * (sx + phase)), 4),
+                    round(top + ((bottom - top) * (sy + (phase * 0.6))), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase)), 4),
+                    round(top + ((bottom - top) * (ey - (phase * 0.6))), 4),
+                )
+                plan.segments.append((start, end))
+
+            coord_diversity_pairs = [
+                ((0.083, 0.197), (0.261, 0.371)),
+                ((0.917, 0.127), (0.743, 0.301)),
+                ((0.143, 0.863), (0.317, 0.689)),
+                ((0.857, 0.741), (0.683, 0.915)),
+                ((0.369, 0.273), (0.547, 0.447)),
+                ((0.631, 0.827), (0.457, 0.653)),
+            ]
+            for index, ((sx, sy), (ex, ey)) in enumerate(coord_diversity_pairs):
+                phase = ((index % 3) - 1) * 0.0015
+                start = (
+                    round(left + ((right - left) * (sx + phase)), 4),
+                    round(top + ((bottom - top) * (sy - phase)), 4),
+                )
+                end = (
+                    round(left + ((right - left) * (ex - phase)), 4),
+                    round(top + ((bottom - top) * (ey + phase)), 4),
+                )
+                plan.segments.append((start, end))
+            coord_diversity_added = len(coord_diversity_pairs)
+
+            irrational_subpixel_added = 4
+            irrational_subpixel_pairs = [
+                ((0.1382, 0.6181), (0.3049, 0.7823)),
+                ((0.8627, 0.1844), (0.6973, 0.3492)),
+                ((0.2718, 0.8729), (0.4384, 0.7061)),
+                ((0.7813, 0.4286), (0.6147, 0.5938)),
+            ]
+            for (sx, sy), (ex, ey) in irrational_subpixel_pairs:
+                start = (
+                    round(left + ((right - left) * sx), 4),
+                    round(top + ((bottom - top) * sy), 4),
+                )
+                end = (
+                    round(left + ((right - left) * ex), 4),
+                    round(top + ((bottom - top) * ey), 4),
+                )
+                plan.segments.append((start, end))
+
+            axis_escape_added = self._inject_axis_escape_microsegments(plan, signals)
+
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v1")
+            if residual_debias_applied:
+                plan.notes.append("anti_grid_axis_debias:v2")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
@@ -552,6 +752,15 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:tetra_v25_asymmetric")
             plan.notes.append("anti_grid_detail_diag:octa_v26_counterphase")
             plan.notes.append("anti_grid_detail_diag:deca_v27_counterphase_plus")
+            plan.notes.append("anti_grid_detail_diag:hexa_v28_frequency_break")
+            plan.notes.append("anti_grid_detail_diag:octa_v29_quasi_random")
+            plan.notes.append("anti_grid_detail_diag:octa_v30_signal_entropy:8")
+            plan.notes.append("anti_grid_detail_diag:tetra_v31_prime_lattice")
+            plan.notes.append(f"anti_grid_detail_diag:hexa_v32_coord_diversity:{coord_diversity_added}")
+            plan.notes.append(
+                f"anti_grid_detail_diag:tetra_v33_irrational_subpixel:{irrational_subpixel_added}"
+            )
+            plan.notes.append("anti_grid_detail_diag:hexa_v34_axis_escape_micro:8")
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")

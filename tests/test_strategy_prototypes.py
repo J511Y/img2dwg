@@ -101,6 +101,22 @@ def test_two_stage_residual_axis_debias_nudges_perfectly_aligned_segments() -> N
     assert abs(second[0][1] - second[1][1]) > 1e-6
 
 
+def test_two_stage_residual_axis_debias_respects_start_index() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((10.0, 10.0), (10.0, 22.0)),
+            ((30.0, 40.0), (48.0, 40.0)),
+            ((1.0, 1.0), (5.0, 7.0)),
+        ]
+    )
+
+    touched = TwoStageBaselineStrategy._debias_residual_axis_aligned_segments(plan, start_index=2)
+
+    assert touched is False
+    assert plan.segments[0] == ((10.0, 10.0), (10.0, 22.0))
+    assert plan.segments[1] == ((30.0, 40.0), (48.0, 40.0))
+
+
 def test_two_stage_axis_escape_microsegments_add_eight_non_axis_segments() -> None:
     plan = SimpleNamespace(
         segments=[
