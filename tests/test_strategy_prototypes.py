@@ -233,7 +233,7 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:octa_v31_axis_escape_phase:8" in note for note in out.notes)
     assert any("anti_grid_detail_diag:octa_v32_irrational_subpixel:8" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v33_residual_blue_noise_phase:6" in note for note in out.notes)
-    assert any("anti_grid_detail_diag:octa_v34_quasi_aperiodic_coord_lift:8" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:octa_v34_quasi_aperiodic_coord_lift:10" in note for note in out.notes)
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -315,7 +315,7 @@ def test_consensus_strategy_injects_quasi_aperiodic_coord_lift_segments() -> Non
 
     appended = ConsensusQAStrategy._inject_quasi_aperiodic_coord_lift_segments(plan, signals)
 
-    assert appended == 8
+    assert appended == 10
     injected = plan.segments[-appended:]
     assert all(
         abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
