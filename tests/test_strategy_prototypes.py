@@ -132,6 +132,30 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert diagonal_count >= 62
 
 
+def test_consensus_strategy_seed_debias_diversifies_seed_coordinates(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    out = ConsensusQAStrategy().run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
+        tmp_path / "out",
+    )
+
+    assert out.success is True
+    assert out.dxf_path is not None
+
+    doc = ezdxf.readfile(str(out.dxf_path))
+    lines = list(doc.modelspace().query("LINE"))
+    seed_lines = lines[:6]
+    assert len(seed_lines) == 6
+
+    start_x_values = {round(line.dxf.start.x, 4) for line in seed_lines}
+    start_y_values = {round(line.dxf.start.y, 4) for line in seed_lines}
+
+    assert len(start_x_values) >= 4
+    assert len(start_y_values) >= 4
+
+
 def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
