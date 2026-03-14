@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-14T06:39:06.278405+00:00",
+  "generated_at": "2026-03-14T06:39:40.269161+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -806,9 +806,9 @@
         "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 126.0,
+        "previous": 130.0,
         "current": 130.0,
-        "delta": 4.0
+        "delta": 0.0
       }
     }
   },
