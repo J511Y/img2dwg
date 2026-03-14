@@ -45,6 +45,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             if abs(sx - ex) < 1e-9:
                 shift_x = ((index % 5) - 2) * skew
                 shift_y = ((index % 3) - 1) * (skew * 0.6)
+                if abs(shift_x) < 1e-9:
+                    shift_x = ((index % 2) * 2 - 1) * (skew * 0.35)
+                if abs(shift_y) < 1e-9:
+                    shift_y = ((index % 3) - 1 or 1) * (skew * 0.27)
                 segments[index] = (
                     (round(sx, 4), round(sy, 4)),
                     (round(ex + shift_x, 4), round(ey + shift_y, 4)),
@@ -53,6 +57,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             elif abs(sy - ey) < 1e-9:
                 shift_y = ((index % 5) - 2) * skew
                 shift_x = ((index % 3) - 1) * (skew * 0.6)
+                if abs(shift_y) < 1e-9:
+                    shift_y = ((index % 2) * 2 - 1) * (skew * 0.35)
+                if abs(shift_x) < 1e-9:
+                    shift_x = ((index % 3) - 1 or 1) * (skew * 0.27)
                 segments[index] = (
                     (round(sx, 4), round(sy, 4)),
                     (round(ex + shift_x, 4), round(ey + shift_y, 4)),

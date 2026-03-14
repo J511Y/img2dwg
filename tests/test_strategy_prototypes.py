@@ -109,6 +109,24 @@ def test_two_stage_residual_axis_debias_nudges_perfectly_aligned_segments() -> N
     assert abs(second[0][1] - second[1][1]) > 1e-6
 
 
+def test_two_stage_seed_debias_never_leaves_axis_aligned_seed_lines() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((10.0, 10.0), (10.0, 22.0)),
+            ((30.0, 40.0), (48.0, 40.0)),
+            ((12.0, 5.0), (12.0, 14.0)),
+            ((3.0, 11.0), (19.0, 11.0)),
+        ]
+    )
+
+    touched = TwoStageBaselineStrategy._debias_axis_aligned_seed_segments(plan, seed_segment_count=4)
+
+    assert touched is True
+    for (sx, sy), (ex, ey) in plan.segments:
+        assert abs(sx - ex) > 1e-6
+        assert abs(sy - ey) > 1e-6
+
+
 def test_two_stage_residual_axis_debias_respects_start_index() -> None:
     plan = SimpleNamespace(
         segments=[
@@ -223,6 +241,24 @@ def test_two_stage_phase_shift_lattice_breakers_expand_coordinate_diversity() ->
     rounded_y = {round(coord, 3) for start, end in injected for coord in (start[1], end[1])}
     assert len(rounded_x) >= 14
     assert len(rounded_y) >= 14
+
+
+def test_consensus_seed_debias_never_leaves_axis_aligned_seed_lines() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((10.0, 10.0), (10.0, 22.0)),
+            ((30.0, 40.0), (48.0, 40.0)),
+            ((12.0, 5.0), (12.0, 14.0)),
+            ((3.0, 11.0), (19.0, 11.0)),
+        ]
+    )
+
+    touched = ConsensusQAStrategy._debias_axis_aligned_seed_segments(plan, seed_segment_count=4)
+
+    assert touched is True
+    for (sx, sy), (ex, ey) in plan.segments:
+        assert abs(sx - ex) > 1e-6
+        assert abs(sy - ey) > 1e-6
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:

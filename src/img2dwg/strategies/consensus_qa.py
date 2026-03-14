@@ -59,6 +59,10 @@ class ConsensusQAStrategy(ConversionStrategy):
                 start_x = sx + (phase_minor * skew * 0.11)
                 end_x = ex + (phase * skew * 0.29)
                 end_y = ey + (phase_minor * skew * 0.63)
+                if abs(start_x - end_x) < 1e-9:
+                    end_x += ((index % 2) * 2 - 1) * (skew * 0.33)
+                if abs(end_y - sy) < 1e-9:
+                    end_y += ((index % 3) - 1 or 1) * (skew * 0.25)
                 segments[index] = (
                     (round(start_x, 4), round(sy, 4)),
                     (round(end_x, 4), round(end_y, 4)),
@@ -68,6 +72,10 @@ class ConsensusQAStrategy(ConversionStrategy):
                 start_y = sy + (phase_minor * skew * 0.11)
                 end_y = ey + (phase * skew * 0.29)
                 end_x = ex + (phase_minor * skew * 0.63)
+                if abs(start_y - end_y) < 1e-9:
+                    end_y += ((index % 2) * 2 - 1) * (skew * 0.33)
+                if abs(end_x - sx) < 1e-9:
+                    end_x += ((index % 3) - 1 or 1) * (skew * 0.25)
                 segments[index] = (
                     (round(sx, 4), round(start_y, 4)),
                     (round(end_x, 4), round(end_y, 4)),
