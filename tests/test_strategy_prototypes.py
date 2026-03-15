@@ -130,12 +130,12 @@ def test_two_stage_strategy_has_grid_debias_guardrail(tmp_path: Path) -> None:
 
     assert baseline.success is True
     assert baseline.dxf_path is not None
-    assert any("offgrid_debias_chords:x6" in note for note in baseline.notes)
+    assert any("offgrid_debias_chords:x7" in note for note in baseline.notes)
 
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(baseline.dxf_path)
     axis_ratio = (line_count - non_axis_count) / line_count
 
-    assert axis_ratio <= 0.19
+    assert axis_ratio <= 0.17
     assert unique_x_count >= 16
     assert unique_y_count >= 16
 
