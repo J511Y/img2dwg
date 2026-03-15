@@ -422,7 +422,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         phi = 1.61803398875
         silver = 2.41421356237
-        adaptive = 0.00073 + (signals.edge_density * 0.00028) + (signals.contrast * 0.00025)
+        adaptive = 0.00079 + (signals.edge_density * 0.00031) + (signals.contrast * 0.00028)
         pairs = [
             (0.0479, 0.8527, 0.2216, 0.6834),
             (0.2834, 0.1946, 0.4572, 0.3638),
@@ -430,6 +430,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             (0.7546, 0.2711, 0.9283, 0.4408),
             (0.1368, 0.5974, 0.3105, 0.4276),
             (0.6401, 0.1189, 0.8138, 0.2881),
+            (0.2057, 0.7432, 0.3795, 0.5741),
+            (0.4328, 0.0864, 0.6063, 0.2557),
+            (0.5872, 0.6775, 0.7609, 0.5076),
+            (0.8214, 0.4039, 0.6478, 0.5731),
         ]
 
         appended = 0

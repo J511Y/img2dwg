@@ -241,7 +241,7 @@ def test_two_stage_irrational_phase_lattice_segments_lift_coordinate_diversity()
 
     appended = TwoStageBaselineStrategy._inject_irrational_phase_lattice_segments(plan, signals)
 
-    assert appended == 6
+    assert appended == 10
     injected = plan.segments[-appended:]
     assert all(
         abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
@@ -249,8 +249,8 @@ def test_two_stage_irrational_phase_lattice_segments_lift_coordinate_diversity()
 
     rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
     rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
-    assert len(rounded_x) >= 11
-    assert len(rounded_y) >= 11
+    assert len(rounded_x) >= 18
+    assert len(rounded_y) >= 18
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
