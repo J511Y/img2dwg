@@ -369,6 +369,46 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_resonant_coordinate_interleave_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        root3 = 1.73205080757
+        adaptive = 0.00079 + (signals.edge_density * 0.00031) + (signals.contrast * 0.00029)
+        pairs = [
+            (0.0613, 0.9281, 0.2394, 0.7418),
+            (0.8142, 0.0839, 0.6364, 0.2615),
+            (0.2976, 0.6473, 0.4759, 0.4687),
+            (0.5481, 0.3184, 0.7267, 0.1398),
+            (0.1327, 0.2215, 0.3112, 0.4016),
+            (0.8671, 0.7762, 0.6883, 0.9541),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 9) * phi) % 1.0 - 0.5) * adaptive
+            weave = (((index + 4) * root3) % 1.0 - 0.5) * (adaptive * 0.88)
+            drift = ((index % 3) - 1) * (adaptive * 0.67)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + drift)), 5),
+                round(top + ((bottom - top) * (sy - (phase * 0.74) + weave - drift)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - phase - (weave * 0.72) - drift)), 5),
+                round(top + ((bottom - top) * (ey + (phase * 0.69) - weave + (drift * 0.83))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -860,6 +900,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             aperiodic_coord_escape_touched = self._inject_aperiodic_coordinate_escape_segments(plan, signals)
             irrational_coord_lift_touched = self._inject_irrational_coordinate_lift_segments(plan, signals)
             resonant_density_lift_touched = self._inject_resonant_density_lift_segments(plan, signals)
+            resonant_interleave_touched = self._inject_resonant_coordinate_interleave_segments(
+                plan, signals
+            )
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
@@ -889,6 +932,11 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             if resonant_density_lift_touched:
                 plan.notes.append(
                     f"anti_grid_detail_diag:octa_v48_resonant_density_lift:{resonant_density_lift_touched}"
+                )
+            if resonant_interleave_touched:
+                plan.notes.append(
+                    "anti_grid_detail_diag:hexa_v49_resonant_coordinate_interleave:"
+                    f"{resonant_interleave_touched}"
                 )
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
