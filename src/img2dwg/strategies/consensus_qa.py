@@ -283,6 +283,47 @@ class ConsensusQAStrategy(ConversionStrategy):
         return appended
 
     @staticmethod
+    def _inject_axis_escape_unique_coord_lift_plus_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        sqrt2 = 1.41421356237
+        adaptive = 0.00121 + (signals.edge_density * 0.00063) + (signals.contrast * 0.00049)
+        anchors = [
+            (0.0391, 0.5538, 0.2063, 0.7192),
+            (0.2716, 0.9714, 0.4398, 0.8067),
+            (0.5144, 0.0286, 0.6817, 0.1949),
+            (0.7532, 0.8893, 0.9206, 0.7234),
+            (0.1437, 0.6818, 0.3112, 0.8462),
+            (0.6074, 0.3175, 0.7751, 0.4838),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(anchors):
+            phase = (((index + 2) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 3) * sqrt2) % 1.0 - 0.5) * (adaptive * 0.9)
+            weave = ((index % 4) - 1.5) * (adaptive * 0.66)
+            drift = ((index % 2) * 2 - 1) * (0.00057 + (signals.contrast * 0.00029))
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + drift)), 5),
+                round(top + ((bottom - top) * (sy - warp + (weave * 0.7) - drift)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.69) - weave - drift)), 5),
+                round(top + ((bottom - top) * (ey + warp - (weave * 0.62) + drift)), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
+    @staticmethod
     def _inject_resonant_density_lift_segments(plan: object, signals: object) -> int:
         if len(plan.segments) < 4:
             return 0
@@ -934,6 +975,9 @@ class ConsensusQAStrategy(ConversionStrategy):
             axis_escape_unique_coord_lift_added = self._inject_axis_escape_unique_coord_lift(
                 plan, signals
             )
+            axis_escape_unique_coord_lift_plus_added = (
+                self._inject_axis_escape_unique_coord_lift_plus_segments(plan, signals)
+            )
             resonant_density_lift_added = self._inject_resonant_density_lift_segments(plan, signals)
 
             if axis_debias_applied:
@@ -981,6 +1025,11 @@ class ConsensusQAStrategy(ConversionStrategy):
                 plan.notes.append(
                     "anti_grid_detail_diag:hexa_v36_axis_escape_unique_coord_lift:"
                     f"{axis_escape_unique_coord_lift_added}"
+                )
+            if axis_escape_unique_coord_lift_plus_added:
+                plan.notes.append(
+                    "anti_grid_detail_diag:hexa_v38_axis_escape_unique_coord_lift_plus:"
+                    f"{axis_escape_unique_coord_lift_plus_added}"
                 )
             if resonant_density_lift_added:
                 plan.notes.append(

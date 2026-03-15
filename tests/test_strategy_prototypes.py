@@ -353,6 +353,10 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
         for note in out.notes
     )
     assert any(
+        "anti_grid_detail_diag:hexa_v38_axis_escape_unique_coord_lift_plus:6" in note
+        for note in out.notes
+    )
+    assert any(
         "anti_grid_detail_diag:octa_v37_resonant_density_lift:8" in note for note in out.notes
     )
 
@@ -471,6 +475,31 @@ def test_consensus_strategy_injects_quasi_aperiodic_density_lift_segments() -> N
     rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
     assert len(rounded_x) >= 8
     assert len(rounded_y) >= 8
+
+
+def test_consensus_strategy_injects_axis_escape_unique_coord_lift_plus_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.63, edge_density=0.6)
+
+    appended = ConsensusQAStrategy._inject_axis_escape_unique_coord_lift_plus_segments(plan, signals)
+
+    assert appended == 6
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 11
+    assert len(rounded_y) >= 11
 
 
 def test_consensus_strategy_seed_debias_diversifies_seed_coordinates(tmp_path: Path) -> None:
