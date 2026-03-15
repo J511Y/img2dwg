@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 from .base import ConversionInput, ConversionOutput, ConversionStrategy
@@ -31,7 +32,17 @@ class TwoStageBaselineStrategy(ConversionStrategy):
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
-        plan = build_vector_plan(signals, self._preset)
+
+        # Adapt chord density to image complexity so we keep lowering axis bias
+        # on dense/contrasty floorplans without changing the base geometry recipe.
+        complexity = (signals.contrast * 0.45) + (signals.edge_density * 0.55)
+        extra_chords = max(0, min(10, int(round(complexity * 14.0)) - 3))
+        preset = replace(
+            self._preset,
+            debias_chord_multiplier=self._preset.debias_chord_multiplier + extra_chords,
+        )
+
+        plan = build_vector_plan(signals, preset)
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
