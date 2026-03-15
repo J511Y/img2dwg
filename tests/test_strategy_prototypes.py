@@ -154,7 +154,7 @@ def test_consensus_strategy_debiases_more_than_two_stage_by_default(tmp_path: Pa
     assert baseline.dxf_path is not None
     assert consensus.success is True
     assert consensus.dxf_path is not None
-    assert any("offgrid_debias_chords:x9" in note for note in consensus.notes)
+    assert any("offgrid_debias_chords:x10" in note for note in consensus.notes)
 
     base_non_axis, base_lines, base_unique_x, base_unique_y = _line_diagnostics(baseline.dxf_path)
     con_non_axis, con_lines, con_unique_x, con_unique_y = _line_diagnostics(consensus.dxf_path)
@@ -165,6 +165,28 @@ def test_consensus_strategy_debiases_more_than_two_stage_by_default(tmp_path: Pa
     assert con_axis_ratio <= base_axis_ratio
     assert con_unique_x >= (base_unique_x - 1)
     assert con_unique_y >= (base_unique_y - 1)
+
+
+def test_consensus_strategy_default_adds_coordinate_diversity_vs_two_stage(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+    consensus = ConsensusQAStrategy().run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.71}),
+        tmp_path / "consensus",
+    )
+
+    assert baseline.success is True
+    assert baseline.dxf_path is not None
+    assert consensus.success is True
+    assert consensus.dxf_path is not None
+
+    _, _, base_unique_x, base_unique_y = _line_diagnostics(baseline.dxf_path)
+    _, _, con_unique_x, con_unique_y = _line_diagnostics(consensus.dxf_path)
+
+    assert con_unique_x >= base_unique_x
+    assert con_unique_y >= base_unique_y
 
 
 def test_consensus_strategy_high_confidence_uses_extra_debias_chords(tmp_path: Path) -> None:
@@ -178,7 +200,7 @@ def test_consensus_strategy_high_confidence_uses_extra_debias_chords(tmp_path: P
 
     assert consensus.success is True
     assert consensus.dxf_path is not None
-    assert any("offgrid_debias_chords:x9" in note for note in consensus.notes)
+    assert any("offgrid_debias_chords:x10" in note for note in consensus.notes)
 
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(consensus.dxf_path)
     axis_ratio = (line_count - non_axis_count) / line_count
