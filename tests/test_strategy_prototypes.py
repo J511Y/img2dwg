@@ -120,3 +120,29 @@ def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Pat
     assert hybrid.dxf_path.exists()
     assert hybrid.metrics["iou"] >= baseline.metrics["iou"]
     assert hybrid.metrics["topology_f1"] >= baseline.metrics["topology_f1"]
+
+
+def test_consensus_strategy_debiases_more_than_two_stage_by_default(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+    consensus = ConsensusQAStrategy().run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.71}),
+        tmp_path / "consensus",
+    )
+
+    assert baseline.success is True
+    assert baseline.dxf_path is not None
+    assert consensus.success is True
+    assert consensus.dxf_path is not None
+
+    base_non_axis, base_lines, base_unique_x, base_unique_y = _line_diagnostics(baseline.dxf_path)
+    con_non_axis, con_lines, con_unique_x, con_unique_y = _line_diagnostics(consensus.dxf_path)
+
+    base_axis_ratio = (base_lines - base_non_axis) / base_lines
+    con_axis_ratio = (con_lines - con_non_axis) / con_lines
+
+    assert con_axis_ratio < base_axis_ratio
+    assert con_unique_x >= base_unique_x
+    assert con_unique_y >= base_unique_y
