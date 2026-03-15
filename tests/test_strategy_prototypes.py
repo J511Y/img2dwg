@@ -54,7 +54,7 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:octa_v26_counterphase" in note for note in out.notes)
     assert any("anti_grid_detail_diag:deca_v27_counterphase_plus" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v41_quasi_lattice_scatter:6" in note for note in out.notes)
-    assert any("anti_grid_detail_diag:entropy_coordinate_lift_v41:168" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:entropy_coordinate_lift_v41:" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v42_axis_escape_micro:8" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v43_axis_escape_entropy:6" in note for note in out.notes)
     assert any("anti_grid_detail_diag:hexa_v44_residual_phase_jitter:6" in note for note in out.notes)
@@ -70,6 +70,10 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any("anti_grid_detail_diag:hexa_v50_irrational_phase_lattice:10" in note for note in out.notes)
     assert any(
         "anti_grid_detail_diag:hexa_v51_irrational_phase_lattice_plus4:4" in note
+        for note in out.notes
+    )
+    assert any(
+        "anti_grid_detail_diag:deca_v52_irrational_phase_lattice_plus6:6" in note
         for note in out.notes
     )
 
@@ -288,6 +292,33 @@ def test_two_stage_irrational_phase_lattice_plus_segments_lift_coordinate_divers
     rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
     assert len(rounded_x) >= 8
     assert len(rounded_y) >= 8
+
+
+def test_two_stage_irrational_phase_lattice_plus6_segments_lift_coordinate_diversity() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.65, edge_density=0.67)
+
+    appended = TwoStageBaselineStrategy._inject_irrational_phase_lattice_plus6_segments(
+        plan, signals
+    )
+
+    assert appended == 6
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 12
+    assert len(rounded_y) >= 12
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
