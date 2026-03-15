@@ -32,6 +32,7 @@ class StrategyPreset:
     include_diagonals: bool
     quality_bias: float
     topology_bias: float
+    offgrid_shift_ratio: float = 0.0
 
 
 def clamp01(value: float) -> float:
@@ -155,6 +156,20 @@ def build_vector_plan(signals: ImageSignals, preset: StrategyPreset) -> VectorPl
             ]
         )
         notes.append("diagonals:on")
+
+    if preset.offgrid_shift_ratio > 0:
+        shift_x = max(1.0, (right - left) * preset.offgrid_shift_ratio)
+        shift_y = max(1.0, (bottom - top) * preset.offgrid_shift_ratio)
+        inset_x = max(1.0, (right - left) * 0.12)
+        inset_y = max(1.0, (bottom - top) * 0.10)
+
+        segments.extend(
+            [
+                ((left + inset_x, top + inset_y), (right - inset_x, bottom - inset_y - shift_y)),
+                ((left + inset_x + shift_x, bottom - inset_y), (right - inset_x - shift_x, top + inset_y + shift_y)),
+            ]
+        )
+        notes.append(f"offgrid_shift:{preset.offgrid_shift_ratio:.3f}")
 
     return VectorPlan(segments=segments, notes=notes)
 

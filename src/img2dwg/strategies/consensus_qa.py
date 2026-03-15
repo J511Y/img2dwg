@@ -24,6 +24,7 @@ class ConsensusQAStrategy(ConversionStrategy):
         include_diagonals=False,
         quality_bias=0.48,
         topology_bias=0.50,
+        offgrid_shift_ratio=0.03,
     )
 
     _high_confidence_preset = StrategyPreset(
@@ -32,6 +33,7 @@ class ConsensusQAStrategy(ConversionStrategy):
         include_diagonals=True,
         quality_bias=0.58,
         topology_bias=0.62,
+        offgrid_shift_ratio=0.04,
     )
 
     _min_consensus = 0.35
