@@ -23,8 +23,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         include_diagonals=True,
         quality_bias=0.42,
         topology_bias=0.40,
-        offgrid_shift_ratio=0.035,
-        diagonal_fan_ratio=0.09,
+        offgrid_shift_ratio=0.038,
+        diagonal_fan_ratio=0.11,
+        debias_chord_multiplier=2,
     )
 
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
