@@ -56,11 +56,12 @@ def test_two_stage_strategy_exports_dxf(tmp_path: Path) -> None:
     assert any("정(thesis)" in note for note in out.notes)
     assert any("offgrid_shift:" in note for note in out.notes)
     assert any("diagonal_fan:" in note for note in out.notes)
+    assert not any("center_cross:on" in note for note in out.notes)
     assert out.dxf_path is not None
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(out.dxf_path)
     assert non_axis_count >= 6
-    assert line_count >= 12
-    assert (line_count - non_axis_count) / line_count <= 0.45
+    assert line_count >= 10
+    assert (line_count - non_axis_count) / line_count <= 0.40
     assert unique_x_count >= 10
     assert unique_y_count >= 10
 
@@ -95,10 +96,11 @@ def test_consensus_strategy_accepts_vote_list(tmp_path: Path) -> None:
     assert out.dxf_path.exists()
     assert any("offgrid_shift:" in note for note in out.notes)
     assert any("diagonal_fan:" in note for note in out.notes)
+    assert not any("center_cross:on" in note for note in out.notes)
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(out.dxf_path)
     assert non_axis_count >= 6
-    assert line_count >= 12
-    assert (line_count - non_axis_count) / line_count <= 0.45
+    assert line_count >= 10
+    assert (line_count - non_axis_count) / line_count <= 0.40
     assert unique_x_count >= 10
     assert unique_y_count >= 10
 
