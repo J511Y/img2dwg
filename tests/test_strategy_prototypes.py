@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import ezdxf
 from PIL import Image, ImageDraw
 
 from img2dwg.strategies.base import ConversionInput
@@ -17,6 +18,22 @@ def _make_sample_plan_image(path: Path) -> None:
     image.convert("RGB").save(path)
 
 
+def _count_non_axis_lines(dxf_path: Path, *, eps: float = 1e-6) -> int:
+    doc = ezdxf.readfile(str(dxf_path))
+    msp = doc.modelspace()
+    count = 0
+    for entity in msp:
+        if entity.dxftype() != "LINE":
+            continue
+        start = entity.dxf.start
+        end = entity.dxf.end
+        dx = float(end[0]) - float(start[0])
+        dy = float(end[1]) - float(start[1])
+        if abs(dx) > eps and abs(dy) > eps:
+            count += 1
+    return count
+
+
 def test_two_stage_strategy_exports_dxf(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
@@ -29,6 +46,9 @@ def test_two_stage_strategy_exports_dxf(tmp_path: Path) -> None:
     assert out.dxf_path.exists()
     assert out.metrics["iou"] > 0.0
     assert any("정(thesis)" in note for note in out.notes)
+    assert any("offgrid_shift:" in note for note in out.notes)
+    assert out.dxf_path is not None
+    assert _count_non_axis_lines(out.dxf_path) >= 2
 
 
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
@@ -59,6 +79,8 @@ def test_consensus_strategy_accepts_vote_list(tmp_path: Path) -> None:
     assert out.success is True
     assert out.dxf_path is not None
     assert out.dxf_path.exists()
+    assert any("offgrid_shift:" in note for note in out.notes)
+    assert _count_non_axis_lines(out.dxf_path) >= 2
 
 
 def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Path) -> None:
