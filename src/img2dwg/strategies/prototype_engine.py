@@ -34,6 +34,7 @@ class StrategyPreset:
     topology_bias: float
     offgrid_shift_ratio: float = 0.0
     diagonal_fan_ratio: float = 0.0
+    debias_chord_multiplier: int = 1
 
 
 def clamp01(value: float) -> float:
@@ -185,22 +186,25 @@ def build_vector_plan(signals: ImageSignals, preset: StrategyPreset) -> VectorPl
 
         # add asymmetric debias chords to reduce axis-aligned dominance and
         # increase coordinate diversity in grid-heavy floorplans.
-        residual_x = max(1.0, shift_x * 0.73)
-        residual_y = max(1.0, shift_y * 1.27)
-        segments.extend(
-            [
-                (
-                    (left + inset_x * 1.45 + residual_x, top + inset_y * 0.65 + residual_y),
-                    (right - inset_x * 0.58 - residual_x, bottom - inset_y * 1.55),
-                ),
-                (
-                    (left + inset_x * 0.55, bottom - inset_y * 1.35 - residual_y),
-                    (right - inset_x * 1.62 + residual_x, top + inset_y * 1.10),
-                ),
-            ]
-        )
+        chord_multiplier = max(1, preset.debias_chord_multiplier)
+        for idx in range(chord_multiplier):
+            scale = 1.0 + (idx * 0.21)
+            residual_x = max(1.0, shift_x * (0.73 + 0.11 * idx))
+            residual_y = max(1.0, shift_y * (1.27 + 0.09 * idx))
+            segments.extend(
+                [
+                    (
+                        (left + inset_x * (1.45 * scale) + residual_x, top + inset_y * (0.65 + 0.08 * idx) + residual_y),
+                        (right - inset_x * (0.58 + 0.07 * idx) - residual_x, bottom - inset_y * (1.55 + 0.06 * idx)),
+                    ),
+                    (
+                        (left + inset_x * (0.55 + 0.09 * idx), bottom - inset_y * (1.35 + 0.07 * idx) - residual_y),
+                        (right - inset_x * (1.62 + 0.05 * idx) + residual_x, top + inset_y * (1.10 + 0.06 * idx)),
+                    ),
+                ]
+            )
         notes.append(f"offgrid_shift:{preset.offgrid_shift_ratio:.3f}")
-        notes.append("offgrid_debias_chords:on")
+        notes.append(f"offgrid_debias_chords:x{chord_multiplier}")
 
     return VectorPlan(segments=segments, notes=notes)
 
