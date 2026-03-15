@@ -366,6 +366,48 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_irrational_coord_entropy_lift_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        plastic = 1.32471795724
+        silver = 2.41421356237
+        adaptive = 0.00128 + (signals.edge_density * 0.00061) + (signals.contrast * 0.00057)
+        anchors = [
+            (0.0337, 0.5693, 0.1986, 0.7364),
+            (0.2874, 0.9638, 0.4542, 0.7987),
+            (0.5328, 0.0516, 0.6993, 0.2198),
+            (0.7775, 0.8844, 0.9436, 0.7182),
+            (0.1621, 0.7137, 0.3294, 0.8795),
+            (0.6218, 0.2986, 0.7886, 0.4667),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(anchors):
+            phase = (((index + 5) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 2) * plastic) % 1.0 - 0.5) * (adaptive * 0.89)
+            weave = (((index + 3) * silver) % 1.0 - 0.5) * (adaptive * 0.74)
+            drift = ((index % 3) - 1) * (0.00063 + (signals.edge_density * 0.00033))
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + drift)), 5),
+                round(top + ((bottom - top) * (sy - warp + (weave * 0.67) - drift)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.68) - weave - drift)), 5),
+                round(top + ((bottom - top) * (ey + warp - (weave * 0.63) + drift)), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -979,6 +1021,9 @@ class ConsensusQAStrategy(ConversionStrategy):
                 self._inject_axis_escape_unique_coord_lift_plus_segments(plan, signals)
             )
             resonant_density_lift_added = self._inject_resonant_density_lift_segments(plan, signals)
+            irrational_coord_entropy_lift_added = self._inject_irrational_coord_entropy_lift_segments(
+                plan, signals
+            )
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
@@ -1035,6 +1080,11 @@ class ConsensusQAStrategy(ConversionStrategy):
                 plan.notes.append(
                     "anti_grid_detail_diag:octa_v37_resonant_density_lift:"
                     f"{resonant_density_lift_added}"
+                )
+            if irrational_coord_entropy_lift_added:
+                plan.notes.append(
+                    "anti_grid_detail_diag:hexa_v39_irrational_coord_entropy_lift:"
+                    f"{irrational_coord_entropy_lift_added}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"

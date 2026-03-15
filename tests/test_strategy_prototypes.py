@@ -394,6 +394,10 @@ def test_consensus_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
     assert any(
         "anti_grid_detail_diag:octa_v37_resonant_density_lift:8" in note for note in out.notes
     )
+    assert any(
+        "anti_grid_detail_diag:hexa_v39_irrational_coord_entropy_lift:6" in note
+        for note in out.notes
+    )
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -449,6 +453,31 @@ def test_consensus_strategy_injects_residual_blue_noise_phase_segments() -> None
     signals = SimpleNamespace(contrast=0.62, edge_density=0.61)
 
     appended = ConsensusQAStrategy._inject_residual_blue_noise_phase_segments(plan, signals)
+
+    assert appended == 6
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 10
+    assert len(rounded_y) >= 10
+
+
+def test_consensus_strategy_injects_irrational_coord_entropy_lift_segments() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.63, edge_density=0.59)
+
+    appended = ConsensusQAStrategy._inject_irrational_coord_entropy_lift_segments(plan, signals)
 
     assert appended == 6
     injected = plan.segments[-appended:]
