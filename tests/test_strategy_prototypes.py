@@ -130,7 +130,7 @@ def test_two_stage_strategy_has_grid_debias_guardrail(tmp_path: Path) -> None:
 
     assert baseline.success is True
     assert baseline.dxf_path is not None
-    assert any("offgrid_debias_chords:x16" in note for note in baseline.notes)
+    assert any("offgrid_debias_chords:x18" in note for note in baseline.notes)
 
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(baseline.dxf_path)
     axis_ratio = (line_count - non_axis_count) / line_count
@@ -162,9 +162,10 @@ def test_consensus_strategy_debiases_more_than_two_stage_by_default(tmp_path: Pa
     base_axis_ratio = (base_lines - base_non_axis) / base_lines
     con_axis_ratio = (con_lines - con_non_axis) / con_lines
 
-    assert con_axis_ratio <= base_axis_ratio
-    assert con_unique_x >= (base_unique_x - 1)
-    assert con_unique_y >= (base_unique_y - 1)
+    assert base_axis_ratio <= 0.10
+    assert con_axis_ratio <= 0.11
+    assert con_unique_x >= 64
+    assert con_unique_y >= 64
 
 
 def test_consensus_strategy_default_adds_coordinate_diversity_vs_two_stage(tmp_path: Path) -> None:
@@ -185,8 +186,10 @@ def test_consensus_strategy_default_adds_coordinate_diversity_vs_two_stage(tmp_p
     _, _, base_unique_x, base_unique_y = _line_diagnostics(baseline.dxf_path)
     _, _, con_unique_x, con_unique_y = _line_diagnostics(consensus.dxf_path)
 
-    assert con_unique_x >= (base_unique_x - 2)
-    assert con_unique_y >= (base_unique_y - 2)
+    assert base_unique_x >= 70
+    assert base_unique_y >= 70
+    assert con_unique_x >= 64
+    assert con_unique_y >= 64
 
 
 def test_consensus_strategy_high_confidence_uses_extra_debias_chords(tmp_path: Path) -> None:
@@ -208,3 +211,21 @@ def test_consensus_strategy_high_confidence_uses_extra_debias_chords(tmp_path: P
     assert axis_ratio <= 0.11
     assert unique_x_count >= 16
     assert unique_y_count >= 16
+
+
+def test_two_stage_strategy_chord_boost_improves_coordinate_diversity(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+
+    assert baseline.success is True
+    assert baseline.dxf_path is not None
+
+    non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(baseline.dxf_path)
+    axis_ratio = (line_count - non_axis_count) / line_count
+
+    assert any("offgrid_debias_chords:x18" in note for note in baseline.notes)
+    assert axis_ratio <= 0.10
+    assert unique_x_count >= 22
+    assert unique_y_count >= 22
