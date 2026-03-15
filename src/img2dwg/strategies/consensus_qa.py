@@ -20,7 +20,7 @@ class ConsensusQAStrategy(ConversionStrategy):
 
     _base_preset = StrategyPreset(
         margin_ratio=0.05,
-        include_center_cross=True,
+        include_center_cross=False,
         include_diagonals=True,
         quality_bias=0.48,
         topology_bias=0.50,
@@ -30,7 +30,7 @@ class ConsensusQAStrategy(ConversionStrategy):
 
     _high_confidence_preset = StrategyPreset(
         margin_ratio=0.05,
-        include_center_cross=True,
+        include_center_cross=False,
         include_diagonals=True,
         quality_bias=0.58,
         topology_bias=0.62,
