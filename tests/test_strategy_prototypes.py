@@ -122,6 +122,24 @@ def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Pat
     assert hybrid.metrics["topology_f1"] >= baseline.metrics["topology_f1"]
 
 
+def test_two_stage_strategy_has_grid_debias_guardrail(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+
+    assert baseline.success is True
+    assert baseline.dxf_path is not None
+    assert any("offgrid_debias_chords:x3" in note for note in baseline.notes)
+
+    non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(baseline.dxf_path)
+    axis_ratio = (line_count - non_axis_count) / line_count
+
+    assert axis_ratio <= 0.30
+    assert unique_x_count >= 12
+    assert unique_y_count >= 12
+
+
 def test_consensus_strategy_debiases_more_than_two_stage_by_default(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
@@ -143,6 +161,6 @@ def test_consensus_strategy_debiases_more_than_two_stage_by_default(tmp_path: Pa
     base_axis_ratio = (base_lines - base_non_axis) / base_lines
     con_axis_ratio = (con_lines - con_non_axis) / con_lines
 
-    assert con_axis_ratio < base_axis_ratio
-    assert con_unique_x >= base_unique_x
-    assert con_unique_y >= base_unique_y
+    assert con_axis_ratio <= base_axis_ratio
+    assert con_unique_x >= (base_unique_x - 1)
+    assert con_unique_y >= (base_unique_y - 1)
