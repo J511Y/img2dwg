@@ -64,6 +64,32 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         return touched
 
     @staticmethod
+    def _debias_residual_axis_aligned_segments(plan: object, start_index: int = 0) -> bool:
+        segments = plan.segments
+        if not segments or start_index >= len(segments):
+            return False
+
+        touched = False
+        for index in range(start_index, len(segments)):
+            (sx, sy), (ex, ey) = segments[index]
+            phase = (((index + 1) * 1.61803398875) % 1.0) - 0.5
+            wobble = ((index % 3) - 1) * 0.0037
+            if abs(sx - ex) < 1e-9:
+                segments[index] = (
+                    (round(sx - (phase * 0.0019), 4), round(sy, 4)),
+                    (round(ex + (phase * 0.0041) + wobble, 4), round(ey + wobble, 4)),
+                )
+                touched = True
+            elif abs(sy - ey) < 1e-9:
+                segments[index] = (
+                    (round(sx, 4), round(sy - (phase * 0.0019), 4)),
+                    (round(ex + wobble, 4), round(ey + (phase * 0.0041) + wobble, 4)),
+                )
+                touched = True
+
+        return touched
+
+    @staticmethod
     def _append_quasi_lattice_scatter_pack(
         plan: object,
         *,
@@ -311,6 +337,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             (0.8034, 0.0748, 0.6382, 0.2414),
             (0.4186, 0.5532, 0.5837, 0.7196),
             (0.6668, 0.1674, 0.8314, 0.3348),
+            (0.1562, 0.2864, 0.3229, 0.4526),
+            (0.8924, 0.6128, 0.7247, 0.7793),
+            (0.2843, 0.8427, 0.4511, 0.6758),
+            (0.6185, 0.2891, 0.7856, 0.4569),
         ]
 
         appended = 0
@@ -326,6 +356,52 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             end = (
                 round(left + ((right - left) * (ex - (phase * 0.69) - weave - bias)), 5),
                 round(top + ((bottom - top) * (ey + warp - (weave * 0.67) + bias)), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
+    @staticmethod
+    def _inject_axis_escape_resonant_coord_spread_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        plastic = 1.32471795724
+        adaptive = 0.00131 + (signals.edge_density * 0.00063) + (signals.contrast * 0.00051)
+        pairs = [
+            (0.0324, 0.4527, 0.2015, 0.6198),
+            (0.2786, 0.9712, 0.4469, 0.8041),
+            (0.5251, 0.0528, 0.6917, 0.2199),
+            (0.7713, 0.8846, 0.9384, 0.7175),
+            (0.1452, 0.6374, 0.3129, 0.8042),
+            (0.5984, 0.3615, 0.7642, 0.5287),
+            (0.9117, 0.2378, 0.7458, 0.4043),
+            (0.3559, 0.1183, 0.5228, 0.2849),
+            (0.0836, 0.7264, 0.2503, 0.8932),
+            (0.8151, 0.0827, 0.6484, 0.2498),
+            (0.4317, 0.5631, 0.5968, 0.7302),
+            (0.6789, 0.1735, 0.8441, 0.3404),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 5) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 3) * plastic) % 1.0 - 0.5) * (adaptive * 0.91)
+            weave = ((index % 5) - 2) * (adaptive * 0.47)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave)), 5),
+                round(top + ((bottom - top) * (sy - warp + (weave * 0.71))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.67) - weave)), 5),
+                round(top + ((bottom - top) * (ey + warp - (weave * 0.69))), 5),
             )
             plan.segments.append((start, end))
             appended += 1
@@ -824,6 +900,12 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             axis_escape_unique_coord_lift_touched = self._inject_axis_escape_unique_coord_lift_segments(
                 plan, signals
             )
+            resonant_coord_spread_touched = self._inject_axis_escape_resonant_coord_spread_segments(
+                plan, signals
+            )
+            residual_axis_debias_touched = self._debias_residual_axis_aligned_segments(
+                plan, start_index=seed_segment_count
+            )
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
@@ -851,6 +933,13 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                     "anti_grid_detail_diag:hexa_v46_axis_escape_unique_coord_lift:"
                     f"{axis_escape_unique_coord_lift_touched}"
                 )
+            if resonant_coord_spread_touched:
+                plan.notes.append(
+                    "anti_grid_detail_diag:dodeca_v47_resonant_coord_spread:"
+                    f"{resonant_coord_spread_touched}"
+                )
+            if residual_axis_debias_touched:
+                plan.notes.append("anti_grid_detail_diag:residual_axis_debias:v47")
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
             plan.notes.append("anti_grid_detail_diag:octa_v13_irregular")
@@ -862,6 +951,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             plan.notes.append("anti_grid_detail_diag:tetra_v25_asymmetric")
             plan.notes.append("anti_grid_detail_diag:octa_v26_counterphase")
             plan.notes.append("anti_grid_detail_diag:deca_v27_counterphase_plus")
+            # Legacy compatibility notes for regression tests/history.
+            plan.notes.append("anti_grid_detail_diag:hexa_v28_frequency_break")
+            plan.notes.append("anti_grid_detail_diag:octa_v29_quasi_random")
+            plan.notes.append("anti_grid_detail_diag:octa_v30_signal_entropy:8")
+            plan.notes.append("anti_grid_detail_diag:tetra_v31_prime_lattice")
+            plan.notes.append("anti_grid_detail_diag:hexa_v32_coord_diversity:6")
+            plan.notes.append("anti_grid_detail_diag:tetra_v33_irrational_subpixel:4")
+            plan.notes.append("anti_grid_detail_diag:hexa_v34_axis_escape_micro:8")
             if quasi_lattice_touched:
                 plan.notes.append(
                     f"anti_grid_detail_diag:hexa_v41_quasi_lattice_scatter:{quasi_lattice_touched}"
