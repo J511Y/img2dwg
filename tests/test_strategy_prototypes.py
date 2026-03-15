@@ -42,6 +42,13 @@ def _line_diagnostics(dxf_path: Path, *, eps: float = 1e-6) -> tuple[int, int, i
     return non_axis_count, line_count, len(x_coords), len(y_coords)
 
 
+def _extract_debias_chord_multiplier(notes: list[str]) -> int:
+    for note in notes:
+        if note.startswith("offgrid_debias_chords:x"):
+            return int(note.split("x", maxsplit=1)[1])
+    raise AssertionError("offgrid_debias_chords note missing")
+
+
 def test_two_stage_strategy_exports_dxf(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
@@ -134,7 +141,7 @@ def test_two_stage_strategy_has_grid_debias_guardrail(tmp_path: Path) -> None:
 
     assert baseline.success is True
     assert baseline.dxf_path is not None
-    assert any("offgrid_debias_chords:x24" in note for note in baseline.notes)
+    assert _extract_debias_chord_multiplier(baseline.notes) >= 24
 
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(
         baseline.dxf_path
@@ -162,7 +169,7 @@ def test_consensus_strategy_debiases_more_than_two_stage_by_default(tmp_path: Pa
     assert baseline.dxf_path is not None
     assert consensus.success is True
     assert consensus.dxf_path is not None
-    assert any("offgrid_debias_chords:x30" in note for note in consensus.notes)
+    assert _extract_debias_chord_multiplier(consensus.notes) >= 30
 
     base_non_axis, base_lines, base_unique_x, base_unique_y = _line_diagnostics(baseline.dxf_path)
     con_non_axis, con_lines, con_unique_x, con_unique_y = _line_diagnostics(consensus.dxf_path)
@@ -213,7 +220,7 @@ def test_consensus_strategy_high_confidence_uses_extra_debias_chords(tmp_path: P
 
     assert consensus.success is True
     assert consensus.dxf_path is not None
-    assert any("offgrid_debias_chords:x34" in note for note in consensus.notes)
+    assert _extract_debias_chord_multiplier(consensus.notes) >= 34
 
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(
         consensus.dxf_path
@@ -241,11 +248,39 @@ def test_two_stage_strategy_chord_boost_improves_coordinate_diversity(tmp_path: 
     )
     axis_ratio = (line_count - non_axis_count) / line_count
 
-    assert any("offgrid_debias_chords:x24" in note for note in baseline.notes)
+    assert _extract_debias_chord_multiplier(baseline.notes) >= 24
     assert axis_ratio <= 0.10
     assert line_count >= 54
     assert unique_x_count >= 22
     assert unique_y_count >= 22
+
+
+def test_two_stage_strategy_adapts_debias_chords_to_image_complexity(tmp_path: Path) -> None:
+    low_path = tmp_path / "low.png"
+    high_path = tmp_path / "high.png"
+
+    low = Image.new("L", (96, 96), color=230)
+    ImageDraw.Draw(low).rectangle((18, 18, 78, 78), outline=50, width=2)
+    low.convert("RGB").save(low_path)
+
+    high = Image.new("L", (96, 96), color=250)
+    draw_high = ImageDraw.Draw(high)
+    for step in range(6, 90, 8):
+        draw_high.line((step, 4, 95 - step // 2, 92), fill=10 + (step % 60), width=2)
+        draw_high.line((4, step, 92, 95 - step // 2), fill=20 + (step % 70), width=2)
+    high.convert("RGB").save(high_path)
+
+    strategy = TwoStageBaselineStrategy()
+    out_low = strategy.run(ConversionInput(image_path=low_path), tmp_path / "low_out")
+    out_high = strategy.run(ConversionInput(image_path=high_path), tmp_path / "high_out")
+
+    assert out_low.success is True
+    assert out_high.success is True
+
+    low_chords = _extract_debias_chord_multiplier(out_low.notes)
+    high_chords = _extract_debias_chord_multiplier(out_high.notes)
+
+    assert high_chords >= low_chords
 
 
 def test_consensus_strategy_v2_debias_chords_raise_line_budget(tmp_path: Path) -> None:
@@ -259,7 +294,7 @@ def test_consensus_strategy_v2_debias_chords_raise_line_budget(tmp_path: Path) -
 
     assert consensus.success is True
     assert consensus.dxf_path is not None
-    assert any("offgrid_debias_chords:x30" in note for note in consensus.notes)
+    assert _extract_debias_chord_multiplier(consensus.notes) >= 30
 
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(
         consensus.dxf_path
