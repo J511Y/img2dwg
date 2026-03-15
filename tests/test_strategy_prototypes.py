@@ -49,6 +49,13 @@ def _extract_debias_chord_multiplier(notes: list[str]) -> int:
     raise AssertionError("offgrid_debias_chords note missing")
 
 
+def _extract_offgrid_shift(notes: list[str]) -> float:
+    for note in notes:
+        if note.startswith("offgrid_shift:"):
+            return float(note.split(":", maxsplit=1)[1])
+    raise AssertionError("offgrid_shift note missing")
+
+
 def test_two_stage_strategy_exports_dxf(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
@@ -279,8 +286,11 @@ def test_two_stage_strategy_adapts_debias_chords_to_image_complexity(tmp_path: P
 
     low_chords = _extract_debias_chord_multiplier(out_low.notes)
     high_chords = _extract_debias_chord_multiplier(out_high.notes)
+    low_shift = _extract_offgrid_shift(out_low.notes)
+    high_shift = _extract_offgrid_shift(out_high.notes)
 
     assert high_chords >= low_chords
+    assert high_shift >= low_shift
 
 
 def test_consensus_strategy_v2_debias_chords_raise_line_budget(tmp_path: Path) -> None:
