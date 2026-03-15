@@ -76,6 +76,10 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
         "anti_grid_detail_diag:deca_v52_irrational_phase_lattice_plus6:6" in note
         for note in out.notes
     )
+    assert any(
+        "anti_grid_detail_diag:hexa_v53_irrational_coordinate_interleave_plus:6" in note
+        for note in out.notes
+    )
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
