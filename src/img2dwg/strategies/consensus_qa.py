@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 from .base import ConversionInput, ConversionOutput, ConversionStrategy
@@ -62,11 +63,24 @@ class ConsensusQAStrategy(ConversionStrategy):
             )
 
         preset = self._high_confidence_preset if consensus_score >= 0.75 else self._base_preset
-        plan = build_vector_plan(signals, preset)
+
+        # Reduce grid-shaped axis bias on complex floorplans by scaling debias chords
+        # and off-grid shift from observed image complexity and consensus confidence.
+        complexity = (signals.contrast * 0.5) + (signals.edge_density * 0.5)
+        complexity_bonus = max(0, min(12, int(round(complexity * 16.0)) - 4))
+        confidence_bonus = max(0, min(4, int(round((consensus_score - 0.72) * 20.0))))
+
+        tuned_preset = replace(
+            preset,
+            debias_chord_multiplier=preset.debias_chord_multiplier + complexity_bonus + confidence_bonus,
+            offgrid_shift_ratio=preset.offgrid_shift_ratio + min(0.02, complexity * 0.02),
+        )
+
+        plan = build_vector_plan(signals, tuned_preset)
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
-        metrics = estimate_metrics(signals, preset, consensus_score=consensus_score)
+        metrics = estimate_metrics(signals, tuned_preset, consensus_score=consensus_score)
 
         return ConversionOutput(
             strategy_name=self.name,
