@@ -226,6 +226,31 @@ def test_two_stage_resonant_coord_spread_segments_lift_coordinate_diversity() ->
     assert len(rounded_y) >= 30
 
 
+
+
+def test_two_stage_irrational_phase_lattice_segments_lift_coordinate_diversity() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.65, edge_density=0.67)
+
+    appended = TwoStageBaselineStrategy._inject_irrational_phase_lattice_segments(plan, signals)
+
+    assert appended == 6
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 11
+    assert len(rounded_y) >= 11
 def test_consensus_strategy_rejects_low_confidence(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
