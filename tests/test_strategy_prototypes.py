@@ -59,7 +59,7 @@ def test_two_stage_strategy_exports_dxf(tmp_path: Path) -> None:
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(out.dxf_path)
     assert non_axis_count >= 4
     assert line_count >= 10
-    assert (line_count - non_axis_count) / line_count <= 0.6
+    assert (line_count - non_axis_count) / line_count <= 0.5
     assert unique_x_count >= 8
     assert unique_y_count >= 8
 
@@ -96,7 +96,7 @@ def test_consensus_strategy_accepts_vote_list(tmp_path: Path) -> None:
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(out.dxf_path)
     assert non_axis_count >= 4
     assert line_count >= 10
-    assert (line_count - non_axis_count) / line_count <= 0.6
+    assert (line_count - non_axis_count) / line_count <= 0.5
     assert unique_x_count >= 8
     assert unique_y_count >= 8
 

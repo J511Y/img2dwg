@@ -20,7 +20,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
     _preset = StrategyPreset(
         margin_ratio=0.04,
         include_center_cross=True,
-        include_diagonals=False,
+        include_diagonals=True,
         quality_bias=0.42,
         topology_bias=0.40,
         offgrid_shift_ratio=0.035,

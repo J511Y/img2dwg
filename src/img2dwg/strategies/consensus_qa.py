@@ -21,7 +21,7 @@ class ConsensusQAStrategy(ConversionStrategy):
     _base_preset = StrategyPreset(
         margin_ratio=0.05,
         include_center_cross=True,
-        include_diagonals=False,
+        include_diagonals=True,
         quality_bias=0.48,
         topology_bias=0.50,
         offgrid_shift_ratio=0.03,
