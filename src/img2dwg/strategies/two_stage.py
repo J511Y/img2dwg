@@ -614,6 +614,49 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_prime_residual_coord_boost_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        root2 = 1.41421356237
+        adaptive = 0.00061 + (signals.edge_density * 0.00031) + (signals.contrast * 0.00028)
+        pairs = [
+            (0.0317, 0.2639, 0.2075, 0.4396),
+            (0.2873, 0.9184, 0.4612, 0.7441),
+            (0.5468, 0.0847, 0.7203, 0.2592),
+            (0.8019, 0.6916, 0.6285, 0.8669),
+            (0.1744, 0.5718, 0.3472, 0.7466),
+            (0.6591, 0.2083, 0.8324, 0.3827),
+            (0.1186, 0.8142, 0.2928, 0.6385),
+            (0.8795, 0.1346, 0.7051, 0.3088),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 23) * phi) % 1.0 - 0.5) * adaptive
+            weave = (((index + 11) * root2) % 1.0 - 0.5) * (adaptive * 0.97)
+            skew = ((index % 5) - 2) * (adaptive * 0.64)
+            bias = (((index * 2) % 7) - 3) * (adaptive * 0.29)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + skew + bias)), 5),
+                round(top + ((bottom - top) * (sy - (phase * 0.73) + weave - skew - bias)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.69) - weave - skew + bias)), 5),
+                round(top + ((bottom - top) * (ey + (phase * 0.76) - weave + skew - bias)), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -1123,6 +1166,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             unique_count_boost_touched = self._inject_axis_escape_unique_count_boost_segments(
                 plan, signals
             )
+            prime_residual_coord_boost_touched = self._inject_prime_residual_coord_boost_segments(
+                plan, signals
+            )
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
@@ -1182,6 +1228,11 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 plan.notes.append(
                     "anti_grid_detail_diag:hexa_v54_axis_escape_unique_count_boost:"
                     f"{unique_count_boost_touched}"
+                )
+            if prime_residual_coord_boost_touched:
+                plan.notes.append(
+                    "anti_grid_detail_diag:octa_v55_prime_residual_coord_boost:"
+                    f"{prime_residual_coord_boost_touched}"
                 )
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
