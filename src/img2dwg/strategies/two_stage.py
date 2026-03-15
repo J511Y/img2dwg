@@ -325,6 +325,50 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_resonant_density_lift_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        plastic = 1.32471795724
+        sqrt2 = 1.41421356237
+        adaptive = 0.00088 + (signals.edge_density * 0.00039) + (signals.contrast * 0.00035)
+        pairs = [
+            (0.0284, 0.4962, 0.1867, 0.6629),
+            (0.2723, 0.9731, 0.4285, 0.8078),
+            (0.5098, 0.0266, 0.6662, 0.1935),
+            (0.7564, 0.8748, 0.9127, 0.7074),
+            (0.1391, 0.6125, 0.2974, 0.7799),
+            (0.5882, 0.3946, 0.7446, 0.5627),
+            (0.9233, 0.2218, 0.7675, 0.3887),
+            (0.3617, 0.1049, 0.5181, 0.2711),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 6) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 3) * plastic) % 1.0 - 0.5) * (adaptive * 0.84)
+            weave = (((index + 1) * sqrt2) % 1.0 - 0.5) * (adaptive * 0.73)
+            skew = ((index % 5) - 2) * (adaptive * 0.57)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + skew)), 5),
+                round(top + ((bottom - top) * (sy - warp + (weave * 0.78) + (skew * 0.63))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.71) - weave - skew)), 5),
+                round(top + ((bottom - top) * (ey + warp - (weave * 0.74) - (skew * 0.59))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -815,6 +859,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             residual_phase_jitter_touched = self._inject_residual_phase_jitter_segments(plan, signals)
             aperiodic_coord_escape_touched = self._inject_aperiodic_coordinate_escape_segments(plan, signals)
             irrational_coord_lift_touched = self._inject_irrational_coordinate_lift_segments(plan, signals)
+            resonant_density_lift_touched = self._inject_resonant_density_lift_segments(plan, signals)
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
@@ -840,6 +885,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             if irrational_coord_lift_touched:
                 plan.notes.append(
                     f"anti_grid_detail_diag:hexa_v46_irrational_coord_lift:{irrational_coord_lift_touched}"
+                )
+            if resonant_density_lift_touched:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:octa_v48_resonant_density_lift:{resonant_density_lift_touched}"
                 )
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
