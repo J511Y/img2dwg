@@ -454,6 +454,44 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_irrational_phase_lattice_plus_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        root3 = 1.73205080757
+        adaptive = 0.00073 + (signals.edge_density * 0.00029) + (signals.contrast * 0.00027)
+        pairs = [
+            (0.0716, 0.8874, 0.2479, 0.7163),
+            (0.3584, 0.1287, 0.5332, 0.3045),
+            (0.6127, 0.9581, 0.7864, 0.7819),
+            (0.8931, 0.3375, 0.7194, 0.5132),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 11) * phi) % 1.0 - 0.5) * adaptive
+            weave = (((index + 5) * root3) % 1.0 - 0.5) * (adaptive * 0.91)
+            skew = ((index % 3) - 1) * (adaptive * 0.67)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + skew)), 5),
+                round(top + ((bottom - top) * (sy - (phase * 0.72) + weave - skew)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.69) - weave - skew)), 5),
+                round(top + ((bottom - top) * (ey + (phase * 0.74) - weave + (skew * 0.82))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -951,6 +989,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             irrational_phase_lattice_touched = self._inject_irrational_phase_lattice_segments(
                 plan, signals
             )
+            irrational_phase_lattice_plus_touched = self._inject_irrational_phase_lattice_plus_segments(
+                plan, signals
+            )
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
@@ -990,6 +1031,11 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 plan.notes.append(
                     "anti_grid_detail_diag:hexa_v50_irrational_phase_lattice:"
                     f"{irrational_phase_lattice_touched}"
+                )
+            if irrational_phase_lattice_plus_touched:
+                plan.notes.append(
+                    "anti_grid_detail_diag:hexa_v51_irrational_phase_lattice_plus4:"
+                    f"{irrational_phase_lattice_plus_touched}"
                 )
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
