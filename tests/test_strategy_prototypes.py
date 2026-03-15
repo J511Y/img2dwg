@@ -109,7 +109,9 @@ def test_hybrid_strategy_improves_over_two_stage_at_high_consensus(tmp_path: Pat
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
 
-    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+    baseline = TwoStageBaselineStrategy().run(
+        ConversionInput(image_path=image_path), tmp_path / "base"
+    )
     hybrid = HybridMVPStrategy().run(
         ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
         tmp_path / "hybrid",
@@ -126,13 +128,17 @@ def test_two_stage_strategy_has_grid_debias_guardrail(tmp_path: Path) -> None:
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
 
-    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+    baseline = TwoStageBaselineStrategy().run(
+        ConversionInput(image_path=image_path), tmp_path / "base"
+    )
 
     assert baseline.success is True
     assert baseline.dxf_path is not None
-    assert any("offgrid_debias_chords:x22" in note for note in baseline.notes)
+    assert any("offgrid_debias_chords:x24" in note for note in baseline.notes)
 
-    non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(baseline.dxf_path)
+    non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(
+        baseline.dxf_path
+    )
     axis_ratio = (line_count - non_axis_count) / line_count
 
     assert axis_ratio <= 0.11
@@ -144,7 +150,9 @@ def test_consensus_strategy_debiases_more_than_two_stage_by_default(tmp_path: Pa
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
 
-    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+    baseline = TwoStageBaselineStrategy().run(
+        ConversionInput(image_path=image_path), tmp_path / "base"
+    )
     consensus = ConsensusQAStrategy().run(
         ConversionInput(image_path=image_path, metadata={"consensus_score": 0.71}),
         tmp_path / "consensus",
@@ -172,7 +180,9 @@ def test_consensus_strategy_default_adds_coordinate_diversity_vs_two_stage(tmp_p
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
 
-    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+    baseline = TwoStageBaselineStrategy().run(
+        ConversionInput(image_path=image_path), tmp_path / "base"
+    )
     consensus = ConsensusQAStrategy().run(
         ConversionInput(image_path=image_path, metadata={"consensus_score": 0.71}),
         tmp_path / "consensus",
@@ -205,7 +215,9 @@ def test_consensus_strategy_high_confidence_uses_extra_debias_chords(tmp_path: P
     assert consensus.dxf_path is not None
     assert any("offgrid_debias_chords:x24" in note for note in consensus.notes)
 
-    non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(consensus.dxf_path)
+    non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(
+        consensus.dxf_path
+    )
     axis_ratio = (line_count - non_axis_count) / line_count
 
     assert axis_ratio <= 0.11
@@ -217,15 +229,19 @@ def test_two_stage_strategy_chord_boost_improves_coordinate_diversity(tmp_path: 
     image_path = tmp_path / "plan.png"
     _make_sample_plan_image(image_path)
 
-    baseline = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "base")
+    baseline = TwoStageBaselineStrategy().run(
+        ConversionInput(image_path=image_path), tmp_path / "base"
+    )
 
     assert baseline.success is True
     assert baseline.dxf_path is not None
 
-    non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(baseline.dxf_path)
+    non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(
+        baseline.dxf_path
+    )
     axis_ratio = (line_count - non_axis_count) / line_count
 
-    assert any("offgrid_debias_chords:x22" in note for note in baseline.notes)
+    assert any("offgrid_debias_chords:x24" in note for note in baseline.notes)
     assert axis_ratio <= 0.10
     assert line_count >= 54
     assert unique_x_count >= 22
