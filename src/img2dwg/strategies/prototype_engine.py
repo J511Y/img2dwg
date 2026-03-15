@@ -33,6 +33,7 @@ class StrategyPreset:
     quality_bias: float
     topology_bias: float
     offgrid_shift_ratio: float = 0.0
+    diagonal_fan_ratio: float = 0.0
 
 
 def clamp01(value: float) -> float:
@@ -155,6 +156,18 @@ def build_vector_plan(signals: ImageSignals, preset: StrategyPreset) -> VectorPl
                 ((right, top), (left, bottom)),
             ]
         )
+
+        if preset.diagonal_fan_ratio > 0:
+            fan_x = max(1.0, (right - left) * preset.diagonal_fan_ratio)
+            fan_y = max(1.0, (bottom - top) * preset.diagonal_fan_ratio)
+            segments.extend(
+                [
+                    ((left + fan_x, top), (right, bottom - fan_y)),
+                    ((right - fan_x, top), (left, bottom - fan_y)),
+                ]
+            )
+            notes.append(f"diagonal_fan:{preset.diagonal_fan_ratio:.3f}")
+
         notes.append("diagonals:on")
 
     if preset.offgrid_shift_ratio > 0:
