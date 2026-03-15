@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-15T11:43:58.221939+00:00",
+  "generated_at": "2026-03-15T12:09:11.160231+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -24,19 +24,19 @@
   },
   "strategy_diagnostics": {
     "consensus_qa": {
-      "avg_line_count": 16.0,
-      "avg_axis_aligned_ratio": 0.25,
+      "avg_line_count": 18.0,
+      "avg_axis_aligned_ratio": 0.2222,
       "std_axis_aligned_ratio": 0.0,
-      "avg_axis_margin_to_grid_threshold": 0.65,
-      "avg_axis_margin_score": 65.0,
-      "max_axis_aligned_ratio": 0.25,
-      "max_axis_margin_to_grid_threshold": 0.65,
-      "p95_axis_aligned_ratio": 0.25,
-      "p95_axis_margin_to_grid_threshold": 0.65,
-      "min_axis_aligned_ratio": 0.25,
-      "min_axis_margin_to_grid_threshold": 0.65,
-      "avg_unique_x_count": 20.0,
-      "avg_unique_y_count": 18.0
+      "avg_axis_margin_to_grid_threshold": 0.6778,
+      "avg_axis_margin_score": 67.78,
+      "max_axis_aligned_ratio": 0.2222,
+      "max_axis_margin_to_grid_threshold": 0.6778,
+      "p95_axis_aligned_ratio": 0.2222,
+      "p95_axis_margin_to_grid_threshold": 0.6778,
+      "min_axis_aligned_ratio": 0.2222,
+      "min_axis_margin_to_grid_threshold": 0.6778,
+      "avg_unique_x_count": 24.0,
+      "avg_unique_y_count": 22.0
     },
     "hybrid_mvp": {
       "avg_line_count": 8.0,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 16.0,
-      "avg_axis_aligned_ratio": 0.25,
+      "avg_line_count": 18.0,
+      "avg_axis_aligned_ratio": 0.2222,
       "std_axis_aligned_ratio": 0.0,
-      "avg_axis_margin_to_grid_threshold": 0.65,
-      "avg_axis_margin_score": 65.0,
-      "max_axis_aligned_ratio": 0.25,
-      "max_axis_margin_to_grid_threshold": 0.65,
-      "p95_axis_aligned_ratio": 0.25,
-      "p95_axis_margin_to_grid_threshold": 0.65,
-      "min_axis_aligned_ratio": 0.25,
-      "min_axis_margin_to_grid_threshold": 0.65,
-      "avg_unique_x_count": 20.0,
-      "avg_unique_y_count": 19.0
+      "avg_axis_margin_to_grid_threshold": 0.6778,
+      "avg_axis_margin_score": 67.78,
+      "max_axis_aligned_ratio": 0.2222,
+      "max_axis_margin_to_grid_threshold": 0.6778,
+      "p95_axis_aligned_ratio": 0.2222,
+      "p95_axis_margin_to_grid_threshold": 0.6778,
+      "min_axis_aligned_ratio": 0.2222,
+      "min_axis_margin_to_grid_threshold": 0.6778,
+      "avg_unique_x_count": 24.0,
+      "avg_unique_y_count": 23.0
     }
   },
   "top_problematic": [],
@@ -307,15 +307,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -326,15 +326,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -345,15 +345,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -364,15 +364,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -383,15 +383,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -402,15 +402,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -421,15 +421,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -440,15 +440,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -459,15 +459,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -478,15 +478,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -497,15 +497,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -516,15 +516,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 19
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 23
       }
     },
     {
@@ -535,15 +535,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -554,15 +554,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -573,15 +573,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -592,15 +592,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -611,15 +611,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -630,15 +630,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -649,15 +649,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -668,15 +668,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -687,15 +687,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -706,15 +706,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -725,15 +725,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     },
     {
@@ -744,15 +744,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 16,
+        "total_entities": 18,
         "entity_type_counts": {
-          "LINE": 16
+          "LINE": 18
         },
         "unique_entity_types": 1,
-        "line_count": 16,
-        "axis_aligned_line_ratio": 0.25,
-        "unique_x_count": 20,
-        "unique_y_count": 18
+        "line_count": 18,
+        "axis_aligned_line_ratio": 0.2222,
+        "unique_x_count": 24,
+        "unique_y_count": 22
       }
     }
   ],
@@ -763,18 +763,18 @@
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
         "previous": 0.25,
-        "current": 0.25,
-        "delta": 0.0
+        "current": 0.2222,
+        "delta": -0.0278
       },
       "avg_axis_margin_to_grid_threshold": {
         "previous": 0.65,
-        "current": 0.65,
-        "delta": 0.0
+        "current": 0.6778,
+        "delta": 0.0278
       },
       "avg_line_count": {
         "previous": 16.0,
-        "current": 16.0,
-        "delta": 0.0
+        "current": 18.0,
+        "delta": 2.0
       }
     },
     "hybrid_mvp": {
@@ -796,18 +796,18 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.2857,
-        "current": 0.25,
-        "delta": -0.0357
+        "previous": 0.25,
+        "current": 0.2222,
+        "delta": -0.0278
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.6143,
-        "current": 0.65,
-        "delta": 0.0357
+        "previous": 0.65,
+        "current": 0.6778,
+        "delta": 0.0278
       },
       "avg_line_count": {
-        "previous": 14.0,
-        "current": 16.0,
+        "previous": 16.0,
+        "current": 18.0,
         "delta": 2.0
       }
     }
