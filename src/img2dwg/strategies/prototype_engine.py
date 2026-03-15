@@ -169,7 +169,25 @@ def build_vector_plan(signals: ImageSignals, preset: StrategyPreset) -> VectorPl
                 ((left + inset_x + shift_x, bottom - inset_y), (right - inset_x - shift_x, top + inset_y + shift_y)),
             ]
         )
+
+        # add asymmetric debias chords to reduce axis-aligned dominance and
+        # increase coordinate diversity in grid-heavy floorplans.
+        residual_x = max(1.0, shift_x * 0.73)
+        residual_y = max(1.0, shift_y * 1.27)
+        segments.extend(
+            [
+                (
+                    (left + inset_x * 1.45 + residual_x, top + inset_y * 0.65 + residual_y),
+                    (right - inset_x * 0.58 - residual_x, bottom - inset_y * 1.55),
+                ),
+                (
+                    (left + inset_x * 0.55, bottom - inset_y * 1.35 - residual_y),
+                    (right - inset_x * 1.62 + residual_x, top + inset_y * 1.10),
+                ),
+            ]
+        )
         notes.append(f"offgrid_shift:{preset.offgrid_shift_ratio:.3f}")
+        notes.append("offgrid_debias_chords:on")
 
     return VectorPlan(segments=segments, notes=notes)
 
