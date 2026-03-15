@@ -80,6 +80,10 @@ def test_two_stage_strategy_adds_anti_grid_diagonal_detail(tmp_path: Path) -> No
         "anti_grid_detail_diag:hexa_v53_irrational_coordinate_interleave_plus:6" in note
         for note in out.notes
     )
+    assert any(
+        "anti_grid_detail_diag:hexa_v54_axis_escape_unique_count_boost:6" in note
+        for note in out.notes
+    )
 
     doc = ezdxf.readfile(str(out.dxf_path))
     lines = list(doc.modelspace().query("LINE"))
@@ -192,6 +196,34 @@ def test_two_stage_residual_phase_jitter_segments_add_coordinate_diversity() -> 
     rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
     assert len(rounded_x) >= 11
     assert len(rounded_y) >= 11
+
+
+def test_two_stage_axis_escape_unique_count_boost_segments_add_coordinate_diversity() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((0.0, 0.0), (100.0, 0.0)),
+            ((100.0, 0.0), (100.0, 100.0)),
+            ((0.0, 100.0), (100.0, 100.0)),
+            ((0.0, 0.0), (0.0, 100.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.66, edge_density=0.69)
+
+    appended = TwoStageBaselineStrategy._inject_axis_escape_unique_count_boost_segments(
+        plan, signals
+    )
+
+    assert appended == 6
+    injected = plan.segments[-appended:]
+    assert all(
+        abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
+    )
+
+    rounded_x = {round(coord, 4) for start, end in injected for coord in (start[0], end[0])}
+    rounded_y = {round(coord, 4) for start, end in injected for coord in (start[1], end[1])}
+    assert len(rounded_x) >= 11
+    assert len(rounded_y) >= 11
+
 
 
 def test_two_stage_axis_escape_unique_coord_lift_segments_add_coordinate_diversity() -> None:
