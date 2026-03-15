@@ -573,6 +573,47 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_axis_escape_unique_count_boost_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        plastic = 1.32471795724
+        adaptive = 0.00067 + (signals.edge_density * 0.00029) + (signals.contrast * 0.00025)
+        pairs = [
+            (0.0238, 0.3347, 0.1894, 0.5039),
+            (0.2684, 0.9573, 0.4342, 0.7861),
+            (0.5139, 0.0652, 0.6791, 0.2347),
+            (0.7597, 0.8424, 0.5928, 0.6715),
+            (0.1426, 0.5978, 0.3089, 0.7686),
+            (0.6351, 0.2219, 0.8014, 0.3917),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 19) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 6) * plastic) % 1.0 - 0.5) * (adaptive * 0.96)
+            weave = ((index % 4) - 1.5) * (adaptive * 0.71)
+            bias = ((index % 2) * 2 - 1) * (adaptive * 0.54)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + bias)), 5),
+                round(top + ((bottom - top) * (sy - (phase * 0.76) + weave - bias - warp)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.72) - weave - bias)), 5),
+                round(top + ((bottom - top) * (ey + (phase * 0.79) - weave + bias + warp)), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -1079,6 +1120,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             irrational_interleave_plus_touched = (
                 self._inject_irrational_coordinate_interleave_plus_segments(plan, signals)
             )
+            unique_count_boost_touched = self._inject_axis_escape_unique_count_boost_segments(
+                plan, signals
+            )
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
@@ -1133,6 +1177,11 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 plan.notes.append(
                     "anti_grid_detail_diag:hexa_v53_irrational_coordinate_interleave_plus:"
                     f"{irrational_interleave_plus_touched}"
+                )
+            if unique_count_boost_touched:
+                plan.notes.append(
+                    "anti_grid_detail_diag:hexa_v54_axis_escape_unique_count_boost:"
+                    f"{unique_count_boost_touched}"
                 )
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
