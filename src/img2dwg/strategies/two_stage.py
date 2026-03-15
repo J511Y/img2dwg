@@ -285,6 +285,171 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_irrational_coordinate_lift_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        silver = 2.41421356237
+        adaptive = 0.00093 + (signals.edge_density * 0.00041) + (signals.contrast * 0.00037)
+        pairs = [
+            (0.0937, 0.6841, 0.2572, 0.8516),
+            (0.3485, 0.1428, 0.5129, 0.3094),
+            (0.5974, 0.9077, 0.7618, 0.7412),
+            (0.8443, 0.2716, 0.6786, 0.4391),
+            (0.2169, 0.5182, 0.3813, 0.6847),
+            (0.6658, 0.3635, 0.8294, 0.5319),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 5) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 2) * silver) % 1.0 - 0.5) * (adaptive * 0.87)
+            skew = ((index % 4) - 1.5) * (adaptive * 0.61)
+            start = (
+                round(left + ((right - left) * (sx + phase + skew)), 5),
+                round(top + ((bottom - top) * (sy - warp + (skew * 0.71))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.73) - skew)), 5),
+                round(top + ((bottom - top) * (ey + warp - (skew * 0.67))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
+    @staticmethod
+    def _inject_resonant_density_lift_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        plastic = 1.32471795724
+        sqrt2 = 1.41421356237
+        adaptive = 0.00088 + (signals.edge_density * 0.00039) + (signals.contrast * 0.00035)
+        pairs = [
+            (0.0284, 0.4962, 0.1867, 0.6629),
+            (0.2723, 0.9731, 0.4285, 0.8078),
+            (0.5098, 0.0266, 0.6662, 0.1935),
+            (0.7564, 0.8748, 0.9127, 0.7074),
+            (0.1391, 0.6125, 0.2974, 0.7799),
+            (0.5882, 0.3946, 0.7446, 0.5627),
+            (0.9233, 0.2218, 0.7675, 0.3887),
+            (0.3617, 0.1049, 0.5181, 0.2711),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 6) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 3) * plastic) % 1.0 - 0.5) * (adaptive * 0.84)
+            weave = (((index + 1) * sqrt2) % 1.0 - 0.5) * (adaptive * 0.73)
+            skew = ((index % 5) - 2) * (adaptive * 0.57)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + skew)), 5),
+                round(top + ((bottom - top) * (sy - warp + (weave * 0.78) + (skew * 0.63))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.71) - weave - skew)), 5),
+                round(top + ((bottom - top) * (ey + warp - (weave * 0.74) - (skew * 0.59))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
+    @staticmethod
+    def _inject_resonant_coordinate_interleave_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        root3 = 1.73205080757
+        adaptive = 0.00079 + (signals.edge_density * 0.00031) + (signals.contrast * 0.00029)
+        pairs = [
+            (0.0613, 0.9281, 0.2394, 0.7418),
+            (0.8142, 0.0839, 0.6364, 0.2615),
+            (0.2976, 0.6473, 0.4759, 0.4687),
+            (0.5481, 0.3184, 0.7267, 0.1398),
+            (0.1327, 0.2215, 0.3112, 0.4016),
+            (0.8671, 0.7762, 0.6883, 0.9541),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 9) * phi) % 1.0 - 0.5) * adaptive
+            weave = (((index + 4) * root3) % 1.0 - 0.5) * (adaptive * 0.88)
+            drift = ((index % 3) - 1) * (adaptive * 0.67)
+            start = (
+                round(left + ((right - left) * (sx + phase + weave + drift)), 5),
+                round(top + ((bottom - top) * (sy - (phase * 0.74) + weave - drift)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - phase - (weave * 0.72) - drift)), 5),
+                round(top + ((bottom - top) * (ey + (phase * 0.69) - weave + (drift * 0.83))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
+
+    @staticmethod
+    def _inject_irrational_phase_lattice_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        silver = 2.41421356237
+        adaptive = 0.00073 + (signals.edge_density * 0.00028) + (signals.contrast * 0.00025)
+        pairs = [
+            (0.0479, 0.8527, 0.2216, 0.6834),
+            (0.2834, 0.1946, 0.4572, 0.3638),
+            (0.5187, 0.9413, 0.6924, 0.7715),
+            (0.7546, 0.2711, 0.9283, 0.4408),
+            (0.1368, 0.5974, 0.3105, 0.4276),
+            (0.6401, 0.1189, 0.8138, 0.2881),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 7) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 5) * silver) % 1.0 - 0.5) * (adaptive * 0.83)
+            shear = ((index % 4) - 1.5) * (adaptive * 0.61)
+            start = (
+                round(left + ((right - left) * (sx + phase + shear)), 5),
+                round(top + ((bottom - top) * (sy - (phase * 0.73) - warp + shear)), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.71) - shear)), 5),
+                round(top + ((bottom - top) * (ey + phase + warp - (shear * 0.79))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -774,6 +939,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             axis_escape_entropy_touched = self._inject_axis_escape_entropy_segments(plan, signals)
             residual_phase_jitter_touched = self._inject_residual_phase_jitter_segments(plan, signals)
             aperiodic_coord_escape_touched = self._inject_aperiodic_coordinate_escape_segments(plan, signals)
+            irrational_coord_lift_touched = self._inject_irrational_coordinate_lift_segments(plan, signals)
+            resonant_density_lift_touched = self._inject_resonant_density_lift_segments(plan, signals)
+            resonant_interleave_touched = self._inject_resonant_coordinate_interleave_segments(
+                plan, signals
+            )
+            irrational_phase_lattice_touched = self._inject_irrational_phase_lattice_segments(
+                plan, signals
+            )
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
@@ -795,6 +968,24 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             if aperiodic_coord_escape_touched:
                 plan.notes.append(
                     f"anti_grid_detail_diag:deca_v45_aperiodic_coord_escape:{aperiodic_coord_escape_touched}"
+                )
+            if irrational_coord_lift_touched:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v46_irrational_coord_lift:{irrational_coord_lift_touched}"
+                )
+            if resonant_density_lift_touched:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:octa_v48_resonant_density_lift:{resonant_density_lift_touched}"
+                )
+            if resonant_interleave_touched:
+                plan.notes.append(
+                    "anti_grid_detail_diag:hexa_v49_resonant_coordinate_interleave:"
+                    f"{resonant_interleave_touched}"
+                )
+            if irrational_phase_lattice_touched:
+                plan.notes.append(
+                    "anti_grid_detail_diag:hexa_v50_irrational_phase_lattice:"
+                    f"{irrational_phase_lattice_touched}"
                 )
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
