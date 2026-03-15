@@ -130,7 +130,7 @@ def test_two_stage_strategy_has_grid_debias_guardrail(tmp_path: Path) -> None:
 
     assert baseline.success is True
     assert baseline.dxf_path is not None
-    assert any("offgrid_debias_chords:x22" in note for note in baseline.notes)
+    assert any("offgrid_debias_chords:x24" in note for note in baseline.notes)
 
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(baseline.dxf_path)
     axis_ratio = (line_count - non_axis_count) / line_count
@@ -225,7 +225,7 @@ def test_two_stage_strategy_chord_boost_improves_coordinate_diversity(tmp_path: 
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(baseline.dxf_path)
     axis_ratio = (line_count - non_axis_count) / line_count
 
-    assert any("offgrid_debias_chords:x22" in note for note in baseline.notes)
+    assert any("offgrid_debias_chords:x24" in note for note in baseline.notes)
     assert axis_ratio <= 0.10
     assert line_count >= 54
     assert unique_x_count >= 22
