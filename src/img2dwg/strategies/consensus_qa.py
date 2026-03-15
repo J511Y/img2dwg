@@ -26,7 +26,7 @@ class ConsensusQAStrategy(ConversionStrategy):
         topology_bias=0.50,
         offgrid_shift_ratio=0.054,
         diagonal_fan_ratio=0.13,
-        debias_chord_multiplier=20,
+        debias_chord_multiplier=30,
     )
 
     _high_confidence_preset = StrategyPreset(
@@ -37,7 +37,7 @@ class ConsensusQAStrategy(ConversionStrategy):
         topology_bias=0.62,
         offgrid_shift_ratio=0.07,
         diagonal_fan_ratio=0.15,
-        debias_chord_multiplier=24,
+        debias_chord_multiplier=34,
     )
 
     _min_consensus = 0.35
