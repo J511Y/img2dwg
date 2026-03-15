@@ -285,6 +285,46 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         return appended
 
+    @staticmethod
+    def _inject_irrational_coordinate_lift_segments(plan: object, signals: object) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+
+        phi = 1.61803398875
+        silver = 2.41421356237
+        adaptive = 0.00093 + (signals.edge_density * 0.00041) + (signals.contrast * 0.00037)
+        pairs = [
+            (0.0937, 0.6841, 0.2572, 0.8516),
+            (0.3485, 0.1428, 0.5129, 0.3094),
+            (0.5974, 0.9077, 0.7618, 0.7412),
+            (0.8443, 0.2716, 0.6786, 0.4391),
+            (0.2169, 0.5182, 0.3813, 0.6847),
+            (0.6658, 0.3635, 0.8294, 0.5319),
+        ]
+
+        appended = 0
+        for index, (sx, sy, ex, ey) in enumerate(pairs):
+            phase = (((index + 5) * phi) % 1.0 - 0.5) * adaptive
+            warp = (((index + 2) * silver) % 1.0 - 0.5) * (adaptive * 0.87)
+            skew = ((index % 4) - 1.5) * (adaptive * 0.61)
+            start = (
+                round(left + ((right - left) * (sx + phase + skew)), 5),
+                round(top + ((bottom - top) * (sy - warp + (skew * 0.71))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (ex - (phase * 0.73) - skew)), 5),
+                round(top + ((bottom - top) * (ey + warp - (skew * 0.67))), 5),
+            )
+            plan.segments.append((start, end))
+            appended += 1
+
+        return appended
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -774,6 +814,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             axis_escape_entropy_touched = self._inject_axis_escape_entropy_segments(plan, signals)
             residual_phase_jitter_touched = self._inject_residual_phase_jitter_segments(plan, signals)
             aperiodic_coord_escape_touched = self._inject_aperiodic_coordinate_escape_segments(plan, signals)
+            irrational_coord_lift_touched = self._inject_irrational_coordinate_lift_segments(plan, signals)
             entropy_touched = self._inject_coordinate_entropy(plan, start_index=seed_segment_count)
 
             if axis_debias_applied:
@@ -795,6 +836,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             if aperiodic_coord_escape_touched:
                 plan.notes.append(
                     f"anti_grid_detail_diag:deca_v45_aperiodic_coord_escape:{aperiodic_coord_escape_touched}"
+                )
+            if irrational_coord_lift_touched:
+                plan.notes.append(
+                    f"anti_grid_detail_diag:hexa_v46_irrational_coord_lift:{irrational_coord_lift_touched}"
                 )
             plan.notes.append("anti_grid_detail_diag:on")
             plan.notes.append("anti_grid_detail_diag:hexacosa_v12_spread")
