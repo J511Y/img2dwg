@@ -523,6 +523,31 @@ def test_consensus_strategy_injects_irrational_coord_entropy_lift_segments() -> 
     assert len(rounded_y) >= 10
 
 
+def test_consensus_strategy_lifts_existing_segment_coordinate_entropy() -> None:
+    plan = SimpleNamespace(
+        segments=[
+            ((10.0, 10.0), (30.0, 40.0)),
+            ((10.0, 10.0), (30.0, 40.0)),
+            ((11.0, 9.0), (31.0, 39.0)),
+            ((11.0, 9.0), (31.0, 39.0)),
+        ]
+    )
+    signals = SimpleNamespace(contrast=0.67, edge_density=0.63)
+
+    baseline_x = {round(coord, 3) for start, end in plan.segments for coord in (start[0], end[0])}
+    baseline_y = {round(coord, 3) for start, end in plan.segments for coord in (start[1], end[1])}
+
+    touched = ConsensusQAStrategy._lift_existing_segment_coordinate_entropy(
+        plan, signals, start_index=0
+    )
+
+    assert touched == 4
+    lifted_x = {round(coord, 3) for start, end in plan.segments for coord in (start[0], end[0])}
+    lifted_y = {round(coord, 3) for start, end in plan.segments for coord in (start[1], end[1])}
+    assert len(lifted_x) > len(baseline_x)
+    assert len(lifted_y) > len(baseline_y)
+
+
 def test_consensus_strategy_injects_quasi_aperiodic_coord_lift_segments() -> None:
     plan = SimpleNamespace(
         segments=[

@@ -242,6 +242,31 @@ class ConsensusQAStrategy(ConversionStrategy):
         return appended
 
     @staticmethod
+    def _lift_existing_segment_coordinate_entropy(plan: object, signals: object, start_index: int = 0) -> int:
+        segments = plan.segments
+        if not segments or start_index >= len(segments):
+            return 0
+
+        phi = 1.61803398875
+        plastic = 1.32471795724
+        # Keep offsets above 1e-3 so uniqueness survives coord_round_digits=3 diagnostics.
+        adaptive = 0.00108 + (signals.edge_density * 0.00053) + (signals.contrast * 0.00049)
+        touched = 0
+        for index in range(start_index, len(segments)):
+            (sx, sy), (ex, ey) = segments[index]
+            phase = (((index + 3) * phi) % 1.0) - 0.5
+            weave = (((index + 5) * plastic) % 1.0) - 0.5
+            shear = ((index % 4) - 1.5) * (adaptive * 0.41)
+            sx2 = round(sx + (phase * adaptive) + (shear * 0.31), 4)
+            sy2 = round(sy - (weave * adaptive * 0.93) + (shear * 0.27), 4)
+            ex2 = round(ex - (phase * adaptive * 0.87) - (shear * 0.29), 4)
+            ey2 = round(ey + (weave * adaptive * 0.91) - (shear * 0.25), 4)
+            segments[index] = ((sx2, sy2), (ex2, ey2))
+            touched += 1
+
+        return touched
+
+    @staticmethod
     def _inject_axis_escape_unique_coord_lift(plan: object, signals: object) -> int:
         if len(plan.segments) < 4:
             return 0
@@ -1024,6 +1049,11 @@ class ConsensusQAStrategy(ConversionStrategy):
             irrational_coord_entropy_lift_added = self._inject_irrational_coord_entropy_lift_segments(
                 plan, signals
             )
+            coordinate_entropy_lift_touched = self._lift_existing_segment_coordinate_entropy(
+                plan,
+                signals,
+                start_index=seed_segment_count,
+            )
 
             if axis_debias_applied:
                 plan.notes.append("anti_grid_axis_debias:v3")
@@ -1085,6 +1115,11 @@ class ConsensusQAStrategy(ConversionStrategy):
                 plan.notes.append(
                     "anti_grid_detail_diag:hexa_v39_irrational_coord_entropy_lift:"
                     f"{irrational_coord_entropy_lift_added}"
+                )
+            if coordinate_entropy_lift_touched:
+                plan.notes.append(
+                    "anti_grid_detail_diag:hexa_v40_existing_segment_entropy_lift:"
+                    f"{coordinate_entropy_lift_touched}"
                 )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
