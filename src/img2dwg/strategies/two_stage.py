@@ -228,6 +228,23 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         corridor_midhigh_offgrid = min(0.003, corridor_midhigh_relief * 0.74)
         corridor_midhigh_fan = min(0.004, corridor_midhigh_relief * 0.98)
 
+        # v92: mild-corridor midband relief. A stubborn thesis pocket still
+        # appears around mildly elongated, mid-complexity plans where axis
+        # bundles survive after v91. Add a tiny bounded blended lift targeted to
+        # that band so coordinate diversity increases without breaking fail=0.
+        mild_corridor_midband_relief = (
+            max(0.0, aspect_ratio - 1.16)
+            * max(0.0, 1.44 - aspect_ratio)
+            * max(0.0, complexity - 0.32)
+            * max(0.0, 0.58 - complexity)
+        )
+        mild_corridor_midband_chords = max(
+            0,
+            min(2, int(round(mild_corridor_midband_relief * 6400.0))),
+        )
+        mild_corridor_midband_offgrid = min(0.003, mild_corridor_midband_relief * 0.88)
+        mild_corridor_midband_fan = min(0.004, mild_corridor_midband_relief * 1.05)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -249,6 +266,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_web_chords
                 + midskew_default_pocket_chords
                 + corridor_midhigh_chords
+                + mild_corridor_midband_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -269,6 +287,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_web_offgrid
                 + midskew_default_pocket_offgrid
                 + corridor_midhigh_offgrid
+                + mild_corridor_midband_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -289,6 +308,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_web_fan
                 + midskew_default_pocket_fan
                 + corridor_midhigh_fan
+                + mild_corridor_midband_fan
             ),
         )
 
