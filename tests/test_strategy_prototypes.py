@@ -304,7 +304,7 @@ def test_consensus_strategy_v2_debias_chords_raise_line_budget(tmp_path: Path) -
 
     assert consensus.success is True
     assert consensus.dxf_path is not None
-    assert _extract_debias_chord_multiplier(consensus.notes) >= 30
+    assert _extract_debias_chord_multiplier(consensus.notes) >= 32
 
     non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(
         consensus.dxf_path
@@ -312,6 +312,32 @@ def test_consensus_strategy_v2_debias_chords_raise_line_budget(tmp_path: Path) -
     axis_ratio = (line_count - non_axis_count) / line_count
 
     assert axis_ratio <= 0.08
-    assert line_count >= 70
-    assert unique_x_count >= 28
-    assert unique_y_count >= 28
+    assert line_count >= 74
+    assert unique_x_count >= 30
+    assert unique_y_count >= 30
+
+
+def test_consensus_strategy_increases_debias_with_confidence(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    strategy = ConsensusQAStrategy()
+    out_mid = strategy.run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.71}),
+        tmp_path / "consensus_mid",
+    )
+    out_high = strategy.run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.92}),
+        tmp_path / "consensus_high",
+    )
+
+    assert out_mid.success is True
+    assert out_high.success is True
+
+    mid_chords = _extract_debias_chord_multiplier(out_mid.notes)
+    high_chords = _extract_debias_chord_multiplier(out_high.notes)
+    mid_shift = _extract_offgrid_shift(out_mid.notes)
+    high_shift = _extract_offgrid_shift(out_high.notes)
+
+    assert high_chords >= mid_chords
+    assert high_shift >= mid_shift

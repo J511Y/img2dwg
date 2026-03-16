@@ -24,9 +24,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         include_diagonals=True,
         quality_bias=0.42,
         topology_bias=0.40,
-        offgrid_shift_ratio=0.056,
-        diagonal_fan_ratio=0.11,
-        debias_chord_multiplier=24,
+        offgrid_shift_ratio=0.058,
+        diagonal_fan_ratio=0.12,
+        debias_chord_multiplier=26,
     )
 
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
@@ -35,10 +35,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         # Adapt debias controls to image complexity so dense/contrasty floorplans
         # do not collapse into axis-aligned grid artifacts.
-        complexity = (signals.contrast * 0.45) + (signals.edge_density * 0.55)
-        extra_chords = max(0, min(14, int(round(complexity * 20.0)) - 4))
-        offgrid_boost = min(0.02, max(0.0, (complexity - 0.30) * 0.045))
-        fan_boost = min(0.035, max(0.0, (complexity - 0.28) * 0.08))
+        complexity = (signals.contrast * 0.40) + (signals.edge_density * 0.60)
+        extra_chords = max(0, min(16, int(round(complexity * 22.0)) - 4))
+        offgrid_boost = min(0.024, max(0.0, (complexity - 0.28) * 0.06))
+        fan_boost = min(0.04, max(0.0, (complexity - 0.26) * 0.10))
         preset = replace(
             self._preset,
             debias_chord_multiplier=self._preset.debias_chord_multiplier + extra_chords,
