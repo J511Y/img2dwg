@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-16T13:39:12.361420+00:00",
+  "generated_at": "2026-03-16T14:09:44.844762+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 102.5,
-      "avg_axis_aligned_ratio": 0.0406,
-      "std_axis_aligned_ratio": 0.0078,
-      "avg_axis_margin_to_grid_threshold": 0.8594,
-      "avg_axis_margin_score": 85.94,
+      "avg_line_count": 105.6667,
+      "avg_axis_aligned_ratio": 0.0396,
+      "std_axis_aligned_ratio": 0.008,
+      "avg_axis_margin_to_grid_threshold": 0.8604,
+      "avg_axis_margin_score": 86.04,
       "max_axis_aligned_ratio": 0.0526,
       "max_axis_margin_to_grid_threshold": 0.8474,
       "p95_axis_aligned_ratio": 0.0526,
       "p95_axis_margin_to_grid_threshold": 0.8474,
-      "min_axis_aligned_ratio": 0.0278,
-      "min_axis_margin_to_grid_threshold": 0.8722,
-      "avg_unique_x_count": 192.0,
-      "avg_unique_y_count": 192.0
+      "min_axis_aligned_ratio": 0.0267,
+      "min_axis_margin_to_grid_threshold": 0.8733,
+      "avg_unique_x_count": 198.3333,
+      "avg_unique_y_count": 198.3333
     }
   },
   "top_problematic": [],
@@ -307,15 +307,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 94,
+        "total_entities": 100,
         "entity_type_counts": {
-          "LINE": 94
+          "LINE": 100
         },
         "unique_entity_types": 1,
-        "line_count": 94,
-        "axis_aligned_line_ratio": 0.0426,
-        "unique_x_count": 175,
-        "unique_y_count": 175
+        "line_count": 100,
+        "axis_aligned_line_ratio": 0.04,
+        "unique_x_count": 187,
+        "unique_y_count": 187
       }
     },
     {
@@ -326,15 +326,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 94,
+        "total_entities": 100,
         "entity_type_counts": {
-          "LINE": 94
+          "LINE": 100
         },
         "unique_entity_types": 1,
-        "line_count": 94,
-        "axis_aligned_line_ratio": 0.0426,
-        "unique_x_count": 175,
-        "unique_y_count": 175
+        "line_count": 100,
+        "axis_aligned_line_ratio": 0.04,
+        "unique_x_count": 187,
+        "unique_y_count": 187
       }
     },
     {
@@ -345,15 +345,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 104,
+        "total_entities": 106,
         "entity_type_counts": {
-          "LINE": 104
+          "LINE": 106
         },
         "unique_entity_types": 1,
-        "line_count": 104,
-        "axis_aligned_line_ratio": 0.0385,
-        "unique_x_count": 195,
-        "unique_y_count": 195
+        "line_count": 106,
+        "axis_aligned_line_ratio": 0.0377,
+        "unique_x_count": 199,
+        "unique_y_count": 199
       }
     },
     {
@@ -383,15 +383,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 112,
+        "total_entities": 118,
         "entity_type_counts": {
-          "LINE": 112
+          "LINE": 118
         },
         "unique_entity_types": 1,
-        "line_count": 112,
-        "axis_aligned_line_ratio": 0.0357,
-        "unique_x_count": 211,
-        "unique_y_count": 211
+        "line_count": 118,
+        "axis_aligned_line_ratio": 0.0339,
+        "unique_x_count": 223,
+        "unique_y_count": 223
       }
     },
     {
@@ -402,15 +402,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 132,
+        "total_entities": 134,
         "entity_type_counts": {
-          "LINE": 132
+          "LINE": 134
         },
         "unique_entity_types": 1,
-        "line_count": 132,
-        "axis_aligned_line_ratio": 0.0303,
-        "unique_x_count": 251,
-        "unique_y_count": 251
+        "line_count": 134,
+        "axis_aligned_line_ratio": 0.0299,
+        "unique_x_count": 255,
+        "unique_y_count": 255
       }
     },
     {
@@ -440,15 +440,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 86,
+        "total_entities": 90,
         "entity_type_counts": {
-          "LINE": 86
+          "LINE": 90
         },
         "unique_entity_types": 1,
-        "line_count": 86,
-        "axis_aligned_line_ratio": 0.0465,
-        "unique_x_count": 159,
-        "unique_y_count": 159
+        "line_count": 90,
+        "axis_aligned_line_ratio": 0.0444,
+        "unique_x_count": 167,
+        "unique_y_count": 167
       }
     },
     {
@@ -478,15 +478,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 144,
+        "total_entities": 150,
         "entity_type_counts": {
-          "LINE": 144
+          "LINE": 150
         },
         "unique_entity_types": 1,
-        "line_count": 144,
-        "axis_aligned_line_ratio": 0.0278,
-        "unique_x_count": 275,
-        "unique_y_count": 275
+        "line_count": 150,
+        "axis_aligned_line_ratio": 0.0267,
+        "unique_x_count": 287,
+        "unique_y_count": 287
       }
     },
     {
@@ -497,15 +497,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 132,
+        "total_entities": 138,
         "entity_type_counts": {
-          "LINE": 132
+          "LINE": 138
         },
         "unique_entity_types": 1,
-        "line_count": 132,
-        "axis_aligned_line_ratio": 0.0303,
-        "unique_x_count": 251,
-        "unique_y_count": 251
+        "line_count": 138,
+        "axis_aligned_line_ratio": 0.029,
+        "unique_x_count": 263,
+        "unique_y_count": 263
       }
     },
     {
@@ -797,18 +797,18 @@
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
         "previous": 0.0406,
-        "current": 0.0406,
-        "delta": 0.0
+        "current": 0.0396,
+        "delta": -0.001
       },
       "avg_axis_margin_to_grid_threshold": {
         "previous": 0.8594,
-        "current": 0.8594,
-        "delta": 0.0
+        "current": 0.8604,
+        "delta": 0.001
       },
       "avg_line_count": {
         "previous": 102.5,
-        "current": 102.5,
-        "delta": 0.0
+        "current": 105.6667,
+        "delta": 3.1667
       }
     }
   },

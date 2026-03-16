@@ -103,6 +103,18 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         axis_lock_relief_offgrid = min(0.005, axis_lock_relief * 0.080)
         axis_lock_relief_fan = min(0.008, axis_lock_relief * 0.110)
 
+        # v80: moderate-corridor low-texture relief. Many web_floorplan_grid_v1
+        # thesis cases sit in elongated, lower-texture pockets where existing
+        # terms under-fire; add a bounded boost to improve coordinate spread.
+        moderate_corridor_relief = (
+            max(0.0, aspect_ratio - 1.34)
+            * max(0.0, 0.56 - complexity)
+            * max(0.0, min(0.18, complexity - 0.20))
+        )
+        moderate_corridor_chords = max(0, min(3, int(round(moderate_corridor_relief * 520.0))))
+        moderate_corridor_offgrid = min(0.004, moderate_corridor_relief * 0.095)
+        moderate_corridor_fan = min(0.006, moderate_corridor_relief * 0.128)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -115,6 +127,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + elongated_chords
                 + orthogonal_relief_chords
                 + axis_lock_relief_chords
+                + moderate_corridor_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -126,6 +139,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + elongated_offgrid
                 + orthogonal_relief_offgrid
                 + axis_lock_relief_offgrid
+                + moderate_corridor_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -137,6 +151,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + elongated_fan
                 + orthogonal_relief_fan
                 + axis_lock_relief_fan
+                + moderate_corridor_fan
             ),
         )
 
