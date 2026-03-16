@@ -181,6 +181,20 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         mild_skew_midcomplex_offgrid = min(0.003, mild_skew_midcomplex_relief * 0.92)
         mild_skew_midcomplex_fan = min(0.004, mild_skew_midcomplex_relief * 1.10)
 
+        # v88: near-square web pocket relief. Some thesis samples in
+        # web_floorplan_grid_v1 remain mildly axis-bundled when shape skew is
+        # small but texture sits in a low/mid band. Add a tiny bounded lift so
+        # coordinate diversity improves without disturbing fail=0 behavior.
+        near_square_web_relief = (
+            max(0.0, aspect_ratio - 1.06)
+            * max(0.0, 1.30 - aspect_ratio)
+            * max(0.0, complexity - 0.22)
+            * max(0.0, 0.48 - complexity)
+        )
+        near_square_web_chords = max(0, min(2, int(round(near_square_web_relief * 7200.0))))
+        near_square_web_offgrid = min(0.003, near_square_web_relief * 0.98)
+        near_square_web_fan = min(0.004, near_square_web_relief * 1.16)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -199,6 +213,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_texture_chords
                 + default_web_pocket_chords
                 + mild_skew_midcomplex_chords
+                + near_square_web_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -216,6 +231,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_texture_offgrid
                 + default_web_pocket_offgrid
                 + mild_skew_midcomplex_offgrid
+                + near_square_web_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -233,6 +249,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_texture_fan
                 + default_web_pocket_fan
                 + mild_skew_midcomplex_fan
+                + near_square_web_fan
             ),
         )
 
