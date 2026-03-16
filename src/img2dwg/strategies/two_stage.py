@@ -115,6 +115,19 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         moderate_corridor_offgrid = min(0.004, moderate_corridor_relief * 0.095)
         moderate_corridor_fan = min(0.006, moderate_corridor_relief * 0.128)
 
+        # v81: broad corridor de-snap lift for the common mid-band pocket in
+        # web_floorplan_grid_v1 (moderately elongated + mid complexity). The
+        # bounded term nudges thesis away from orthogonal rebundling without
+        # harming fail=0 stability.
+        midskew_grid_relief = (
+            max(0.0, aspect_ratio - 1.22)
+            * max(0.0, complexity - 0.24)
+            * max(0.0, 0.54 - complexity)
+        )
+        midskew_grid_chords = max(0, min(4, int(round(midskew_grid_relief * 700.0))))
+        midskew_grid_offgrid = min(0.005, midskew_grid_relief * 0.120)
+        midskew_grid_fan = min(0.007, midskew_grid_relief * 0.145)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -128,6 +141,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + orthogonal_relief_chords
                 + axis_lock_relief_chords
                 + moderate_corridor_chords
+                + midskew_grid_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -140,6 +154,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + orthogonal_relief_offgrid
                 + axis_lock_relief_offgrid
                 + moderate_corridor_offgrid
+                + midskew_grid_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -152,6 +167,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + orthogonal_relief_fan
                 + axis_lock_relief_fan
                 + moderate_corridor_fan
+                + midskew_grid_fan
             ),
         )
 
