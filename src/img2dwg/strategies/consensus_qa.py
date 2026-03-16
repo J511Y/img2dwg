@@ -105,6 +105,20 @@ class ConsensusQAStrategy(ConversionStrategy):
         skew_complexity_offgrid = min(0.008, skew_complexity * 0.045)
         skew_complexity_fan = min(0.012, skew_complexity * 0.060)
 
+        # v73: mid-confidence corridor texture relief. Some elongated plans with
+        # consensus in the 0.70~0.84 band still show residual axis regularity.
+        # Add a bounded boost on skew+texture so we increase coordinate diversity
+        # without perturbing high-confidence easy cases.
+        mid_confidence_tail = max(0.0, min(0.16, 0.84 - consensus_score))
+        corridor_texture_relief = (
+            max(0.0, aspect_ratio - 1.62)
+            * max(0.0, complexity - 0.47)
+            * (1.0 + (mid_confidence_tail * 2.2))
+        )
+        corridor_texture_chords = max(0, min(4, int(round(corridor_texture_relief * 150.0))))
+        corridor_texture_offgrid = min(0.006, corridor_texture_relief * 0.070)
+        corridor_texture_fan = min(0.009, corridor_texture_relief * 0.090)
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -116,6 +130,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + corridor_tail_bonus
                 + confident_corridor_bonus
                 + skew_complexity_chords
+                + corridor_texture_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -126,6 +141,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + min(0.006, complexity * 0.004)
                 + confident_corridor_tail
                 + skew_complexity_offgrid
+                + corridor_texture_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -134,6 +150,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + min(0.008, complexity * 0.005)
                 + min(0.012, confident_corridor_tail * 1.1)
                 + skew_complexity_fan
+                + corridor_texture_fan
             ),
         )
 
