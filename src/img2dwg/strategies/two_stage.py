@@ -210,6 +210,24 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         )
         mild_corridor_midtexture_fan = min(0.0028, mild_corridor_midtexture_relief * 1.06)
 
+        # v97: low-edge corridor pocket relief. A subset of web floorplans has
+        # mild elongation with weak edge density, which can still re-snap to
+        # orthogonal bundles. Add a bounded low-edge term to increase coordinate
+        # spread without changing fail=0 behavior.
+        low_edge_corridor_relief = (
+            max(0.0, aspect_ratio - 1.18)
+            * max(0.0, 1.46 - aspect_ratio)
+            * max(0.0, complexity - 0.24)
+            * max(0.0, 0.50 - complexity)
+            * max(0.0, 0.22 - signals.edge_density)
+        )
+        low_edge_corridor_chords = max(
+            0,
+            min(2, int(round(low_edge_corridor_relief * 21000.0))),
+        )
+        low_edge_corridor_offgrid = min(0.0016, low_edge_corridor_relief * 0.80)
+        low_edge_corridor_fan = min(0.0024, low_edge_corridor_relief * 0.98)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -229,6 +247,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + mild_elongation_midband_chords
                 + mild_midtexture_anti_grid_chords
                 + mild_corridor_midtexture_chords
+                + low_edge_corridor_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -247,6 +266,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + mild_elongation_midband_offgrid
                 + mild_midtexture_anti_grid_offgrid
                 + mild_corridor_midtexture_offgrid
+                + low_edge_corridor_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -265,6 +285,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + mild_elongation_midband_fan
                 + mild_midtexture_anti_grid_fan
                 + mild_corridor_midtexture_fan
+                + low_edge_corridor_fan
             ),
         )
 
