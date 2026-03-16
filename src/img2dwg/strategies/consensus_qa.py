@@ -119,6 +119,24 @@ class ConsensusQAStrategy(ConversionStrategy):
         skew_complexity_offgrid = min(0.006, skew_complexity_interaction * 0.095)
         skew_complexity_fan = min(0.006, skew_complexity_interaction * 0.110)
 
+        # v78: axis-lock proxy lift. High-consensus elongated layouts with lower
+        # texture complexity can still settle into orthogonal bundles; apply a
+        # bounded relief signal so consensus_qa keeps coordinate diversity.
+        axis_lock_proxy = (
+            max(0.0, aspect_ratio - 1.58)
+            * max(0.0, 0.60 - complexity)
+            * max(0.0, min(0.24, consensus_score - 0.74))
+        )
+        axis_lock_proxy_chords = max(0, min(3, int(round(axis_lock_proxy * 310.0))))
+        axis_lock_proxy_offgrid = min(0.004, axis_lock_proxy * 0.115)
+        axis_lock_proxy_fan = min(0.005, axis_lock_proxy * 0.120)
+
+        elongated_consensus_floor = (
+            max(0.0, aspect_ratio - 1.24) * max(0.0, min(0.22, consensus_score - 0.70))
+        )
+        elongated_floor_chords = max(0, min(2, int(round(elongated_consensus_floor * 90.0))))
+        elongated_floor_offgrid = min(0.003, elongated_consensus_floor * 0.060)
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -131,6 +149,8 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + confident_corridor_bonus
                 + bridge_mid_confidence_chords
                 + skew_complexity_chords
+                + axis_lock_proxy_chords
+                + elongated_floor_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -142,6 +162,8 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + confident_corridor_tail
                 + bridge_mid_confidence_offgrid
                 + skew_complexity_offgrid
+                + axis_lock_proxy_offgrid
+                + elongated_floor_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -151,6 +173,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + min(0.012, confident_corridor_tail * 1.1)
                 + bridge_mid_confidence_fan
                 + skew_complexity_fan
+                + axis_lock_proxy_fan
             ),
         )
 
