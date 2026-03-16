@@ -81,6 +81,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         elongated_offgrid = min(0.008, elongated_corridor * 0.065)
         elongated_fan = min(0.012, elongated_corridor * 0.090)
 
+        # v76: orthogonal-relief tail for skewed medium/high complexity plans.
+        # This specifically targets residual axis bundling pockets in
+        # web_floorplan_grid_v1 thesis outputs.
+        orthogonal_relief = max(0.0, aspect_ratio - 1.42) * max(0.0, complexity - 0.34)
+        orthogonal_relief_chords = max(0, min(5, int(round(orthogonal_relief * 88.0))))
+        orthogonal_relief_offgrid = min(0.006, orthogonal_relief * 0.055)
+        orthogonal_relief_fan = min(0.010, orthogonal_relief * 0.076)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -91,6 +99,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + interaction_chords
                 + corridor_complexity_chords
                 + elongated_chords
+                + orthogonal_relief_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -100,6 +109,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + interaction_offgrid
                 + corridor_complexity_offgrid
                 + elongated_offgrid
+                + orthogonal_relief_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -109,6 +119,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + interaction_fan
                 + corridor_complexity_fan
                 + elongated_fan
+                + orthogonal_relief_fan
             ),
         )
 
