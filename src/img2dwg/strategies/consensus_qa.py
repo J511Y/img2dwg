@@ -196,6 +196,31 @@ class ConsensusQAStrategy(ConversionStrategy):
         default_consensus_corridor_offgrid = min(0.003, default_consensus_corridor_relief * 0.70)
         default_consensus_corridor_fan = min(0.004, default_consensus_corridor_relief * 0.92)
 
+        # v89: near-square default-consensus pocket relief. Some antithesis
+        # samples remain mildly axis-bundled around near-square layouts with
+        # low/mid complexity at default web consensus; add a tiny bounded term
+        # to improve coordinate diversity without disturbing fail=0 behavior.
+        near_square_default_consensus_relief = (
+            max(0.0, aspect_ratio - 1.06)
+            * max(0.0, 1.24 - aspect_ratio)
+            * max(0.0, complexity - 0.24)
+            * max(0.0, 0.48 - complexity)
+            * max(0.0, consensus_score - 0.69)
+            * max(0.0, 0.75 - consensus_score)
+        )
+        near_square_default_consensus_chords = max(
+            0,
+            min(2, int(round(near_square_default_consensus_relief * 16000.0))),
+        )
+        near_square_default_consensus_offgrid = min(
+            0.003,
+            near_square_default_consensus_relief * 0.96,
+        )
+        near_square_default_consensus_fan = min(
+            0.004,
+            near_square_default_consensus_relief * 1.16,
+        )
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -213,6 +238,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + midband_square_chords
                 + elongated_floor_chords
                 + default_consensus_corridor_chords
+                + near_square_default_consensus_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -229,6 +255,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + midband_square_offgrid
                 + elongated_floor_offgrid
                 + default_consensus_corridor_offgrid
+                + near_square_default_consensus_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -242,6 +269,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_consensus_corridor_fan
                 + midband_square_fan
                 + default_consensus_corridor_fan
+                + near_square_default_consensus_fan
             ),
         )
 
