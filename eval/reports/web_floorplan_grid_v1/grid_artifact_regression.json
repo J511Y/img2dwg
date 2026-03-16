@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-16T17:09:30.043068+00:00",
+  "generated_at": "2026-03-16T17:39:52.240199+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 111.6667,
-      "avg_axis_aligned_ratio": 0.0373,
-      "std_axis_aligned_ratio": 0.0074,
-      "avg_axis_margin_to_grid_threshold": 0.8627,
-      "avg_axis_margin_score": 86.27,
+      "avg_line_count": 111.8333,
+      "avg_axis_aligned_ratio": 0.0372,
+      "std_axis_aligned_ratio": 0.0073,
+      "avg_axis_margin_to_grid_threshold": 0.8628,
+      "avg_axis_margin_score": 86.28,
       "max_axis_aligned_ratio": 0.05,
       "max_axis_margin_to_grid_threshold": 0.85,
       "p95_axis_aligned_ratio": 0.05,
       "p95_axis_margin_to_grid_threshold": 0.85,
       "min_axis_aligned_ratio": 0.0253,
       "min_axis_margin_to_grid_threshold": 0.8747,
-      "avg_unique_x_count": 210.3333,
-      "avg_unique_y_count": 210.3333
+      "avg_unique_x_count": 210.6667,
+      "avg_unique_y_count": 210.6667
     }
   },
   "top_problematic": [],
@@ -421,15 +421,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 90,
+        "total_entities": 92,
         "entity_type_counts": {
-          "LINE": 90
+          "LINE": 92
         },
         "unique_entity_types": 1,
-        "line_count": 90,
-        "axis_aligned_line_ratio": 0.0444,
-        "unique_x_count": 167,
-        "unique_y_count": 167
+        "line_count": 92,
+        "axis_aligned_line_ratio": 0.0435,
+        "unique_x_count": 171,
+        "unique_y_count": 171
       }
     },
     {
@@ -797,18 +797,18 @@
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
         "previous": 0.0373,
-        "current": 0.0373,
-        "delta": 0.0
+        "current": 0.0372,
+        "delta": -0.0001
       },
       "avg_axis_margin_to_grid_threshold": {
         "previous": 0.8627,
-        "current": 0.8627,
-        "delta": 0.0
+        "current": 0.8628,
+        "delta": 0.0001
       },
       "avg_line_count": {
         "previous": 111.6667,
-        "current": 111.6667,
-        "delta": 0.0
+        "current": 111.8333,
+        "delta": 0.1666
       }
     }
   },

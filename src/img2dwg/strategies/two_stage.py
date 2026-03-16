@@ -154,6 +154,20 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         midskew_texture_offgrid = min(0.004, midskew_texture_relief * 0.72)
         midskew_texture_fan = min(0.006, midskew_texture_relief * 0.90)
 
+        # v86: default web pocket anti-grid relief. In practice, many thesis
+        # cases cluster near mildly elongated layouts with mid/low texture where
+        # existing lifts are individually small. Add a bounded blended term to
+        # raise coordinate diversity while preserving fail=0 stability.
+        default_web_pocket_relief = (
+            max(0.0, aspect_ratio - 1.20)
+            * max(0.0, 1.46 - aspect_ratio)
+            * max(0.0, complexity - 0.24)
+            * max(0.0, 0.52 - complexity)
+        )
+        default_web_pocket_chords = max(0, min(3, int(round(default_web_pocket_relief * 4600.0))))
+        default_web_pocket_offgrid = min(0.004, default_web_pocket_relief * 0.84)
+        default_web_pocket_fan = min(0.006, default_web_pocket_relief * 1.02)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -170,6 +184,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_grid_chords
                 + low_skew_grid_chords
                 + midskew_texture_chords
+                + default_web_pocket_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -185,6 +200,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_grid_offgrid
                 + low_skew_grid_offgrid
                 + midskew_texture_offgrid
+                + default_web_pocket_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -200,6 +216,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_grid_fan
                 + low_skew_grid_fan
                 + midskew_texture_fan
+                + default_web_pocket_fan
             ),
         )
 
