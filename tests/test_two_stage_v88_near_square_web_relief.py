@@ -29,7 +29,9 @@ def _extract_debias_chords(notes: list[str]) -> int:
     raise AssertionError("offgrid_debias_chords note missing")
 
 
-def test_two_stage_v88_near_square_web_relief_lifts_target_pocket(monkeypatch, tmp_path: Path) -> None:
+def test_two_stage_v88_near_square_web_relief_lifts_target_pocket(
+    monkeypatch, tmp_path: Path
+) -> None:
     image_path = tmp_path / "two_stage_v88_near_square_web.png"
     Image.new("RGB", (16, 16), color="white").save(image_path)
 

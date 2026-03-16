@@ -177,7 +177,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             * max(0.0, complexity - 0.26)
             * max(0.0, 0.50 - complexity)
         )
-        mild_skew_midcomplex_chords = max(0, min(2, int(round(mild_skew_midcomplex_relief * 5400.0))))
+        mild_skew_midcomplex_chords = max(
+            0, min(2, int(round(mild_skew_midcomplex_relief * 5400.0)))
+        )
         mild_skew_midcomplex_offgrid = min(0.003, mild_skew_midcomplex_relief * 0.92)
         mild_skew_midcomplex_fan = min(0.004, mild_skew_midcomplex_relief * 1.10)
 
