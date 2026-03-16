@@ -57,3 +57,30 @@ def test_consensus_v59_elongated_floorplan_gets_extra_debias(monkeypatch, tmp_pa
     )
 
     assert _extract_chords(out_elongated.notes) > _extract_chords(out_square.notes)
+
+
+def test_consensus_v62_corridor_skew_gets_extra_decollapse_bonus(monkeypatch, tmp_path: Path) -> None:
+    calls: list[ImageSignals] = [
+        ImageSignals(width=320, height=200, contrast=0.92, edge_density=0.9),
+        ImageSignals(width=420, height=180, contrast=0.92, edge_density=0.9),
+    ]
+
+    def _fake_signals(_image_path: Path) -> ImageSignals:
+        return calls.pop(0)
+
+    monkeypatch.setattr(consensus_qa, "extract_image_signals", _fake_signals)
+
+    image_path = tmp_path / "stub.png"
+    image_path.write_bytes(b"stub")
+
+    strategy = ConsensusQAStrategy()
+    out_wide = strategy.run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
+        tmp_path / "out_wide",
+    )
+    out_corridor = strategy.run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.9}),
+        tmp_path / "out_corridor",
+    )
+
+    assert _extract_chords(out_corridor.notes) > _extract_chords(out_wide.notes)

@@ -68,10 +68,16 @@ class ConsensusQAStrategy(ConversionStrategy):
         # and off-grid shift from observed image complexity, consensus confidence,
         # and aspect-ratio skew (many web floorplans are long corridors).
         complexity = (signals.contrast * 0.42) + (signals.edge_density * 0.58)
-        complexity_bonus = max(0, min(16, int(round(complexity * 20.0)) - 4))
-        confidence_bonus = max(0, min(7, int(round((consensus_score - 0.68) * 26.0))))
+        complexity_bonus = max(0, min(18, int(round(complexity * 22.0)) - 4))
+        confidence_bonus = max(0, min(8, int(round((consensus_score - 0.66) * 27.0))))
         aspect_ratio = max(signals.width, signals.height) / max(1, min(signals.width, signals.height))
-        shape_skew_bonus = max(0, min(6, int(round((aspect_ratio - 1.08) * 8.0))))
+        shape_skew_bonus = max(0, min(10, int(round((aspect_ratio - 1.06) * 9.0))))
+
+        # Extra decollapse lift for corridor-heavy plans: keep antithesis from drifting
+        # toward low-diversity axis bundles when aspect skew is pronounced.
+        corridor_bonus = 0
+        if aspect_ratio >= 1.65:
+            corridor_bonus = min(6, int(round((aspect_ratio - 1.65) * 6.0)) + 2)
 
         tuned_preset = replace(
             preset,
@@ -80,15 +86,16 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + complexity_bonus
                 + confidence_bonus
                 + shape_skew_bonus
+                + corridor_bonus
             ),
             offgrid_shift_ratio=(
                 preset.offgrid_shift_ratio
-                + min(0.024, complexity * 0.024)
-                + min(0.010, max(0.0, (aspect_ratio - 1.15) * 0.012))
+                + min(0.028, complexity * 0.026)
+                + min(0.014, max(0.0, (aspect_ratio - 1.12) * 0.016))
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
-                + min(0.028, max(0.0, (aspect_ratio - 1.10) * 0.022))
+                + min(0.034, max(0.0, (aspect_ratio - 1.08) * 0.026))
             ),
         )
 
