@@ -42,7 +42,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
 
         # Long corridor-like plans in web_floorplan_grid_v1 tend to re-collapse into
         # axis-aligned traces unless we scale debias for aspect skew as well.
-        aspect_ratio = max(signals.width, signals.height) / max(1, min(signals.width, signals.height))
+        aspect_ratio = max(signals.width, signals.height) / max(
+            1, min(signals.width, signals.height)
+        )
         aspect_chords = max(0, min(10, int(round((aspect_ratio - 1.08) * 7.5))))
         aspect_offgrid = min(0.016, max(0.0, (aspect_ratio - 1.14) * 0.012))
         aspect_fan = min(0.028, max(0.0, (aspect_ratio - 1.14) * 0.018))
@@ -89,6 +91,18 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         orthogonal_relief_offgrid = min(0.006, orthogonal_relief * 0.055)
         orthogonal_relief_fan = min(0.010, orthogonal_relief * 0.076)
 
+        # v77: axis-lock relief for elongated mid-complexity layouts where
+        # structure is corridor-like but texture is not strong enough to trigger
+        # larger complexity-only lifts. This keeps thesis from re-snap to grids.
+        axis_lock_relief = (
+            max(0.0, aspect_ratio - 1.46)
+            * max(0.0, 0.58 - complexity)
+            * max(0.0, complexity - 0.24)
+        )
+        axis_lock_relief_chords = max(0, min(4, int(round(axis_lock_relief * 360.0))))
+        axis_lock_relief_offgrid = min(0.005, axis_lock_relief * 0.080)
+        axis_lock_relief_fan = min(0.008, axis_lock_relief * 0.110)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -100,6 +114,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + corridor_complexity_chords
                 + elongated_chords
                 + orthogonal_relief_chords
+                + axis_lock_relief_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -110,6 +125,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + corridor_complexity_offgrid
                 + elongated_offgrid
                 + orthogonal_relief_offgrid
+                + axis_lock_relief_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -120,6 +136,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + corridor_complexity_fan
                 + elongated_fan
                 + orthogonal_relief_fan
+                + axis_lock_relief_fan
             ),
         )
 
