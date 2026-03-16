@@ -197,6 +197,23 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         near_square_web_offgrid = min(0.003, near_square_web_relief * 0.98)
         near_square_web_fan = min(0.004, near_square_web_relief * 1.16)
 
+        # v90: midskew default-web pocket relief. Remaining thesis cases cluster
+        # around mildly elongated layouts with low/mid texture where previous
+        # tiny lifts are often just below threshold. Add a bounded blended term
+        # to reduce axis rebundling while preserving fail=0 guardrails.
+        midskew_default_pocket_relief = (
+            max(0.0, aspect_ratio - 1.16)
+            * max(0.0, 1.42 - aspect_ratio)
+            * max(0.0, complexity - 0.22)
+            * max(0.0, 0.50 - complexity)
+        )
+        midskew_default_pocket_chords = max(
+            0,
+            min(2, int(round(midskew_default_pocket_relief * 8200.0))),
+        )
+        midskew_default_pocket_offgrid = min(0.003, midskew_default_pocket_relief * 0.94)
+        midskew_default_pocket_fan = min(0.004, midskew_default_pocket_relief * 1.12)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -216,6 +233,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_web_pocket_chords
                 + mild_skew_midcomplex_chords
                 + near_square_web_chords
+                + midskew_default_pocket_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -234,6 +252,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_web_pocket_offgrid
                 + mild_skew_midcomplex_offgrid
                 + near_square_web_offgrid
+                + midskew_default_pocket_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -252,6 +271,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_web_pocket_fan
                 + mild_skew_midcomplex_fan
                 + near_square_web_fan
+                + midskew_default_pocket_fan
             ),
         )
 
