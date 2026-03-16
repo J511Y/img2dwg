@@ -1,0 +1,66 @@
+from pathlib import Path
+
+import ezdxf
+from PIL import Image, ImageDraw
+
+from img2dwg.strategies.base import ConversionInput
+from img2dwg.strategies.two_stage import TwoStageBaselineStrategy
+
+
+def _make_sample_plan_image(path: Path) -> None:
+    image = Image.new("L", (96, 96), color=245)
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((12, 12, 84, 84), outline=20, width=4)
+    draw.line((12, 48, 84, 48), fill=50, width=2)
+    draw.line((48, 12, 48, 84), fill=50, width=2)
+    image.convert("RGB").save(path)
+
+
+def _line_diagnostics(dxf_path: Path, *, eps: float = 1e-6) -> tuple[int, int, int, int]:
+    doc = ezdxf.readfile(str(dxf_path))
+    msp = doc.modelspace()
+    non_axis_count = 0
+    line_count = 0
+    x_coords: set[float] = set()
+    y_coords: set[float] = set()
+    for entity in msp:
+        if entity.dxftype() != "LINE":
+            continue
+        start = entity.dxf.start
+        end = entity.dxf.end
+        dx = float(end[0]) - float(start[0])
+        dy = float(end[1]) - float(start[1])
+        line_count += 1
+        x_coords.add(round(float(start[0]), 3))
+        x_coords.add(round(float(end[0]), 3))
+        y_coords.add(round(float(start[1]), 3))
+        y_coords.add(round(float(end[1]), 3))
+        if abs(dx) > eps and abs(dy) > eps:
+            non_axis_count += 1
+    return non_axis_count, line_count, len(x_coords), len(y_coords)
+
+
+def _extract_debias_chords(notes: list[str]) -> int:
+    for note in notes:
+        if note.startswith("offgrid_debias_chords:x"):
+            return int(note.split("x", maxsplit=1)[1])
+    raise AssertionError("offgrid_debias_chords note missing")
+
+
+def test_two_stage_v64_base_chord_floor_lifts_coordinate_diversity(tmp_path: Path) -> None:
+    image_path = tmp_path / "plan.png"
+    _make_sample_plan_image(image_path)
+
+    out = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "out")
+
+    assert out.success is True
+    assert out.dxf_path is not None
+    assert _extract_debias_chords(out.notes) >= 28
+
+    non_axis_count, line_count, unique_x_count, unique_y_count = _line_diagnostics(out.dxf_path)
+    axis_ratio = (line_count - non_axis_count) / line_count
+
+    assert axis_ratio <= 0.10
+    assert line_count >= 58
+    assert unique_x_count >= 24
+    assert unique_y_count >= 24
