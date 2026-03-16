@@ -65,15 +65,31 @@ class ConsensusQAStrategy(ConversionStrategy):
         preset = self._high_confidence_preset if consensus_score >= 0.75 else self._base_preset
 
         # Reduce grid-shaped axis bias on complex floorplans by scaling debias chords
-        # and off-grid shift from observed image complexity and consensus confidence.
+        # and off-grid shift from observed image complexity, consensus confidence,
+        # and aspect-ratio skew (many web floorplans are long corridors).
         complexity = (signals.contrast * 0.42) + (signals.edge_density * 0.58)
         complexity_bonus = max(0, min(16, int(round(complexity * 20.0)) - 4))
         confidence_bonus = max(0, min(7, int(round((consensus_score - 0.68) * 26.0))))
+        aspect_ratio = max(signals.width, signals.height) / max(1, min(signals.width, signals.height))
+        shape_skew_bonus = max(0, min(6, int(round((aspect_ratio - 1.08) * 8.0))))
 
         tuned_preset = replace(
             preset,
-            debias_chord_multiplier=preset.debias_chord_multiplier + complexity_bonus + confidence_bonus,
-            offgrid_shift_ratio=preset.offgrid_shift_ratio + min(0.024, complexity * 0.024),
+            debias_chord_multiplier=(
+                preset.debias_chord_multiplier
+                + complexity_bonus
+                + confidence_bonus
+                + shape_skew_bonus
+            ),
+            offgrid_shift_ratio=(
+                preset.offgrid_shift_ratio
+                + min(0.024, complexity * 0.024)
+                + min(0.010, max(0.0, (aspect_ratio - 1.15) * 0.012))
+            ),
+            diagonal_fan_ratio=(
+                preset.diagonal_fan_ratio
+                + min(0.028, max(0.0, (aspect_ratio - 1.10) * 0.022))
+            ),
         )
 
         plan = build_vector_plan(signals, tuned_preset)
