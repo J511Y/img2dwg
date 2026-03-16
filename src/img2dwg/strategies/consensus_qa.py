@@ -70,7 +70,9 @@ class ConsensusQAStrategy(ConversionStrategy):
         complexity = (signals.contrast * 0.42) + (signals.edge_density * 0.58)
         complexity_bonus = max(0, min(18, int(round(complexity * 22.0)) - 4))
         confidence_bonus = max(0, min(8, int(round((consensus_score - 0.66) * 27.0))))
-        aspect_ratio = max(signals.width, signals.height) / max(1, min(signals.width, signals.height))
+        aspect_ratio = max(signals.width, signals.height) / max(
+            1, min(signals.width, signals.height)
+        )
         shape_skew_bonus = max(0, min(10, int(round((aspect_ratio - 1.06) * 9.0))))
 
         # Extra decollapse lift for corridor-heavy plans: keep antithesis from drifting
@@ -131,8 +133,30 @@ class ConsensusQAStrategy(ConversionStrategy):
         axis_lock_proxy_offgrid = min(0.004, axis_lock_proxy * 0.115)
         axis_lock_proxy_fan = min(0.005, axis_lock_proxy * 0.120)
 
-        elongated_consensus_floor = (
-            max(0.0, aspect_ratio - 1.24) * max(0.0, min(0.22, consensus_score - 0.70))
+        # v79: most web_floorplan_grid_v1 consensus cases still land near the
+        # default 0.71 score, so the higher-confidence relief packs do not fire.
+        # Add a bounded moderate-consensus lift for elongated, lower-texture
+        # layouts to preserve coordinate diversity without risking fail=0.
+        moderate_consensus_corridor_relief = (
+            max(0.0, aspect_ratio - 1.38)
+            * max(0.0, 0.60 - complexity)
+            * max(0.0, min(0.10, consensus_score - 0.68))
+        )
+        moderate_consensus_corridor_chords = max(
+            0,
+            min(2, int(round(moderate_consensus_corridor_relief * 950.0))),
+        )
+        moderate_consensus_corridor_offgrid = min(
+            0.004,
+            moderate_consensus_corridor_relief * 0.38,
+        )
+        moderate_consensus_corridor_fan = min(
+            0.005,
+            moderate_consensus_corridor_relief * 0.46,
+        )
+
+        elongated_consensus_floor = max(0.0, aspect_ratio - 1.24) * max(
+            0.0, min(0.22, consensus_score - 0.70)
         )
         elongated_floor_chords = max(0, min(2, int(round(elongated_consensus_floor * 90.0))))
         elongated_floor_offgrid = min(0.003, elongated_consensus_floor * 0.060)
@@ -150,6 +174,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + bridge_mid_confidence_chords
                 + skew_complexity_chords
                 + axis_lock_proxy_chords
+                + moderate_consensus_corridor_chords
                 + elongated_floor_chords
                 + 4
             ),
@@ -163,6 +188,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + bridge_mid_confidence_offgrid
                 + skew_complexity_offgrid
                 + axis_lock_proxy_offgrid
+                + moderate_consensus_corridor_offgrid
                 + elongated_floor_offgrid
             ),
             diagonal_fan_ratio=(
@@ -174,6 +200,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + bridge_mid_confidence_fan
                 + skew_complexity_fan
                 + axis_lock_proxy_fan
+                + moderate_consensus_corridor_fan
             ),
         )
 
