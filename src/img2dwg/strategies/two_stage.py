@@ -97,6 +97,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         skew_texture_offgrid = min(0.008, skew_texture_tail * 0.082)
         skew_texture_fan = min(0.011, skew_texture_tail * 0.104)
 
+        # v72: bridge-zone relief for corridor plans that are elongated but not
+        # ultra-extreme. This closes a remaining axis-regularity pocket seen on
+        # web_floorplan_grid_v1 when skew and complexity are both moderate-high.
+        bridge_corridor = max(0.0, aspect_ratio - 1.62) * max(0.0, complexity - 0.31)
+        bridge_corridor_chords = max(0, min(6, int(round(bridge_corridor * 140.0))))
+        bridge_corridor_offgrid = min(0.006, bridge_corridor * 0.060)
+        bridge_corridor_fan = min(0.009, bridge_corridor * 0.086)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -109,6 +117,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + elongated_chords
                 + ultra_elongated_chords
                 + skew_texture_chords
+                + bridge_corridor_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -120,6 +129,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + elongated_offgrid
                 + ultra_elongated_offgrid
                 + skew_texture_offgrid
+                + bridge_corridor_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -131,6 +141,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + elongated_fan
                 + ultra_elongated_fan
                 + skew_texture_fan
+                + bridge_corridor_fan
             ),
         )
 

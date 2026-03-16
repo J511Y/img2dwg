@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-16T08:13:41.394275+00:00",
+  "generated_at": "2026-03-16T09:39:05.679877+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -24,19 +24,19 @@
   },
   "strategy_diagnostics": {
     "consensus_qa": {
-      "avg_line_count": 107.8333,
-      "avg_axis_aligned_ratio": 0.0374,
-      "std_axis_aligned_ratio": 0.0033,
-      "avg_axis_margin_to_grid_threshold": 0.8626,
-      "avg_axis_margin_score": 86.26,
+      "avg_line_count": 108.1667,
+      "avg_axis_aligned_ratio": 0.0373,
+      "std_axis_aligned_ratio": 0.0034,
+      "avg_axis_margin_to_grid_threshold": 0.8627,
+      "avg_axis_margin_score": 86.27,
       "max_axis_aligned_ratio": 0.0435,
       "max_axis_margin_to_grid_threshold": 0.8565,
       "p95_axis_aligned_ratio": 0.0435,
       "p95_axis_margin_to_grid_threshold": 0.8565,
       "min_axis_aligned_ratio": 0.0312,
       "min_axis_margin_to_grid_threshold": 0.8688,
-      "avg_unique_x_count": 202.6667,
-      "avg_unique_y_count": 202.6667
+      "avg_unique_x_count": 203.25,
+      "avg_unique_y_count": 203.3333
     },
     "hybrid_mvp": {
       "avg_line_count": 8.0,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 97.6667,
-      "avg_axis_aligned_ratio": 0.0421,
-      "std_axis_aligned_ratio": 0.0067,
-      "avg_axis_margin_to_grid_threshold": 0.8579,
-      "avg_axis_margin_score": 85.79,
+      "avg_line_count": 101.6667,
+      "avg_axis_aligned_ratio": 0.0412,
+      "std_axis_aligned_ratio": 0.008,
+      "avg_axis_margin_to_grid_threshold": 0.8588,
+      "avg_axis_margin_score": 85.88,
       "max_axis_aligned_ratio": 0.0526,
       "max_axis_margin_to_grid_threshold": 0.8474,
       "p95_axis_aligned_ratio": 0.0526,
       "p95_axis_margin_to_grid_threshold": 0.8474,
-      "min_axis_aligned_ratio": 0.0286,
-      "min_axis_margin_to_grid_threshold": 0.8714,
-      "avg_unique_x_count": 182.3333,
-      "avg_unique_y_count": 182.3333
+      "min_axis_aligned_ratio": 0.025,
+      "min_axis_margin_to_grid_threshold": 0.875,
+      "avg_unique_x_count": 190.3333,
+      "avg_unique_y_count": 190.3333
     }
   },
   "top_problematic": [],
@@ -383,15 +383,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 102,
+        "total_entities": 106,
         "entity_type_counts": {
-          "LINE": 102
+          "LINE": 106
         },
         "unique_entity_types": 1,
-        "line_count": 102,
-        "axis_aligned_line_ratio": 0.0392,
-        "unique_x_count": 191,
-        "unique_y_count": 191
+        "line_count": 106,
+        "axis_aligned_line_ratio": 0.0377,
+        "unique_x_count": 199,
+        "unique_y_count": 199
       }
     },
     {
@@ -402,15 +402,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 118,
+        "total_entities": 130,
         "entity_type_counts": {
-          "LINE": 118
+          "LINE": 130
         },
         "unique_entity_types": 1,
-        "line_count": 118,
-        "axis_aligned_line_ratio": 0.0339,
-        "unique_x_count": 223,
-        "unique_y_count": 223
+        "line_count": 130,
+        "axis_aligned_line_ratio": 0.0308,
+        "unique_x_count": 247,
+        "unique_y_count": 247
       }
     },
     {
@@ -478,15 +478,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 140,
+        "total_entities": 160,
         "entity_type_counts": {
-          "LINE": 140
+          "LINE": 160
         },
         "unique_entity_types": 1,
-        "line_count": 140,
-        "axis_aligned_line_ratio": 0.0286,
-        "unique_x_count": 267,
-        "unique_y_count": 267
+        "line_count": 160,
+        "axis_aligned_line_ratio": 0.025,
+        "unique_x_count": 307,
+        "unique_y_count": 307
       }
     },
     {
@@ -497,15 +497,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 116,
+        "total_entities": 128,
         "entity_type_counts": {
-          "LINE": 116
+          "LINE": 128
         },
         "unique_entity_types": 1,
-        "line_count": 116,
-        "axis_aligned_line_ratio": 0.0345,
-        "unique_x_count": 219,
-        "unique_y_count": 219
+        "line_count": 128,
+        "axis_aligned_line_ratio": 0.0312,
+        "unique_x_count": 243,
+        "unique_y_count": 243
       }
     },
     {
@@ -580,7 +580,7 @@
         "unique_entity_types": 1,
         "line_count": 110,
         "axis_aligned_line_ratio": 0.0364,
-        "unique_x_count": 207,
+        "unique_x_count": 206,
         "unique_y_count": 207
       }
     },
@@ -630,15 +630,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 120,
+        "total_entities": 124,
         "entity_type_counts": {
-          "LINE": 120
+          "LINE": 124
         },
         "unique_entity_types": 1,
-        "line_count": 120,
-        "axis_aligned_line_ratio": 0.0333,
-        "unique_x_count": 227,
-        "unique_y_count": 227
+        "line_count": 124,
+        "axis_aligned_line_ratio": 0.0323,
+        "unique_x_count": 235,
+        "unique_y_count": 235
       }
     },
     {
@@ -763,18 +763,18 @@
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
         "previous": 0.0374,
-        "current": 0.0374,
-        "delta": 0.0
+        "current": 0.0373,
+        "delta": -0.0001
       },
       "avg_axis_margin_to_grid_threshold": {
         "previous": 0.8626,
-        "current": 0.8626,
-        "delta": 0.0
+        "current": 0.8627,
+        "delta": 0.0001
       },
       "avg_line_count": {
         "previous": 107.8333,
-        "current": 107.8333,
-        "delta": 0.0
+        "current": 108.1667,
+        "delta": 0.3334
       }
     },
     "hybrid_mvp": {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0424,
-        "current": 0.0421,
-        "delta": -0.0003
+        "previous": 0.0421,
+        "current": 0.0412,
+        "delta": -0.0009
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8576,
-        "current": 0.8579,
-        "delta": 0.0003
+        "previous": 0.8579,
+        "current": 0.8588,
+        "delta": 0.0009
       },
       "avg_line_count": {
-        "previous": 96.5,
-        "current": 97.6667,
-        "delta": 1.1667
+        "previous": 97.6667,
+        "current": 101.6667,
+        "delta": 4.0
       }
     }
   },
