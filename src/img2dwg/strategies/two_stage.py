@@ -228,6 +228,23 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_edge_corridor_offgrid = min(0.0016, low_edge_corridor_relief * 0.80)
         low_edge_corridor_fan = min(0.0024, low_edge_corridor_relief * 0.98)
 
+        # v98: low-mid texture drift relief. Mildly elongated plans with lower
+        # texture can still accumulate orthogonal traces even when v97 does not
+        # trigger strongly. Add a tiny bounded lift to improve coordinate spread
+        # in that pocket while preserving fail=0 behavior.
+        low_midtexture_drift_relief = (
+            max(0.0, aspect_ratio - 1.22)
+            * max(0.0, 1.52 - aspect_ratio)
+            * max(0.0, 0.46 - complexity)
+            * max(0.0, 0.26 - signals.edge_density)
+        )
+        low_midtexture_drift_chords = max(
+            0,
+            min(3, int(round(low_midtexture_drift_relief * 4200.0))),
+        )
+        low_midtexture_drift_offgrid = min(0.0030, low_midtexture_drift_relief * 2.4)
+        low_midtexture_drift_fan = min(0.0038, low_midtexture_drift_relief * 2.8)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -248,6 +265,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + mild_midtexture_anti_grid_chords
                 + mild_corridor_midtexture_chords
                 + low_edge_corridor_chords
+                + low_midtexture_drift_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -267,6 +285,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + mild_midtexture_anti_grid_offgrid
                 + mild_corridor_midtexture_offgrid
                 + low_edge_corridor_offgrid
+                + low_midtexture_drift_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -286,6 +305,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + mild_midtexture_anti_grid_fan
                 + mild_corridor_midtexture_fan
                 + low_edge_corridor_fan
+                + low_midtexture_drift_fan
             ),
         )
 
