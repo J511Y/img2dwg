@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-16T21:40:45.570221+00:00",
+  "generated_at": "2026-03-16T22:39:44.978899+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 112.5,
-      "avg_axis_aligned_ratio": 0.037,
-      "std_axis_aligned_ratio": 0.0071,
-      "avg_axis_margin_to_grid_threshold": 0.863,
-      "avg_axis_margin_score": 86.3,
+      "avg_line_count": 113.1667,
+      "avg_axis_aligned_ratio": 0.0367,
+      "std_axis_aligned_ratio": 0.0069,
+      "avg_axis_margin_to_grid_threshold": 0.8633,
+      "avg_axis_margin_score": 86.33,
       "max_axis_aligned_ratio": 0.0488,
       "max_axis_margin_to_grid_threshold": 0.8512,
       "p95_axis_aligned_ratio": 0.0488,
       "p95_axis_margin_to_grid_threshold": 0.8512,
       "min_axis_aligned_ratio": 0.0253,
       "min_axis_margin_to_grid_threshold": 0.8747,
-      "avg_unique_x_count": 212.0,
-      "avg_unique_y_count": 212.0
+      "avg_unique_x_count": 213.3333,
+      "avg_unique_y_count": 213.3333
     }
   },
   "top_problematic": [],
@@ -421,15 +421,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 90,
+        "total_entities": 94,
         "entity_type_counts": {
-          "LINE": 90
+          "LINE": 94
         },
         "unique_entity_types": 1,
-        "line_count": 90,
-        "axis_aligned_line_ratio": 0.0444,
-        "unique_x_count": 167,
-        "unique_y_count": 167
+        "line_count": 94,
+        "axis_aligned_line_ratio": 0.0426,
+        "unique_x_count": 175,
+        "unique_y_count": 175
       }
     },
     {
@@ -440,15 +440,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 102,
+        "total_entities": 106,
         "entity_type_counts": {
-          "LINE": 102
+          "LINE": 106
         },
         "unique_entity_types": 1,
-        "line_count": 102,
-        "axis_aligned_line_ratio": 0.0392,
-        "unique_x_count": 191,
-        "unique_y_count": 191
+        "line_count": 106,
+        "axis_aligned_line_ratio": 0.0377,
+        "unique_x_count": 199,
+        "unique_y_count": 199
       }
     },
     {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0376,
-        "current": 0.037,
-        "delta": -0.0006
+        "previous": 0.0368,
+        "current": 0.0367,
+        "delta": -0.0001
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8624,
-        "current": 0.863,
-        "delta": 0.0006
+        "previous": 0.8632,
+        "current": 0.8633,
+        "delta": 0.0001
       },
       "avg_line_count": {
-        "previous": 111.1667,
-        "current": 112.5,
-        "delta": 1.3333
+        "previous": 112.8333,
+        "current": 113.1667,
+        "delta": 0.3334
       }
     }
   },

@@ -191,6 +191,25 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         mild_midtexture_anti_grid_offgrid = min(0.0018, mild_midtexture_anti_grid_relief * 0.95)
         mild_midtexture_anti_grid_fan = min(0.0026, mild_midtexture_anti_grid_relief * 1.10)
 
+        # v96: broadened mild-corridor midtexture relief. v95 improved a narrow
+        # pocket but residual axis-heavy traces remain just outside that band
+        # (slightly lower skew / slightly higher texture). Add a tiny bounded
+        # extension to keep fail=0 while nudging coordinate diversity upward.
+        mild_corridor_midtexture_relief = (
+            max(0.0, aspect_ratio - 1.26)
+            * max(0.0, 1.54 - aspect_ratio)
+            * max(0.0, complexity - 0.24)
+            * max(0.0, 0.50 - complexity)
+        )
+        mild_corridor_midtexture_chords = max(
+            0,
+            min(2, int(round(mild_corridor_midtexture_relief * 4200.0))),
+        )
+        mild_corridor_midtexture_offgrid = min(
+            0.0019, mild_corridor_midtexture_relief * 0.92
+        )
+        mild_corridor_midtexture_fan = min(0.0028, mild_corridor_midtexture_relief * 1.06)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -209,6 +228,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_midband_chords
                 + mild_elongation_midband_chords
                 + mild_midtexture_anti_grid_chords
+                + mild_corridor_midtexture_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -226,6 +246,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_midband_offgrid
                 + mild_elongation_midband_offgrid
                 + mild_midtexture_anti_grid_offgrid
+                + mild_corridor_midtexture_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -243,6 +264,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_midband_fan
                 + mild_elongation_midband_fan
                 + mild_midtexture_anti_grid_fan
+                + mild_corridor_midtexture_fan
             ),
         )
 
