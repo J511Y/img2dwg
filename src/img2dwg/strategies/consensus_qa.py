@@ -25,9 +25,9 @@ class ConsensusQAStrategy(ConversionStrategy):
         include_diagonals=True,
         quality_bias=0.48,
         topology_bias=0.50,
-        offgrid_shift_ratio=0.054,
-        diagonal_fan_ratio=0.13,
-        debias_chord_multiplier=30,
+        offgrid_shift_ratio=0.058,
+        diagonal_fan_ratio=0.14,
+        debias_chord_multiplier=32,
     )
 
     _high_confidence_preset = StrategyPreset(
@@ -36,9 +36,9 @@ class ConsensusQAStrategy(ConversionStrategy):
         include_diagonals=True,
         quality_bias=0.58,
         topology_bias=0.62,
-        offgrid_shift_ratio=0.07,
-        diagonal_fan_ratio=0.15,
-        debias_chord_multiplier=34,
+        offgrid_shift_ratio=0.074,
+        diagonal_fan_ratio=0.16,
+        debias_chord_multiplier=36,
     )
 
     _min_consensus = 0.35
@@ -66,14 +66,14 @@ class ConsensusQAStrategy(ConversionStrategy):
 
         # Reduce grid-shaped axis bias on complex floorplans by scaling debias chords
         # and off-grid shift from observed image complexity and consensus confidence.
-        complexity = (signals.contrast * 0.5) + (signals.edge_density * 0.5)
-        complexity_bonus = max(0, min(12, int(round(complexity * 16.0)) - 4))
-        confidence_bonus = max(0, min(4, int(round((consensus_score - 0.72) * 20.0))))
+        complexity = (signals.contrast * 0.42) + (signals.edge_density * 0.58)
+        complexity_bonus = max(0, min(14, int(round(complexity * 18.0)) - 4))
+        confidence_bonus = max(0, min(6, int(round((consensus_score - 0.70) * 24.0))))
 
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=preset.debias_chord_multiplier + complexity_bonus + confidence_bonus,
-            offgrid_shift_ratio=preset.offgrid_shift_ratio + min(0.02, complexity * 0.02),
+            offgrid_shift_ratio=preset.offgrid_shift_ratio + min(0.024, complexity * 0.024),
         )
 
         plan = build_vector_plan(signals, tuned_preset)

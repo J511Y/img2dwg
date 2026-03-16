@@ -24,22 +24,26 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         include_diagonals=True,
         quality_bias=0.42,
         topology_bias=0.40,
-        offgrid_shift_ratio=0.056,
-        diagonal_fan_ratio=0.11,
-        debias_chord_multiplier=24,
+        offgrid_shift_ratio=0.058,
+        diagonal_fan_ratio=0.12,
+        debias_chord_multiplier=26,
     )
 
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
 
-        # Adapt chord density to image complexity so we keep lowering axis bias
-        # on dense/contrasty floorplans without changing the base geometry recipe.
-        complexity = (signals.contrast * 0.45) + (signals.edge_density * 0.55)
-        extra_chords = max(0, min(10, int(round(complexity * 14.0)) - 3))
+        # Adapt debias controls to image complexity so dense/contrasty floorplans
+        # do not collapse into axis-aligned grid artifacts.
+        complexity = (signals.contrast * 0.40) + (signals.edge_density * 0.60)
+        extra_chords = max(0, min(16, int(round(complexity * 22.0)) - 4))
+        offgrid_boost = min(0.024, max(0.0, (complexity - 0.28) * 0.06))
+        fan_boost = min(0.04, max(0.0, (complexity - 0.26) * 0.10))
         preset = replace(
             self._preset,
             debias_chord_multiplier=self._preset.debias_chord_multiplier + extra_chords,
+            offgrid_shift_ratio=self._preset.offgrid_shift_ratio + offgrid_boost,
+            diagonal_fan_ratio=self._preset.diagonal_fan_ratio + fan_boost,
         )
 
         plan = build_vector_plan(signals, preset)
@@ -47,7 +51,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="THESIS")
 
-        metrics = estimate_metrics(signals, self._preset, consensus_score=0.56)
+        metrics = estimate_metrics(signals, preset, consensus_score=0.56)
         return ConversionOutput(
             strategy_name=self.name,
             dxf_path=dxf_path,
