@@ -89,6 +89,13 @@ class ConsensusQAStrategy(ConversionStrategy):
         if aspect_ratio >= 1.60 and consensus_score >= 0.82:
             confident_corridor_bonus = min(4, int(round((consensus_score - 0.82) * 20.0)) + 1)
 
+        # Strong-consensus long corridors still occasionally bunch around axis
+        # anchors. Add a bounded high-confidence tail lift to increase coordinate
+        # diversity without destabilizing fail=0 guardrails.
+        confident_corridor_tail = 0.0
+        if aspect_ratio >= 1.85 and consensus_score >= 0.86:
+            confident_corridor_tail = min(0.012, max(0.0, (aspect_ratio - 1.85) * 0.010))
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -99,17 +106,22 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + corridor_bonus
                 + corridor_tail_bonus
                 + confident_corridor_bonus
+                + 4
             ),
             offgrid_shift_ratio=(
                 preset.offgrid_shift_ratio
                 + min(0.028, complexity * 0.026)
                 + min(0.014, max(0.0, (aspect_ratio - 1.12) * 0.016))
                 + min(0.010, max(0.0, (aspect_ratio - 1.55) * 0.014))
+                + min(0.006, complexity * 0.004)
+                + confident_corridor_tail
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
                 + min(0.034, max(0.0, (aspect_ratio - 1.08) * 0.026))
                 + min(0.016, max(0.0, (aspect_ratio - 1.55) * 0.020))
+                + min(0.008, complexity * 0.005)
+                + min(0.012, confident_corridor_tail * 1.1)
             ),
         )
 
