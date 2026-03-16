@@ -39,11 +39,19 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         extra_chords = max(0, min(16, int(round(complexity * 22.0)) - 4))
         offgrid_boost = min(0.024, max(0.0, (complexity - 0.28) * 0.06))
         fan_boost = min(0.04, max(0.0, (complexity - 0.26) * 0.10))
+
+        # Long corridor-like plans in web_floorplan_grid_v1 tend to re-collapse into
+        # axis-aligned traces unless we scale debias for aspect skew as well.
+        aspect_ratio = max(signals.width, signals.height) / max(1, min(signals.width, signals.height))
+        aspect_chords = max(0, min(8, int(round((aspect_ratio - 1.10) * 7.0))))
+        aspect_offgrid = min(0.012, max(0.0, (aspect_ratio - 1.18) * 0.010))
+        aspect_fan = min(0.022, max(0.0, (aspect_ratio - 1.18) * 0.016))
+
         preset = replace(
             self._preset,
-            debias_chord_multiplier=self._preset.debias_chord_multiplier + extra_chords,
-            offgrid_shift_ratio=self._preset.offgrid_shift_ratio + offgrid_boost,
-            diagonal_fan_ratio=self._preset.diagonal_fan_ratio + fan_boost,
+            debias_chord_multiplier=self._preset.debias_chord_multiplier + extra_chords + aspect_chords,
+            offgrid_shift_ratio=self._preset.offgrid_shift_ratio + offgrid_boost + aspect_offgrid,
+            diagonal_fan_ratio=self._preset.diagonal_fan_ratio + fan_boost + aspect_fan,
         )
 
         plan = build_vector_plan(signals, preset)
