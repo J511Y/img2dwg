@@ -65,6 +65,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         interaction_offgrid = min(0.012, (skew_intensity * 0.006) + (complexity_tail * 0.010))
         interaction_fan = min(0.018, (skew_intensity * 0.009) + (complexity_tail * 0.012))
 
+        # Additional corridor-complexity coupling for elongated, moderately dense
+        # layouts. This nudges coordinate diversity upward without destabilizing
+        # fail=0 guardrails.
+        corridor_complexity = max(0.0, aspect_ratio - 1.48) * max(0.0, complexity - 0.30)
+        corridor_complexity_chords = max(0, min(6, int(round(corridor_complexity * 95.0))))
+        corridor_complexity_offgrid = min(0.008, corridor_complexity * 0.060)
+        corridor_complexity_fan = min(0.010, corridor_complexity * 0.072)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -73,6 +81,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + aspect_chords
                 + corridor_chords
                 + interaction_chords
+                + corridor_complexity_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -80,6 +89,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + aspect_offgrid
                 + corridor_offgrid
                 + interaction_offgrid
+                + corridor_complexity_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -87,6 +97,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + aspect_fan
                 + corridor_fan
                 + interaction_fan
+                + corridor_complexity_fan
             ),
         )
 
