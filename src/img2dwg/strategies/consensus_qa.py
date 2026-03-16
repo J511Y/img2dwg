@@ -176,6 +176,26 @@ class ConsensusQAStrategy(ConversionStrategy):
         elongated_floor_chords = max(0, min(2, int(round(elongated_consensus_floor * 90.0))))
         elongated_floor_offgrid = min(0.003, elongated_consensus_floor * 0.060)
 
+        # v85: default-consensus corridor pocket relief. A residual antithesis
+        # pocket remains around default web consensus (~0.71) with moderate
+        # elongation and mid/low texture where prior terms can under-fire.
+        # Keep the lift bounded to preserve fail=0 while nudging coordinate
+        # diversity upward in the common deployment regime.
+        default_consensus_corridor_relief = (
+            max(0.0, aspect_ratio - 1.28)
+            * max(0.0, 1.78 - aspect_ratio)
+            * max(0.0, complexity - 0.28)
+            * max(0.0, 0.56 - complexity)
+            * max(0.0, consensus_score - 0.68)
+            * max(0.0, 0.76 - consensus_score)
+        )
+        default_consensus_corridor_chords = max(
+            0,
+            min(2, int(round(default_consensus_corridor_relief * 9500.0))),
+        )
+        default_consensus_corridor_offgrid = min(0.003, default_consensus_corridor_relief * 0.70)
+        default_consensus_corridor_fan = min(0.004, default_consensus_corridor_relief * 0.92)
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -192,6 +212,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_consensus_corridor_chords
                 + midband_square_chords
                 + elongated_floor_chords
+                + default_consensus_corridor_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -207,6 +228,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_consensus_corridor_offgrid
                 + midband_square_offgrid
                 + elongated_floor_offgrid
+                + default_consensus_corridor_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -219,6 +241,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + axis_lock_proxy_fan
                 + moderate_consensus_corridor_fan
                 + midband_square_fan
+                + default_consensus_corridor_fan
             ),
         )
 

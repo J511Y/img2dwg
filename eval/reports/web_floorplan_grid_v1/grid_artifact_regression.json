@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-16T16:39:22.154637+00:00",
+  "generated_at": "2026-03-16T17:09:30.043068+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0376,
+        "previous": 0.0373,
         "current": 0.0373,
-        "delta": -0.0003
+        "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8624,
+        "previous": 0.8627,
         "current": 0.8627,
-        "delta": 0.0003
+        "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 111.1667,
+        "previous": 111.6667,
         "current": 111.6667,
-        "delta": 0.5
+        "delta": 0.0
       }
     }
   },
