@@ -140,6 +140,23 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_skew_grid_offgrid = min(0.004, low_skew_grid_relief * 0.72)
         low_skew_grid_fan = min(0.006, low_skew_grid_relief * 0.92)
 
+        # v93: near-square midband relief. Some thesis floorplans remain mildly
+        # axis-bundled around almost-square geometry with mid complexity where
+        # elongated-focused tails under-fire. Add a bounded lift for that pocket
+        # to improve coordinate spread while preserving fail=0 stability.
+        near_square_midband_relief = (
+            max(0.0, 1.22 - aspect_ratio)
+            * max(0.0, aspect_ratio - 0.98)
+            * max(0.0, complexity - 0.30)
+            * max(0.0, 0.58 - complexity)
+        )
+        near_square_midband_chords = max(
+            0,
+            min(2, int(round(near_square_midband_relief * 9000.0))),
+        )
+        near_square_midband_offgrid = min(0.003, near_square_midband_relief * 0.92)
+        near_square_midband_fan = min(0.004, near_square_midband_relief * 1.08)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -155,6 +172,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_corridor_chords
                 + midskew_grid_chords
                 + low_skew_grid_chords
+                + near_square_midband_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -169,6 +187,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_corridor_offgrid
                 + midskew_grid_offgrid
                 + low_skew_grid_offgrid
+                + near_square_midband_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -183,6 +202,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_corridor_fan
                 + midskew_grid_fan
                 + low_skew_grid_fan
+                + near_square_midband_fan
             ),
         )
 
