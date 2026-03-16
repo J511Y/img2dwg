@@ -79,6 +79,16 @@ class ConsensusQAStrategy(ConversionStrategy):
         if aspect_ratio >= 1.65:
             corridor_bonus = min(6, int(round((aspect_ratio - 1.65) * 6.0)) + 2)
 
+        # Additional tail boost for highly elongated corridors with confident
+        # consensus so antithesis keeps enough non-axis coverage.
+        corridor_tail_bonus = 0
+        if aspect_ratio >= 1.90:
+            corridor_tail_bonus = min(6, int(round((aspect_ratio - 1.90) * 7.0)) + 1)
+
+        confident_corridor_bonus = 0
+        if aspect_ratio >= 1.60 and consensus_score >= 0.82:
+            confident_corridor_bonus = min(4, int(round((consensus_score - 0.82) * 20.0)) + 1)
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -87,15 +97,19 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + confidence_bonus
                 + shape_skew_bonus
                 + corridor_bonus
+                + corridor_tail_bonus
+                + confident_corridor_bonus
             ),
             offgrid_shift_ratio=(
                 preset.offgrid_shift_ratio
                 + min(0.028, complexity * 0.026)
                 + min(0.014, max(0.0, (aspect_ratio - 1.12) * 0.016))
+                + min(0.010, max(0.0, (aspect_ratio - 1.55) * 0.014))
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
                 + min(0.034, max(0.0, (aspect_ratio - 1.08) * 0.026))
+                + min(0.016, max(0.0, (aspect_ratio - 1.55) * 0.020))
             ),
         )
 

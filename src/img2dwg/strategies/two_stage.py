@@ -47,11 +47,33 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         aspect_offgrid = min(0.016, max(0.0, (aspect_ratio - 1.14) * 0.012))
         aspect_fan = min(0.028, max(0.0, (aspect_ratio - 1.14) * 0.018))
 
+        # Extra tail lift for highly elongated corridors to avoid axis relapse on
+        # long thin plans where the basic aspect boost is not enough.
+        corridor_tail = max(0.0, aspect_ratio - 1.58)
+        corridor_chords = max(0, min(8, int(round(corridor_tail * 8.0))))
+        corridor_offgrid = min(0.01, corridor_tail * 0.011)
+        corridor_fan = min(0.02, corridor_tail * 0.021)
+
         preset = replace(
             self._preset,
-            debias_chord_multiplier=self._preset.debias_chord_multiplier + extra_chords + aspect_chords,
-            offgrid_shift_ratio=self._preset.offgrid_shift_ratio + offgrid_boost + aspect_offgrid,
-            diagonal_fan_ratio=self._preset.diagonal_fan_ratio + fan_boost + aspect_fan,
+            debias_chord_multiplier=(
+                self._preset.debias_chord_multiplier
+                + extra_chords
+                + aspect_chords
+                + corridor_chords
+            ),
+            offgrid_shift_ratio=(
+                self._preset.offgrid_shift_ratio
+                + offgrid_boost
+                + aspect_offgrid
+                + corridor_offgrid
+            ),
+            diagonal_fan_ratio=(
+                self._preset.diagonal_fan_ratio
+                + fan_boost
+                + aspect_fan
+                + corridor_fan
+            ),
         )
 
         plan = build_vector_plan(signals, preset)
