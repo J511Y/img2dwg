@@ -140,6 +140,20 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_skew_grid_offgrid = min(0.004, low_skew_grid_relief * 0.72)
         low_skew_grid_fan = min(0.006, low_skew_grid_relief * 0.92)
 
+        # v84: mid-skew texture-plateau relief. A remaining thesis pocket in
+        # web_floorplan_grid_v1 sits around mildly elongated plans with moderate
+        # texture where current tails can under-fire; add a bounded lift to keep
+        # coordinate diversity moving without upsetting fail=0.
+        midskew_texture_relief = (
+            max(0.0, aspect_ratio - 1.18)
+            * max(0.0, 1.56 - aspect_ratio)
+            * max(0.0, complexity - 0.30)
+            * max(0.0, 0.58 - complexity)
+        )
+        midskew_texture_chords = max(0, min(3, int(round(midskew_texture_relief * 2600.0))))
+        midskew_texture_offgrid = min(0.004, midskew_texture_relief * 0.72)
+        midskew_texture_fan = min(0.006, midskew_texture_relief * 0.90)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -155,6 +169,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_corridor_chords
                 + midskew_grid_chords
                 + low_skew_grid_chords
+                + midskew_texture_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -169,6 +184,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_corridor_offgrid
                 + midskew_grid_offgrid
                 + low_skew_grid_offgrid
+                + midskew_texture_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -183,6 +199,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_corridor_fan
                 + midskew_grid_fan
                 + low_skew_grid_fan
+                + midskew_texture_fan
             ),
         )
 
