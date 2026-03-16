@@ -157,6 +157,23 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         near_square_midband_offgrid = min(0.003, near_square_midband_relief * 0.92)
         near_square_midband_fan = min(0.004, near_square_midband_relief * 1.08)
 
+        # v94: mild-elongation mid-complexity relief. Some thesis cases in
+        # web_floorplan_grid_v1 still peak around ~0.05 axis ratio in a narrow
+        # mid-band (not near-square, not highly elongated), so apply a small
+        # bounded lift to spread coordinates without disturbing fail=0.
+        mild_elongation_midband_relief = (
+            max(0.0, aspect_ratio - 1.24)
+            * max(0.0, 1.62 - aspect_ratio)
+            * max(0.0, complexity - 0.24)
+            * max(0.0, 0.52 - complexity)
+        )
+        mild_elongation_midband_chords = max(
+            0,
+            min(2, int(round(mild_elongation_midband_relief * 3200.0))),
+        )
+        mild_elongation_midband_offgrid = min(0.0025, mild_elongation_midband_relief * 0.85)
+        mild_elongation_midband_fan = min(0.0035, mild_elongation_midband_relief * 1.02)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -173,6 +190,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_grid_chords
                 + low_skew_grid_chords
                 + near_square_midband_chords
+                + mild_elongation_midband_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -188,6 +206,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_grid_offgrid
                 + low_skew_grid_offgrid
                 + near_square_midband_offgrid
+                + mild_elongation_midband_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -203,6 +222,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_grid_fan
                 + low_skew_grid_fan
                 + near_square_midband_fan
+                + mild_elongation_midband_fan
             ),
         )
 
