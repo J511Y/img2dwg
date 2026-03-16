@@ -168,6 +168,19 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         default_web_pocket_offgrid = min(0.004, default_web_pocket_relief * 0.84)
         default_web_pocket_fan = min(0.006, default_web_pocket_relief * 1.02)
 
+        # v87: mild-skew mid-complexity anti-grid lift. A remaining thesis pocket
+        # sits near near-square to mildly elongated plans where multiple tails stay
+        # sub-threshold; add a tiny bounded blended term to reduce axis rebundling.
+        mild_skew_midcomplex_relief = (
+            max(0.0, aspect_ratio - 1.10)
+            * max(0.0, 1.34 - aspect_ratio)
+            * max(0.0, complexity - 0.26)
+            * max(0.0, 0.50 - complexity)
+        )
+        mild_skew_midcomplex_chords = max(0, min(2, int(round(mild_skew_midcomplex_relief * 5400.0))))
+        mild_skew_midcomplex_offgrid = min(0.003, mild_skew_midcomplex_relief * 0.92)
+        mild_skew_midcomplex_fan = min(0.004, mild_skew_midcomplex_relief * 1.10)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -185,6 +198,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_grid_chords
                 + midskew_texture_chords
                 + default_web_pocket_chords
+                + mild_skew_midcomplex_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -201,6 +215,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_grid_offgrid
                 + midskew_texture_offgrid
                 + default_web_pocket_offgrid
+                + mild_skew_midcomplex_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -217,6 +232,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_grid_fan
                 + midskew_texture_fan
                 + default_web_pocket_fan
+                + mild_skew_midcomplex_fan
             ),
         )
 
