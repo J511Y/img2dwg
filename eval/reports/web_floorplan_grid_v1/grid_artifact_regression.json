@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-16T07:10:26.000538+00:00",
+  "generated_at": "2026-03-16T08:13:41.394275+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 96.1667,
-      "avg_axis_aligned_ratio": 0.0425,
-      "std_axis_aligned_ratio": 0.0061,
-      "avg_axis_margin_to_grid_threshold": 0.8575,
-      "avg_axis_margin_score": 85.75,
+      "avg_line_count": 97.6667,
+      "avg_axis_aligned_ratio": 0.0421,
+      "std_axis_aligned_ratio": 0.0067,
+      "avg_axis_margin_to_grid_threshold": 0.8579,
+      "avg_axis_margin_score": 85.79,
       "max_axis_aligned_ratio": 0.0526,
       "max_axis_margin_to_grid_threshold": 0.8474,
       "p95_axis_aligned_ratio": 0.0526,
       "p95_axis_margin_to_grid_threshold": 0.8474,
-      "min_axis_aligned_ratio": 0.0328,
-      "min_axis_margin_to_grid_threshold": 0.8672,
-      "avg_unique_x_count": 179.3333,
-      "avg_unique_y_count": 179.3333
+      "min_axis_aligned_ratio": 0.0286,
+      "min_axis_margin_to_grid_threshold": 0.8714,
+      "avg_unique_x_count": 182.3333,
+      "avg_unique_y_count": 182.3333
     }
   },
   "top_problematic": [],
@@ -478,15 +478,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 122,
+        "total_entities": 140,
         "entity_type_counts": {
-          "LINE": 122
+          "LINE": 140
         },
         "unique_entity_types": 1,
-        "line_count": 122,
-        "axis_aligned_line_ratio": 0.0328,
-        "unique_x_count": 231,
-        "unique_y_count": 231
+        "line_count": 140,
+        "axis_aligned_line_ratio": 0.0286,
+        "unique_x_count": 267,
+        "unique_y_count": 267
       }
     },
     {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.044,
-        "current": 0.0425,
-        "delta": -0.0015
+        "previous": 0.0424,
+        "current": 0.0421,
+        "delta": -0.0003
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.856,
-        "current": 0.8575,
-        "delta": 0.0015
+        "previous": 0.8576,
+        "current": 0.8579,
+        "delta": 0.0003
       },
       "avg_line_count": {
-        "previous": 92.0,
-        "current": 96.1667,
-        "delta": 4.1667
+        "previous": 96.5,
+        "current": 97.6667,
+        "delta": 1.1667
       }
     }
   },

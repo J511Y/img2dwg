@@ -1,6 +1,6 @@
 # Grid Artifact Regression Report
 
-- generated_at: `2026-03-16T07:10:26.000538+00:00`
+- generated_at: `2026-03-16T08:13:41.394275+00:00`
 - total_cases: `36`
 - passed_cases: `36`
 - failed_cases: `0`
@@ -35,13 +35,13 @@
 
 - `consensus_qa`: avg_axis_aligned_ratio: prev=0.0374, cur=0.0374, delta=0.0; avg_axis_margin_to_grid_threshold: prev=0.8626, cur=0.8626, delta=0.0; avg_line_count: prev=107.8333, cur=107.8333, delta=0.0
 - `hybrid_mvp`: avg_axis_aligned_ratio: prev=0.75, cur=0.75, delta=0.0; avg_axis_margin_to_grid_threshold: prev=0.15, cur=0.15, delta=0.0; avg_line_count: prev=8.0, cur=8.0, delta=0.0
-- `two_stage_baseline`: avg_axis_aligned_ratio: prev=0.044, cur=0.0425, delta=-0.0015; avg_axis_margin_to_grid_threshold: prev=0.856, cur=0.8575, delta=0.0015; avg_line_count: prev=92.0, cur=96.1667, delta=4.1667
+- `two_stage_baseline`: avg_axis_aligned_ratio: prev=0.0424, cur=0.0421, delta=-0.0003; avg_axis_margin_to_grid_threshold: prev=0.8576, cur=0.8579, delta=0.0003; avg_line_count: prev=96.5, cur=97.6667, delta=1.1667
 
 ## Strategy diagnostics
 
 - `consensus_qa`: avg_line_count=107.8333, avg_axis_aligned_ratio=0.0374, std_axis_aligned_ratio=0.0033, avg_axis_margin_to_grid_threshold=0.8626, avg_axis_margin_score=86.26, max_axis_aligned_ratio=0.0435, max_axis_margin_to_grid_threshold=0.8565, p95_axis_aligned_ratio=0.0435, p95_axis_margin_to_grid_threshold=0.8565, min_axis_aligned_ratio=0.0312, min_axis_margin_to_grid_threshold=0.8688, avg_unique_x_count=202.6667, avg_unique_y_count=202.6667
 - `hybrid_mvp`: avg_line_count=8.0, avg_axis_aligned_ratio=0.75, std_axis_aligned_ratio=0.0, avg_axis_margin_to_grid_threshold=0.15, avg_axis_margin_score=15.0, max_axis_aligned_ratio=0.75, max_axis_margin_to_grid_threshold=0.15, p95_axis_aligned_ratio=0.75, p95_axis_margin_to_grid_threshold=0.15, min_axis_aligned_ratio=0.75, min_axis_margin_to_grid_threshold=0.15, avg_unique_x_count=3.0, avg_unique_y_count=3.0
-- `two_stage_baseline`: avg_line_count=96.1667, avg_axis_aligned_ratio=0.0425, std_axis_aligned_ratio=0.0061, avg_axis_margin_to_grid_threshold=0.8575, avg_axis_margin_score=85.75, max_axis_aligned_ratio=0.0526, max_axis_margin_to_grid_threshold=0.8474, p95_axis_aligned_ratio=0.0526, p95_axis_margin_to_grid_threshold=0.8474, min_axis_aligned_ratio=0.0328, min_axis_margin_to_grid_threshold=0.8672, avg_unique_x_count=179.3333, avg_unique_y_count=179.3333
+- `two_stage_baseline`: avg_line_count=97.6667, avg_axis_aligned_ratio=0.0421, std_axis_aligned_ratio=0.0067, avg_axis_margin_to_grid_threshold=0.8579, avg_axis_margin_score=85.79, max_axis_aligned_ratio=0.0526, max_axis_margin_to_grid_threshold=0.8474, p95_axis_aligned_ratio=0.0526, p95_axis_margin_to_grid_threshold=0.8474, min_axis_aligned_ratio=0.0286, min_axis_margin_to_grid_threshold=0.8714, avg_unique_x_count=182.3333, avg_unique_y_count=182.3333
 
 ## Top problematic samples
 

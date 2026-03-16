@@ -81,6 +81,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         elongated_offgrid = min(0.008, elongated_corridor * 0.065)
         elongated_fan = min(0.012, elongated_corridor * 0.090)
 
+        # Ultra-elongated plans (e.g. corridor-heavy web floorplans) still show
+        # residual axis relapse on thesis outputs. Add a tiny tail-only lift so
+        # we improve coordinate diversity without changing normal cases.
+        ultra_elongated = max(0.0, aspect_ratio - 1.88) * max(0.0, complexity - 0.20)
+        ultra_elongated_chords = max(0, min(7, int(round(ultra_elongated * 220.0))))
+        ultra_elongated_offgrid = min(0.007, ultra_elongated * 0.085)
+        ultra_elongated_fan = min(0.011, ultra_elongated * 0.115)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -91,6 +99,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + interaction_chords
                 + corridor_complexity_chords
                 + elongated_chords
+                + ultra_elongated_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -100,6 +109,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + interaction_offgrid
                 + corridor_complexity_offgrid
                 + elongated_offgrid
+                + ultra_elongated_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -109,6 +119,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + interaction_fan
                 + corridor_complexity_fan
                 + elongated_fan
+                + ultra_elongated_fan
             ),
         )
 
