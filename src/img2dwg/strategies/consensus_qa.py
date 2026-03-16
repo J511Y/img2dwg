@@ -67,8 +67,8 @@ class ConsensusQAStrategy(ConversionStrategy):
         # Reduce grid-shaped axis bias on complex floorplans by scaling debias chords
         # and off-grid shift from observed image complexity and consensus confidence.
         complexity = (signals.contrast * 0.42) + (signals.edge_density * 0.58)
-        complexity_bonus = max(0, min(14, int(round(complexity * 18.0)) - 4))
-        confidence_bonus = max(0, min(6, int(round((consensus_score - 0.70) * 24.0))))
+        complexity_bonus = max(0, min(16, int(round(complexity * 20.0)) - 4))
+        confidence_bonus = max(0, min(7, int(round((consensus_score - 0.68) * 26.0))))
 
         tuned_preset = replace(
             preset,

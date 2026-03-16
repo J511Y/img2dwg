@@ -36,9 +36,12 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         # Adapt debias controls to image complexity so dense/contrasty floorplans
         # do not collapse into axis-aligned grid artifacts.
         complexity = (signals.contrast * 0.40) + (signals.edge_density * 0.60)
-        extra_chords = max(0, min(16, int(round(complexity * 22.0)) - 4))
-        offgrid_boost = min(0.024, max(0.0, (complexity - 0.28) * 0.06))
-        fan_boost = min(0.04, max(0.0, (complexity - 0.26) * 0.10))
+        # v58: stronger anti-grid lift for floorplan-heavy inputs.
+        # Increase non-axis chord budget and coordinate perturbation range to
+        # further reduce axis alignment concentration in regression samples.
+        extra_chords = max(0, min(28, int(round(complexity * 34.0)) - 5))
+        offgrid_boost = min(0.032, max(0.0, (complexity - 0.24) * 0.09))
+        fan_boost = min(0.055, max(0.0, (complexity - 0.22) * 0.12))
         preset = replace(
             self._preset,
             debias_chord_multiplier=self._preset.debias_chord_multiplier + extra_chords,
