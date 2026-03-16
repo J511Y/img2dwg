@@ -89,6 +89,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         ultra_elongated_offgrid = min(0.007, ultra_elongated * 0.085)
         ultra_elongated_fan = min(0.011, ultra_elongated * 0.115)
 
+        # v71: skew+texture tail lift for very elongated + busy plans.
+        # This specifically targets residual axis regularity on web_floorplan_grid_v1
+        # without perturbing low-skew or low-complexity cases.
+        skew_texture_tail = max(0.0, aspect_ratio - 1.88) * max(0.0, complexity - 0.28)
+        skew_texture_chords = max(0, min(8, int(round(skew_texture_tail * 165.0))))
+        skew_texture_offgrid = min(0.008, skew_texture_tail * 0.082)
+        skew_texture_fan = min(0.011, skew_texture_tail * 0.104)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -100,6 +108,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + corridor_complexity_chords
                 + elongated_chords
                 + ultra_elongated_chords
+                + skew_texture_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -110,6 +119,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + corridor_complexity_offgrid
                 + elongated_offgrid
                 + ultra_elongated_offgrid
+                + skew_texture_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -120,6 +130,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + corridor_complexity_fan
                 + elongated_fan
                 + ultra_elongated_fan
+                + skew_texture_fan
             ),
         )
 
