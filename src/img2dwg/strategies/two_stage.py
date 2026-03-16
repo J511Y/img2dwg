@@ -54,6 +54,17 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         corridor_offgrid = min(0.01, corridor_tail * 0.011)
         corridor_fan = min(0.02, corridor_tail * 0.021)
 
+        # For skewed + moderately complex plans, apply an interaction lift so
+        # thesis does not under-debias into sparse axis bundles.
+        skew_intensity = max(0.0, aspect_ratio - 1.35)
+        complexity_tail = max(0.0, complexity - 0.22)
+        interaction_chords = max(
+            0,
+            min(8, int(round((skew_intensity * 4.5) + (complexity_tail * 6.0)))),
+        )
+        interaction_offgrid = min(0.012, (skew_intensity * 0.006) + (complexity_tail * 0.010))
+        interaction_fan = min(0.018, (skew_intensity * 0.009) + (complexity_tail * 0.012))
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -61,18 +72,21 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + extra_chords
                 + aspect_chords
                 + corridor_chords
+                + interaction_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
                 + offgrid_boost
                 + aspect_offgrid
                 + corridor_offgrid
+                + interaction_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
                 + fan_boost
                 + aspect_fan
                 + corridor_fan
+                + interaction_fan
             ),
         )
 
