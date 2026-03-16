@@ -96,6 +96,15 @@ class ConsensusQAStrategy(ConversionStrategy):
         if aspect_ratio >= 1.85 and consensus_score >= 0.86:
             confident_corridor_tail = min(0.012, max(0.0, (aspect_ratio - 1.85) * 0.010))
 
+        # Mid-confidence elongated plans are still a common failure mode for
+        # web_floorplan_grid_v1: axis bundles remain too regular when corridor
+        # skew and texture complexity co-occur. Add a bounded interaction lift
+        # to improve coordinate diversity without affecting easy cases.
+        skew_complexity = max(0.0, aspect_ratio - 1.48) * max(0.0, complexity - 0.50)
+        skew_complexity_chords = max(0, min(5, int(round(skew_complexity * 90.0))))
+        skew_complexity_offgrid = min(0.008, skew_complexity * 0.045)
+        skew_complexity_fan = min(0.012, skew_complexity * 0.060)
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -106,6 +115,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + corridor_bonus
                 + corridor_tail_bonus
                 + confident_corridor_bonus
+                + skew_complexity_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -115,6 +125,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + min(0.010, max(0.0, (aspect_ratio - 1.55) * 0.014))
                 + min(0.006, complexity * 0.004)
                 + confident_corridor_tail
+                + skew_complexity_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -122,6 +133,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + min(0.016, max(0.0, (aspect_ratio - 1.55) * 0.020))
                 + min(0.008, complexity * 0.005)
                 + min(0.012, confident_corridor_tail * 1.1)
+                + skew_complexity_fan
             ),
         )
 
