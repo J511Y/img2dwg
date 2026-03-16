@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-16T06:12:23.399042+00:00",
+  "generated_at": "2026-03-16T07:10:26.000538+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 86.8333,
-      "avg_axis_aligned_ratio": 0.0464,
-      "std_axis_aligned_ratio": 0.004,
-      "avg_axis_margin_to_grid_threshold": 0.8536,
-      "avg_axis_margin_score": 85.36,
-      "max_axis_aligned_ratio": 0.0541,
-      "max_axis_margin_to_grid_threshold": 0.8459,
-      "p95_axis_aligned_ratio": 0.0541,
-      "p95_axis_margin_to_grid_threshold": 0.8459,
-      "min_axis_aligned_ratio": 0.04,
-      "min_axis_margin_to_grid_threshold": 0.86,
-      "avg_unique_x_count": 160.6667,
-      "avg_unique_y_count": 160.6667
+      "avg_line_count": 96.1667,
+      "avg_axis_aligned_ratio": 0.0425,
+      "std_axis_aligned_ratio": 0.0061,
+      "avg_axis_margin_to_grid_threshold": 0.8575,
+      "avg_axis_margin_score": 85.75,
+      "max_axis_aligned_ratio": 0.0526,
+      "max_axis_margin_to_grid_threshold": 0.8474,
+      "p95_axis_aligned_ratio": 0.0526,
+      "p95_axis_margin_to_grid_threshold": 0.8474,
+      "min_axis_aligned_ratio": 0.0328,
+      "min_axis_margin_to_grid_threshold": 0.8672,
+      "avg_unique_x_count": 179.3333,
+      "avg_unique_y_count": 179.3333
     }
   },
   "top_problematic": [],
@@ -307,15 +307,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 84,
+        "total_entities": 90,
         "entity_type_counts": {
-          "LINE": 84
+          "LINE": 90
         },
         "unique_entity_types": 1,
-        "line_count": 84,
-        "axis_aligned_line_ratio": 0.0476,
-        "unique_x_count": 155,
-        "unique_y_count": 155
+        "line_count": 90,
+        "axis_aligned_line_ratio": 0.0444,
+        "unique_x_count": 167,
+        "unique_y_count": 167
       }
     },
     {
@@ -323,63 +323,6 @@
       "case_id": "case_002",
       "image_path": "output/web_floorplan_grid_v1/images/Book_Building_second_floor_plan.png",
       "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0001-output__web_floorplan_grid_v1__images__Book_Building_second_floor_plan.png/Book_Building_second_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 84,
-        "entity_type_counts": {
-          "LINE": 84
-        },
-        "unique_entity_types": 1,
-        "line_count": 84,
-        "axis_aligned_line_ratio": 0.0476,
-        "unique_x_count": 155,
-        "unique_y_count": 155
-      }
-    },
-    {
-      "strategy_name": "two_stage_baseline",
-      "case_id": "case_003",
-      "image_path": "output/web_floorplan_grid_v1/images/Canada_Building_Saskatoon_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0002-output__web_floorplan_grid_v1__images__Canada_Building_Saskatoon_floor_plan.png/Canada_Building_Saskatoon_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 88,
-        "entity_type_counts": {
-          "LINE": 88
-        },
-        "unique_entity_types": 1,
-        "line_count": 88,
-        "axis_aligned_line_ratio": 0.0455,
-        "unique_x_count": 163,
-        "unique_y_count": 163
-      }
-    },
-    {
-      "strategy_name": "two_stage_baseline",
-      "case_id": "case_004",
-      "image_path": "output/web_floorplan_grid_v1/images/Chrysler_Building_first_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0003-output__web_floorplan_grid_v1__images__Chrysler_Building_first_floor_plan.png/Chrysler_Building_first_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 74,
-        "entity_type_counts": {
-          "LINE": 74
-        },
-        "unique_entity_types": 1,
-        "line_count": 74,
-        "axis_aligned_line_ratio": 0.0541,
-        "unique_x_count": 135,
-        "unique_y_count": 135
-      }
-    },
-    {
-      "strategy_name": "two_stage_baseline",
-      "case_id": "case_005",
-      "image_path": "output/web_floorplan_grid_v1/images/Empire_State_Building_ground_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0004-output__web_floorplan_grid_v1__images__Empire_State_Building_ground_floor_plan.png/Empire_State_Building_ground_floor_plan.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
@@ -396,9 +339,9 @@
     },
     {
       "strategy_name": "two_stage_baseline",
-      "case_id": "case_006",
-      "image_path": "output/web_floorplan_grid_v1/images/Hudson_Terminal_ground_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0005-output__web_floorplan_grid_v1__images__Hudson_Terminal_ground_floor_plan.png/Hudson_Terminal_ground_floor_plan.dxf",
+      "case_id": "case_003",
+      "image_path": "output/web_floorplan_grid_v1/images/Canada_Building_Saskatoon_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0002-output__web_floorplan_grid_v1__images__Canada_Building_Saskatoon_floor_plan.png/Canada_Building_Saskatoon_floor_plan.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
@@ -415,28 +358,66 @@
     },
     {
       "strategy_name": "two_stage_baseline",
-      "case_id": "case_007",
-      "image_path": "output/web_floorplan_grid_v1/images/Jewelers_Building_lower_level_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0006-output__web_floorplan_grid_v1__images__Jewelers_Building_lower_level_floor_plan.png/Jewelers_Building_lower_level_floor_plan.dxf",
+      "case_id": "case_004",
+      "image_path": "output/web_floorplan_grid_v1/images/Chrysler_Building_first_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0003-output__web_floorplan_grid_v1__images__Chrysler_Building_first_floor_plan.png/Chrysler_Building_first_floor_plan.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 80,
+        "total_entities": 76,
         "entity_type_counts": {
-          "LINE": 80
+          "LINE": 76
         },
         "unique_entity_types": 1,
-        "line_count": 80,
-        "axis_aligned_line_ratio": 0.05,
-        "unique_x_count": 147,
-        "unique_y_count": 147
+        "line_count": 76,
+        "axis_aligned_line_ratio": 0.0526,
+        "unique_x_count": 139,
+        "unique_y_count": 139
       }
     },
     {
       "strategy_name": "two_stage_baseline",
-      "case_id": "case_008",
-      "image_path": "output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0007-output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
+      "case_id": "case_005",
+      "image_path": "output/web_floorplan_grid_v1/images/Empire_State_Building_ground_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0004-output__web_floorplan_grid_v1__images__Empire_State_Building_ground_floor_plan.png/Empire_State_Building_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 102,
+        "entity_type_counts": {
+          "LINE": 102
+        },
+        "unique_entity_types": 1,
+        "line_count": 102,
+        "axis_aligned_line_ratio": 0.0392,
+        "unique_x_count": 191,
+        "unique_y_count": 191
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_006",
+      "image_path": "output/web_floorplan_grid_v1/images/Hudson_Terminal_ground_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0005-output__web_floorplan_grid_v1__images__Hudson_Terminal_ground_floor_plan.png/Hudson_Terminal_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 118,
+        "entity_type_counts": {
+          "LINE": 118
+        },
+        "unique_entity_types": 1,
+        "line_count": 118,
+        "axis_aligned_line_ratio": 0.0339,
+        "unique_x_count": 223,
+        "unique_y_count": 223
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_007",
+      "image_path": "output/web_floorplan_grid_v1/images/Jewelers_Building_lower_level_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0006-output__web_floorplan_grid_v1__images__Jewelers_Building_lower_level_floor_plan.png/Jewelers_Building_lower_level_floor_plan.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
@@ -453,66 +434,9 @@
     },
     {
       "strategy_name": "two_stage_baseline",
-      "case_id": "case_009",
-      "image_path": "output/web_floorplan_grid_v1/images/Railway_Exchange_first_floor.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0008-output__web_floorplan_grid_v1__images__Railway_Exchange_first_floor.png/Railway_Exchange_first_floor.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 80,
-        "entity_type_counts": {
-          "LINE": 80
-        },
-        "unique_entity_types": 1,
-        "line_count": 80,
-        "axis_aligned_line_ratio": 0.05,
-        "unique_x_count": 147,
-        "unique_y_count": 147
-      }
-    },
-    {
-      "strategy_name": "two_stage_baseline",
-      "case_id": "case_010",
-      "image_path": "output/web_floorplan_grid_v1/images/Subway_Terminal_Building_ground_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0009-output__web_floorplan_grid_v1__images__Subway_Terminal_Building_ground_floor_plan.png/Subway_Terminal_Building_ground_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 100,
-        "entity_type_counts": {
-          "LINE": 100
-        },
-        "unique_entity_types": 1,
-        "line_count": 100,
-        "axis_aligned_line_ratio": 0.04,
-        "unique_x_count": 187,
-        "unique_y_count": 187
-      }
-    },
-    {
-      "strategy_name": "two_stage_baseline",
-      "case_id": "case_011",
-      "image_path": "output/web_floorplan_grid_v1/images/Typical_floor_of_the_Flatiron_Building.jpg",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0010-output__web_floorplan_grid_v1__images__Typical_floor_of_the_Flatiron_Building.jpg/Typical_floor_of_the_Flatiron_Building.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 96,
-        "entity_type_counts": {
-          "LINE": 96
-        },
-        "unique_entity_types": 1,
-        "line_count": 96,
-        "axis_aligned_line_ratio": 0.0417,
-        "unique_x_count": 179,
-        "unique_y_count": 179
-      }
-    },
-    {
-      "strategy_name": "two_stage_baseline",
-      "case_id": "case_012",
-      "image_path": "output/web_floorplan_grid_v1/images/Woolworth_Bldg_1st.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0011-output__web_floorplan_grid_v1__images__Woolworth_Bldg_1st.png/Woolworth_Bldg_1st.dxf",
+      "case_id": "case_008",
+      "image_path": "output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0007-output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
@@ -525,6 +449,82 @@
         "axis_aligned_line_ratio": 0.0465,
         "unique_x_count": 159,
         "unique_y_count": 159
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_009",
+      "image_path": "output/web_floorplan_grid_v1/images/Railway_Exchange_first_floor.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0008-output__web_floorplan_grid_v1__images__Railway_Exchange_first_floor.png/Railway_Exchange_first_floor.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 84,
+        "entity_type_counts": {
+          "LINE": 84
+        },
+        "unique_entity_types": 1,
+        "line_count": 84,
+        "axis_aligned_line_ratio": 0.0476,
+        "unique_x_count": 155,
+        "unique_y_count": 155
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_010",
+      "image_path": "output/web_floorplan_grid_v1/images/Subway_Terminal_Building_ground_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0009-output__web_floorplan_grid_v1__images__Subway_Terminal_Building_ground_floor_plan.png/Subway_Terminal_Building_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 122,
+        "entity_type_counts": {
+          "LINE": 122
+        },
+        "unique_entity_types": 1,
+        "line_count": 122,
+        "axis_aligned_line_ratio": 0.0328,
+        "unique_x_count": 231,
+        "unique_y_count": 231
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_011",
+      "image_path": "output/web_floorplan_grid_v1/images/Typical_floor_of_the_Flatiron_Building.jpg",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0010-output__web_floorplan_grid_v1__images__Typical_floor_of_the_Flatiron_Building.jpg/Typical_floor_of_the_Flatiron_Building.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 116,
+        "entity_type_counts": {
+          "LINE": 116
+        },
+        "unique_entity_types": 1,
+        "line_count": 116,
+        "axis_aligned_line_ratio": 0.0345,
+        "unique_x_count": 219,
+        "unique_y_count": 219
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_012",
+      "image_path": "output/web_floorplan_grid_v1/images/Woolworth_Bldg_1st.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0011-output__web_floorplan_grid_v1__images__Woolworth_Bldg_1st.png/Woolworth_Bldg_1st.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 90,
+        "entity_type_counts": {
+          "LINE": 90
+        },
+        "unique_entity_types": 1,
+        "line_count": 90,
+        "axis_aligned_line_ratio": 0.0444,
+        "unique_x_count": 167,
+        "unique_y_count": 167
       }
     },
     {
@@ -762,19 +762,19 @@
   "strategy_delta_vs_previous": {
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0404,
+        "previous": 0.0374,
         "current": 0.0374,
-        "delta": -0.003
+        "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8596,
+        "previous": 0.8626,
         "current": 0.8626,
-        "delta": 0.003
+        "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 99.8333,
+        "previous": 107.8333,
         "current": 107.8333,
-        "delta": 8.0
+        "delta": 0.0
       }
     },
     "hybrid_mvp": {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0464,
-        "current": 0.0464,
-        "delta": 0.0
+        "previous": 0.044,
+        "current": 0.0425,
+        "delta": -0.0015
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8536,
-        "current": 0.8536,
-        "delta": 0.0
+        "previous": 0.856,
+        "current": 0.8575,
+        "delta": 0.0015
       },
       "avg_line_count": {
-        "previous": 86.8333,
-        "current": 86.8333,
-        "delta": 0.0
+        "previous": 92.0,
+        "current": 96.1667,
+        "delta": 4.1667
       }
     }
   },
