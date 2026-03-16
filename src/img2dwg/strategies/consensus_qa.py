@@ -107,6 +107,18 @@ class ConsensusQAStrategy(ConversionStrategy):
         bridge_mid_confidence_offgrid = min(0.004, bridge_mid_confidence * 0.090)
         bridge_mid_confidence_fan = min(0.006, bridge_mid_confidence * 0.105)
 
+        # v75: skew-complexity interaction lift. Dense, elongated layouts still
+        # show occasional axis rebundling at mid/high confidence; inject a small
+        # bounded interaction bonus to bias antithesis away from axis grids.
+        skew_complexity_interaction = (
+            max(0.0, aspect_ratio - 1.36)
+            * max(0.0, complexity - 0.46)
+            * max(0.0, min(0.26, consensus_score - 0.68))
+        )
+        skew_complexity_chords = max(0, min(4, int(round(skew_complexity_interaction * 380.0))))
+        skew_complexity_offgrid = min(0.006, skew_complexity_interaction * 0.095)
+        skew_complexity_fan = min(0.006, skew_complexity_interaction * 0.110)
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -118,6 +130,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + corridor_tail_bonus
                 + confident_corridor_bonus
                 + bridge_mid_confidence_chords
+                + skew_complexity_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -128,6 +141,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + min(0.006, complexity * 0.004)
                 + confident_corridor_tail
                 + bridge_mid_confidence_offgrid
+                + skew_complexity_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -136,6 +150,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + min(0.008, complexity * 0.005)
                 + min(0.012, confident_corridor_tail * 1.1)
                 + bridge_mid_confidence_fan
+                + skew_complexity_fan
             ),
         )
 
