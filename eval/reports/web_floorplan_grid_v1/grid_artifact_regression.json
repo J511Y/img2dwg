@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-16T00:09:47.707412+00:00",
+  "generated_at": "2026-03-16T01:39:16.796493+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -24,19 +24,19 @@
   },
   "strategy_diagnostics": {
     "consensus_qa": {
-      "avg_line_count": 83.5,
-      "avg_axis_aligned_ratio": 0.0479,
-      "std_axis_aligned_ratio": 0.0014,
-      "avg_axis_margin_to_grid_threshold": 0.852,
-      "avg_axis_margin_score": 85.2,
-      "max_axis_aligned_ratio": 0.05,
-      "max_axis_margin_to_grid_threshold": 0.85,
-      "p95_axis_aligned_ratio": 0.05,
-      "p95_axis_margin_to_grid_threshold": 0.85,
-      "min_axis_aligned_ratio": 0.0455,
-      "min_axis_margin_to_grid_threshold": 0.8545,
-      "avg_unique_x_count": 154.0,
-      "avg_unique_y_count": 154.0
+      "avg_line_count": 93.8333,
+      "avg_axis_aligned_ratio": 0.0428,
+      "std_axis_aligned_ratio": 0.0026,
+      "avg_axis_margin_to_grid_threshold": 0.8572,
+      "avg_axis_margin_score": 85.72,
+      "max_axis_aligned_ratio": 0.0488,
+      "max_axis_margin_to_grid_threshold": 0.8512,
+      "p95_axis_aligned_ratio": 0.0488,
+      "p95_axis_margin_to_grid_threshold": 0.8512,
+      "min_axis_aligned_ratio": 0.0392,
+      "min_axis_margin_to_grid_threshold": 0.8608,
+      "avg_unique_x_count": 174.6667,
+      "avg_unique_y_count": 174.6667
     },
     "hybrid_mvp": {
       "avg_line_count": 8.0,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 74.1667,
-      "avg_axis_aligned_ratio": 0.054,
-      "std_axis_aligned_ratio": 0.0022,
-      "avg_axis_margin_to_grid_threshold": 0.846,
-      "avg_axis_margin_score": 84.6,
+      "avg_line_count": 80.1667,
+      "avg_axis_aligned_ratio": 0.0501,
+      "std_axis_aligned_ratio": 0.0032,
+      "avg_axis_margin_to_grid_threshold": 0.8499,
+      "avg_axis_margin_score": 84.99,
       "max_axis_aligned_ratio": 0.0571,
       "max_axis_margin_to_grid_threshold": 0.8429,
       "p95_axis_aligned_ratio": 0.0571,
       "p95_axis_margin_to_grid_threshold": 0.8429,
-      "min_axis_aligned_ratio": 0.05,
-      "min_axis_margin_to_grid_threshold": 0.85,
-      "avg_unique_x_count": 135.3333,
-      "avg_unique_y_count": 135.3333
+      "min_axis_aligned_ratio": 0.0455,
+      "min_axis_margin_to_grid_threshold": 0.8545,
+      "avg_unique_x_count": 147.3333,
+      "avg_unique_y_count": 147.3333
     }
   },
   "top_problematic": [],
@@ -307,15 +307,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 72,
+        "total_entities": 78,
         "entity_type_counts": {
-          "LINE": 72
+          "LINE": 78
         },
         "unique_entity_types": 1,
-        "line_count": 72,
-        "axis_aligned_line_ratio": 0.0556,
-        "unique_x_count": 131,
-        "unique_y_count": 131
+        "line_count": 78,
+        "axis_aligned_line_ratio": 0.0513,
+        "unique_x_count": 143,
+        "unique_y_count": 143
       }
     },
     {
@@ -326,15 +326,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 72,
+        "total_entities": 78,
         "entity_type_counts": {
-          "LINE": 72
+          "LINE": 78
         },
         "unique_entity_types": 1,
-        "line_count": 72,
-        "axis_aligned_line_ratio": 0.0556,
-        "unique_x_count": 131,
-        "unique_y_count": 131
+        "line_count": 78,
+        "axis_aligned_line_ratio": 0.0513,
+        "unique_x_count": 143,
+        "unique_y_count": 143
       }
     },
     {
@@ -345,15 +345,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 76,
+        "total_entities": 82,
         "entity_type_counts": {
-          "LINE": 76
+          "LINE": 82
         },
         "unique_entity_types": 1,
-        "line_count": 76,
-        "axis_aligned_line_ratio": 0.0526,
-        "unique_x_count": 139,
-        "unique_y_count": 139
+        "line_count": 82,
+        "axis_aligned_line_ratio": 0.0488,
+        "unique_x_count": 151,
+        "unique_y_count": 151
       }
     },
     {
@@ -383,15 +383,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 70,
+        "total_entities": 80,
         "entity_type_counts": {
-          "LINE": 70
+          "LINE": 80
         },
         "unique_entity_types": 1,
-        "line_count": 70,
-        "axis_aligned_line_ratio": 0.0571,
-        "unique_x_count": 127,
-        "unique_y_count": 127
+        "line_count": 80,
+        "axis_aligned_line_ratio": 0.05,
+        "unique_x_count": 147,
+        "unique_y_count": 147
       }
     },
     {
@@ -399,6 +399,44 @@
       "case_id": "case_006",
       "image_path": "output/web_floorplan_grid_v1/images/Hudson_Terminal_ground_floor_plan.png",
       "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0005-output__web_floorplan_grid_v1__images__Hudson_Terminal_ground_floor_plan.png/Hudson_Terminal_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 88,
+        "entity_type_counts": {
+          "LINE": 88
+        },
+        "unique_entity_types": 1,
+        "line_count": 88,
+        "axis_aligned_line_ratio": 0.0455,
+        "unique_x_count": 163,
+        "unique_y_count": 163
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_007",
+      "image_path": "output/web_floorplan_grid_v1/images/Jewelers_Building_lower_level_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0006-output__web_floorplan_grid_v1__images__Jewelers_Building_lower_level_floor_plan.png/Jewelers_Building_lower_level_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 76,
+        "entity_type_counts": {
+          "LINE": 76
+        },
+        "unique_entity_types": 1,
+        "line_count": 76,
+        "axis_aligned_line_ratio": 0.0526,
+        "unique_x_count": 139,
+        "unique_y_count": 139
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_008",
+      "image_path": "output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0007-output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
@@ -411,44 +449,6 @@
         "axis_aligned_line_ratio": 0.0513,
         "unique_x_count": 143,
         "unique_y_count": 143
-      }
-    },
-    {
-      "strategy_name": "two_stage_baseline",
-      "case_id": "case_007",
-      "image_path": "output/web_floorplan_grid_v1/images/Jewelers_Building_lower_level_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0006-output__web_floorplan_grid_v1__images__Jewelers_Building_lower_level_floor_plan.png/Jewelers_Building_lower_level_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 72,
-        "entity_type_counts": {
-          "LINE": 72
-        },
-        "unique_entity_types": 1,
-        "line_count": 72,
-        "axis_aligned_line_ratio": 0.0556,
-        "unique_x_count": 131,
-        "unique_y_count": 131
-      }
-    },
-    {
-      "strategy_name": "two_stage_baseline",
-      "case_id": "case_008",
-      "image_path": "output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0007-output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 72,
-        "entity_type_counts": {
-          "LINE": 72
-        },
-        "unique_entity_types": 1,
-        "line_count": 72,
-        "axis_aligned_line_ratio": 0.0556,
-        "unique_x_count": 131,
-        "unique_y_count": 131
       }
     },
     {
@@ -478,15 +478,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 76,
+        "total_entities": 88,
         "entity_type_counts": {
-          "LINE": 76
+          "LINE": 88
         },
         "unique_entity_types": 1,
-        "line_count": 76,
-        "axis_aligned_line_ratio": 0.0526,
-        "unique_x_count": 139,
-        "unique_y_count": 139
+        "line_count": 88,
+        "axis_aligned_line_ratio": 0.0455,
+        "unique_x_count": 163,
+        "unique_y_count": 163
       }
     },
     {
@@ -497,15 +497,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 76,
+        "total_entities": 86,
         "entity_type_counts": {
-          "LINE": 76
+          "LINE": 86
         },
         "unique_entity_types": 1,
-        "line_count": 76,
-        "axis_aligned_line_ratio": 0.0526,
-        "unique_x_count": 139,
-        "unique_y_count": 139
+        "line_count": 86,
+        "axis_aligned_line_ratio": 0.0465,
+        "unique_x_count": 159,
+        "unique_y_count": 159
       }
     },
     {
@@ -516,15 +516,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 80,
+        "total_entities": 82,
         "entity_type_counts": {
-          "LINE": 80
+          "LINE": 82
         },
         "unique_entity_types": 1,
-        "line_count": 80,
-        "axis_aligned_line_ratio": 0.05,
-        "unique_x_count": 147,
-        "unique_y_count": 147
+        "line_count": 82,
+        "axis_aligned_line_ratio": 0.0488,
+        "unique_x_count": 151,
+        "unique_y_count": 151
       }
     },
     {
@@ -535,15 +535,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 82,
+        "total_entities": 92,
         "entity_type_counts": {
-          "LINE": 82
+          "LINE": 92
         },
         "unique_entity_types": 1,
-        "line_count": 82,
-        "axis_aligned_line_ratio": 0.0488,
-        "unique_x_count": 151,
-        "unique_y_count": 151
+        "line_count": 92,
+        "axis_aligned_line_ratio": 0.0435,
+        "unique_x_count": 171,
+        "unique_y_count": 171
       }
     },
     {
@@ -554,15 +554,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 82,
+        "total_entities": 94,
         "entity_type_counts": {
-          "LINE": 82
+          "LINE": 94
         },
         "unique_entity_types": 1,
-        "line_count": 82,
-        "axis_aligned_line_ratio": 0.0488,
-        "unique_x_count": 151,
-        "unique_y_count": 151
+        "line_count": 94,
+        "axis_aligned_line_ratio": 0.0426,
+        "unique_x_count": 175,
+        "unique_y_count": 175
       }
     },
     {
@@ -573,15 +573,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 86,
+        "total_entities": 98,
         "entity_type_counts": {
-          "LINE": 86
+          "LINE": 98
         },
         "unique_entity_types": 1,
-        "line_count": 86,
-        "axis_aligned_line_ratio": 0.0465,
-        "unique_x_count": 159,
-        "unique_y_count": 159
+        "line_count": 98,
+        "axis_aligned_line_ratio": 0.0408,
+        "unique_x_count": 183,
+        "unique_y_count": 183
       }
     },
     {
@@ -592,15 +592,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 80,
+        "total_entities": 82,
         "entity_type_counts": {
-          "LINE": 80
+          "LINE": 82
         },
         "unique_entity_types": 1,
-        "line_count": 80,
-        "axis_aligned_line_ratio": 0.05,
-        "unique_x_count": 147,
-        "unique_y_count": 147
+        "line_count": 82,
+        "axis_aligned_line_ratio": 0.0488,
+        "unique_x_count": 151,
+        "unique_y_count": 151
       }
     },
     {
@@ -611,15 +611,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 80,
+        "total_entities": 96,
         "entity_type_counts": {
-          "LINE": 80
+          "LINE": 96
         },
         "unique_entity_types": 1,
-        "line_count": 80,
-        "axis_aligned_line_ratio": 0.05,
-        "unique_x_count": 147,
-        "unique_y_count": 147
+        "line_count": 96,
+        "axis_aligned_line_ratio": 0.0417,
+        "unique_x_count": 179,
+        "unique_y_count": 179
       }
     },
     {
@@ -630,15 +630,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 86,
+        "total_entities": 102,
         "entity_type_counts": {
-          "LINE": 86
+          "LINE": 102
         },
         "unique_entity_types": 1,
-        "line_count": 86,
-        "axis_aligned_line_ratio": 0.0465,
-        "unique_x_count": 159,
-        "unique_y_count": 159
+        "line_count": 102,
+        "axis_aligned_line_ratio": 0.0392,
+        "unique_x_count": 191,
+        "unique_y_count": 191
       }
     },
     {
@@ -646,101 +646,6 @@
       "case_id": "case_007",
       "image_path": "output/web_floorplan_grid_v1/images/Jewelers_Building_lower_level_floor_plan.png",
       "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0006-output__web_floorplan_grid_v1__images__Jewelers_Building_lower_level_floor_plan.png/Jewelers_Building_lower_level_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 82,
-        "entity_type_counts": {
-          "LINE": 82
-        },
-        "unique_entity_types": 1,
-        "line_count": 82,
-        "axis_aligned_line_ratio": 0.0488,
-        "unique_x_count": 151,
-        "unique_y_count": 151
-      }
-    },
-    {
-      "strategy_name": "consensus_qa",
-      "case_id": "case_008",
-      "image_path": "output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0007-output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 82,
-        "entity_type_counts": {
-          "LINE": 82
-        },
-        "unique_entity_types": 1,
-        "line_count": 82,
-        "axis_aligned_line_ratio": 0.0488,
-        "unique_x_count": 151,
-        "unique_y_count": 151
-      }
-    },
-    {
-      "strategy_name": "consensus_qa",
-      "case_id": "case_009",
-      "image_path": "output/web_floorplan_grid_v1/images/Railway_Exchange_first_floor.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0008-output__web_floorplan_grid_v1__images__Railway_Exchange_first_floor.png/Railway_Exchange_first_floor.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 86,
-        "entity_type_counts": {
-          "LINE": 86
-        },
-        "unique_entity_types": 1,
-        "line_count": 86,
-        "axis_aligned_line_ratio": 0.0465,
-        "unique_x_count": 159,
-        "unique_y_count": 159
-      }
-    },
-    {
-      "strategy_name": "consensus_qa",
-      "case_id": "case_010",
-      "image_path": "output/web_floorplan_grid_v1/images/Subway_Terminal_Building_ground_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0009-output__web_floorplan_grid_v1__images__Subway_Terminal_Building_ground_floor_plan.png/Subway_Terminal_Building_ground_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 84,
-        "entity_type_counts": {
-          "LINE": 84
-        },
-        "unique_entity_types": 1,
-        "line_count": 84,
-        "axis_aligned_line_ratio": 0.0476,
-        "unique_x_count": 155,
-        "unique_y_count": 155
-      }
-    },
-    {
-      "strategy_name": "consensus_qa",
-      "case_id": "case_011",
-      "image_path": "output/web_floorplan_grid_v1/images/Typical_floor_of_the_Flatiron_Building.jpg",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0010-output__web_floorplan_grid_v1__images__Typical_floor_of_the_Flatiron_Building.jpg/Typical_floor_of_the_Flatiron_Building.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 84,
-        "entity_type_counts": {
-          "LINE": 84
-        },
-        "unique_entity_types": 1,
-        "line_count": 84,
-        "axis_aligned_line_ratio": 0.0476,
-        "unique_x_count": 155,
-        "unique_y_count": 155
-      }
-    },
-    {
-      "strategy_name": "consensus_qa",
-      "case_id": "case_012",
-      "image_path": "output/web_floorplan_grid_v1/images/Woolworth_Bldg_1st.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0011-output__web_floorplan_grid_v1__images__Woolworth_Bldg_1st.png/Woolworth_Bldg_1st.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
@@ -754,6 +659,101 @@
         "unique_x_count": 163,
         "unique_y_count": 163
       }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_008",
+      "image_path": "output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0007-output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 90,
+        "entity_type_counts": {
+          "LINE": 90
+        },
+        "unique_entity_types": 1,
+        "line_count": 90,
+        "axis_aligned_line_ratio": 0.0444,
+        "unique_x_count": 167,
+        "unique_y_count": 167
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_009",
+      "image_path": "output/web_floorplan_grid_v1/images/Railway_Exchange_first_floor.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0008-output__web_floorplan_grid_v1__images__Railway_Exchange_first_floor.png/Railway_Exchange_first_floor.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 90,
+        "entity_type_counts": {
+          "LINE": 90
+        },
+        "unique_entity_types": 1,
+        "line_count": 90,
+        "axis_aligned_line_ratio": 0.0444,
+        "unique_x_count": 167,
+        "unique_y_count": 167
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_010",
+      "image_path": "output/web_floorplan_grid_v1/images/Subway_Terminal_Building_ground_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0009-output__web_floorplan_grid_v1__images__Subway_Terminal_Building_ground_floor_plan.png/Subway_Terminal_Building_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 100,
+        "entity_type_counts": {
+          "LINE": 100
+        },
+        "unique_entity_types": 1,
+        "line_count": 100,
+        "axis_aligned_line_ratio": 0.04,
+        "unique_x_count": 187,
+        "unique_y_count": 187
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_011",
+      "image_path": "output/web_floorplan_grid_v1/images/Typical_floor_of_the_Flatiron_Building.jpg",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0010-output__web_floorplan_grid_v1__images__Typical_floor_of_the_Flatiron_Building.jpg/Typical_floor_of_the_Flatiron_Building.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 100,
+        "entity_type_counts": {
+          "LINE": 100
+        },
+        "unique_entity_types": 1,
+        "line_count": 100,
+        "axis_aligned_line_ratio": 0.04,
+        "unique_x_count": 187,
+        "unique_y_count": 187
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_012",
+      "image_path": "output/web_floorplan_grid_v1/images/Woolworth_Bldg_1st.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0011-output__web_floorplan_grid_v1__images__Woolworth_Bldg_1st.png/Woolworth_Bldg_1st.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 94,
+        "entity_type_counts": {
+          "LINE": 94
+        },
+        "unique_entity_types": 1,
+        "line_count": 94,
+        "axis_aligned_line_ratio": 0.0426,
+        "unique_x_count": 175,
+        "unique_y_count": 175
+      }
     }
   ],
   "dataset_id": "web_floorplan_grid_v1",
@@ -762,19 +762,19 @@
   "strategy_delta_vs_previous": {
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0507,
-        "current": 0.0479,
-        "delta": -0.0028
+        "previous": 0.0428,
+        "current": 0.0428,
+        "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8493,
-        "current": 0.852,
-        "delta": 0.0027
+        "previous": 0.8572,
+        "current": 0.8572,
+        "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 79.0,
-        "current": 83.5,
-        "delta": 4.5
+        "previous": 93.8333,
+        "current": 93.8333,
+        "delta": 0.0
       }
     },
     "hybrid_mvp": {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0575,
-        "current": 0.054,
-        "delta": -0.0035
+        "previous": 0.054,
+        "current": 0.0501,
+        "delta": -0.0039
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8425,
-        "current": 0.846,
-        "delta": 0.0035
+        "previous": 0.846,
+        "current": 0.8499,
+        "delta": 0.0039
       },
       "avg_line_count": {
-        "previous": 69.6667,
-        "current": 74.1667,
-        "delta": 4.5
+        "previous": 74.1667,
+        "current": 80.1667,
+        "delta": 6.0
       }
     }
   },
