@@ -43,9 +43,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         # Long corridor-like plans in web_floorplan_grid_v1 tend to re-collapse into
         # axis-aligned traces unless we scale debias for aspect skew as well.
         aspect_ratio = max(signals.width, signals.height) / max(1, min(signals.width, signals.height))
-        aspect_chords = max(0, min(8, int(round((aspect_ratio - 1.10) * 7.0))))
-        aspect_offgrid = min(0.012, max(0.0, (aspect_ratio - 1.18) * 0.010))
-        aspect_fan = min(0.022, max(0.0, (aspect_ratio - 1.18) * 0.016))
+        aspect_chords = max(0, min(10, int(round((aspect_ratio - 1.08) * 7.5))))
+        aspect_offgrid = min(0.016, max(0.0, (aspect_ratio - 1.14) * 0.012))
+        aspect_fan = min(0.028, max(0.0, (aspect_ratio - 1.14) * 0.018))
 
         preset = replace(
             self._preset,
