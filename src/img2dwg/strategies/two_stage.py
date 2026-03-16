@@ -73,6 +73,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         corridor_complexity_offgrid = min(0.008, corridor_complexity * 0.060)
         corridor_complexity_fan = min(0.010, corridor_complexity * 0.072)
 
+        # Very elongated corridor plans can still relapse into axis-heavy traces.
+        # Add a bounded tail boost that only activates on high-skew layouts so
+        # we increase coordinate diversity without perturbing easy cases.
+        elongated_corridor = max(0.0, aspect_ratio - 1.95) * max(0.0, complexity - 0.27)
+        elongated_chords = max(0, min(6, int(round(elongated_corridor * 120.0))))
+        elongated_offgrid = min(0.008, elongated_corridor * 0.065)
+        elongated_fan = min(0.012, elongated_corridor * 0.090)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -82,6 +90,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + corridor_chords
                 + interaction_chords
                 + corridor_complexity_chords
+                + elongated_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -90,6 +99,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + corridor_offgrid
                 + interaction_offgrid
                 + corridor_complexity_offgrid
+                + elongated_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -98,6 +108,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + corridor_fan
                 + interaction_fan
                 + corridor_complexity_fan
+                + elongated_fan
             ),
         )
 
