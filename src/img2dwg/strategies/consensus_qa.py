@@ -96,6 +96,17 @@ class ConsensusQAStrategy(ConversionStrategy):
         if aspect_ratio >= 1.85 and consensus_score >= 0.86:
             confident_corridor_tail = min(0.012, max(0.0, (aspect_ratio - 1.85) * 0.010))
 
+        # v74: bridge-band relief for moderately elongated corridor plans in the
+        # mid-confidence pocket (aspect around 1.45~1.70).
+        bridge_mid_confidence = (
+            max(0.0, aspect_ratio - 1.42)
+            * max(0.0, complexity - 0.44)
+            * max(0.0, min(0.20, 0.83 - consensus_score))
+        )
+        bridge_mid_confidence_chords = max(0, min(3, int(round(bridge_mid_confidence * 240.0))))
+        bridge_mid_confidence_offgrid = min(0.004, bridge_mid_confidence * 0.090)
+        bridge_mid_confidence_fan = min(0.006, bridge_mid_confidence * 0.105)
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -106,6 +117,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + corridor_bonus
                 + corridor_tail_bonus
                 + confident_corridor_bonus
+                + bridge_mid_confidence_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -115,6 +127,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + min(0.010, max(0.0, (aspect_ratio - 1.55) * 0.014))
                 + min(0.006, complexity * 0.004)
                 + confident_corridor_tail
+                + bridge_mid_confidence_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -122,6 +135,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + min(0.016, max(0.0, (aspect_ratio - 1.55) * 0.020))
                 + min(0.008, complexity * 0.005)
                 + min(0.012, confident_corridor_tail * 1.1)
+                + bridge_mid_confidence_fan
             ),
         )
 
