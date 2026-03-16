@@ -155,6 +155,21 @@ class ConsensusQAStrategy(ConversionStrategy):
             moderate_consensus_corridor_relief * 0.46,
         )
 
+        # v83: mid-band square-plan relief. In web_floorplan_grid_v1, consensus
+        # around default (≈0.7) with only mild elongation can still re-snap into
+        # orthogonal bundles. Add a tiny bounded lift focused on that pocket.
+        midband_square_relief = (
+            max(0.0, aspect_ratio - 1.14)
+            * max(0.0, 1.32 - aspect_ratio)
+            * max(0.0, complexity - 0.32)
+            * max(0.0, 0.58 - complexity)
+            * max(0.0, consensus_score - 0.69)
+            * max(0.0, 0.78 - consensus_score)
+        )
+        midband_square_chords = max(0, min(2, int(round(midband_square_relief * 12000.0))))
+        midband_square_offgrid = min(0.003, midband_square_relief * 0.95)
+        midband_square_fan = min(0.004, midband_square_relief * 1.20)
+
         elongated_consensus_floor = max(0.0, aspect_ratio - 1.24) * max(
             0.0, min(0.22, consensus_score - 0.70)
         )
@@ -175,6 +190,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + skew_complexity_chords
                 + axis_lock_proxy_chords
                 + moderate_consensus_corridor_chords
+                + midband_square_chords
                 + elongated_floor_chords
                 + 4
             ),
@@ -189,6 +205,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + skew_complexity_offgrid
                 + axis_lock_proxy_offgrid
                 + moderate_consensus_corridor_offgrid
+                + midband_square_offgrid
                 + elongated_floor_offgrid
             ),
             diagonal_fan_ratio=(
@@ -201,6 +218,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + skew_complexity_fan
                 + axis_lock_proxy_fan
                 + moderate_consensus_corridor_fan
+                + midband_square_fan
             ),
         )
 
