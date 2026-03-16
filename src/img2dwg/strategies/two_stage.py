@@ -174,6 +174,23 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         mild_elongation_midband_offgrid = min(0.0025, mild_elongation_midband_relief * 0.85)
         mild_elongation_midband_fan = min(0.0035, mild_elongation_midband_relief * 1.02)
 
+        # v95: narrow-band anti-grid pocket for mild elongation + low-mid texture.
+        # Residual failures are already zero, but a subset still clusters near
+        # axis-aligned 0.04-0.05. Add a tiny bounded lift in that pocket to
+        # improve coordinate diversity without destabilizing gates.
+        mild_midtexture_anti_grid_relief = (
+            max(0.0, aspect_ratio - 1.30)
+            * max(0.0, 1.58 - aspect_ratio)
+            * max(0.0, complexity - 0.22)
+            * max(0.0, 0.46 - complexity)
+        )
+        mild_midtexture_anti_grid_chords = max(
+            0,
+            min(2, int(round(mild_midtexture_anti_grid_relief * 5200.0))),
+        )
+        mild_midtexture_anti_grid_offgrid = min(0.0018, mild_midtexture_anti_grid_relief * 0.95)
+        mild_midtexture_anti_grid_fan = min(0.0026, mild_midtexture_anti_grid_relief * 1.10)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -191,6 +208,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_grid_chords
                 + near_square_midband_chords
                 + mild_elongation_midband_chords
+                + mild_midtexture_anti_grid_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -207,6 +225,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_grid_offgrid
                 + near_square_midband_offgrid
                 + mild_elongation_midband_offgrid
+                + mild_midtexture_anti_grid_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -223,6 +242,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_grid_fan
                 + near_square_midband_fan
                 + mild_elongation_midband_fan
+                + mild_midtexture_anti_grid_fan
             ),
         )
 
