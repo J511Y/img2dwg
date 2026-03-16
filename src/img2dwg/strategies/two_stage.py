@@ -128,6 +128,18 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         midskew_grid_offgrid = min(0.005, midskew_grid_relief * 0.120)
         midskew_grid_fan = min(0.007, midskew_grid_relief * 0.145)
 
+        # v82: low-skew grid relief. Several web floorplans relapse into sparse
+        # orthogonal bundles even when aspect ratio is close to square, so add a
+        # small bounded lift for low-skew mid-complexity layouts.
+        low_skew_grid_relief = (
+            max(0.0, 1.16 - aspect_ratio)
+            * max(0.0, complexity - 0.30)
+            * max(0.0, 0.60 - complexity)
+        )
+        low_skew_grid_chords = max(0, min(3, int(round(low_skew_grid_relief * 1200.0))))
+        low_skew_grid_offgrid = min(0.004, low_skew_grid_relief * 0.72)
+        low_skew_grid_fan = min(0.006, low_skew_grid_relief * 0.92)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -142,6 +154,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + axis_lock_relief_chords
                 + moderate_corridor_chords
                 + midskew_grid_chords
+                + low_skew_grid_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -155,6 +168,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + axis_lock_relief_offgrid
                 + moderate_corridor_offgrid
                 + midskew_grid_offgrid
+                + low_skew_grid_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -168,6 +182,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + axis_lock_relief_fan
                 + moderate_corridor_fan
                 + midskew_grid_fan
+                + low_skew_grid_fan
             ),
         )
 
