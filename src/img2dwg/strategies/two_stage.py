@@ -356,6 +356,20 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         moderate_skew_fallback_offgrid = 0.0008 if moderate_skew_fallback_gate else 0.0
         moderate_skew_fallback_fan = 0.0011 if moderate_skew_fallback_gate else 0.0
 
+        # v116: moderate-skew default-band expansion. Residual web_floorplan
+        # grid pockets still surface in moderate skew + default complexity with
+        # weaker edge texture, where v112-v113 lifts are present but shallow.
+        # Add a bounded deterministic boost to improve coordinate diversity
+        # without perturbing fail=0 or over-shifting out-of-band layouts.
+        moderate_skew_default_band_gate = (
+            1.18 <= aspect_ratio <= 1.86
+            and 0.30 <= complexity <= 0.56
+            and signals.edge_density <= 0.24
+        )
+        moderate_skew_default_band_chords = 2 if moderate_skew_default_band_gate else 0
+        moderate_skew_default_band_offgrid = 0.0022 if moderate_skew_default_band_gate else 0.0
+        moderate_skew_default_band_fan = 0.0025 if moderate_skew_default_band_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -384,6 +398,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_high_texture_chords
                 + mid_skew_texture_bridge_chords
                 + moderate_skew_fallback_chords
+                + moderate_skew_default_band_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -411,6 +426,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_high_texture_offgrid
                 + mid_skew_texture_bridge_offgrid
                 + moderate_skew_fallback_offgrid
+                + moderate_skew_default_band_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -438,6 +454,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_high_texture_fan
                 + mid_skew_texture_bridge_fan
                 + moderate_skew_fallback_fan
+                + moderate_skew_default_band_fan
             ),
         )
 
