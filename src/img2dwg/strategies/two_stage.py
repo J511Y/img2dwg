@@ -352,9 +352,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         moderate_skew_fallback_gate = (
             1.12 <= aspect_ratio <= 1.72 and 0.30 <= complexity <= 0.66
         )
-        moderate_skew_fallback_chords = 1 if moderate_skew_fallback_gate else 0
-        moderate_skew_fallback_offgrid = 0.0008 if moderate_skew_fallback_gate else 0.0
-        moderate_skew_fallback_fan = 0.0011 if moderate_skew_fallback_gate else 0.0
+        moderate_skew_fallback_chords = 2 if moderate_skew_fallback_gate else 0
+        moderate_skew_fallback_offgrid = 0.0012 if moderate_skew_fallback_gate else 0.0
+        moderate_skew_fallback_fan = 0.0015 if moderate_skew_fallback_gate else 0.0
 
         # v119: near-square broad bridge relief. Mildly skewed floorplans with
         # mid/default complexity can still keep small axis-aligned pockets near
