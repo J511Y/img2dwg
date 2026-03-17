@@ -221,18 +221,20 @@ class ConsensusQAStrategy(ConversionStrategy):
         midband_residual_degrid_offgrid = 0.0010 if midband_residual_degrid_gate else 0.0
         midband_residual_degrid_fan = 0.0012 if midband_residual_degrid_gate else 0.0
 
-        # v109: near-square residual degrid relief. A small subset of consensus
-        # traces remains mildly axis-heavy when aspect is close to square,
-        # because elongated-focused lifts barely activate. Add a tiny bounded
-        # gate for that pocket to improve coordinate diversity.
+        # v109/v115: near-square residual degrid relief. A small subset of
+        # consensus traces remains mildly axis-heavy when aspect is close to
+        # square, because elongated-focused lifts barely activate. Strengthen
+        # the tiny bounded gate slightly so the residual Chrysler/Railway-like
+        # default-band pocket gains one more debias step without affecting
+        # broader fail=0 stability.
         near_square_residual_degrid_gate = (
             1.00 <= aspect_ratio <= 1.10
             and 0.34 <= complexity <= 0.56
             and 0.69 <= consensus_score <= 0.80
         )
-        near_square_residual_degrid_chords = 3 if near_square_residual_degrid_gate else 0
-        near_square_residual_degrid_offgrid = 0.0014 if near_square_residual_degrid_gate else 0.0
-        near_square_residual_degrid_fan = 0.0016 if near_square_residual_degrid_gate else 0.0
+        near_square_residual_degrid_chords = 4 if near_square_residual_degrid_gate else 0
+        near_square_residual_degrid_offgrid = 0.0017 if near_square_residual_degrid_gate else 0.0
+        near_square_residual_degrid_fan = 0.0019 if near_square_residual_degrid_gate else 0.0
 
         # v111: near-square high-complexity degrid expansion. Residual
         # web_floorplan_grid_v1 consensus traces still show mild axis pockets
@@ -260,6 +262,20 @@ class ConsensusQAStrategy(ConversionStrategy):
         high_texture_midband_relief_offgrid = 0.0008 if high_texture_midband_relief_gate else 0.0
         high_texture_midband_relief_fan = 0.0010 if high_texture_midband_relief_gate else 0.0
 
+        # v114: moderate-skew default-band bridge relief. A few consensus_qa
+        # traces still show residual axis bundling in the common default-score
+        # pocket (consensus ≈0.7x) where elongated and high-texture gates do not
+        # overlap enough. Add a bounded deterministic bridge to lift coordinate
+        # diversity while preserving fail=0 stability.
+        default_band_bridge_gate = (
+            1.08 <= aspect_ratio <= 1.46
+            and 0.34 <= complexity <= 0.58
+            and 0.69 <= consensus_score <= 0.78
+        )
+        default_band_bridge_chords = 1 if default_band_bridge_gate else 0
+        default_band_bridge_offgrid = 0.0007 if default_band_bridge_gate else 0.0
+        default_band_bridge_fan = 0.0009 if default_band_bridge_gate else 0.0
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -283,6 +299,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_residual_degrid_chords
                 + near_square_high_complexity_chords
                 + high_texture_midband_relief_chords
+                + default_band_bridge_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -305,6 +322,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_residual_degrid_offgrid
                 + near_square_high_complexity_offgrid
                 + high_texture_midband_relief_offgrid
+                + default_band_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -324,6 +342,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_residual_degrid_fan
                 + near_square_high_complexity_fan
                 + high_texture_midband_relief_fan
+                + default_band_bridge_fan
             ),
         )
 

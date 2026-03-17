@@ -6,7 +6,6 @@ from img2dwg.strategies import consensus_qa
 from img2dwg.strategies.base import ConversionInput
 from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
 from img2dwg.strategies.prototype_engine import ImageSignals
-from scripts.run_grid_artifact_regression import analyze_dxf
 
 
 def _extract_offgrid_shift(notes: list[str]) -> float:
@@ -30,44 +29,38 @@ def _extract_debias_chords(notes: list[str]) -> int:
     raise AssertionError("offgrid_debias_chords note missing")
 
 
-def test_consensus_v111_near_square_high_complexity_degrid_expands_coordinate_spread(
+def test_consensus_v114_default_band_bridge_relief_lifts_tuning_when_gate_matches(
     monkeypatch, tmp_path: Path
 ) -> None:
-    image_path = tmp_path / "consensus_v111_near_square_high_complexity.png"
-    Image.new("RGB", (18, 18), color="white").save(image_path)
+    image_path = tmp_path / "consensus_v114_default_band_bridge.png"
+    Image.new("RGB", (16, 16), color="white").save(image_path)
 
     strategy = ConsensusQAStrategy()
 
+    # Gate-on sample: moderate skew + mid complexity + default consensus pocket.
     monkeypatch.setattr(
         consensus_qa,
         "extract_image_signals",
-        lambda _: ImageSignals(width=304, height=292, contrast=0.98, edge_density=0.26),
+        lambda _: ImageSignals(width=292, height=224, contrast=0.74, edge_density=0.18),
     )
-    out_relief = strategy.run(
+    out_gate_on = strategy.run(
         ConversionInput(image_path=image_path, metadata={"consensus_score": 0.72}),
-        tmp_path / "out_relief",
+        tmp_path / "out_gate_on",
     )
 
+    # Gate-off control: same consensus but outside aspect band.
     monkeypatch.setattr(
         consensus_qa,
         "extract_image_signals",
-        lambda _: ImageSignals(width=304, height=292, contrast=0.74, edge_density=0.16),
+        lambda _: ImageSignals(width=236, height=224, contrast=0.74, edge_density=0.18),
     )
-    out_control = strategy.run(
+    out_gate_off = strategy.run(
         ConversionInput(image_path=image_path, metadata={"consensus_score": 0.72}),
-        tmp_path / "out_control",
+        tmp_path / "out_gate_off",
     )
 
-    relief_diag = analyze_dxf(str(out_relief.dxf_path))
-    control_diag = analyze_dxf(str(out_control.dxf_path))
-
-    assert out_relief.success is True
-    assert out_control.success is True
-    assert _extract_debias_chords(out_relief.notes) >= _extract_debias_chords(out_control.notes)
-    assert _extract_offgrid_shift(out_relief.notes) > _extract_offgrid_shift(out_control.notes)
-    assert _extract_diagonal_fan(out_relief.notes) >= _extract_diagonal_fan(out_control.notes)
-    assert relief_diag.unique_x_count >= control_diag.unique_x_count
-    assert relief_diag.unique_y_count >= control_diag.unique_y_count
-    assert (relief_diag.unique_x_count + relief_diag.unique_y_count) > (
-        control_diag.unique_x_count + control_diag.unique_y_count
-    )
+    assert out_gate_on.success is True
+    assert out_gate_off.success is True
+    assert _extract_debias_chords(out_gate_on.notes) > _extract_debias_chords(out_gate_off.notes)
+    assert _extract_offgrid_shift(out_gate_on.notes) > _extract_offgrid_shift(out_gate_off.notes)
+    assert _extract_diagonal_fan(out_gate_on.notes) > _extract_diagonal_fan(out_gate_off.notes)
