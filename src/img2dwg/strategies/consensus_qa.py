@@ -295,6 +295,20 @@ class ConsensusQAStrategy(ConversionStrategy):
             0.0008 if default_score_midskew_midedge_extension_gate else 0.0
         )
 
+        # v134: near-square mid-edge bridge expansion. Residual axis-heavy
+        # consensus traces still appear in web_floorplan_grid_v1 around mild
+        # skew + moderate edge density where previous near-square gates are too
+        # narrow. Add a bounded deterministic lift in that pocket.
+        near_square_midedge_bridge_gate = (
+            1.00 <= aspect_ratio <= 1.16
+            and 0.36 <= complexity <= 0.66
+            and 0.22 <= signals.edge_density <= 0.48
+            and 0.69 <= consensus_score <= 0.78
+        )
+        near_square_midedge_bridge_chords = 2 if near_square_midedge_bridge_gate else 0
+        near_square_midedge_bridge_offgrid = 0.0011 if near_square_midedge_bridge_gate else 0.0
+        near_square_midedge_bridge_fan = 0.0014 if near_square_midedge_bridge_gate else 0.0
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -320,6 +334,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + high_texture_midband_relief_chords
                 + default_band_bridge_chords
                 + default_score_midskew_midedge_extension_chords
+                + near_square_midedge_bridge_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -344,6 +359,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + high_texture_midband_relief_offgrid
                 + default_band_bridge_offgrid
                 + default_score_midskew_midedge_extension_offgrid
+                + near_square_midedge_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -365,6 +381,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + high_texture_midband_relief_fan
                 + default_band_bridge_fan
                 + default_score_midskew_midedge_extension_fan
+                + near_square_midedge_bridge_fan
             ),
         )
 

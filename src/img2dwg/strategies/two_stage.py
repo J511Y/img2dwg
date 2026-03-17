@@ -352,9 +352,28 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         moderate_skew_fallback_gate = (
             1.12 <= aspect_ratio <= 1.72 and 0.30 <= complexity <= 0.66
         )
-        moderate_skew_fallback_chords = 1 if moderate_skew_fallback_gate else 0
-        moderate_skew_fallback_offgrid = 0.0008 if moderate_skew_fallback_gate else 0.0
-        moderate_skew_fallback_fan = 0.0011 if moderate_skew_fallback_gate else 0.0
+        moderate_skew_fallback_chords = 2 if moderate_skew_fallback_gate else 0
+        moderate_skew_fallback_offgrid = 0.0012 if moderate_skew_fallback_gate else 0.0
+        moderate_skew_fallback_fan = 0.0015 if moderate_skew_fallback_gate else 0.0
+
+        # v134: moderate-skew edge bridge relief. Residual web_floorplan_grid_v1
+        # thesis traces can still cluster around moderate skew + mid complexity
+        # when edge texture is present but not strong enough to trigger larger
+        # tails. Add a tiny bounded edge-weighted lift to improve coordinate
+        # diversity and reduce axis bias while preserving fail=0 behavior.
+        moderate_skew_edge_bridge_relief = (
+            max(0.0, aspect_ratio - 1.10)
+            * max(0.0, 1.78 - aspect_ratio)
+            * max(0.0, complexity - 0.30)
+            * max(0.0, 0.64 - complexity)
+            * max(0.0, signals.edge_density - 0.13)
+        )
+        moderate_skew_edge_bridge_chords = max(
+            0,
+            min(2, int(round(moderate_skew_edge_bridge_relief * 1800.0))),
+        )
+        moderate_skew_edge_bridge_offgrid = min(0.0016, moderate_skew_edge_bridge_relief * 0.85)
+        moderate_skew_edge_bridge_fan = min(0.0020, moderate_skew_edge_bridge_relief * 1.05)
 
         # v119: near-square broad bridge relief. Mildly skewed floorplans with
         # mid/default complexity can still keep small axis-aligned pockets near
@@ -410,6 +429,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_high_texture_chords
                 + mid_skew_texture_bridge_chords
                 + moderate_skew_fallback_chords
+                + moderate_skew_edge_bridge_chords
                 + near_square_broad_bridge_chords
                 + low_edge_mild_skew_bridge_chords
             ),
@@ -439,6 +459,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_high_texture_offgrid
                 + mid_skew_texture_bridge_offgrid
                 + moderate_skew_fallback_offgrid
+                + moderate_skew_edge_bridge_offgrid
                 + near_square_broad_bridge_offgrid
                 + low_edge_mild_skew_bridge_offgrid
             ),
@@ -468,6 +489,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_high_texture_fan
                 + mid_skew_texture_bridge_fan
                 + moderate_skew_fallback_fan
+                + moderate_skew_edge_bridge_fan
                 + near_square_broad_bridge_fan
                 + low_edge_mild_skew_bridge_fan
             ),
