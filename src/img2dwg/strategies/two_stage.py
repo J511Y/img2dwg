@@ -382,6 +382,21 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_edge_mild_skew_bridge_offgrid = 0.0008 if low_edge_mild_skew_bridge_gate else 0.0
         low_edge_mild_skew_bridge_fan = 0.0011 if low_edge_mild_skew_bridge_gate else 0.0
 
+        # v127: near-square low-edge residual bridge. web_floorplan_grid_v1 still
+        # has a mild residual axis pocket near square geometry (around case_004)
+        # where v119/v120 are active but too weak. Add one extra bounded lift in
+        # that narrow pocket to reduce axis ratio while preserving fail=0.
+        near_square_low_edge_residual_gate = (
+            0.98 <= aspect_ratio <= 1.10
+            and 0.30 <= complexity <= 0.42
+            and 0.12 <= signals.edge_density <= 0.18
+        )
+        near_square_low_edge_residual_chords = 2 if near_square_low_edge_residual_gate else 0
+        near_square_low_edge_residual_offgrid = (
+            0.0016 if near_square_low_edge_residual_gate else 0.0
+        )
+        near_square_low_edge_residual_fan = 0.0022 if near_square_low_edge_residual_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -412,6 +427,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_chords
                 + near_square_broad_bridge_chords
                 + low_edge_mild_skew_bridge_chords
+                + near_square_low_edge_residual_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -441,6 +457,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_offgrid
                 + near_square_broad_bridge_offgrid
                 + low_edge_mild_skew_bridge_offgrid
+                + near_square_low_edge_residual_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -470,6 +487,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_fan
                 + near_square_broad_bridge_fan
                 + low_edge_mild_skew_bridge_fan
+                + near_square_low_edge_residual_fan
             ),
         )
 

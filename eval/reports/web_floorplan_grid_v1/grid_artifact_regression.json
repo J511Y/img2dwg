@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-17T17:12:08.699964+00:00",
+  "generated_at": "2026-03-17T17:40:51.111245+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 120.1667,
-      "avg_axis_aligned_ratio": 0.0341,
-      "std_axis_aligned_ratio": 0.0054,
-      "avg_axis_margin_to_grid_threshold": 0.8659,
-      "avg_axis_margin_score": 86.59,
-      "max_axis_aligned_ratio": 0.0465,
-      "max_axis_margin_to_grid_threshold": 0.8535,
-      "p95_axis_aligned_ratio": 0.0465,
-      "p95_axis_margin_to_grid_threshold": 0.8535,
+      "avg_line_count": 120.5,
+      "avg_axis_aligned_ratio": 0.0339,
+      "std_axis_aligned_ratio": 0.005,
+      "avg_axis_margin_to_grid_threshold": 0.8661,
+      "avg_axis_margin_score": 86.61,
+      "max_axis_aligned_ratio": 0.0444,
+      "max_axis_margin_to_grid_threshold": 0.8556,
+      "p95_axis_aligned_ratio": 0.0444,
+      "p95_axis_margin_to_grid_threshold": 0.8556,
       "min_axis_aligned_ratio": 0.0253,
       "min_axis_margin_to_grid_threshold": 0.8747,
-      "avg_unique_x_count": 227.3333,
-      "avg_unique_y_count": 227.3333
+      "avg_unique_x_count": 228.0,
+      "avg_unique_y_count": 228.0
     }
   },
   "top_problematic": [],
@@ -364,15 +364,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 86,
+        "total_entities": 90,
         "entity_type_counts": {
-          "LINE": 86
+          "LINE": 90
         },
         "unique_entity_types": 1,
-        "line_count": 86,
-        "axis_aligned_line_ratio": 0.0465,
-        "unique_x_count": 159,
-        "unique_y_count": 159
+        "line_count": 90,
+        "axis_aligned_line_ratio": 0.0444,
+        "unique_x_count": 167,
+        "unique_y_count": 167
       }
     },
     {
@@ -762,19 +762,19 @@
   "strategy_delta_vs_previous": {
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0341,
+        "previous": 0.034,
         "current": 0.034,
-        "delta": -0.0001
+        "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8659,
+        "previous": 0.866,
         "current": 0.866,
-        "delta": 0.0001
+        "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 118.5,
+        "previous": 118.8333,
         "current": 118.8333,
-        "delta": 0.3333
+        "delta": 0.0
       }
     },
     "hybrid_mvp": {
@@ -797,18 +797,18 @@
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
         "previous": 0.0341,
-        "current": 0.0341,
-        "delta": 0.0
+        "current": 0.0339,
+        "delta": -0.0002
       },
       "avg_axis_margin_to_grid_threshold": {
         "previous": 0.8659,
-        "current": 0.8659,
-        "delta": 0.0
+        "current": 0.8661,
+        "delta": 0.0002
       },
       "avg_line_count": {
         "previous": 120.1667,
-        "current": 120.1667,
-        "delta": 0.0
+        "current": 120.5,
+        "delta": 0.3333
       }
     }
   },
