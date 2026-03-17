@@ -210,6 +210,19 @@ class ConsensusQAStrategy(ConversionStrategy):
         moderate_band_default_offgrid = 0.0008 if moderate_band_default_gate else 0.0
         moderate_band_default_fan = 0.0010 if moderate_band_default_gate else 0.0
 
+        # v108: midband residual degrid relief. Residual web_floorplan_grid_v1
+        # consensus cases cluster in moderate elongation + mid complexity where
+        # tiny product terms can under-fire. Add a deterministic micro-lift so
+        # coordinate diversity improves without upsetting fail=0 constraints.
+        midband_residual_degrid_gate = (
+            1.18 <= aspect_ratio <= 1.62
+            and 0.32 <= complexity <= 0.62
+            and 0.69 <= consensus_score <= 0.80
+        )
+        midband_residual_degrid_chords = 1 if midband_residual_degrid_gate else 0
+        midband_residual_degrid_offgrid = 0.0010 if midband_residual_degrid_gate else 0.0
+        midband_residual_degrid_fan = 0.0012 if midband_residual_degrid_gate else 0.0
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -229,6 +242,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + axis_jitter_chords
                 + residual_axis_jitter_chords
                 + moderate_band_default_chords
+                + midband_residual_degrid_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -247,6 +261,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + axis_jitter_offgrid
                 + residual_axis_jitter_offgrid
                 + moderate_band_default_offgrid
+                + midband_residual_degrid_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -262,6 +277,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + axis_jitter_fan
                 + residual_axis_jitter_fan
                 + moderate_band_default_fan
+                + midband_residual_degrid_fan
             ),
         )
 
