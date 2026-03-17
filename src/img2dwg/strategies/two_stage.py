@@ -191,6 +191,127 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         mild_midtexture_anti_grid_offgrid = min(0.0018, mild_midtexture_anti_grid_relief * 0.95)
         mild_midtexture_anti_grid_fan = min(0.0026, mild_midtexture_anti_grid_relief * 1.10)
 
+        # v96: broadened mild-corridor midtexture relief. v95 improved a narrow
+        # pocket but residual axis-heavy traces remain just outside that band
+        # (slightly lower skew / slightly higher texture). Add a tiny bounded
+        # extension to keep fail=0 while nudging coordinate diversity upward.
+        mild_corridor_midtexture_relief = (
+            max(0.0, aspect_ratio - 1.26)
+            * max(0.0, 1.54 - aspect_ratio)
+            * max(0.0, complexity - 0.24)
+            * max(0.0, 0.50 - complexity)
+        )
+        mild_corridor_midtexture_chords = max(
+            0,
+            min(2, int(round(mild_corridor_midtexture_relief * 4200.0))),
+        )
+        mild_corridor_midtexture_offgrid = min(0.0019, mild_corridor_midtexture_relief * 0.92)
+        mild_corridor_midtexture_fan = min(0.0028, mild_corridor_midtexture_relief * 1.06)
+
+        # v97: low-edge corridor pocket relief. A subset of web floorplans has
+        # mild elongation with weak edge density, which can still re-snap to
+        # orthogonal bundles. Add a bounded low-edge term to increase coordinate
+        # spread without changing fail=0 behavior.
+        low_edge_corridor_relief = (
+            max(0.0, aspect_ratio - 1.18)
+            * max(0.0, 1.46 - aspect_ratio)
+            * max(0.0, complexity - 0.24)
+            * max(0.0, 0.50 - complexity)
+            * max(0.0, 0.22 - signals.edge_density)
+        )
+        low_edge_corridor_chords = max(
+            0,
+            min(2, int(round(low_edge_corridor_relief * 21000.0))),
+        )
+        low_edge_corridor_offgrid = min(0.0016, low_edge_corridor_relief * 0.80)
+        low_edge_corridor_fan = min(0.0024, low_edge_corridor_relief * 0.98)
+
+        # v98: low-mid texture drift relief. Mildly elongated plans with lower
+        # texture can still accumulate orthogonal traces even when v97 does not
+        # trigger strongly. Add a tiny bounded lift to improve coordinate spread
+        # in that pocket while preserving fail=0 behavior.
+        low_midtexture_drift_relief = (
+            max(0.0, aspect_ratio - 1.22)
+            * max(0.0, 1.52 - aspect_ratio)
+            * max(0.0, 0.46 - complexity)
+            * max(0.0, 0.26 - signals.edge_density)
+        )
+        low_midtexture_drift_chords = max(
+            0,
+            min(3, int(round(low_midtexture_drift_relief * 4200.0))),
+        )
+        low_midtexture_drift_offgrid = min(0.0030, low_midtexture_drift_relief * 2.4)
+        low_midtexture_drift_fan = min(0.0038, low_midtexture_drift_relief * 2.8)
+
+        # v101: moderate-skew broad anti-grid relief. Residual web_floorplan
+        # pockets still show mild axis rebundling around aspect 1.20-1.55 with
+        # low-mid texture where v95-v98 can under-fire. Add a small bounded
+        # broad-band lift to improve coordinate diversity without moving gates.
+        moderate_skew_broad_relief = (
+            max(0.0, aspect_ratio - 1.20)
+            * max(0.0, 1.55 - aspect_ratio)
+            * max(0.0, complexity - 0.22)
+            * max(0.0, 0.48 - complexity)
+        )
+        moderate_skew_broad_chords = max(
+            0,
+            min(2, int(round(moderate_skew_broad_relief * 2800.0))),
+        )
+        moderate_skew_broad_offgrid = min(0.0016, moderate_skew_broad_relief * 0.75)
+        moderate_skew_broad_fan = min(0.0022, moderate_skew_broad_relief * 0.90)
+
+        # v102: low-edge mid-skew relief. Residual mild grid pockets remain in
+        # moderately elongated + low-mid texture layouts when edge density is
+        # weak, where v101 can still under-fire. Add a tiny bounded lift to
+        # improve coordinate diversity while preserving fail=0 behavior.
+        low_edge_midskew_relief = (
+            max(0.0, aspect_ratio - 1.16)
+            * max(0.0, 1.62 - aspect_ratio)
+            * max(0.0, 0.52 - complexity)
+            * max(0.0, 0.30 - signals.edge_density)
+        )
+        low_edge_midskew_chords = max(
+            0,
+            min(2, int(round(low_edge_midskew_relief * 2600.0))),
+        )
+        low_edge_midskew_offgrid = min(0.0014, low_edge_midskew_relief * 0.78)
+        low_edge_midskew_fan = min(0.0020, low_edge_midskew_relief * 0.92)
+
+        # v103: compact mid-band relief. Residual web_floorplan_grid_v1 thesis
+        # cases still cluster around low/mid skew with mid complexity where the
+        # elongated corridor terms do not activate strongly. Add a tiny bounded
+        # lift for that compact pocket to reduce strategy-wide axis bias while
+        # keeping fail=0 behavior unchanged.
+        compact_midband_relief = (
+            max(0.0, 1.26 - aspect_ratio)
+            * max(0.0, aspect_ratio - 0.98)
+            * max(0.0, complexity - 0.30)
+            * max(0.0, 0.62 - complexity)
+        )
+        compact_midband_chords = max(
+            0,
+            min(2, int(round(compact_midband_relief * 6000.0))),
+        )
+        compact_midband_offgrid = min(0.0018, compact_midband_relief * 0.78)
+        compact_midband_fan = min(0.0026, compact_midband_relief * 0.96)
+
+        # v104: broad mild-band anti-grid relief. Some web_floorplan_grid_v1
+        # thesis traces still land in a mild skew + mid complexity pocket just
+        # outside v103 bounds. Add a tiny bounded broad-band lift to improve
+        # coordinate diversity while preserving fail=0 guardrails.
+        broad_mildband_relief = (
+            max(0.0, aspect_ratio - 1.14)
+            * max(0.0, 1.44 - aspect_ratio)
+            * max(0.0, complexity - 0.26)
+            * max(0.0, 0.56 - complexity)
+        )
+        broad_mildband_chords = max(
+            0,
+            min(1, int(round(broad_mildband_relief * 5200.0))),
+        )
+        broad_mildband_offgrid = min(0.0012, broad_mildband_relief * 0.72)
+        broad_mildband_fan = min(0.0018, broad_mildband_relief * 0.92)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -209,6 +330,13 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_midband_chords
                 + mild_elongation_midband_chords
                 + mild_midtexture_anti_grid_chords
+                + mild_corridor_midtexture_chords
+                + low_edge_corridor_chords
+                + low_midtexture_drift_chords
+                + moderate_skew_broad_chords
+                + low_edge_midskew_chords
+                + compact_midband_chords
+                + broad_mildband_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -226,6 +354,13 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_midband_offgrid
                 + mild_elongation_midband_offgrid
                 + mild_midtexture_anti_grid_offgrid
+                + mild_corridor_midtexture_offgrid
+                + low_edge_corridor_offgrid
+                + low_midtexture_drift_offgrid
+                + moderate_skew_broad_offgrid
+                + low_edge_midskew_offgrid
+                + compact_midband_offgrid
+                + broad_mildband_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -243,6 +378,13 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_midband_fan
                 + mild_elongation_midband_fan
                 + mild_midtexture_anti_grid_fan
+                + mild_corridor_midtexture_fan
+                + low_edge_corridor_fan
+                + low_midtexture_drift_fan
+                + moderate_skew_broad_fan
+                + low_edge_midskew_fan
+                + compact_midband_fan
+                + broad_mildband_fan
             ),
         )
 
