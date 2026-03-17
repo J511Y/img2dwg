@@ -312,6 +312,50 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         broad_mildband_offgrid = min(0.0016, broad_mildband_relief * 0.90)
         broad_mildband_fan = min(0.0022, broad_mildband_relief * 1.08)
 
+        # v111: low-skew high-texture anti-grid relief. Residual axis-heavy
+        # pockets remain around near-square to mildly elongated plans where
+        # texture is strong enough that corridor-focused terms under-fire.
+        # Add a bounded lift in this pocket to improve coordinate diversity.
+        low_skew_high_texture_relief = (
+            max(0.0, 1.24 - aspect_ratio)
+            * max(0.0, aspect_ratio - 0.96)
+            * max(0.0, complexity - 0.34)
+            * max(0.0, 0.62 - complexity)
+            * max(0.0, signals.edge_density - 0.12)
+        )
+        low_skew_high_texture_chords = max(
+            0,
+            min(3, int(round(low_skew_high_texture_relief * 180000.0))),
+        )
+        low_skew_high_texture_offgrid = min(0.0032, low_skew_high_texture_relief * 22.0)
+        low_skew_high_texture_fan = min(0.0042, low_skew_high_texture_relief * 28.0)
+
+        # v112: mid-skew texture bridge relief. Residual web_floorplan_grid_v1
+        # thesis traces still cluster in mildly elongated + mid/high texture
+        # pockets where low-skew v111 and corridor-heavy lifts only partially
+        # overlap. Add a tiny bounded bridge term to increase coordinate
+        # diversity and reduce axis bias without touching fail=0 guardrails.
+        mid_skew_texture_bridge_gate = (
+            1.18 <= aspect_ratio <= 1.92
+            and 0.32 <= complexity <= 0.60
+            and signals.edge_density >= 0.12
+        )
+        mid_skew_texture_bridge_chords = 1 if mid_skew_texture_bridge_gate else 0
+        mid_skew_texture_bridge_offgrid = 0.0012 if mid_skew_texture_bridge_gate else 0.0
+        mid_skew_texture_bridge_fan = 0.0015 if mid_skew_texture_bridge_gate else 0.0
+
+        # v113: moderate-skew fallback degrid gate. Some thesis outputs still
+        # show mild axis rebundling in common moderate-skew + mid-complexity
+        # pockets that sit near but not always inside v112's edge gate.
+        # Add a tiny deterministic fallback lift to reduce residual axis bias
+        # while keeping fail=0 stability unchanged.
+        moderate_skew_fallback_gate = (
+            1.12 <= aspect_ratio <= 1.72 and 0.30 <= complexity <= 0.66
+        )
+        moderate_skew_fallback_chords = 1 if moderate_skew_fallback_gate else 0
+        moderate_skew_fallback_offgrid = 0.0008 if moderate_skew_fallback_gate else 0.0
+        moderate_skew_fallback_fan = 0.0011 if moderate_skew_fallback_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -337,6 +381,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_midskew_chords
                 + compact_midband_chords
                 + broad_mildband_chords
+                + low_skew_high_texture_chords
+                + mid_skew_texture_bridge_chords
+                + moderate_skew_fallback_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -361,6 +408,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_midskew_offgrid
                 + compact_midband_offgrid
                 + broad_mildband_offgrid
+                + low_skew_high_texture_offgrid
+                + mid_skew_texture_bridge_offgrid
+                + moderate_skew_fallback_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -385,6 +435,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_midskew_fan
                 + compact_midband_fan
                 + broad_mildband_fan
+                + low_skew_high_texture_fan
+                + mid_skew_texture_bridge_fan
+                + moderate_skew_fallback_fan
             ),
         )
 
