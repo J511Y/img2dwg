@@ -276,6 +276,25 @@ class ConsensusQAStrategy(ConversionStrategy):
         default_band_bridge_offgrid = 0.0007 if default_band_bridge_gate else 0.0
         default_band_bridge_fan = 0.0009 if default_band_bridge_gate else 0.0
 
+        # v126: default-score moderate-skew mid-edge bridge extension.
+        # Residual axis bias appears in slightly higher edge-density pockets
+        # where v114's narrow bridge can under-fire.
+        default_score_midskew_midedge_extension_gate = (
+            1.14 <= aspect_ratio <= 1.62
+            and 0.34 <= complexity <= 0.64
+            and 0.20 <= signals.edge_density <= 0.42
+            and 0.69 <= consensus_score <= 0.76
+        )
+        default_score_midskew_midedge_extension_chords = (
+            1 if default_score_midskew_midedge_extension_gate else 0
+        )
+        default_score_midskew_midedge_extension_offgrid = (
+            0.0006 if default_score_midskew_midedge_extension_gate else 0.0
+        )
+        default_score_midskew_midedge_extension_fan = (
+            0.0008 if default_score_midskew_midedge_extension_gate else 0.0
+        )
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -300,6 +319,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_high_complexity_chords
                 + high_texture_midband_relief_chords
                 + default_band_bridge_chords
+                + default_score_midskew_midedge_extension_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -323,6 +343,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_high_complexity_offgrid
                 + high_texture_midband_relief_offgrid
                 + default_band_bridge_offgrid
+                + default_score_midskew_midedge_extension_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -343,6 +364,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_high_complexity_fan
                 + high_texture_midband_relief_fan
                 + default_band_bridge_fan
+                + default_score_midskew_midedge_extension_fan
             ),
         )
 
