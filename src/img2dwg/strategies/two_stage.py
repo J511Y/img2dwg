@@ -312,6 +312,23 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         broad_mildband_offgrid = min(0.0012, broad_mildband_relief * 0.72)
         broad_mildband_fan = min(0.0018, broad_mildband_relief * 0.92)
 
+        # v105: residual mild-axis pocket relief. Even after v104, some thesis
+        # cases in web_floorplan_grid_v1 remain lightly axis-biased in a narrow
+        # mild-skew + low-mid texture band. Add a tiny bounded lift so at least
+        # one extra debias chord appears in that pocket without shifting gates.
+        residual_mild_axis_relief = (
+            max(0.0, aspect_ratio - 1.18)
+            * max(0.0, 1.42 - aspect_ratio)
+            * max(0.0, complexity - 0.30)
+            * max(0.0, 0.52 - complexity)
+        )
+        residual_mild_axis_chords = max(
+            0,
+            min(1, int(round(residual_mild_axis_relief * 9000.0))),
+        )
+        residual_mild_axis_offgrid = min(0.0010, residual_mild_axis_relief * 0.68)
+        residual_mild_axis_fan = min(0.0014, residual_mild_axis_relief * 0.84)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -337,6 +354,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_midskew_chords
                 + compact_midband_chords
                 + broad_mildband_chords
+                + residual_mild_axis_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -361,6 +379,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_midskew_offgrid
                 + compact_midband_offgrid
                 + broad_mildband_offgrid
+                + residual_mild_axis_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -385,6 +404,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_midskew_fan
                 + compact_midband_fan
                 + broad_mildband_fan
+                + residual_mild_axis_fan
             ),
         )
 
