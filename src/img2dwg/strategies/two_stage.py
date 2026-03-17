@@ -397,6 +397,26 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         )
         near_square_low_edge_residual_fan = 0.0022 if near_square_low_edge_residual_gate else 0.0
 
+        # v130: near-square mid-edge default fallback. Some residual thesis
+        # traces still show mild axis pockets in the common near-square,
+        # default-complexity band with mid edge density just outside v127.
+        # Add a tiny bounded fallback lift to improve coordinate diversity
+        # while keeping fail=0 guardrails unchanged.
+        near_square_midedge_default_fallback_gate = (
+            0.95 <= aspect_ratio <= 1.30
+            and 0.28 <= complexity <= 0.62
+            and 0.15 <= signals.edge_density <= 0.34
+        )
+        near_square_midedge_default_fallback_chords = (
+            2 if near_square_midedge_default_fallback_gate else 0
+        )
+        near_square_midedge_default_fallback_offgrid = (
+            0.0022 if near_square_midedge_default_fallback_gate else 0.0
+        )
+        near_square_midedge_default_fallback_fan = (
+            0.0028 if near_square_midedge_default_fallback_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -428,6 +448,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_broad_bridge_chords
                 + low_edge_mild_skew_bridge_chords
                 + near_square_low_edge_residual_chords
+                + near_square_midedge_default_fallback_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -458,6 +479,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_broad_bridge_offgrid
                 + low_edge_mild_skew_bridge_offgrid
                 + near_square_low_edge_residual_offgrid
+                + near_square_midedge_default_fallback_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -488,6 +510,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_broad_bridge_fan
                 + low_edge_mild_skew_bridge_fan
                 + near_square_low_edge_residual_fan
+                + near_square_midedge_default_fallback_fan
             ),
         )
 

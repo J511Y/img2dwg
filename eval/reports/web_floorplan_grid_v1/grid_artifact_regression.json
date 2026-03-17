@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-17T18:09:48.819407+00:00",
+  "generated_at": "2026-03-17T19:10:34.375987+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -24,19 +24,19 @@
   },
   "strategy_diagnostics": {
     "consensus_qa": {
-      "avg_line_count": 119.1667,
+      "avg_line_count": 119.3333,
       "avg_axis_aligned_ratio": 0.0338,
-      "std_axis_aligned_ratio": 0.0029,
-      "avg_axis_margin_to_grid_threshold": 0.8661,
-      "avg_axis_margin_score": 86.61,
+      "std_axis_aligned_ratio": 0.0028,
+      "avg_axis_margin_to_grid_threshold": 0.8662,
+      "avg_axis_margin_score": 86.62,
       "max_axis_aligned_ratio": 0.0385,
       "max_axis_margin_to_grid_threshold": 0.8615,
       "p95_axis_aligned_ratio": 0.0385,
       "p95_axis_margin_to_grid_threshold": 0.8615,
       "min_axis_aligned_ratio": 0.0282,
       "min_axis_margin_to_grid_threshold": 0.8718,
-      "avg_unique_x_count": 225.3333,
-      "avg_unique_y_count": 225.3333
+      "avg_unique_x_count": 225.6667,
+      "avg_unique_y_count": 225.6667
     },
     "hybrid_mvp": {
       "avg_line_count": 8.0,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 120.5,
-      "avg_axis_aligned_ratio": 0.0339,
-      "std_axis_aligned_ratio": 0.005,
-      "avg_axis_margin_to_grid_threshold": 0.8661,
-      "avg_axis_margin_score": 86.61,
+      "avg_line_count": 121.1667,
+      "avg_axis_aligned_ratio": 0.0337,
+      "std_axis_aligned_ratio": 0.0048,
+      "avg_axis_margin_to_grid_threshold": 0.8663,
+      "avg_axis_margin_score": 86.63,
       "max_axis_aligned_ratio": 0.0444,
       "max_axis_margin_to_grid_threshold": 0.8556,
       "p95_axis_aligned_ratio": 0.0444,
       "p95_axis_margin_to_grid_threshold": 0.8556,
       "min_axis_aligned_ratio": 0.0253,
       "min_axis_margin_to_grid_threshold": 0.8747,
-      "avg_unique_x_count": 228.0,
-      "avg_unique_y_count": 228.0
+      "avg_unique_x_count": 229.3333,
+      "avg_unique_y_count": 229.3333
     }
   },
   "top_problematic": [],
@@ -459,15 +459,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 106,
+        "total_entities": 110,
         "entity_type_counts": {
-          "LINE": 106
+          "LINE": 110
         },
         "unique_entity_types": 1,
-        "line_count": 106,
-        "axis_aligned_line_ratio": 0.0377,
-        "unique_x_count": 199,
-        "unique_y_count": 199
+        "line_count": 110,
+        "axis_aligned_line_ratio": 0.0364,
+        "unique_x_count": 207,
+        "unique_y_count": 207
       }
     },
     {
@@ -516,15 +516,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 104,
+        "total_entities": 108,
         "entity_type_counts": {
-          "LINE": 104
+          "LINE": 108
         },
         "unique_entity_types": 1,
-        "line_count": 104,
-        "axis_aligned_line_ratio": 0.0385,
-        "unique_x_count": 195,
-        "unique_y_count": 195
+        "line_count": 108,
+        "axis_aligned_line_ratio": 0.037,
+        "unique_x_count": 203,
+        "unique_y_count": 203
       }
     },
     {
@@ -687,15 +687,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 110,
+        "total_entities": 112,
         "entity_type_counts": {
-          "LINE": 110
+          "LINE": 112
         },
         "unique_entity_types": 1,
-        "line_count": 110,
-        "axis_aligned_line_ratio": 0.0364,
-        "unique_x_count": 207,
-        "unique_y_count": 207
+        "line_count": 112,
+        "axis_aligned_line_ratio": 0.0357,
+        "unique_x_count": 211,
+        "unique_y_count": 211
       }
     },
     {
@@ -762,19 +762,19 @@
   "strategy_delta_vs_previous": {
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.034,
+        "previous": 0.0338,
         "current": 0.0338,
-        "delta": -0.0002
+        "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.866,
-        "current": 0.8661,
-        "delta": 0.0001
+        "previous": 0.8662,
+        "current": 0.8662,
+        "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 118.8333,
-        "current": 119.1667,
-        "delta": 0.3334
+        "previous": 119.3333,
+        "current": 119.3333,
+        "delta": 0.0
       }
     },
     "hybrid_mvp": {
@@ -797,18 +797,18 @@
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
         "previous": 0.0339,
-        "current": 0.0339,
-        "delta": 0.0
+        "current": 0.0337,
+        "delta": -0.0002
       },
       "avg_axis_margin_to_grid_threshold": {
         "previous": 0.8661,
-        "current": 0.8661,
-        "delta": 0.0
+        "current": 0.8663,
+        "delta": 0.0002
       },
       "avg_line_count": {
         "previous": 120.5,
-        "current": 120.5,
-        "delta": 0.0
+        "current": 121.1667,
+        "delta": 0.6667
       }
     }
   },
