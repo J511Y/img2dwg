@@ -262,6 +262,23 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         moderate_skew_broad_offgrid = min(0.0016, moderate_skew_broad_relief * 0.75)
         moderate_skew_broad_fan = min(0.0022, moderate_skew_broad_relief * 0.90)
 
+        # v102: low-edge mid-skew relief. Residual mild grid pockets remain in
+        # moderately elongated + low-mid texture layouts when edge density is
+        # weak, where v101 can still under-fire. Add a tiny bounded lift to
+        # improve coordinate diversity while preserving fail=0 behavior.
+        low_edge_midskew_relief = (
+            max(0.0, aspect_ratio - 1.16)
+            * max(0.0, 1.62 - aspect_ratio)
+            * max(0.0, 0.52 - complexity)
+            * max(0.0, 0.30 - signals.edge_density)
+        )
+        low_edge_midskew_chords = max(
+            0,
+            min(2, int(round(low_edge_midskew_relief * 2600.0))),
+        )
+        low_edge_midskew_offgrid = min(0.0014, low_edge_midskew_relief * 0.78)
+        low_edge_midskew_fan = min(0.0020, low_edge_midskew_relief * 0.92)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -284,6 +301,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_corridor_chords
                 + low_midtexture_drift_chords
                 + moderate_skew_broad_chords
+                + low_edge_midskew_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -305,6 +323,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_corridor_offgrid
                 + low_midtexture_drift_offgrid
                 + moderate_skew_broad_offgrid
+                + low_edge_midskew_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -326,6 +345,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_corridor_fan
                 + low_midtexture_drift_fan
                 + moderate_skew_broad_fan
+                + low_edge_midskew_fan
             ),
         )
 
