@@ -223,6 +223,21 @@ class ConsensusQAStrategy(ConversionStrategy):
         midband_residual_degrid_offgrid = 0.0010 if midband_residual_degrid_gate else 0.0
         midband_residual_degrid_fan = 0.0012 if midband_residual_degrid_gate else 0.0
 
+        # v109: near-square residual degrid relief. A small subset of consensus
+        # traces remains mildly axis-heavy when aspect is close to square,
+        # because elongated-focused lifts barely activate. Add a tiny bounded
+        # gate for that pocket to improve coordinate diversity.
+        near_square_residual_degrid_gate = (
+            1.00 <= aspect_ratio <= 1.10
+            and 0.34 <= complexity <= 0.56
+            and 0.69 <= consensus_score <= 0.80
+        )
+        near_square_residual_degrid_chords = 2 if near_square_residual_degrid_gate else 0
+        near_square_residual_degrid_offgrid = (
+            0.0012 if near_square_residual_degrid_gate else 0.0
+        )
+        near_square_residual_degrid_fan = 0.0014 if near_square_residual_degrid_gate else 0.0
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -243,6 +258,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + residual_axis_jitter_chords
                 + moderate_band_default_chords
                 + midband_residual_degrid_chords
+                + near_square_residual_degrid_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -262,6 +278,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + residual_axis_jitter_offgrid
                 + moderate_band_default_offgrid
                 + midband_residual_degrid_offgrid
+                + near_square_residual_degrid_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -278,6 +295,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + residual_axis_jitter_fan
                 + moderate_band_default_fan
                 + midband_residual_degrid_fan
+                + near_square_residual_degrid_fan
             ),
         )
 
