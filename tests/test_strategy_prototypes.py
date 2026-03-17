@@ -341,3 +341,40 @@ def test_consensus_strategy_increases_debias_with_confidence(tmp_path: Path) -> 
 
     assert high_chords >= mid_chords
     assert high_shift >= mid_shift
+
+
+def test_consensus_strategy_residual_axis_jitter_gate_lifts_moderate_band(tmp_path: Path) -> None:
+    mild_path = tmp_path / "mild.png"
+    gated_path = tmp_path / "gated.png"
+
+    mild = Image.new("L", (96, 96), color=238)
+    ImageDraw.Draw(mild).rectangle((16, 16, 80, 80), outline=55, width=2)
+    mild.convert("RGB").save(mild_path)
+
+    gated = Image.new("L", (168, 96), color=250)
+    draw_gated = ImageDraw.Draw(gated)
+    for step in range(8, 160, 10):
+        draw_gated.line((step, 6, max(4, step - 34), 90), fill=12 + (step % 80), width=2)
+        draw_gated.line((max(4, step - 28), 8, step, 88), fill=22 + (step % 90), width=2)
+    gated.convert("RGB").save(gated_path)
+
+    strategy = ConsensusQAStrategy()
+    out_mild = strategy.run(
+        ConversionInput(image_path=mild_path, metadata={"consensus_score": 0.72}),
+        tmp_path / "mild_out",
+    )
+    out_gated = strategy.run(
+        ConversionInput(image_path=gated_path, metadata={"consensus_score": 0.72}),
+        tmp_path / "gated_out",
+    )
+
+    assert out_mild.success is True
+    assert out_gated.success is True
+
+    mild_chords = _extract_debias_chord_multiplier(out_mild.notes)
+    gated_chords = _extract_debias_chord_multiplier(out_gated.notes)
+    mild_shift = _extract_offgrid_shift(out_mild.notes)
+    gated_shift = _extract_offgrid_shift(out_gated.notes)
+
+    assert gated_chords >= mild_chords + 2
+    assert gated_shift > mild_shift
