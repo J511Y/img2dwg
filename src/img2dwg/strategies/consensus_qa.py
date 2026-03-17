@@ -176,6 +176,26 @@ class ConsensusQAStrategy(ConversionStrategy):
         elongated_floor_chords = max(0, min(2, int(round(elongated_consensus_floor * 90.0))))
         elongated_floor_offgrid = min(0.003, elongated_consensus_floor * 0.060)
 
+        # v99: midtexture mild-corridor relief for the default-consensus band.
+        # Some web_floorplan_grid_v1 antithesis outputs still cluster in a small
+        # orthogonal pocket around mild elongation + low-mid texture. Add a tiny
+        # bounded lift to increase coordinate diversity without affecting fail=0.
+        midtexture_mild_corridor_relief = (
+            max(0.0, aspect_ratio - 1.20)
+            * max(0.0, 1.50 - aspect_ratio)
+            * max(0.0, 0.54 - complexity)
+            * (
+                max(0.0, min(0.08, consensus_score - 0.68))
+                + max(0.0, min(0.08, 0.78 - consensus_score))
+            )
+        )
+        midtexture_mild_corridor_chords = max(
+            0,
+            min(2, int(round(midtexture_mild_corridor_relief * 2200.0))),
+        )
+        midtexture_mild_corridor_offgrid = min(0.0025, midtexture_mild_corridor_relief * 0.95)
+        midtexture_mild_corridor_fan = min(0.0032, midtexture_mild_corridor_relief * 1.10)
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -192,6 +212,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_consensus_corridor_chords
                 + midband_square_chords
                 + elongated_floor_chords
+                + midtexture_mild_corridor_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -207,6 +228,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_consensus_corridor_offgrid
                 + midband_square_offgrid
                 + elongated_floor_offgrid
+                + midtexture_mild_corridor_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -219,6 +241,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + axis_lock_proxy_fan
                 + moderate_consensus_corridor_fan
                 + midband_square_fan
+                + midtexture_mild_corridor_fan
             ),
         )
 
