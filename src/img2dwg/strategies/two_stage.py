@@ -312,6 +312,24 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         broad_mildband_offgrid = min(0.0016, broad_mildband_relief * 0.90)
         broad_mildband_fan = min(0.0022, broad_mildband_relief * 1.08)
 
+        # v111: low-skew high-texture anti-grid relief. Residual axis-heavy
+        # pockets remain around near-square to mildly elongated plans where
+        # texture is strong enough that corridor-focused terms under-fire.
+        # Add a bounded lift in this pocket to improve coordinate diversity.
+        low_skew_high_texture_relief = (
+            max(0.0, 1.24 - aspect_ratio)
+            * max(0.0, aspect_ratio - 0.96)
+            * max(0.0, complexity - 0.34)
+            * max(0.0, 0.62 - complexity)
+            * max(0.0, signals.edge_density - 0.12)
+        )
+        low_skew_high_texture_chords = max(
+            0,
+            min(3, int(round(low_skew_high_texture_relief * 180000.0))),
+        )
+        low_skew_high_texture_offgrid = min(0.0032, low_skew_high_texture_relief * 22.0)
+        low_skew_high_texture_fan = min(0.0042, low_skew_high_texture_relief * 28.0)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -337,6 +355,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_midskew_chords
                 + compact_midband_chords
                 + broad_mildband_chords
+                + low_skew_high_texture_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -361,6 +380,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_midskew_offgrid
                 + compact_midband_offgrid
                 + broad_mildband_offgrid
+                + low_skew_high_texture_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -385,6 +405,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_edge_midskew_fan
                 + compact_midband_fan
                 + broad_mildband_fan
+                + low_skew_high_texture_fan
             ),
         )
 
