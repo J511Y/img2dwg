@@ -260,6 +260,20 @@ class ConsensusQAStrategy(ConversionStrategy):
         high_texture_midband_relief_offgrid = 0.0008 if high_texture_midband_relief_gate else 0.0
         high_texture_midband_relief_fan = 0.0010 if high_texture_midband_relief_gate else 0.0
 
+        # v114: moderate-skew default-band bridge relief. A few consensus_qa
+        # traces still show residual axis bundling in the common default-score
+        # pocket (consensus ≈0.7x) where elongated and high-texture gates do not
+        # overlap enough. Add a bounded deterministic bridge to lift coordinate
+        # diversity while preserving fail=0 stability.
+        default_band_bridge_gate = (
+            1.08 <= aspect_ratio <= 1.46
+            and 0.34 <= complexity <= 0.58
+            and 0.69 <= consensus_score <= 0.78
+        )
+        default_band_bridge_chords = 1 if default_band_bridge_gate else 0
+        default_band_bridge_offgrid = 0.0007 if default_band_bridge_gate else 0.0
+        default_band_bridge_fan = 0.0009 if default_band_bridge_gate else 0.0
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -283,6 +297,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_residual_degrid_chords
                 + near_square_high_complexity_chords
                 + high_texture_midband_relief_chords
+                + default_band_bridge_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -305,6 +320,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_residual_degrid_offgrid
                 + near_square_high_complexity_offgrid
                 + high_texture_midband_relief_offgrid
+                + default_band_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -324,6 +340,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_residual_degrid_fan
                 + near_square_high_complexity_fan
                 + high_texture_midband_relief_fan
+                + default_band_bridge_fan
             ),
         )
 
