@@ -276,6 +276,27 @@ class ConsensusQAStrategy(ConversionStrategy):
         default_band_bridge_offgrid = 0.0007 if default_band_bridge_gate else 0.0
         default_band_bridge_fan = 0.0009 if default_band_bridge_gate else 0.0
 
+        # v124: default-score moderate-skew mid-edge relief. Residual
+        # consensus_qa traces in web_floorplan_grid_v1 still appear around
+        # moderate skew + mid edge-density where v114 can under-fire. Add one
+        # tiny bounded lift to improve coordinate diversity while preserving
+        # fail=0 stability.
+        default_score_midskew_midedge_gate = (
+            1.18 <= aspect_ratio <= 1.58
+            and 0.36 <= complexity <= 0.60
+            and 0.20 <= signals.edge_density <= 0.30
+            and 0.69 <= consensus_score <= 0.76
+        )
+        default_score_midskew_midedge_chords = (
+            1 if default_score_midskew_midedge_gate else 0
+        )
+        default_score_midskew_midedge_offgrid = (
+            0.0007 if default_score_midskew_midedge_gate else 0.0
+        )
+        default_score_midskew_midedge_fan = (
+            0.0009 if default_score_midskew_midedge_gate else 0.0
+        )
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -300,6 +321,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_high_complexity_chords
                 + high_texture_midband_relief_chords
                 + default_band_bridge_chords
+                + default_score_midskew_midedge_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -323,6 +345,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_high_complexity_offgrid
                 + high_texture_midband_relief_offgrid
                 + default_band_bridge_offgrid
+                + default_score_midskew_midedge_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -343,6 +366,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_high_complexity_fan
                 + high_texture_midband_relief_fan
                 + default_band_bridge_fan
+                + default_score_midskew_midedge_fan
             ),
         )
 
