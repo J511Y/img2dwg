@@ -330,6 +330,20 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_skew_high_texture_offgrid = min(0.0032, low_skew_high_texture_relief * 22.0)
         low_skew_high_texture_fan = min(0.0042, low_skew_high_texture_relief * 28.0)
 
+        # v112: mid-skew texture bridge relief. Residual web_floorplan_grid_v1
+        # thesis traces still cluster in mildly elongated + mid/high texture
+        # pockets where low-skew v111 and corridor-heavy lifts only partially
+        # overlap. Add a tiny bounded bridge term to increase coordinate
+        # diversity and reduce axis bias without touching fail=0 guardrails.
+        mid_skew_texture_bridge_gate = (
+            1.18 <= aspect_ratio <= 1.92
+            and 0.32 <= complexity <= 0.60
+            and signals.edge_density >= 0.12
+        )
+        mid_skew_texture_bridge_chords = 1 if mid_skew_texture_bridge_gate else 0
+        mid_skew_texture_bridge_offgrid = 0.0012 if mid_skew_texture_bridge_gate else 0.0
+        mid_skew_texture_bridge_fan = 0.0015 if mid_skew_texture_bridge_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -356,6 +370,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + compact_midband_chords
                 + broad_mildband_chords
                 + low_skew_high_texture_chords
+                + mid_skew_texture_bridge_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -381,6 +396,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + compact_midband_offgrid
                 + broad_mildband_offgrid
                 + low_skew_high_texture_offgrid
+                + mid_skew_texture_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -406,6 +422,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + compact_midband_fan
                 + broad_mildband_fan
                 + low_skew_high_texture_fan
+                + mid_skew_texture_bridge_fan
             ),
         )
 
