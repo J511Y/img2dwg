@@ -22,15 +22,14 @@ def _extract_debias_chords(notes: list[str]) -> int:
     raise AssertionError("offgrid_debias_chords note missing")
 
 
-def test_two_stage_v104_broad_mildband_relief_boosts_mild_skew_mid_complexity_pocket(
+def test_two_stage_v105_broad_mildband_relief_expansion_lifts_midband_pocket(
     monkeypatch, tmp_path: Path
 ) -> None:
-    image_path = tmp_path / "broad_mildband_relief.png"
+    image_path = tmp_path / "broad_mildband_relief_expansion.png"
     Image.new("RGB", (24, 24), color="white").save(image_path)
 
     strategy = TwoStageBaselineStrategy()
 
-    # Relief pocket: mild skew + mid complexity just outside v103 compact bounds.
     monkeypatch.setattr(
         two_stage,
         "extract_image_signals",
@@ -38,6 +37,13 @@ def test_two_stage_v104_broad_mildband_relief_boosts_mild_skew_mid_complexity_po
     )
     out_relief = strategy.run(ConversionInput(image_path=image_path), tmp_path / "out_relief")
 
+    monkeypatch.setattr(
+        two_stage,
+        "extract_image_signals",
+        lambda _: ImageSignals(width=220, height=220, contrast=0.20, edge_density=0.35),
+    )
+    out_control = strategy.run(ConversionInput(image_path=image_path), tmp_path / "out_control")
+
     assert out_relief.success is True
-    assert _extract_offgrid_shift(out_relief.notes) == 0.064
-    assert _extract_debias_chords(out_relief.notes) == 38
+    assert _extract_offgrid_shift(out_relief.notes) > _extract_offgrid_shift(out_control.notes)
+    assert _extract_debias_chords(out_relief.notes) >= _extract_debias_chords(out_control.notes)

@@ -307,10 +307,10 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         )
         broad_mildband_chords = max(
             0,
-            min(1, int(round(broad_mildband_relief * 5200.0))),
+            min(2, int(round(broad_mildband_relief * 5600.0))),
         )
-        broad_mildband_offgrid = min(0.0012, broad_mildband_relief * 0.72)
-        broad_mildband_fan = min(0.0018, broad_mildband_relief * 0.92)
+        broad_mildband_offgrid = min(0.0016, broad_mildband_relief * 0.90)
+        broad_mildband_fan = min(0.0022, broad_mildband_relief * 1.08)
 
         preset = replace(
             self._preset,
