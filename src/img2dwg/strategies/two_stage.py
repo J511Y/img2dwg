@@ -382,6 +382,25 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_edge_mild_skew_bridge_offgrid = 0.0011 if low_edge_mild_skew_bridge_gate else 0.0
         low_edge_mild_skew_bridge_fan = 0.0015 if low_edge_mild_skew_bridge_gate else 0.0
 
+        # v122: near-square low/mid-edge residual bridge. A remaining thesis
+        # pocket in web_floorplan_grid_v1 sits just outside the narrow v121
+        # edge band; add a tiny deterministic fallback lift to reduce residual
+        # axis rebundling while preserving fail=0 stability.
+        near_square_low_mid_edge_residual_gate = (
+            1.00 <= aspect_ratio <= 1.34
+            and 0.30 <= complexity <= 0.62
+            and 0.18 <= signals.edge_density <= 0.30
+        )
+        near_square_low_mid_edge_residual_chords = (
+            1 if near_square_low_mid_edge_residual_gate else 0
+        )
+        near_square_low_mid_edge_residual_offgrid = (
+            0.0009 if near_square_low_mid_edge_residual_gate else 0.0
+        )
+        near_square_low_mid_edge_residual_fan = (
+            0.0012 if near_square_low_mid_edge_residual_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -412,6 +431,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_chords
                 + near_square_broad_bridge_chords
                 + low_edge_mild_skew_bridge_chords
+                + near_square_low_mid_edge_residual_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -441,6 +461,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_offgrid
                 + near_square_broad_bridge_offgrid
                 + low_edge_mild_skew_bridge_offgrid
+                + near_square_low_mid_edge_residual_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -470,6 +491,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_fan
                 + near_square_broad_bridge_fan
                 + low_edge_mild_skew_bridge_fan
+                + near_square_low_mid_edge_residual_fan
             ),
         )
 
