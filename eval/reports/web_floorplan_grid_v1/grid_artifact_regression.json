@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-17T00:09:56.757868+00:00",
+  "generated_at": "2026-03-17T00:40:16.999865+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -762,19 +762,19 @@
   "strategy_delta_vs_previous": {
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0366,
+        "previous": 0.0365,
         "current": 0.0365,
-        "delta": -0.0001
+        "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8634,
+        "previous": 0.8635,
         "current": 0.8635,
-        "delta": 0.0001
+        "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 110.6667,
+        "previous": 110.8333,
         "current": 110.8333,
-        "delta": 0.1666
+        "delta": 0.0
       }
     },
     "hybrid_mvp": {

@@ -196,6 +196,25 @@ class ConsensusQAStrategy(ConversionStrategy):
         midtexture_mild_corridor_offgrid = min(0.0025, midtexture_mild_corridor_relief * 0.95)
         midtexture_mild_corridor_fan = min(0.0032, midtexture_mild_corridor_relief * 1.10)
 
+        # v100: default-consensus axis pocket relief. A subset of mildly elongated
+        # low-mid texture plans still settle near orthogonal anchors even after v99.
+        # Add a bounded lift in that pocket to increase coordinate diversity while
+        # keeping fail=0 guardrails stable.
+        default_axis_pocket_relief = (
+            max(0.0, aspect_ratio - 1.22)
+            * max(0.0, 1.56 - aspect_ratio)
+            * max(0.0, 0.56 - complexity)
+            * max(0.0, complexity - 0.34)
+            * max(0.0, consensus_score - 0.69)
+            * max(0.0, 0.77 - consensus_score)
+        )
+        default_axis_pocket_chords = max(
+            0,
+            min(2, int(round(default_axis_pocket_relief * 14000.0))),
+        )
+        default_axis_pocket_offgrid = min(0.0020, default_axis_pocket_relief * 1.05)
+        default_axis_pocket_fan = min(0.0024, default_axis_pocket_relief * 1.18)
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -213,6 +232,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + midband_square_chords
                 + elongated_floor_chords
                 + midtexture_mild_corridor_chords
+                + default_axis_pocket_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -229,6 +249,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + midband_square_offgrid
                 + elongated_floor_offgrid
                 + midtexture_mild_corridor_offgrid
+                + default_axis_pocket_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -242,6 +263,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_consensus_corridor_fan
                 + midband_square_fan
                 + midtexture_mild_corridor_fan
+                + default_axis_pocket_fan
             ),
         )
 
