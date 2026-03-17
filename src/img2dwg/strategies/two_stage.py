@@ -245,6 +245,23 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_midtexture_drift_offgrid = min(0.0030, low_midtexture_drift_relief * 2.4)
         low_midtexture_drift_fan = min(0.0038, low_midtexture_drift_relief * 2.8)
 
+        # v101: moderate-skew broad anti-grid relief. Residual web_floorplan
+        # pockets still show mild axis rebundling around aspect 1.20-1.55 with
+        # low-mid texture where v95-v98 can under-fire. Add a small bounded
+        # broad-band lift to improve coordinate diversity without moving gates.
+        moderate_skew_broad_relief = (
+            max(0.0, aspect_ratio - 1.20)
+            * max(0.0, 1.55 - aspect_ratio)
+            * max(0.0, complexity - 0.22)
+            * max(0.0, 0.48 - complexity)
+        )
+        moderate_skew_broad_chords = max(
+            0,
+            min(2, int(round(moderate_skew_broad_relief * 2800.0))),
+        )
+        moderate_skew_broad_offgrid = min(0.0016, moderate_skew_broad_relief * 0.75)
+        moderate_skew_broad_fan = min(0.0022, moderate_skew_broad_relief * 0.90)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -266,6 +283,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + mild_corridor_midtexture_chords
                 + low_edge_corridor_chords
                 + low_midtexture_drift_chords
+                + moderate_skew_broad_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -286,6 +304,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + mild_corridor_midtexture_offgrid
                 + low_edge_corridor_offgrid
                 + low_midtexture_drift_offgrid
+                + moderate_skew_broad_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -306,6 +325,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + mild_corridor_midtexture_fan
                 + low_edge_corridor_fan
                 + low_midtexture_drift_fan
+                + moderate_skew_broad_fan
             ),
         )
 
