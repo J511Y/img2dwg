@@ -25,9 +25,9 @@ class ConsensusQAStrategy(ConversionStrategy):
         include_diagonals=True,
         quality_bias=0.48,
         topology_bias=0.50,
-        offgrid_shift_ratio=0.058,
-        diagonal_fan_ratio=0.14,
-        debias_chord_multiplier=32,
+        offgrid_shift_ratio=0.061,
+        diagonal_fan_ratio=0.142,
+        debias_chord_multiplier=36,
     )
 
     _high_confidence_preset = StrategyPreset(
@@ -36,9 +36,9 @@ class ConsensusQAStrategy(ConversionStrategy):
         include_diagonals=True,
         quality_bias=0.58,
         topology_bias=0.62,
-        offgrid_shift_ratio=0.074,
-        diagonal_fan_ratio=0.16,
-        debias_chord_multiplier=36,
+        offgrid_shift_ratio=0.078,
+        diagonal_fan_ratio=0.163,
+        debias_chord_multiplier=40,
     )
 
     _min_consensus = 0.35
