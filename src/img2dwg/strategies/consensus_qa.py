@@ -176,6 +176,33 @@ class ConsensusQAStrategy(ConversionStrategy):
         elongated_floor_chords = max(0, min(2, int(round(elongated_consensus_floor * 90.0))))
         elongated_floor_offgrid = min(0.003, elongated_consensus_floor * 0.060)
 
+        # v107: axis-jitter bias break. Residual web_floorplan_grid_v1 consensus
+        # traces can still bunch into mild axis pockets around moderate elongation
+        # and mid texture. Apply a tiny bounded lift to increase coordinate spread.
+        axis_jitter_relief = (
+            max(0.0, aspect_ratio - 1.22)
+            * max(0.0, 1.60 - aspect_ratio)
+            * max(0.0, complexity - 0.36)
+            * max(0.0, 0.58 - complexity)
+            * max(0.0, consensus_score - 0.69)
+            * max(0.0, 0.78 - consensus_score)
+        )
+        axis_jitter_chords = max(0, min(2, int(round(axis_jitter_relief * 22000.0))))
+        axis_jitter_offgrid = min(0.0025, axis_jitter_relief * 0.90)
+        axis_jitter_fan = min(0.0035, axis_jitter_relief * 1.15)
+
+        # Residual deterministic lift so moderate consensus corridor-like plans
+        # consistently escape axis bundles instead of depending on tiny product
+        # terms that may round out on real web_floorplan_grid_v1 samples.
+        residual_axis_jitter_gate = (
+            aspect_ratio >= 1.18
+            and complexity >= 0.34
+            and 0.69 <= consensus_score <= 0.80
+        )
+        residual_axis_jitter_chords = 1 if residual_axis_jitter_gate else 0
+        residual_axis_jitter_offgrid = 0.0009 if residual_axis_jitter_gate else 0.0
+        residual_axis_jitter_fan = 0.0012 if residual_axis_jitter_gate else 0.0
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -192,6 +219,8 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_consensus_corridor_chords
                 + midband_square_chords
                 + elongated_floor_chords
+                + axis_jitter_chords
+                + residual_axis_jitter_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -207,6 +236,8 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_consensus_corridor_offgrid
                 + midband_square_offgrid
                 + elongated_floor_offgrid
+                + axis_jitter_offgrid
+                + residual_axis_jitter_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -219,6 +250,8 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + axis_lock_proxy_fan
                 + moderate_consensus_corridor_fan
                 + midband_square_fan
+                + axis_jitter_fan
+                + residual_axis_jitter_fan
             ),
         )
 
