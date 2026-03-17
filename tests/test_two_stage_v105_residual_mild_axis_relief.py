@@ -40,4 +40,4 @@ def test_two_stage_v105_residual_mild_axis_relief_keeps_mild_band_debias_profile
 
     assert out.success is True
     assert _extract_offgrid_shift(out.notes) == 0.068
-    assert _extract_debias_chords(out.notes) == 37
+    assert _extract_debias_chords(out.notes) == 38

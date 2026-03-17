@@ -329,6 +329,25 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         residual_mild_axis_offgrid = min(0.0010, residual_mild_axis_relief * 0.68)
         residual_mild_axis_fan = min(0.0014, residual_mild_axis_relief * 0.84)
 
+        # v106: low-edge mild-axis broadening. Residual grid pockets in
+        # web_floorplan_grid_v1 still appear in mild-skew + low-mid texture
+        # plans when edge density is on the weaker side. Add a tiny bounded lift
+        # around that band so thesis gains one more debias chord in-pocket while
+        # preserving fail=0 behavior.
+        low_edge_mild_axis_relief = (
+            max(0.0, aspect_ratio - 1.16)
+            * max(0.0, 1.46 - aspect_ratio)
+            * max(0.0, complexity - 0.28)
+            * max(0.0, 0.54 - complexity)
+            * max(0.0, 0.37 - signals.edge_density)
+        )
+        low_edge_mild_axis_chords = max(
+            0,
+            min(1, int(round(low_edge_mild_axis_relief * 62000.0))),
+        )
+        low_edge_mild_axis_offgrid = min(0.0012, low_edge_mild_axis_relief * 0.90)
+        low_edge_mild_axis_fan = min(0.0018, low_edge_mild_axis_relief * 1.10)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -355,6 +374,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + compact_midband_chords
                 + broad_mildband_chords
                 + residual_mild_axis_chords
+                + low_edge_mild_axis_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -380,6 +400,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + compact_midband_offgrid
                 + broad_mildband_offgrid
                 + residual_mild_axis_offgrid
+                + low_edge_mild_axis_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -405,6 +426,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + compact_midband_fan
                 + broad_mildband_fan
                 + residual_mild_axis_fan
+                + low_edge_mild_axis_fan
             ),
         )
 
