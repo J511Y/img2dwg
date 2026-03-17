@@ -195,9 +195,7 @@ class ConsensusQAStrategy(ConversionStrategy):
         # consistently escape axis bundles instead of depending on tiny product
         # terms that may round out on real web_floorplan_grid_v1 samples.
         residual_axis_jitter_gate = (
-            aspect_ratio >= 1.14
-            and complexity >= 0.30
-            and 0.68 <= consensus_score <= 0.82
+            aspect_ratio >= 1.14 and complexity >= 0.30 and 0.68 <= consensus_score <= 0.82
         )
         residual_axis_jitter_chords = 2 if residual_axis_jitter_gate else 0
         residual_axis_jitter_offgrid = 0.0014 if residual_axis_jitter_gate else 0.0
@@ -232,11 +230,22 @@ class ConsensusQAStrategy(ConversionStrategy):
             and 0.34 <= complexity <= 0.56
             and 0.69 <= consensus_score <= 0.80
         )
-        near_square_residual_degrid_chords = 2 if near_square_residual_degrid_gate else 0
-        near_square_residual_degrid_offgrid = (
-            0.0012 if near_square_residual_degrid_gate else 0.0
+        near_square_residual_degrid_chords = 3 if near_square_residual_degrid_gate else 0
+        near_square_residual_degrid_offgrid = 0.0014 if near_square_residual_degrid_gate else 0.0
+        near_square_residual_degrid_fan = 0.0016 if near_square_residual_degrid_gate else 0.0
+
+        # v111: near-square high-complexity degrid expansion. Residual
+        # web_floorplan_grid_v1 consensus traces still show mild axis pockets
+        # for near-square plans when texture is strong enough that the tiny
+        # v109 lift under-fires. Add one more bounded step in that pocket.
+        near_square_high_complexity_gate = (
+            1.00 <= aspect_ratio <= 1.08
+            and 0.50 <= complexity <= 0.60
+            and 0.69 <= consensus_score <= 0.78
         )
-        near_square_residual_degrid_fan = 0.0014 if near_square_residual_degrid_gate else 0.0
+        near_square_high_complexity_chords = 1 if near_square_high_complexity_gate else 0
+        near_square_high_complexity_offgrid = 0.0008 if near_square_high_complexity_gate else 0.0
+        near_square_high_complexity_fan = 0.0010 if near_square_high_complexity_gate else 0.0
 
         # v110: high-texture midband relief. A residual subset in
         # web_floorplan_grid_v1 sits in moderate skew + higher texture where
@@ -248,9 +257,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             and 0.70 <= consensus_score <= 0.82
         )
         high_texture_midband_relief_chords = 1 if high_texture_midband_relief_gate else 0
-        high_texture_midband_relief_offgrid = (
-            0.0008 if high_texture_midband_relief_gate else 0.0
-        )
+        high_texture_midband_relief_offgrid = 0.0008 if high_texture_midband_relief_gate else 0.0
         high_texture_midband_relief_fan = 0.0010 if high_texture_midband_relief_gate else 0.0
 
         tuned_preset = replace(
@@ -274,6 +281,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_band_default_chords
                 + midband_residual_degrid_chords
                 + near_square_residual_degrid_chords
+                + near_square_high_complexity_chords
                 + high_texture_midband_relief_chords
                 + 4
             ),
@@ -295,6 +303,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_band_default_offgrid
                 + midband_residual_degrid_offgrid
                 + near_square_residual_degrid_offgrid
+                + near_square_high_complexity_offgrid
                 + high_texture_midband_relief_offgrid
             ),
             diagonal_fan_ratio=(
@@ -313,6 +322,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + moderate_band_default_fan
                 + midband_residual_degrid_fan
                 + near_square_residual_degrid_fan
+                + near_square_high_complexity_fan
                 + high_texture_midband_relief_fan
             ),
         )
