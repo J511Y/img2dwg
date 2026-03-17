@@ -297,6 +297,25 @@ class ConsensusQAStrategy(ConversionStrategy):
             0.0009 if default_score_midskew_midedge_gate else 0.0
         )
 
+        # v125: default-score moderate-skew low-edge bridge. A remaining
+        # subset of moderate-skew traces sits slightly below the v124
+        # edge-density band, leaving coordinate diversity unchanged in that
+        # pocket. Extend with one tiny bounded step to reduce residual
+        # axis-bias while keeping fail=0.
+        default_score_midskew_lowedge_gate = (
+            1.16 <= aspect_ratio <= 1.56
+            and 0.34 <= complexity <= 0.60
+            and 0.16 <= signals.edge_density < 0.35
+            and 0.69 <= consensus_score <= 0.76
+        )
+        default_score_midskew_lowedge_chords = 1 if default_score_midskew_lowedge_gate else 0
+        default_score_midskew_lowedge_offgrid = (
+            0.0006 if default_score_midskew_lowedge_gate else 0.0
+        )
+        default_score_midskew_lowedge_fan = (
+            0.0008 if default_score_midskew_lowedge_gate else 0.0
+        )
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -322,6 +341,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + high_texture_midband_relief_chords
                 + default_band_bridge_chords
                 + default_score_midskew_midedge_chords
+                + default_score_midskew_lowedge_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -346,6 +366,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + high_texture_midband_relief_offgrid
                 + default_band_bridge_offgrid
                 + default_score_midskew_midedge_offgrid
+                + default_score_midskew_lowedge_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -367,6 +388,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + high_texture_midband_relief_fan
                 + default_band_bridge_fan
                 + default_score_midskew_midedge_fan
+                + default_score_midskew_lowedge_fan
             ),
         )
 

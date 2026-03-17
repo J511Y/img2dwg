@@ -1,0 +1,66 @@
+from pathlib import Path
+
+from PIL import Image
+
+from img2dwg.strategies import consensus_qa
+from img2dwg.strategies.base import ConversionInput
+from img2dwg.strategies.consensus_qa import ConsensusQAStrategy
+from img2dwg.strategies.prototype_engine import ImageSignals
+
+
+def _extract_offgrid_shift(notes: list[str]) -> float:
+    for note in notes:
+        if note.startswith("offgrid_shift:"):
+            return float(note.split(":", maxsplit=1)[1])
+    raise AssertionError("offgrid_shift note missing")
+
+
+def _extract_diagonal_fan(notes: list[str]) -> float:
+    for note in notes:
+        if note.startswith("diagonal_fan:"):
+            return float(note.split(":", maxsplit=1)[1])
+    raise AssertionError("diagonal_fan note missing")
+
+
+def _extract_debias_chords(notes: list[str]) -> int:
+    for note in notes:
+        if note.startswith("offgrid_debias_chords:x"):
+            return int(note.split("x", maxsplit=1)[1])
+    raise AssertionError("offgrid_debias_chords note missing")
+
+
+def test_consensus_v125_default_score_midskew_lowedge_relief_lifts_tuning_when_gate_matches(
+    monkeypatch, tmp_path: Path
+) -> None:
+    image_path = tmp_path / "consensus_v125_default_score_midskew_lowedge.png"
+    Image.new("RGB", (16, 16), color="white").save(image_path)
+
+    strategy = ConsensusQAStrategy()
+
+    # Gate-on sample: moderate skew + low-edge + default consensus score.
+    monkeypatch.setattr(
+        consensus_qa,
+        "extract_image_signals",
+        lambda _: ImageSignals(width=290, height=210, contrast=0.72, edge_density=0.18),
+    )
+    out_gate_on = strategy.run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.72}),
+        tmp_path / "out_gate_on",
+    )
+
+    # Gate-off control: same geometry/contrast but consensus score outside default-score band.
+    monkeypatch.setattr(
+        consensus_qa,
+        "extract_image_signals",
+        lambda _: ImageSignals(width=290, height=210, contrast=0.72, edge_density=0.18),
+    )
+    out_gate_off = strategy.run(
+        ConversionInput(image_path=image_path, metadata={"consensus_score": 0.68}),
+        tmp_path / "out_gate_off",
+    )
+
+    assert out_gate_on.success is True
+    assert out_gate_off.success is True
+    assert _extract_debias_chords(out_gate_on.notes) > _extract_debias_chords(out_gate_off.notes)
+    assert _extract_offgrid_shift(out_gate_on.notes) > _extract_offgrid_shift(out_gate_off.notes)
+    assert _extract_diagonal_fan(out_gate_on.notes) >= _extract_diagonal_fan(out_gate_off.notes)
