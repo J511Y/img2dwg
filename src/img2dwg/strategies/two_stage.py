@@ -451,6 +451,26 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0012 if near_square_low_skew_default_bridge_gate else 0.0
         )
 
+        # v133: near-square midband reinforcement. Residual low-skew cases in
+        # web_floorplan_grid_v1 still show mild axis rebundling around the
+        # centered near-square pocket where v131/v132 can remain underpowered.
+        # Add one bounded reinforcement lift to increase coordinate diversity
+        # without altering fail=0 behavior.
+        near_square_midband_reinforcement_gate = (
+            0.96 <= aspect_ratio <= 1.30
+            and 0.28 <= complexity <= 0.62
+            and 0.16 <= signals.edge_density <= 0.34
+        )
+        near_square_midband_reinforcement_chords = (
+            2 if near_square_midband_reinforcement_gate else 0
+        )
+        near_square_midband_reinforcement_offgrid = (
+            0.0018 if near_square_midband_reinforcement_gate else 0.0
+        )
+        near_square_midband_reinforcement_fan = (
+            0.0024 if near_square_midband_reinforcement_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -485,6 +505,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_midedge_default_fallback_chords
                 + near_square_centered_followup_chords
                 + near_square_low_skew_default_bridge_chords
+                + near_square_midband_reinforcement_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -518,6 +539,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_midedge_default_fallback_offgrid
                 + near_square_centered_followup_offgrid
                 + near_square_low_skew_default_bridge_offgrid
+                + near_square_midband_reinforcement_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -551,6 +573,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_midedge_default_fallback_fan
                 + near_square_centered_followup_fan
                 + near_square_low_skew_default_bridge_fan
+                + near_square_midband_reinforcement_fan
             ),
         )
 
