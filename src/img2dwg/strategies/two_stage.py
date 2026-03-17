@@ -414,6 +414,21 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         default_band_anti_grid_offgrid = 0.0009 if default_band_anti_grid_gate else 0.0
         default_band_anti_grid_fan = 0.0012 if default_band_anti_grid_gate else 0.0
 
+        # v137: default-band low-edge bridge extension. Residual thesis pockets
+        # still appear around the same mild/moderate skew band when edge density
+        # is slightly lower than v136's floor. Add a tiny bounded bridge so
+        # coordinate diversity improves without changing fail=0 behavior.
+        default_band_low_edge_bridge_gate = (
+            1.06 <= aspect_ratio <= 1.74
+            and 0.26 <= complexity <= 0.66
+            and 0.10 <= signals.edge_density <= 0.30
+        )
+        default_band_low_edge_bridge_chords = 1 if default_band_low_edge_bridge_gate else 0
+        default_band_low_edge_bridge_offgrid = (
+            0.0007 if default_band_low_edge_bridge_gate else 0.0
+        )
+        default_band_low_edge_bridge_fan = 0.0009 if default_band_low_edge_bridge_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -446,6 +461,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_broad_bridge_chords
                 + low_edge_mild_skew_bridge_chords
                 + default_band_anti_grid_chords
+                + default_band_low_edge_bridge_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -477,6 +493,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_broad_bridge_offgrid
                 + low_edge_mild_skew_bridge_offgrid
                 + default_band_anti_grid_offgrid
+                + default_band_low_edge_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -508,6 +525,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_broad_bridge_fan
                 + low_edge_mild_skew_bridge_fan
                 + default_band_anti_grid_fan
+                + default_band_low_edge_bridge_fan
             ),
         )
 
