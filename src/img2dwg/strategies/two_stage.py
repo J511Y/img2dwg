@@ -382,6 +382,20 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         near_square_default_band_offgrid = 0.0018 if near_square_default_band_gate else 0.0
         near_square_default_band_fan = 0.0022 if near_square_default_band_gate else 0.0
 
+        # v118: near-square texture-bridge degrid gate. Residual thesis pockets
+        # in web_floorplan_grid_v1 still show mild axis bundling just outside
+        # v117's narrow edge band (slightly higher edge texture, still default
+        # complexity). Add a tiny deterministic bridge lift to improve axis
+        # ratio/coordinate diversity while preserving fail=0 stability.
+        near_square_texture_bridge_gate = (
+            1.00 <= aspect_ratio <= 1.18
+            and 0.30 <= complexity <= 0.58
+            and 0.16 <= signals.edge_density <= 0.28
+        )
+        near_square_texture_bridge_chords = 1 if near_square_texture_bridge_gate else 0
+        near_square_texture_bridge_offgrid = 0.0012 if near_square_texture_bridge_gate else 0.0
+        near_square_texture_bridge_fan = 0.0016 if near_square_texture_bridge_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -412,6 +426,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_chords
                 + moderate_skew_default_band_chords
                 + near_square_default_band_chords
+                + near_square_texture_bridge_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -441,6 +456,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_offgrid
                 + moderate_skew_default_band_offgrid
                 + near_square_default_band_offgrid
+                + near_square_texture_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -470,6 +486,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_fan
                 + moderate_skew_default_band_fan
                 + near_square_default_band_fan
+                + near_square_texture_bridge_fan
             ),
         )
 
