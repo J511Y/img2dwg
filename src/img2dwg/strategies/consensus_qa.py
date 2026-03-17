@@ -314,6 +314,26 @@ class ConsensusQAStrategy(ConversionStrategy):
             0.0012 if near_square_low_edge_default_bridge_gate else 0.0
         )
 
+        # v129: near-square mid-edge default-band fallback. Some residual
+        # consensus_qa traces remain slightly axis-biased in the common
+        # near-square + mid-edge default-score pocket where low-edge v128 does
+        # not activate. Add a tiny bounded fallback lift for coordinate spread.
+        near_square_midedge_default_fallback_gate = (
+            1.00 <= aspect_ratio <= 1.20
+            and 0.30 <= complexity <= 0.54
+            and 0.14 <= signals.edge_density <= 0.30
+            and 0.69 <= consensus_score <= 0.79
+        )
+        near_square_midedge_default_fallback_chords = (
+            1 if near_square_midedge_default_fallback_gate else 0
+        )
+        near_square_midedge_default_fallback_offgrid = (
+            0.0007 if near_square_midedge_default_fallback_gate else 0.0
+        )
+        near_square_midedge_default_fallback_fan = (
+            0.0009 if near_square_midedge_default_fallback_gate else 0.0
+        )
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -340,6 +360,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_band_bridge_chords
                 + default_score_midskew_midedge_extension_chords
                 + near_square_low_edge_default_bridge_chords
+                + near_square_midedge_default_fallback_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -365,6 +386,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_band_bridge_offgrid
                 + default_score_midskew_midedge_extension_offgrid
                 + near_square_low_edge_default_bridge_offgrid
+                + near_square_midedge_default_fallback_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -387,6 +409,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_band_bridge_fan
                 + default_score_midskew_midedge_extension_fan
                 + near_square_low_edge_default_bridge_fan
+                + near_square_midedge_default_fallback_fan
             ),
         )
 
