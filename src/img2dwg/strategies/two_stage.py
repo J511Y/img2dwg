@@ -431,6 +431,26 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         )
         near_square_centered_followup_fan = 0.0016 if near_square_centered_followup_gate else 0.0
 
+        # v132: near-square low-skew default bridge. Residual thesis traces in
+        # web_floorplan_grid_v1 still show mild axis rebundling in the common
+        # near-square, low-skew default band where v130/v131 are active but can
+        # remain slightly underpowered. Add one tiny deterministic follow-up
+        # lift to improve coordinate diversity while preserving fail=0.
+        near_square_low_skew_default_bridge_gate = (
+            0.96 <= aspect_ratio <= 1.32
+            and 0.28 <= complexity <= 0.62
+            and 0.16 <= signals.edge_density <= 0.34
+        )
+        near_square_low_skew_default_bridge_chords = (
+            1 if near_square_low_skew_default_bridge_gate else 0
+        )
+        near_square_low_skew_default_bridge_offgrid = (
+            0.0009 if near_square_low_skew_default_bridge_gate else 0.0
+        )
+        near_square_low_skew_default_bridge_fan = (
+            0.0012 if near_square_low_skew_default_bridge_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -464,6 +484,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_low_edge_residual_chords
                 + near_square_midedge_default_fallback_chords
                 + near_square_centered_followup_chords
+                + near_square_low_skew_default_bridge_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -496,6 +517,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_low_edge_residual_offgrid
                 + near_square_midedge_default_fallback_offgrid
                 + near_square_centered_followup_offgrid
+                + near_square_low_skew_default_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -528,6 +550,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_low_edge_residual_fan
                 + near_square_midedge_default_fallback_fan
                 + near_square_centered_followup_fan
+                + near_square_low_skew_default_bridge_fan
             ),
         )
 
