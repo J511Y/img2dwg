@@ -221,18 +221,20 @@ class ConsensusQAStrategy(ConversionStrategy):
         midband_residual_degrid_offgrid = 0.0010 if midband_residual_degrid_gate else 0.0
         midband_residual_degrid_fan = 0.0012 if midband_residual_degrid_gate else 0.0
 
-        # v109: near-square residual degrid relief. A small subset of consensus
-        # traces remains mildly axis-heavy when aspect is close to square,
-        # because elongated-focused lifts barely activate. Add a tiny bounded
-        # gate for that pocket to improve coordinate diversity.
+        # v109/v115: near-square residual degrid relief. A small subset of
+        # consensus traces remains mildly axis-heavy when aspect is close to
+        # square, because elongated-focused lifts barely activate. Strengthen
+        # the tiny bounded gate slightly so the residual Chrysler/Railway-like
+        # default-band pocket gains one more debias step without affecting
+        # broader fail=0 stability.
         near_square_residual_degrid_gate = (
             1.00 <= aspect_ratio <= 1.10
             and 0.34 <= complexity <= 0.56
             and 0.69 <= consensus_score <= 0.80
         )
-        near_square_residual_degrid_chords = 3 if near_square_residual_degrid_gate else 0
-        near_square_residual_degrid_offgrid = 0.0014 if near_square_residual_degrid_gate else 0.0
-        near_square_residual_degrid_fan = 0.0016 if near_square_residual_degrid_gate else 0.0
+        near_square_residual_degrid_chords = 4 if near_square_residual_degrid_gate else 0
+        near_square_residual_degrid_offgrid = 0.0017 if near_square_residual_degrid_gate else 0.0
+        near_square_residual_degrid_fan = 0.0019 if near_square_residual_degrid_gate else 0.0
 
         # v111: near-square high-complexity degrid expansion. Residual
         # web_floorplan_grid_v1 consensus traces still show mild axis pockets
