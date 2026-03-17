@@ -276,6 +276,27 @@ class ConsensusQAStrategy(ConversionStrategy):
         default_band_bridge_offgrid = 0.0007 if default_band_bridge_gate else 0.0
         default_band_bridge_fan = 0.0009 if default_band_bridge_gate else 0.0
 
+        # v123: default-score elongated low-edge bridge expansion. Residual
+        # consensus_qa axis pockets remain in common web_floorplan_grid_v1
+        # layouts (mild~elongated + low/mid edge density) where the v114 band
+        # under-fires; add one tiny deterministic lift to improve coordinate
+        # diversity while preserving fail=0 stability.
+        default_score_elongated_low_edge_gate = (
+            1.30 <= aspect_ratio <= 1.95
+            and 0.38 <= complexity <= 0.56
+            and 0.13 <= signals.edge_density <= 0.22
+            and 0.69 <= consensus_score <= 0.74
+        )
+        default_score_elongated_low_edge_chords = (
+            1 if default_score_elongated_low_edge_gate else 0
+        )
+        default_score_elongated_low_edge_offgrid = (
+            0.0008 if default_score_elongated_low_edge_gate else 0.0
+        )
+        default_score_elongated_low_edge_fan = (
+            0.0010 if default_score_elongated_low_edge_gate else 0.0
+        )
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -300,6 +321,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_high_complexity_chords
                 + high_texture_midband_relief_chords
                 + default_band_bridge_chords
+                + default_score_elongated_low_edge_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -323,6 +345,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_high_complexity_offgrid
                 + high_texture_midband_relief_offgrid
                 + default_band_bridge_offgrid
+                + default_score_elongated_low_edge_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -343,6 +366,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + near_square_high_complexity_fan
                 + high_texture_midband_relief_fan
                 + default_band_bridge_fan
+                + default_score_elongated_low_edge_fan
             ),
         )
 
