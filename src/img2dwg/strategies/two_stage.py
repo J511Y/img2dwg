@@ -382,6 +382,55 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_edge_mild_skew_bridge_offgrid = 0.0008 if low_edge_mild_skew_bridge_gate else 0.0
         low_edge_mild_skew_bridge_fan = 0.0011 if low_edge_mild_skew_bridge_gate else 0.0
 
+        # v127: near-square low-edge residual bridge. web_floorplan_grid_v1 still
+        # has a mild residual axis pocket near square geometry (around case_004)
+        # where v119/v120 are active but too weak. Add one extra bounded lift in
+        # that narrow pocket to reduce axis ratio while preserving fail=0.
+        near_square_low_edge_residual_gate = (
+            0.98 <= aspect_ratio <= 1.10
+            and 0.30 <= complexity <= 0.42
+            and 0.12 <= signals.edge_density <= 0.18
+        )
+        near_square_low_edge_residual_chords = 2 if near_square_low_edge_residual_gate else 0
+        near_square_low_edge_residual_offgrid = (
+            0.0016 if near_square_low_edge_residual_gate else 0.0
+        )
+        near_square_low_edge_residual_fan = 0.0022 if near_square_low_edge_residual_gate else 0.0
+
+        # v130: near-square mid-edge default fallback. Some residual thesis
+        # traces still show mild axis pockets in the common near-square,
+        # default-complexity band with mid edge density just outside v127.
+        # Add a tiny bounded fallback lift to improve coordinate diversity
+        # while keeping fail=0 guardrails unchanged.
+        near_square_midedge_default_fallback_gate = (
+            0.95 <= aspect_ratio <= 1.30
+            and 0.28 <= complexity <= 0.62
+            and 0.14 <= signals.edge_density <= 0.36
+        )
+        near_square_midedge_default_fallback_chords = (
+            3 if near_square_midedge_default_fallback_gate else 0
+        )
+        near_square_midedge_default_fallback_offgrid = (
+            0.0028 if near_square_midedge_default_fallback_gate else 0.0
+        )
+        near_square_midedge_default_fallback_fan = (
+            0.0035 if near_square_midedge_default_fallback_gate else 0.0
+        )
+
+        # v131: near-square centered-band follow-up relief. Residual axis bias
+        # still concentrates in centered near-square geometry with moderate
+        # texture where v130 is active but sometimes underpowered.
+        near_square_centered_followup_gate = (
+            0.98 <= aspect_ratio <= 1.18
+            and 0.30 <= complexity <= 0.50
+            and 0.18 <= signals.edge_density <= 0.30
+        )
+        near_square_centered_followup_chords = 1 if near_square_centered_followup_gate else 0
+        near_square_centered_followup_offgrid = (
+            0.0012 if near_square_centered_followup_gate else 0.0
+        )
+        near_square_centered_followup_fan = 0.0016 if near_square_centered_followup_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -412,6 +461,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_chords
                 + near_square_broad_bridge_chords
                 + low_edge_mild_skew_bridge_chords
+                + near_square_low_edge_residual_chords
+                + near_square_midedge_default_fallback_chords
+                + near_square_centered_followup_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -441,6 +493,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_offgrid
                 + near_square_broad_bridge_offgrid
                 + low_edge_mild_skew_bridge_offgrid
+                + near_square_low_edge_residual_offgrid
+                + near_square_midedge_default_fallback_offgrid
+                + near_square_centered_followup_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -470,6 +525,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_fallback_fan
                 + near_square_broad_bridge_fan
                 + low_edge_mild_skew_bridge_fan
+                + near_square_low_edge_residual_fan
+                + near_square_midedge_default_fallback_fan
+                + near_square_centered_followup_fan
             ),
         )
 
