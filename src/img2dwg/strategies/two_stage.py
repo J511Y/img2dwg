@@ -205,9 +205,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0,
             min(2, int(round(mild_corridor_midtexture_relief * 4200.0))),
         )
-        mild_corridor_midtexture_offgrid = min(
-            0.0019, mild_corridor_midtexture_relief * 0.92
-        )
+        mild_corridor_midtexture_offgrid = min(0.0019, mild_corridor_midtexture_relief * 0.92)
         mild_corridor_midtexture_fan = min(0.0028, mild_corridor_midtexture_relief * 1.06)
 
         # v97: low-edge corridor pocket relief. A subset of web floorplans has
@@ -279,6 +277,24 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_edge_midskew_offgrid = min(0.0014, low_edge_midskew_relief * 0.78)
         low_edge_midskew_fan = min(0.0020, low_edge_midskew_relief * 0.92)
 
+        # v103: compact mid-band relief. Residual web_floorplan_grid_v1 thesis
+        # cases still cluster around low/mid skew with mid complexity where the
+        # elongated corridor terms do not activate strongly. Add a tiny bounded
+        # lift for that compact pocket to reduce strategy-wide axis bias while
+        # keeping fail=0 behavior unchanged.
+        compact_midband_relief = (
+            max(0.0, 1.26 - aspect_ratio)
+            * max(0.0, aspect_ratio - 0.98)
+            * max(0.0, complexity - 0.30)
+            * max(0.0, 0.62 - complexity)
+        )
+        compact_midband_chords = max(
+            0,
+            min(2, int(round(compact_midband_relief * 6000.0))),
+        )
+        compact_midband_offgrid = min(0.0018, compact_midband_relief * 0.78)
+        compact_midband_fan = min(0.0026, compact_midband_relief * 0.96)
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -302,6 +318,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_midtexture_drift_chords
                 + moderate_skew_broad_chords
                 + low_edge_midskew_chords
+                + compact_midband_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -324,6 +341,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_midtexture_drift_offgrid
                 + moderate_skew_broad_offgrid
                 + low_edge_midskew_offgrid
+                + compact_midband_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -346,6 +364,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_midtexture_drift_fan
                 + moderate_skew_broad_fan
                 + low_edge_midskew_fan
+                + compact_midband_fan
             ),
         )
 
