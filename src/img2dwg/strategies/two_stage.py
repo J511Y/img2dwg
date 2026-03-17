@@ -344,6 +344,18 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         mid_skew_texture_bridge_offgrid = 0.0012 if mid_skew_texture_bridge_gate else 0.0
         mid_skew_texture_bridge_fan = 0.0015 if mid_skew_texture_bridge_gate else 0.0
 
+        # v113: moderate-skew fallback degrid gate. Some thesis outputs still
+        # show mild axis rebundling in common moderate-skew + mid-complexity
+        # pockets that sit near but not always inside v112's edge gate.
+        # Add a tiny deterministic fallback lift to reduce residual axis bias
+        # while keeping fail=0 stability unchanged.
+        moderate_skew_fallback_gate = (
+            1.12 <= aspect_ratio <= 1.72 and 0.30 <= complexity <= 0.66
+        )
+        moderate_skew_fallback_chords = 1 if moderate_skew_fallback_gate else 0
+        moderate_skew_fallback_offgrid = 0.0008 if moderate_skew_fallback_gate else 0.0
+        moderate_skew_fallback_fan = 0.0011 if moderate_skew_fallback_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -371,6 +383,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + broad_mildband_chords
                 + low_skew_high_texture_chords
                 + mid_skew_texture_bridge_chords
+                + moderate_skew_fallback_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -397,6 +410,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + broad_mildband_offgrid
                 + low_skew_high_texture_offgrid
                 + mid_skew_texture_bridge_offgrid
+                + moderate_skew_fallback_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -423,6 +437,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + broad_mildband_fan
                 + low_skew_high_texture_fan
                 + mid_skew_texture_bridge_fan
+                + moderate_skew_fallback_fan
             ),
         )
 
