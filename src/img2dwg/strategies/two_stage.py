@@ -356,6 +356,19 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         moderate_skew_fallback_offgrid = 0.0008 if moderate_skew_fallback_gate else 0.0
         moderate_skew_fallback_fan = 0.0011 if moderate_skew_fallback_gate else 0.0
 
+        # v119: near-square broad bridge relief. Mildly skewed floorplans with
+        # mid/default complexity can still keep small axis-aligned pockets near
+        # square geometry. Add a tiny deterministic bridge lift to improve
+        # coordinate diversity while preserving fail=0 stability.
+        near_square_broad_bridge_gate = (
+            1.00 <= aspect_ratio <= 1.26
+            and 0.28 <= complexity <= 0.62
+            and 0.14 <= signals.edge_density <= 0.34
+        )
+        near_square_broad_bridge_chords = 1 if near_square_broad_bridge_gate else 0
+        near_square_broad_bridge_offgrid = 0.0010 if near_square_broad_bridge_gate else 0.0
+        near_square_broad_bridge_fan = 0.0013 if near_square_broad_bridge_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -384,6 +397,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_high_texture_chords
                 + mid_skew_texture_bridge_chords
                 + moderate_skew_fallback_chords
+                + near_square_broad_bridge_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -411,6 +425,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_high_texture_offgrid
                 + mid_skew_texture_bridge_offgrid
                 + moderate_skew_fallback_offgrid
+                + near_square_broad_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -438,6 +453,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + low_skew_high_texture_fan
                 + mid_skew_texture_bridge_fan
                 + moderate_skew_fallback_fan
+                + near_square_broad_bridge_fan
             ),
         )
 
