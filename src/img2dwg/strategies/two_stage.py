@@ -369,18 +369,18 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         near_square_broad_bridge_offgrid = 0.0010 if near_square_broad_bridge_gate else 0.0
         near_square_broad_bridge_fan = 0.0013 if near_square_broad_bridge_gate else 0.0
 
-        # v120: low-edge mild-skew bridge relief. Residual thesis pockets around
-        # mild skew + mid/default complexity with lower edge density can still
-        # retain axis-aligned traces outside v119's edge window. Add a tiny
-        # bounded bridge to increase coordinate diversity while keeping fail=0.
+        # v121: low-edge mild-skew bridge expansion. A residual web_floorplan
+        # pocket still appears at edge_density ~0.22-0.24 where v120 does not
+        # fire, causing occasional thesis axis rebundling. Slightly widen the
+        # edge window and add one tiny extra degrid lift while keeping fail=0.
         low_edge_mild_skew_bridge_gate = (
             1.00 <= aspect_ratio <= 1.42
             and 0.30 <= complexity <= 0.60
-            and 0.12 <= signals.edge_density <= 0.22
+            and 0.12 <= signals.edge_density <= 0.24
         )
-        low_edge_mild_skew_bridge_chords = 1 if low_edge_mild_skew_bridge_gate else 0
-        low_edge_mild_skew_bridge_offgrid = 0.0008 if low_edge_mild_skew_bridge_gate else 0.0
-        low_edge_mild_skew_bridge_fan = 0.0011 if low_edge_mild_skew_bridge_gate else 0.0
+        low_edge_mild_skew_bridge_chords = 2 if low_edge_mild_skew_bridge_gate else 0
+        low_edge_mild_skew_bridge_offgrid = 0.0011 if low_edge_mild_skew_bridge_gate else 0.0
+        low_edge_mild_skew_bridge_fan = 0.0015 if low_edge_mild_skew_bridge_gate else 0.0
 
         preset = replace(
             self._preset,
