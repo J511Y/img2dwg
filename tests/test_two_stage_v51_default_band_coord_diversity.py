@@ -29,7 +29,7 @@ def test_two_stage_v51_default_band_coord_diversity_appends_non_axis_segments() 
 
     appended = TwoStageBaselineStrategy._inject_default_band_coord_diversity_lift_segments(plan, signals)
 
-    assert appended == 4
+    assert appended == 6
     injected = plan.segments[-appended:]
     assert all(
         abs(start[0] - end[0]) > 1e-6 and abs(start[1] - end[1]) > 1e-6 for start, end in injected
@@ -37,8 +37,8 @@ def test_two_stage_v51_default_band_coord_diversity_appends_non_axis_segments() 
 
     rounded_x = {round(coord, 5) for start, end in injected for coord in (start[0], end[0])}
     rounded_y = {round(coord, 5) for start, end in injected for coord in (start[1], end[1])}
-    assert len(rounded_x) >= 8
-    assert len(rounded_y) >= 8
+    assert len(rounded_x) >= 10
+    assert len(rounded_y) >= 10
 
 
 def test_two_stage_v51_default_band_coord_diversity_note_present(tmp_path: Path) -> None:
@@ -48,4 +48,4 @@ def test_two_stage_v51_default_band_coord_diversity_note_present(tmp_path: Path)
     out = TwoStageBaselineStrategy().run(ConversionInput(image_path=image_path), tmp_path / "out-v51")
 
     assert out.success is True
-    assert any("anti_grid_detail_diag:tetra_v51_default_band_coord_diversity:4" in note for note in out.notes)
+    assert any("anti_grid_detail_diag:tetra_v51_default_band_coord_diversity:6" in note for note in out.notes)
