@@ -727,6 +727,25 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0010 if midskew_default_band_axis_unlock_gate else 0.0
         )
 
+        # v151: midskew default-band coordination bridge. Residual thesis
+        # grid pockets still appear around mild-to-mid skew with slightly
+        # higher edge density where v143/v150 can under-fire. Add a tiny,
+        # bounded lift to reduce axis rebundling while preserving fail=0.
+        midskew_default_band_coord_bridge_gate = (
+            1.16 <= aspect_ratio <= 1.58
+            and 0.30 <= complexity <= 0.58
+            and 0.18 <= signals.edge_density <= 0.34
+        )
+        midskew_default_band_coord_bridge_chords = (
+            1 if midskew_default_band_coord_bridge_gate else 0
+        )
+        midskew_default_band_coord_bridge_offgrid = (
+            0.0012 if midskew_default_band_coord_bridge_gate else 0.0
+        )
+        midskew_default_band_coord_bridge_fan = (
+            0.0015 if midskew_default_band_coord_bridge_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -765,6 +784,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_chords
                 + near_square_default_band_axis_unlock_chords
                 + midskew_default_band_axis_unlock_chords
+                + midskew_default_band_coord_bridge_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -802,6 +822,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_offgrid
                 + near_square_default_band_axis_unlock_offgrid
                 + midskew_default_band_axis_unlock_offgrid
+                + midskew_default_band_coord_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -839,6 +860,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_fan
                 + near_square_default_band_axis_unlock_fan
                 + midskew_default_band_axis_unlock_fan
+                + midskew_default_band_coord_bridge_fan
             ),
         )
 
