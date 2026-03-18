@@ -350,6 +350,27 @@ class ConsensusQAStrategy(ConversionStrategy):
         near_square_midedge_bridge_offgrid = 0.0011 if near_square_midedge_bridge_gate else 0.0
         near_square_midedge_bridge_fan = 0.0014 if near_square_midedge_bridge_gate else 0.0
 
+        # v139: high-midskew default-band tail unlock. Residual consensus
+        # hotspots on web_floorplan_grid_v1 still appear around slightly higher
+        # skew (roughly 1.78~2.04 aspect) with default-band complexity where
+        # existing mild/near-square bridges under-fire. Add a bounded lift in
+        # this pocket to reduce axis alignment while preserving fail=0.
+        high_midskew_default_band_tail_unlock_gate = (
+            1.78 <= aspect_ratio <= 2.04
+            and 0.31 <= complexity <= 0.52
+            and 0.69 <= consensus_score <= 0.79
+            and 0.16 <= signals.edge_density <= 0.33
+        )
+        high_midskew_default_band_tail_unlock_chords = (
+            2 if high_midskew_default_band_tail_unlock_gate else 0
+        )
+        high_midskew_default_band_tail_unlock_offgrid = (
+            0.0013 if high_midskew_default_band_tail_unlock_gate else 0.0
+        )
+        high_midskew_default_band_tail_unlock_fan = (
+            0.0016 if high_midskew_default_band_tail_unlock_gate else 0.0
+        )
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -376,6 +397,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_band_bridge_chords
                 + default_score_midskew_midedge_extension_chords
                 + near_square_midedge_bridge_chords
+                + high_midskew_default_band_tail_unlock_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -401,6 +423,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_band_bridge_offgrid
                 + default_score_midskew_midedge_extension_offgrid
                 + near_square_midedge_bridge_offgrid
+                + high_midskew_default_band_tail_unlock_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -423,6 +446,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_band_bridge_fan
                 + default_score_midskew_midedge_extension_fan
                 + near_square_midedge_bridge_fan
+                + high_midskew_default_band_tail_unlock_fan
             ),
         )
 
