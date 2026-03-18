@@ -539,6 +539,26 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0012 if near_square_default_band_axis_unlock_gate else 0.0
         )
 
+        # v143: mid-skew default-band axis unlock extension. Residual thesis
+        # samples still show mild axis rebundling just outside the near-square
+        # window (aspect ~1.28-1.48) under default complexity. Add a tiny
+        # bounded bridge so two_stage maintains coordinate diversity while
+        # preserving fail=0.
+        midskew_default_band_axis_unlock_gate = (
+            1.28 <= aspect_ratio <= 1.48
+            and 0.28 <= complexity <= 0.60
+            and 0.10 <= signals.edge_density <= 0.30
+        )
+        midskew_default_band_axis_unlock_chords = (
+            1 if midskew_default_band_axis_unlock_gate else 0
+        )
+        midskew_default_band_axis_unlock_offgrid = (
+            0.0008 if midskew_default_band_axis_unlock_gate else 0.0
+        )
+        midskew_default_band_axis_unlock_fan = (
+            0.0010 if midskew_default_band_axis_unlock_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -576,6 +596,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_low_edge_default_band_chords
                 + default_band_coord_diversity_chords
                 + near_square_default_band_axis_unlock_chords
+                + midskew_default_band_axis_unlock_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -612,6 +633,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_low_edge_default_band_offgrid
                 + default_band_coord_diversity_offgrid
                 + near_square_default_band_axis_unlock_offgrid
+                + midskew_default_band_axis_unlock_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -648,6 +670,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_low_edge_default_band_fan
                 + default_band_coord_diversity_fan
                 + near_square_default_band_axis_unlock_fan
+                + midskew_default_band_axis_unlock_fan
             ),
         )
 

@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-18T06:45:29.499050+00:00",
+  "generated_at": "2026-03-18T07:11:45.195176+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,7 +54,7 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 126.0,
+      "avg_line_count": 126.1667,
       "avg_axis_aligned_ratio": 0.0323,
       "std_axis_aligned_ratio": 0.0047,
       "avg_axis_margin_to_grid_threshold": 0.8677,
@@ -65,8 +65,8 @@
       "p95_axis_margin_to_grid_threshold": 0.8556,
       "min_axis_aligned_ratio": 0.0253,
       "min_axis_margin_to_grid_threshold": 0.8747,
-      "avg_unique_x_count": 239.0,
-      "avg_unique_y_count": 239.0
+      "avg_unique_x_count": 239.3333,
+      "avg_unique_y_count": 239.3333
     }
   },
   "top_problematic": [],
@@ -421,15 +421,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 124,
+        "total_entities": 126,
         "entity_type_counts": {
-          "LINE": 124
+          "LINE": 126
         },
         "unique_entity_types": 1,
-        "line_count": 124,
-        "axis_aligned_line_ratio": 0.0323,
-        "unique_x_count": 235,
-        "unique_y_count": 235
+        "line_count": 126,
+        "axis_aligned_line_ratio": 0.0317,
+        "unique_x_count": 239,
+        "unique_y_count": 239
       }
     },
     {
@@ -762,19 +762,19 @@
   "strategy_delta_vs_previous": {
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0318,
+        "previous": 0.0315,
         "current": 0.0315,
-        "delta": -0.0003
+        "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8682,
+        "previous": 0.8685,
         "current": 0.8685,
-        "delta": 0.0003
+        "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 126.8333,
+        "previous": 128.0,
         "current": 128.0,
-        "delta": 1.1667
+        "delta": 0.0
       }
     },
     "hybrid_mvp": {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0325,
+        "previous": 0.0323,
         "current": 0.0323,
-        "delta": -0.0002
+        "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8675,
+        "previous": 0.8677,
         "current": 0.8677,
-        "delta": 0.0002
+        "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 125.5,
-        "current": 126.0,
-        "delta": 0.5
+        "previous": 126.0,
+        "current": 126.1667,
+        "delta": 0.1667
       }
     }
   },
