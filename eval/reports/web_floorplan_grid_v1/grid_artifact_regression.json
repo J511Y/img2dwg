@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-18T05:41:02.525609+00:00",
+  "generated_at": "2026-03-18T06:45:29.499050+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -24,19 +24,19 @@
   },
   "strategy_diagnostics": {
     "consensus_qa": {
-      "avg_line_count": 126.8333,
-      "avg_axis_aligned_ratio": 0.0318,
-      "std_axis_aligned_ratio": 0.0027,
-      "avg_axis_margin_to_grid_threshold": 0.8682,
-      "avg_axis_margin_score": 86.82,
+      "avg_line_count": 128.0,
+      "avg_axis_aligned_ratio": 0.0315,
+      "std_axis_aligned_ratio": 0.0026,
+      "avg_axis_margin_to_grid_threshold": 0.8685,
+      "avg_axis_margin_score": 86.85,
       "max_axis_aligned_ratio": 0.037,
       "max_axis_margin_to_grid_threshold": 0.863,
       "p95_axis_aligned_ratio": 0.037,
       "p95_axis_margin_to_grid_threshold": 0.863,
       "min_axis_aligned_ratio": 0.0267,
       "min_axis_margin_to_grid_threshold": 0.8733,
-      "avg_unique_x_count": 240.6667,
-      "avg_unique_y_count": 240.6667
+      "avg_unique_x_count": 243.0,
+      "avg_unique_y_count": 243.0
     },
     "hybrid_mvp": {
       "avg_line_count": 8.0,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 125.5,
-      "avg_axis_aligned_ratio": 0.0325,
-      "std_axis_aligned_ratio": 0.005,
-      "avg_axis_margin_to_grid_threshold": 0.8675,
-      "avg_axis_margin_score": 86.75,
-      "max_axis_aligned_ratio": 0.0455,
-      "max_axis_margin_to_grid_threshold": 0.8545,
-      "p95_axis_aligned_ratio": 0.0455,
-      "p95_axis_margin_to_grid_threshold": 0.8545,
+      "avg_line_count": 126.0,
+      "avg_axis_aligned_ratio": 0.0323,
+      "std_axis_aligned_ratio": 0.0047,
+      "avg_axis_margin_to_grid_threshold": 0.8677,
+      "avg_axis_margin_score": 86.77,
+      "max_axis_aligned_ratio": 0.0444,
+      "max_axis_margin_to_grid_threshold": 0.8556,
+      "p95_axis_aligned_ratio": 0.0444,
+      "p95_axis_margin_to_grid_threshold": 0.8556,
       "min_axis_aligned_ratio": 0.0253,
       "min_axis_margin_to_grid_threshold": 0.8747,
-      "avg_unique_x_count": 238.0,
-      "avg_unique_y_count": 238.0
+      "avg_unique_x_count": 239.0,
+      "avg_unique_y_count": 239.0
     }
   },
   "top_problematic": [],
@@ -364,15 +364,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 88,
+        "total_entities": 90,
         "entity_type_counts": {
-          "LINE": 88
+          "LINE": 90
         },
         "unique_entity_types": 1,
-        "line_count": 88,
-        "axis_aligned_line_ratio": 0.0455,
-        "unique_x_count": 163,
-        "unique_y_count": 163
+        "line_count": 90,
+        "axis_aligned_line_ratio": 0.0444,
+        "unique_x_count": 167,
+        "unique_y_count": 167
       }
     },
     {
@@ -459,15 +459,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 106,
+        "total_entities": 108,
         "entity_type_counts": {
-          "LINE": 106
+          "LINE": 108
         },
         "unique_entity_types": 1,
-        "line_count": 106,
-        "axis_aligned_line_ratio": 0.0377,
-        "unique_x_count": 199,
-        "unique_y_count": 199
+        "line_count": 108,
+        "axis_aligned_line_ratio": 0.037,
+        "unique_x_count": 203,
+        "unique_y_count": 203
       }
     },
     {
@@ -516,15 +516,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 113,
+        "total_entities": 115,
         "entity_type_counts": {
-          "LINE": 113
+          "LINE": 115
         },
         "unique_entity_types": 1,
-        "line_count": 113,
-        "axis_aligned_line_ratio": 0.0354,
-        "unique_x_count": 213,
-        "unique_y_count": 213
+        "line_count": 115,
+        "axis_aligned_line_ratio": 0.0348,
+        "unique_x_count": 217,
+        "unique_y_count": 217
       }
     },
     {
@@ -532,25 +532,6 @@
       "case_id": "case_001",
       "image_path": "output/web_floorplan_grid_v1/images/Book_Building_first_floor_plan.png",
       "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0000-output__web_floorplan_grid_v1__images__Book_Building_first_floor_plan.png/Book_Building_first_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
-        "total_entities": 122,
-        "entity_type_counts": {
-          "LINE": 122
-        },
-        "unique_entity_types": 1,
-        "line_count": 122,
-        "axis_aligned_line_ratio": 0.0328,
-        "unique_x_count": 231,
-        "unique_y_count": 231
-      }
-    },
-    {
-      "strategy_name": "consensus_qa",
-      "case_id": "case_002",
-      "image_path": "output/web_floorplan_grid_v1/images/Book_Building_second_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0001-output__web_floorplan_grid_v1__images__Book_Building_second_floor_plan.png/Book_Building_second_floor_plan.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
@@ -567,9 +548,9 @@
     },
     {
       "strategy_name": "consensus_qa",
-      "case_id": "case_003",
-      "image_path": "output/web_floorplan_grid_v1/images/Canada_Building_Saskatoon_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0002-output__web_floorplan_grid_v1__images__Canada_Building_Saskatoon_floor_plan.png/Canada_Building_Saskatoon_floor_plan.dxf",
+      "case_id": "case_002",
+      "image_path": "output/web_floorplan_grid_v1/images/Book_Building_second_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0001-output__web_floorplan_grid_v1__images__Book_Building_second_floor_plan.png/Book_Building_second_floor_plan.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
@@ -582,6 +563,25 @@
         "axis_aligned_line_ratio": 0.0317,
         "unique_x_count": 239,
         "unique_y_count": 239
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_003",
+      "image_path": "output/web_floorplan_grid_v1/images/Canada_Building_Saskatoon_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0002-output__web_floorplan_grid_v1__images__Canada_Building_Saskatoon_floor_plan.png/Canada_Building_Saskatoon_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 128,
+        "entity_type_counts": {
+          "LINE": 128
+        },
+        "unique_entity_types": 1,
+        "line_count": 128,
+        "axis_aligned_line_ratio": 0.0312,
+        "unique_x_count": 243,
+        "unique_y_count": 243
       }
     },
     {
@@ -649,25 +649,6 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 118,
-        "entity_type_counts": {
-          "LINE": 118
-        },
-        "unique_entity_types": 1,
-        "line_count": 118,
-        "axis_aligned_line_ratio": 0.0339,
-        "unique_x_count": 223,
-        "unique_y_count": 223
-      }
-    },
-    {
-      "strategy_name": "consensus_qa",
-      "case_id": "case_008",
-      "image_path": "output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0007-output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
         "total_entities": 120,
         "entity_type_counts": {
           "LINE": 120
@@ -681,21 +662,40 @@
     },
     {
       "strategy_name": "consensus_qa",
+      "case_id": "case_008",
+      "image_path": "output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0007-output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 122,
+        "entity_type_counts": {
+          "LINE": 122
+        },
+        "unique_entity_types": 1,
+        "line_count": 122,
+        "axis_aligned_line_ratio": 0.0328,
+        "unique_x_count": 231,
+        "unique_y_count": 231
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
       "case_id": "case_009",
       "image_path": "output/web_floorplan_grid_v1/images/Railway_Exchange_first_floor.png",
       "dxf_path": "output/benchmark/web_floorplan_grid_v1/consensus_qa/0008-output__web_floorplan_grid_v1__images__Railway_Exchange_first_floor.png/Railway_Exchange_first_floor.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 118,
+        "total_entities": 120,
         "entity_type_counts": {
-          "LINE": 118
+          "LINE": 120
         },
         "unique_entity_types": 1,
-        "line_count": 118,
-        "axis_aligned_line_ratio": 0.0339,
-        "unique_x_count": 223,
-        "unique_y_count": 223
+        "line_count": 120,
+        "axis_aligned_line_ratio": 0.0333,
+        "unique_x_count": 227,
+        "unique_y_count": 227
       }
     },
     {
@@ -744,15 +744,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 124,
+        "total_entities": 126,
         "entity_type_counts": {
-          "LINE": 124
+          "LINE": 126
         },
         "unique_entity_types": 1,
-        "line_count": 124,
-        "axis_aligned_line_ratio": 0.0323,
-        "unique_x_count": 235,
-        "unique_y_count": 235
+        "line_count": 126,
+        "axis_aligned_line_ratio": 0.0317,
+        "unique_x_count": 239,
+        "unique_y_count": 239
       }
     }
   ],
@@ -763,18 +763,18 @@
     "consensus_qa": {
       "avg_axis_aligned_ratio": {
         "previous": 0.0318,
-        "current": 0.0318,
-        "delta": 0.0
+        "current": 0.0315,
+        "delta": -0.0003
       },
       "avg_axis_margin_to_grid_threshold": {
         "previous": 0.8682,
-        "current": 0.8682,
-        "delta": 0.0
+        "current": 0.8685,
+        "delta": 0.0003
       },
       "avg_line_count": {
         "previous": 126.8333,
-        "current": 126.8333,
-        "delta": 0.0
+        "current": 128.0,
+        "delta": 1.1667
       }
     },
     "hybrid_mvp": {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0326,
-        "current": 0.0325,
-        "delta": -0.0001
+        "previous": 0.0325,
+        "current": 0.0323,
+        "delta": -0.0002
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8674,
-        "current": 0.8675,
-        "delta": 0.0001
+        "previous": 0.8675,
+        "current": 0.8677,
+        "delta": 0.0002
       },
       "avg_line_count": {
-        "previous": 125.1667,
-        "current": 125.5,
-        "delta": 0.3333
+        "previous": 125.5,
+        "current": 126.0,
+        "delta": 0.5
       }
     }
   },
