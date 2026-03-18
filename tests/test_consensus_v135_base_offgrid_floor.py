@@ -32,6 +32,6 @@ def test_consensus_v135_base_offgrid_floor_raised_for_mid_consensus(monkeypatch,
     )
 
     assert out.success is True
-    # v135 floor bump: base preset offgrid should now clear 0.060 even in a
+    # v138 floor bump: base preset offgrid should now clear 0.063 even in a
     # near-zero bonus setup.
-    assert _extract_offgrid_shift(out.notes) > 0.060
+    assert _extract_offgrid_shift(out.notes) >= 0.063
