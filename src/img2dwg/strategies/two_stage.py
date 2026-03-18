@@ -196,6 +196,48 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         plan.segments.append((start, end))
         return 1
 
+    @staticmethod
+    def _inject_default_band_axis_relay_diag(
+        plan: object,
+        *,
+        aspect_ratio: float,
+        complexity: float,
+        edge_density: float,
+    ) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+        if right <= left or bottom <= top:
+            return 0
+
+        # v150: default-band axis relay extension. Residual two_stage pockets
+        # around mild/moderate skew still keep sparse axis-heavy bundles. Add
+        # one additional bounded diagonal to widen coordinate diversity while
+        # preserving fail=0 behavior.
+        gate = (
+            1.14 <= aspect_ratio <= 1.78
+            and 0.28 <= complexity <= 0.64
+            and 0.08 <= edge_density <= 0.34
+        )
+        if not gate:
+            return 0
+
+        gain = 0.00033 + (complexity * 0.00019)
+        start = (
+            round(left + ((right - left) * (0.216 + (gain * 0.88))), 5),
+            round(top + ((bottom - top) * (0.778 - (gain * 0.70))), 5),
+        )
+        end = (
+            round(left + ((right - left) * (0.812 - (gain * 0.64))), 5),
+            round(top + ((bottom - top) * (0.244 + (gain * 0.96))), 5),
+        )
+        plan.segments.append((start, end))
+        return 1
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -843,6 +885,17 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         if relay_diag_added:
             plan.notes.append(
                 f"anti_grid_detail_diag:pair_v149_midskew_default_band_relay_diag:{relay_diag_added}"
+            )
+
+        axis_relay_diag_added = self._inject_default_band_axis_relay_diag(
+            plan,
+            aspect_ratio=aspect_ratio,
+            complexity=complexity,
+            edge_density=signals.edge_density,
+        )
+        if axis_relay_diag_added:
+            plan.notes.append(
+                f"anti_grid_detail_diag:pair_v150_default_band_axis_relay_diag:{axis_relay_diag_added}"
             )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
