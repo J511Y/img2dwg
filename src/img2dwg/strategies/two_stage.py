@@ -446,6 +446,25 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0010 if near_square_low_edge_default_band_gate else 0.0
         )
 
+        # v139: moderate-skew low-edge default-band bridge. Residual thesis
+        # samples in web_floorplan_grid_v1 still cluster around moderate skew
+        # with low/mid edge density where v136-v138 under-fire. Add a tiny
+        # deterministic bridge to reduce axis rebundling without affecting fail=0.
+        moderate_skew_low_edge_default_band_gate = (
+            1.10 <= aspect_ratio <= 1.64
+            and 0.24 <= complexity <= 0.60
+            and 0.09 <= signals.edge_density <= 0.24
+        )
+        moderate_skew_low_edge_default_band_chords = (
+            1 if moderate_skew_low_edge_default_band_gate else 0
+        )
+        moderate_skew_low_edge_default_band_offgrid = (
+            0.0008 if moderate_skew_low_edge_default_band_gate else 0.0
+        )
+        moderate_skew_low_edge_default_band_fan = (
+            0.0010 if moderate_skew_low_edge_default_band_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -480,6 +499,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_anti_grid_chords
                 + default_band_low_edge_bridge_chords
                 + near_square_low_edge_default_band_chords
+                + moderate_skew_low_edge_default_band_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -513,6 +533,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_anti_grid_offgrid
                 + default_band_low_edge_bridge_offgrid
                 + near_square_low_edge_default_band_offgrid
+                + moderate_skew_low_edge_default_band_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -546,6 +567,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_anti_grid_fan
                 + default_band_low_edge_bridge_fan
                 + near_square_low_edge_default_band_fan
+                + moderate_skew_low_edge_default_band_fan
             ),
         )
 
