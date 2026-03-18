@@ -461,6 +461,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         bottom = plan.segments[2][0][1]
 
         phi = 1.61803398875
+        silver = 2.41421356237
         adaptive = 0.00079 + (signals.edge_density * 0.00033) + (signals.contrast * 0.00029)
         pairs = [
             (0.0394, 0.3028, 0.1972, 0.4636),
@@ -469,20 +470,25 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             (0.7926, 0.6813, 0.6339, 0.8428),
             (0.1683, 0.7429, 0.3261, 0.5842),
             (0.6714, 0.2586, 0.8297, 0.4179),
+            (0.1142, 0.1876, 0.2729, 0.3498),
+            (0.3826, 0.8467, 0.5418, 0.6844),
+            (0.6139, 0.0731, 0.7727, 0.2356),
+            (0.8584, 0.5292, 0.6993, 0.6915),
         ]
 
         appended = 0
         for index, (sx, sy, ex, ey) in enumerate(pairs):
             phase = (((index + 2) * phi) % 1.0 - 0.5) * adaptive
+            drift = (((index + 3) * silver) % 1.0 - 0.5) * (adaptive * 0.73)
             weave = ((index % 3) - 1) * (adaptive * 0.81)
             shear = ((index % 2) * 2 - 1) * (0.00041 + (signals.edge_density * 0.00027))
             start = (
                 round(left + ((right - left) * (sx + phase + weave + shear)), 5),
-                round(top + ((bottom - top) * (sy - (phase * 0.73) + weave - shear)), 5),
+                round(top + ((bottom - top) * (sy - (phase * 0.73) - drift + weave - shear)), 5),
             )
             end = (
                 round(left + ((right - left) * (ex - (phase * 0.69) - weave - shear)), 5),
-                round(top + ((bottom - top) * (ey + phase - (weave * 0.71) + shear)), 5),
+                round(top + ((bottom - top) * (ey + phase + drift - (weave * 0.71) + shear)), 5),
             )
             plan.segments.append((start, end))
             appended += 1
