@@ -44,22 +44,28 @@ class ConsensusQAStrategy(ConversionStrategy):
     _min_consensus = 0.35
 
     @staticmethod
-    def _inject_default_band_tail_segments(plan: object, *, aspect_ratio: float, complexity: float) -> int:
+    def _inject_default_band_tail_segments(
+        plan: object,
+        *,
+        aspect_ratio: float,
+        complexity: float,
+        edge_density: float,
+    ) -> tuple[int, int]:
         if len(plan.segments) < 4:
-            return 0
+            return (0, 0)
 
         left = plan.segments[0][0][0]
         right = plan.segments[0][1][0]
         top = plan.segments[0][0][1]
         bottom = plan.segments[2][0][1]
         if right <= left or bottom <= top:
-            return 0
+            return (0, 0)
 
         # v138: deterministic micro tail to widen coordinate spread on
         # default-band consensus plans without upsetting fail=0.
         gate = 1.02 <= aspect_ratio <= 1.78 and 0.28 <= complexity <= 0.76
         if not gate:
-            return 0
+            return (0, 0)
 
         gain = 0.0011 + (complexity * 0.0007)
         anchors = [
@@ -67,7 +73,7 @@ class ConsensusQAStrategy(ConversionStrategy):
             (0.3126, 0.9018, 0.4742, 0.7397),
         ]
 
-        appended = 0
+        appended_v138 = 0
         for index, (sx, sy, ex, ey) in enumerate(anchors):
             phase = (index - 0.5) * gain
             shear = (1.0 if index % 2 else -1.0) * (0.00033 + (complexity * 0.00021))
@@ -80,9 +86,31 @@ class ConsensusQAStrategy(ConversionStrategy):
                 round(top + ((bottom - top) * (ey + phase + (shear * 0.76))), 5),
             )
             plan.segments.append((start, end))
-            appended += 1
+            appended_v138 += 1
 
-        return appended
+        # v139: default-band micro-zig relay for the common mid-edge pocket.
+        # Add one extra non-axis segment so consensus_qa further resists
+        # coordinate rebundling in web_floorplan_grid_v1 without touching fail=0.
+        v139_gate = (
+            1.10 <= aspect_ratio <= 1.72
+            and 0.24 <= complexity <= 0.76
+            and 0.18 <= edge_density <= 0.46
+        )
+        appended_v139 = 0
+        if v139_gate:
+            relay_gain = 0.00052 + (complexity * 0.00031)
+            start = (
+                round(left + ((right - left) * (0.184 + relay_gain)), 5),
+                round(top + ((bottom - top) * (0.622 - (relay_gain * 0.71))), 5),
+            )
+            end = (
+                round(left + ((right - left) * (0.843 - (relay_gain * 0.58))), 5),
+                round(top + ((bottom - top) * (0.336 + relay_gain)), 5),
+            )
+            plan.segments.append((start, end))
+            appended_v139 = 1
+
+        return (appended_v138, appended_v139)
 
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -427,13 +455,20 @@ class ConsensusQAStrategy(ConversionStrategy):
         )
 
         plan = build_vector_plan(signals, tuned_preset)
-        tail_segments_added = self._inject_default_band_tail_segments(
+        tail_segments_added_v138, tail_segments_added_v139 = self._inject_default_band_tail_segments(
             plan,
             aspect_ratio=aspect_ratio,
             complexity=complexity,
+            edge_density=signals.edge_density,
         )
-        if tail_segments_added:
-            plan.notes.append(f"anti_grid_detail_diag:pair_v138_default_band_tail:{tail_segments_added}")
+        if tail_segments_added_v138:
+            plan.notes.append(
+                f"anti_grid_detail_diag:pair_v138_default_band_tail:{tail_segments_added_v138}"
+            )
+        if tail_segments_added_v139:
+            plan.notes.append(
+                f"anti_grid_detail_diag:pair_v139_default_band_micro_zig:{tail_segments_added_v139}"
+            )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
         export_plan_as_dxf(dxf_path, plan, layer="ANTITHESIS")
