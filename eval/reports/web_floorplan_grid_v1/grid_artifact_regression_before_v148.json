@@ -1,0 +1,762 @@
+{
+  "report_schema_version": 1,
+  "generated_at": "2026-03-18T10:11:26.972820+00:00",
+  "summary": {
+    "total_cases": 36,
+    "passed_cases": 36,
+    "failed_cases": 0,
+    "pass_rate": 1.0,
+    "failures_by_reason": {}
+  },
+  "thresholds": {
+    "min_entities": 6,
+    "min_unique_entity_types": 1,
+    "min_axis_aligned_ratio_for_grid": 0.9,
+    "min_line_count_for_grid_pattern": 8,
+    "max_unique_x_for_grid": 4,
+    "max_unique_y_for_grid": 4,
+    "coord_round_digits": 3
+  },
+  "strategy_failures_by_reason": {
+    "consensus_qa": {},
+    "hybrid_mvp": {},
+    "two_stage_baseline": {}
+  },
+  "strategy_diagnostics": {
+    "consensus_qa": {
+      "avg_line_count": 129.0,
+      "avg_axis_aligned_ratio": 0.0313,
+      "std_axis_aligned_ratio": 0.0028,
+      "avg_axis_margin_to_grid_threshold": 0.8687,
+      "avg_axis_margin_score": 86.87,
+      "max_axis_aligned_ratio": 0.037,
+      "max_axis_margin_to_grid_threshold": 0.863,
+      "p95_axis_aligned_ratio": 0.037,
+      "p95_axis_margin_to_grid_threshold": 0.863,
+      "min_axis_aligned_ratio": 0.026,
+      "min_axis_margin_to_grid_threshold": 0.874,
+      "avg_unique_x_count": 245.0,
+      "avg_unique_y_count": 245.0
+    },
+    "hybrid_mvp": {
+      "avg_line_count": 8.0,
+      "avg_axis_aligned_ratio": 0.75,
+      "std_axis_aligned_ratio": 0.0,
+      "avg_axis_margin_to_grid_threshold": 0.15,
+      "avg_axis_margin_score": 15.0,
+      "max_axis_aligned_ratio": 0.75,
+      "max_axis_margin_to_grid_threshold": 0.15,
+      "p95_axis_aligned_ratio": 0.75,
+      "p95_axis_margin_to_grid_threshold": 0.15,
+      "min_axis_aligned_ratio": 0.75,
+      "min_axis_margin_to_grid_threshold": 0.15,
+      "avg_unique_x_count": 3.0,
+      "avg_unique_y_count": 3.0
+    },
+    "two_stage_baseline": {
+      "avg_line_count": 126.5833,
+      "avg_axis_aligned_ratio": 0.0322,
+      "std_axis_aligned_ratio": 0.0047,
+      "avg_axis_margin_to_grid_threshold": 0.8678,
+      "avg_axis_margin_score": 86.78,
+      "max_axis_aligned_ratio": 0.0444,
+      "max_axis_margin_to_grid_threshold": 0.8556,
+      "p95_axis_aligned_ratio": 0.0444,
+      "p95_axis_margin_to_grid_threshold": 0.8556,
+      "min_axis_aligned_ratio": 0.0253,
+      "min_axis_margin_to_grid_threshold": 0.8747,
+      "avg_unique_x_count": 240.1667,
+      "avg_unique_y_count": 240.1667
+    }
+  },
+  "top_problematic": [],
+  "cases": [
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_001",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Book_Building_first_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0000-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Book_Building_first_floor_plan.png/Book_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_002",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Book_Building_second_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0001-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Book_Building_second_floor_plan.png/Book_Building_second_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_003",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Canada_Building_Saskatoon_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0002-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Canada_Building_Saskatoon_floor_plan.png/Canada_Building_Saskatoon_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_004",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Chrysler_Building_first_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0003-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Chrysler_Building_first_floor_plan.png/Chrysler_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_005",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Empire_State_Building_ground_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0004-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Empire_State_Building_ground_floor_plan.png/Empire_State_Building_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_006",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Hudson_Terminal_ground_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0005-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Hudson_Terminal_ground_floor_plan.png/Hudson_Terminal_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_007",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Jewelers_Building_lower_level_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0006-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Jewelers_Building_lower_level_floor_plan.png/Jewelers_Building_lower_level_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_008",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0007-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_009",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Railway_Exchange_first_floor.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0008-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Railway_Exchange_first_floor.png/Railway_Exchange_first_floor.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_010",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Subway_Terminal_Building_ground_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0009-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Subway_Terminal_Building_ground_floor_plan.png/Subway_Terminal_Building_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_011",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Typical_floor_of_the_Flatiron_Building.jpg",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0010-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Typical_floor_of_the_Flatiron_Building.jpg/Typical_floor_of_the_Flatiron_Building.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "hybrid_mvp",
+      "case_id": "case_012",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Woolworth_Bldg_1st.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/hybrid_mvp/0011-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Woolworth_Bldg_1st.png/Woolworth_Bldg_1st.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 8,
+        "entity_type_counts": {
+          "LINE": 8
+        },
+        "unique_entity_types": 1,
+        "line_count": 8,
+        "axis_aligned_line_ratio": 0.75,
+        "unique_x_count": 3,
+        "unique_y_count": 3
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_001",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Book_Building_first_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0000-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Book_Building_first_floor_plan.png/Book_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 128,
+        "entity_type_counts": {
+          "LINE": 128
+        },
+        "unique_entity_types": 1,
+        "line_count": 128,
+        "axis_aligned_line_ratio": 0.0312,
+        "unique_x_count": 243,
+        "unique_y_count": 243
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_002",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Book_Building_second_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0001-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Book_Building_second_floor_plan.png/Book_Building_second_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 128,
+        "entity_type_counts": {
+          "LINE": 128
+        },
+        "unique_entity_types": 1,
+        "line_count": 128,
+        "axis_aligned_line_ratio": 0.0312,
+        "unique_x_count": 243,
+        "unique_y_count": 243
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_003",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Canada_Building_Saskatoon_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0002-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Canada_Building_Saskatoon_floor_plan.png/Canada_Building_Saskatoon_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 126,
+        "entity_type_counts": {
+          "LINE": 126
+        },
+        "unique_entity_types": 1,
+        "line_count": 126,
+        "axis_aligned_line_ratio": 0.0317,
+        "unique_x_count": 239,
+        "unique_y_count": 239
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_004",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Chrysler_Building_first_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0003-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Chrysler_Building_first_floor_plan.png/Chrysler_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 90,
+        "entity_type_counts": {
+          "LINE": 90
+        },
+        "unique_entity_types": 1,
+        "line_count": 90,
+        "axis_aligned_line_ratio": 0.0444,
+        "unique_x_count": 167,
+        "unique_y_count": 167
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_005",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Empire_State_Building_ground_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0004-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Empire_State_Building_ground_floor_plan.png/Empire_State_Building_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 128,
+        "entity_type_counts": {
+          "LINE": 128
+        },
+        "unique_entity_types": 1,
+        "line_count": 128,
+        "axis_aligned_line_ratio": 0.0312,
+        "unique_x_count": 243,
+        "unique_y_count": 243
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_006",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Hudson_Terminal_ground_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0005-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Hudson_Terminal_ground_floor_plan.png/Hudson_Terminal_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 136,
+        "entity_type_counts": {
+          "LINE": 136
+        },
+        "unique_entity_types": 1,
+        "line_count": 136,
+        "axis_aligned_line_ratio": 0.0294,
+        "unique_x_count": 259,
+        "unique_y_count": 259
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_007",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Jewelers_Building_lower_level_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0006-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Jewelers_Building_lower_level_floor_plan.png/Jewelers_Building_lower_level_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 127,
+        "entity_type_counts": {
+          "LINE": 127
+        },
+        "unique_entity_types": 1,
+        "line_count": 127,
+        "axis_aligned_line_ratio": 0.0315,
+        "unique_x_count": 241,
+        "unique_y_count": 241
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_008",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0007-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 127,
+        "entity_type_counts": {
+          "LINE": 127
+        },
+        "unique_entity_types": 1,
+        "line_count": 127,
+        "axis_aligned_line_ratio": 0.0315,
+        "unique_x_count": 241,
+        "unique_y_count": 241
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_009",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Railway_Exchange_first_floor.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0008-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Railway_Exchange_first_floor.png/Railway_Exchange_first_floor.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 108,
+        "entity_type_counts": {
+          "LINE": 108
+        },
+        "unique_entity_types": 1,
+        "line_count": 108,
+        "axis_aligned_line_ratio": 0.037,
+        "unique_x_count": 203,
+        "unique_y_count": 203
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_010",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Subway_Terminal_Building_ground_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0009-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Subway_Terminal_Building_ground_floor_plan.png/Subway_Terminal_Building_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 158,
+        "entity_type_counts": {
+          "LINE": 158
+        },
+        "unique_entity_types": 1,
+        "line_count": 158,
+        "axis_aligned_line_ratio": 0.0253,
+        "unique_x_count": 303,
+        "unique_y_count": 303
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_011",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Typical_floor_of_the_Flatiron_Building.jpg",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0010-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Typical_floor_of_the_Flatiron_Building.jpg/Typical_floor_of_the_Flatiron_Building.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 148,
+        "entity_type_counts": {
+          "LINE": 148
+        },
+        "unique_entity_types": 1,
+        "line_count": 148,
+        "axis_aligned_line_ratio": 0.027,
+        "unique_x_count": 283,
+        "unique_y_count": 283
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
+      "case_id": "case_012",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Woolworth_Bldg_1st.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/two_stage_baseline/0011-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Woolworth_Bldg_1st.png/Woolworth_Bldg_1st.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 115,
+        "entity_type_counts": {
+          "LINE": 115
+        },
+        "unique_entity_types": 1,
+        "line_count": 115,
+        "axis_aligned_line_ratio": 0.0348,
+        "unique_x_count": 217,
+        "unique_y_count": 217
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_001",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Book_Building_first_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0000-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Book_Building_first_floor_plan.png/Book_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 124,
+        "entity_type_counts": {
+          "LINE": 124
+        },
+        "unique_entity_types": 1,
+        "line_count": 124,
+        "axis_aligned_line_ratio": 0.0323,
+        "unique_x_count": 235,
+        "unique_y_count": 235
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_002",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Book_Building_second_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0001-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Book_Building_second_floor_plan.png/Book_Building_second_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 126,
+        "entity_type_counts": {
+          "LINE": 126
+        },
+        "unique_entity_types": 1,
+        "line_count": 126,
+        "axis_aligned_line_ratio": 0.0317,
+        "unique_x_count": 239,
+        "unique_y_count": 239
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_003",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Canada_Building_Saskatoon_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0002-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Canada_Building_Saskatoon_floor_plan.png/Canada_Building_Saskatoon_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 128,
+        "entity_type_counts": {
+          "LINE": 128
+        },
+        "unique_entity_types": 1,
+        "line_count": 128,
+        "axis_aligned_line_ratio": 0.0312,
+        "unique_x_count": 243,
+        "unique_y_count": 243
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_004",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Chrysler_Building_first_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0003-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Chrysler_Building_first_floor_plan.png/Chrysler_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 108,
+        "entity_type_counts": {
+          "LINE": 108
+        },
+        "unique_entity_types": 1,
+        "line_count": 108,
+        "axis_aligned_line_ratio": 0.037,
+        "unique_x_count": 203,
+        "unique_y_count": 203
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_005",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Empire_State_Building_ground_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0004-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Empire_State_Building_ground_floor_plan.png/Empire_State_Building_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 136,
+        "entity_type_counts": {
+          "LINE": 136
+        },
+        "unique_entity_types": 1,
+        "line_count": 136,
+        "axis_aligned_line_ratio": 0.0294,
+        "unique_x_count": 259,
+        "unique_y_count": 259
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_006",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Hudson_Terminal_ground_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0005-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Hudson_Terminal_ground_floor_plan.png/Hudson_Terminal_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 142,
+        "entity_type_counts": {
+          "LINE": 142
+        },
+        "unique_entity_types": 1,
+        "line_count": 142,
+        "axis_aligned_line_ratio": 0.0282,
+        "unique_x_count": 271,
+        "unique_y_count": 271
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_007",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Jewelers_Building_lower_level_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0006-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Jewelers_Building_lower_level_floor_plan.png/Jewelers_Building_lower_level_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 120,
+        "entity_type_counts": {
+          "LINE": 120
+        },
+        "unique_entity_types": 1,
+        "line_count": 120,
+        "axis_aligned_line_ratio": 0.0333,
+        "unique_x_count": 227,
+        "unique_y_count": 227
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_008",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Koppers_Building_first_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0007-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Koppers_Building_first_floor_plan.png/Koppers_Building_first_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 122,
+        "entity_type_counts": {
+          "LINE": 122
+        },
+        "unique_entity_types": 1,
+        "line_count": 122,
+        "axis_aligned_line_ratio": 0.0328,
+        "unique_x_count": 231,
+        "unique_y_count": 231
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_009",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Railway_Exchange_first_floor.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0008-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Railway_Exchange_first_floor.png/Railway_Exchange_first_floor.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 120,
+        "entity_type_counts": {
+          "LINE": 120
+        },
+        "unique_entity_types": 1,
+        "line_count": 120,
+        "axis_aligned_line_ratio": 0.0333,
+        "unique_x_count": 227,
+        "unique_y_count": 227
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_010",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Subway_Terminal_Building_ground_floor_plan.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0009-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Subway_Terminal_Building_ground_floor_plan.png/Subway_Terminal_Building_ground_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 154,
+        "entity_type_counts": {
+          "LINE": 154
+        },
+        "unique_entity_types": 1,
+        "line_count": 154,
+        "axis_aligned_line_ratio": 0.026,
+        "unique_x_count": 295,
+        "unique_y_count": 295
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_011",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Typical_floor_of_the_Flatiron_Building.jpg",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0010-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Typical_floor_of_the_Flatiron_Building.jpg/Typical_floor_of_the_Flatiron_Building.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 142,
+        "entity_type_counts": {
+          "LINE": 142
+        },
+        "unique_entity_types": 1,
+        "line_count": 142,
+        "axis_aligned_line_ratio": 0.0282,
+        "unique_x_count": 271,
+        "unique_y_count": 271
+      }
+    },
+    {
+      "strategy_name": "consensus_qa",
+      "case_id": "case_012",
+      "image_path": "/Users/jhyou/.openclaw/workspace/img2dwg/output/web_floorplan_grid_v1/images/Woolworth_Bldg_1st.png",
+      "dxf_path": "/tmp/img2dwg-v148-base-benchmark/consensus_qa/0011-__Users__jhyou__.openclaw__workspace__img2dwg__output__web_floorplan_grid_v1__images__Woolworth_Bldg_1st.png/Woolworth_Bldg_1st.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 126,
+        "entity_type_counts": {
+          "LINE": 126
+        },
+        "unique_entity_types": 1,
+        "line_count": 126,
+        "axis_aligned_line_ratio": 0.0317,
+        "unique_x_count": 239,
+        "unique_y_count": 239
+      }
+    }
+  ],
+  "dataset_id": "web_floorplan_grid_v1",
+  "manifest": "/Users/jhyou/.openclaw/workspace/img2dwg/eval/datasets/web_floorplan_grid_v1/manifest.csv",
+  "benchmark_results_path": "/tmp/img2dwg-v148-base-benchmark/benchmark_results.json"
+}
