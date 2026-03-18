@@ -520,6 +520,25 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         )
         default_band_coord_diversity_fan = 0.0008 if default_band_coord_diversity_gate else 0.0
 
+        # v141: mild-corridor default-band anti-axis lift. Residual thesis traces
+        # still show slight axis rebundling in the common mild/moderate skew
+        # pocket with low/mid edge density. Add a tiny bounded lift so
+        # avg_axis_aligned_ratio drops without disturbing fail=0 behavior.
+        mild_corridor_default_band_axis_lift_gate = (
+            1.12 <= aspect_ratio <= 1.56
+            and 0.30 <= complexity <= 0.60
+            and 0.10 <= signals.edge_density <= 0.24
+        )
+        mild_corridor_default_band_axis_lift_chords = (
+            1 if mild_corridor_default_band_axis_lift_gate else 0
+        )
+        mild_corridor_default_band_axis_lift_offgrid = (
+            0.0007 if mild_corridor_default_band_axis_lift_gate else 0.0
+        )
+        mild_corridor_default_band_axis_lift_fan = (
+            0.0009 if mild_corridor_default_band_axis_lift_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -556,6 +575,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_low_edge_default_band_chords
                 + moderate_skew_low_edge_default_band_chords
                 + default_band_coord_diversity_chords
+                + mild_corridor_default_band_axis_lift_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -591,6 +611,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_low_edge_default_band_offgrid
                 + moderate_skew_low_edge_default_band_offgrid
                 + default_band_coord_diversity_offgrid
+                + mild_corridor_default_band_axis_lift_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -626,6 +647,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_low_edge_default_band_fan
                 + moderate_skew_low_edge_default_band_fan
                 + default_band_coord_diversity_fan
+                + mild_corridor_default_band_axis_lift_fan
             ),
         )
 

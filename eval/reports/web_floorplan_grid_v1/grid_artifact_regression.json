@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-18T05:41:02.525609+00:00",
+  "generated_at": "2026-03-18T06:09:57.230464+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 125.5,
-      "avg_axis_aligned_ratio": 0.0325,
+      "avg_line_count": 126.0,
+      "avg_axis_aligned_ratio": 0.0324,
       "std_axis_aligned_ratio": 0.005,
-      "avg_axis_margin_to_grid_threshold": 0.8675,
-      "avg_axis_margin_score": 86.75,
+      "avg_axis_margin_to_grid_threshold": 0.8676,
+      "avg_axis_margin_score": 86.76,
       "max_axis_aligned_ratio": 0.0455,
       "max_axis_margin_to_grid_threshold": 0.8545,
       "p95_axis_aligned_ratio": 0.0455,
       "p95_axis_margin_to_grid_threshold": 0.8545,
       "min_axis_aligned_ratio": 0.0253,
       "min_axis_margin_to_grid_threshold": 0.8747,
-      "avg_unique_x_count": 238.0,
-      "avg_unique_y_count": 238.0
+      "avg_unique_x_count": 239.0,
+      "avg_unique_y_count": 239.0
     }
   },
   "top_problematic": [],
@@ -307,15 +307,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 127,
+        "total_entities": 129,
         "entity_type_counts": {
-          "LINE": 127
+          "LINE": 129
         },
         "unique_entity_types": 1,
-        "line_count": 127,
-        "axis_aligned_line_ratio": 0.0315,
-        "unique_x_count": 241,
-        "unique_y_count": 241
+        "line_count": 129,
+        "axis_aligned_line_ratio": 0.031,
+        "unique_x_count": 245,
+        "unique_y_count": 245
       }
     },
     {
@@ -421,15 +421,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 124,
+        "total_entities": 126,
         "entity_type_counts": {
-          "LINE": 124
+          "LINE": 126
         },
         "unique_entity_types": 1,
-        "line_count": 124,
-        "axis_aligned_line_ratio": 0.0323,
-        "unique_x_count": 235,
-        "unique_y_count": 235
+        "line_count": 126,
+        "axis_aligned_line_ratio": 0.0317,
+        "unique_x_count": 239,
+        "unique_y_count": 239
       }
     },
     {
@@ -440,15 +440,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 126,
+        "total_entities": 128,
         "entity_type_counts": {
-          "LINE": 126
+          "LINE": 128
         },
         "unique_entity_types": 1,
-        "line_count": 126,
-        "axis_aligned_line_ratio": 0.0317,
-        "unique_x_count": 239,
-        "unique_y_count": 239
+        "line_count": 128,
+        "axis_aligned_line_ratio": 0.0312,
+        "unique_x_count": 243,
+        "unique_y_count": 243
       }
     },
     {
@@ -757,7 +757,7 @@
     }
   ],
   "dataset_id": "web_floorplan_grid_v1",
-  "manifest": "eval/datasets/web_floorplan_grid_v1/manifest.csv",
+  "manifest": ".worktrees/consensus-v20x/eval/datasets/web_floorplan_grid_v1/manifest.csv",
   "benchmark_results_path": "output/benchmark/web_floorplan_grid_v1/benchmark_results.json",
   "strategy_delta_vs_previous": {
     "consensus_qa": {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0326,
-        "current": 0.0325,
+        "previous": 0.0325,
+        "current": 0.0324,
         "delta": -0.0001
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8674,
-        "current": 0.8675,
+        "previous": 0.8675,
+        "current": 0.8676,
         "delta": 0.0001
       },
       "avg_line_count": {
-        "previous": 125.1667,
-        "current": 125.5,
-        "delta": 0.3333
+        "previous": 125.5,
+        "current": 126.0,
+        "delta": 0.5
       }
     }
   },
