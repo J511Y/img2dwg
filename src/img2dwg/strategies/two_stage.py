@@ -559,6 +559,26 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0010 if midskew_default_band_axis_unlock_gate else 0.0
         )
 
+        # v144: upper-mid-skew default-band axis unlock bridge. Some
+        # web_floorplan_grid_v1 thesis samples remain under-diversified just
+        # above v143's aspect window (roughly 1.48-1.64) with default-band
+        # complexity. Add a tiny bounded bridge to keep axis rebundling down
+        # without destabilizing fail=0.
+        upper_midskew_default_band_axis_unlock_gate = (
+            1.48 <= aspect_ratio <= 1.64
+            and 0.28 <= complexity <= 0.62
+            and 0.10 <= signals.edge_density <= 0.30
+        )
+        upper_midskew_default_band_axis_unlock_chords = (
+            2 if upper_midskew_default_band_axis_unlock_gate else 0
+        )
+        upper_midskew_default_band_axis_unlock_offgrid = (
+            0.0009 if upper_midskew_default_band_axis_unlock_gate else 0.0
+        )
+        upper_midskew_default_band_axis_unlock_fan = (
+            0.0011 if upper_midskew_default_band_axis_unlock_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -597,6 +617,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_chords
                 + near_square_default_band_axis_unlock_chords
                 + midskew_default_band_axis_unlock_chords
+                + upper_midskew_default_band_axis_unlock_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -634,6 +655,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_offgrid
                 + near_square_default_band_axis_unlock_offgrid
                 + midskew_default_band_axis_unlock_offgrid
+                + upper_midskew_default_band_axis_unlock_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -671,6 +693,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_fan
                 + near_square_default_band_axis_unlock_fan
                 + midskew_default_band_axis_unlock_fan
+                + upper_midskew_default_band_axis_unlock_fan
             ),
         )
 
