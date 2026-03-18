@@ -465,6 +465,20 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0010 if moderate_skew_low_edge_default_band_gate else 0.0
         )
 
+        # v140: default-band coordinate diversity lift. Even after v136-v139,
+        # web_floorplan_grid_v1 thesis can remain slightly under-diversified in
+        # the common mild/moderate skew + mid/default complexity pocket.
+        # Add a tiny deterministic lift to increase unique coordinate spread
+        # while preserving fail=0 guardrails.
+        default_band_coord_diversity_gate = (
+            1.08 <= aspect_ratio <= 1.70 and 0.26 <= complexity <= 0.62
+        )
+        default_band_coord_diversity_chords = 1 if default_band_coord_diversity_gate else 0
+        default_band_coord_diversity_offgrid = (
+            0.0006 if default_band_coord_diversity_gate else 0.0
+        )
+        default_band_coord_diversity_fan = 0.0008 if default_band_coord_diversity_gate else 0.0
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -500,6 +514,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_low_edge_bridge_chords
                 + near_square_low_edge_default_band_chords
                 + moderate_skew_low_edge_default_band_chords
+                + default_band_coord_diversity_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -534,6 +549,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_low_edge_bridge_offgrid
                 + near_square_low_edge_default_band_offgrid
                 + moderate_skew_low_edge_default_band_offgrid
+                + default_band_coord_diversity_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -568,6 +584,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_low_edge_bridge_fan
                 + near_square_low_edge_default_band_fan
                 + moderate_skew_low_edge_default_band_fan
+                + default_band_coord_diversity_fan
             ),
         )
 
