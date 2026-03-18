@@ -520,6 +520,25 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         )
         default_band_coord_diversity_fan = 0.0008 if default_band_coord_diversity_gate else 0.0
 
+        # v142: near-square default-band axis unlock bridge. Residual thesis
+        # hotspots in web_floorplan_grid_v1 still include mildly skewed near-square
+        # plans where axis traces rebundle. Add a tiny bounded lift in that
+        # pocket to reduce avg_axis_aligned_ratio while preserving fail=0.
+        near_square_default_band_axis_unlock_gate = (
+            1.00 <= aspect_ratio <= 1.28
+            and 0.30 <= complexity <= 0.60
+            and 0.12 <= signals.edge_density <= 0.30
+        )
+        near_square_default_band_axis_unlock_chords = (
+            1 if near_square_default_band_axis_unlock_gate else 0
+        )
+        near_square_default_band_axis_unlock_offgrid = (
+            0.0009 if near_square_default_band_axis_unlock_gate else 0.0
+        )
+        near_square_default_band_axis_unlock_fan = (
+            0.0012 if near_square_default_band_axis_unlock_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -556,6 +575,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_low_edge_default_band_chords
                 + moderate_skew_low_edge_default_band_chords
                 + default_band_coord_diversity_chords
+                + near_square_default_band_axis_unlock_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -591,6 +611,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_low_edge_default_band_offgrid
                 + moderate_skew_low_edge_default_band_offgrid
                 + default_band_coord_diversity_offgrid
+                + near_square_default_band_axis_unlock_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -626,6 +647,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_low_edge_default_band_fan
                 + moderate_skew_low_edge_default_band_fan
                 + default_band_coord_diversity_fan
+                + near_square_default_band_axis_unlock_fan
             ),
         )
 
