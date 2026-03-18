@@ -309,6 +309,20 @@ class ConsensusQAStrategy(ConversionStrategy):
         near_square_midedge_bridge_offgrid = 0.0011 if near_square_midedge_bridge_gate else 0.0
         near_square_midedge_bridge_fan = 0.0014 if near_square_midedge_bridge_gate else 0.0
 
+        # v136: default-band low-edge bridge extension. Residual consensus_qa
+        # traces still show mild axis rebundling when skew is moderate and edge
+        # density sits just below earlier mid-edge gates. Add a tiny bounded
+        # lift focused on this default-score pocket.
+        default_band_low_edge_bridge_gate = (
+            1.10 <= aspect_ratio <= 1.56
+            and 0.32 <= complexity <= 0.62
+            and 0.14 <= signals.edge_density <= 0.24
+            and 0.69 <= consensus_score <= 0.78
+        )
+        default_band_low_edge_bridge_chords = 1 if default_band_low_edge_bridge_gate else 0
+        default_band_low_edge_bridge_offgrid = 0.0007 if default_band_low_edge_bridge_gate else 0.0
+        default_band_low_edge_bridge_fan = 0.0009 if default_band_low_edge_bridge_gate else 0.0
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -335,6 +349,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_band_bridge_chords
                 + default_score_midskew_midedge_extension_chords
                 + near_square_midedge_bridge_chords
+                + default_band_low_edge_bridge_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -360,6 +375,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_band_bridge_offgrid
                 + default_score_midskew_midedge_extension_offgrid
                 + near_square_midedge_bridge_offgrid
+                + default_band_low_edge_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -382,6 +398,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_band_bridge_fan
                 + default_score_midskew_midedge_extension_fan
                 + near_square_midedge_bridge_fan
+                + default_band_low_edge_bridge_fan
             ),
         )
 
