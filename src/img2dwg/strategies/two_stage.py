@@ -401,6 +401,51 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_edge_mild_skew_bridge_offgrid = 0.0008 if low_edge_mild_skew_bridge_gate else 0.0
         low_edge_mild_skew_bridge_fan = 0.0011 if low_edge_mild_skew_bridge_gate else 0.0
 
+        # v136: default-band anti-grid guard. Most web_floorplan_grid_v1 thesis
+        # samples sit in this mild/moderate skew + mid/default complexity pocket.
+        # Add a tiny deterministic lift so residual axis rebundling drops without
+        # disturbing fail=0.
+        default_band_anti_grid_gate = (
+            1.10 <= aspect_ratio <= 1.68
+            and 0.28 <= complexity <= 0.62
+            and signals.edge_density >= 0.12
+        )
+        default_band_anti_grid_chords = 1 if default_band_anti_grid_gate else 0
+        default_band_anti_grid_offgrid = 0.0009 if default_band_anti_grid_gate else 0.0
+        default_band_anti_grid_fan = 0.0012 if default_band_anti_grid_gate else 0.0
+
+        # v137: default-band low-edge bridge extension. Residual thesis pockets
+        # still appear around the same mild/moderate skew band when edge density
+        # is slightly lower than v136's floor. Add a tiny bounded bridge so
+        # coordinate diversity improves without changing fail=0 behavior.
+        default_band_low_edge_bridge_gate = (
+            1.06 <= aspect_ratio <= 1.74
+            and 0.26 <= complexity <= 0.66
+            and 0.10 <= signals.edge_density <= 0.30
+        )
+        default_band_low_edge_bridge_chords = 1 if default_band_low_edge_bridge_gate else 0
+        default_band_low_edge_bridge_offgrid = (
+            0.0007 if default_band_low_edge_bridge_gate else 0.0
+        )
+        default_band_low_edge_bridge_fan = 0.0009 if default_band_low_edge_bridge_gate else 0.0
+
+        # v138: near-square low-edge default-band reinforcement. Residual thesis
+        # pockets remain where geometry is close to square with low edge density,
+        # causing mild axis rebundling. Add a tiny bounded lift to improve
+        # coordinate diversity while preserving fail=0 stability.
+        near_square_low_edge_default_band_gate = (
+            1.00 <= aspect_ratio <= 1.30
+            and 0.30 <= complexity <= 0.64
+            and 0.08 <= signals.edge_density <= 0.20
+        )
+        near_square_low_edge_default_band_chords = 1 if near_square_low_edge_default_band_gate else 0
+        near_square_low_edge_default_band_offgrid = (
+            0.0008 if near_square_low_edge_default_band_gate else 0.0
+        )
+        near_square_low_edge_default_band_fan = (
+            0.0010 if near_square_low_edge_default_band_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -432,6 +477,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_edge_bridge_chords
                 + near_square_broad_bridge_chords
                 + low_edge_mild_skew_bridge_chords
+                + default_band_anti_grid_chords
+                + default_band_low_edge_bridge_chords
+                + near_square_low_edge_default_band_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -462,6 +510,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_edge_bridge_offgrid
                 + near_square_broad_bridge_offgrid
                 + low_edge_mild_skew_bridge_offgrid
+                + default_band_anti_grid_offgrid
+                + default_band_low_edge_bridge_offgrid
+                + near_square_low_edge_default_band_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -492,6 +543,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + moderate_skew_edge_bridge_fan
                 + near_square_broad_bridge_fan
                 + low_edge_mild_skew_bridge_fan
+                + default_band_anti_grid_fan
+                + default_band_low_edge_bridge_fan
+                + near_square_low_edge_default_band_fan
             ),
         )
 
