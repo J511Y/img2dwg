@@ -789,6 +789,26 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0009 if low_edge_default_band_degrid_gate else 0.0
         )
 
+        # v161: low-edge midskew default-band degrid follow-up. Remaining
+        # web_floorplan_grid_v1 thesis pockets cluster around mild/moderate skew
+        # with slightly denser low-edge traces where v160 under-fires. Add a
+        # tiny bounded extension to further reduce axis rebundling while
+        # preserving fail=0 guardrails.
+        low_edge_midskew_default_band_followup_gate = (
+            1.18 <= aspect_ratio <= 1.66
+            and 0.26 <= complexity <= 0.58
+            and 0.12 <= signals.edge_density <= 0.22
+        )
+        low_edge_midskew_default_band_followup_chords = (
+            1 if low_edge_midskew_default_band_followup_gate else 0
+        )
+        low_edge_midskew_default_band_followup_offgrid = (
+            0.0008 if low_edge_midskew_default_band_followup_gate else 0.0
+        )
+        low_edge_midskew_default_band_followup_fan = (
+            0.0010 if low_edge_midskew_default_band_followup_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -828,6 +848,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_default_band_axis_unlock_chords
                 + midskew_default_band_axis_unlock_chords
                 + low_edge_default_band_degrid_chords
+                + low_edge_midskew_default_band_followup_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -866,6 +887,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_default_band_axis_unlock_offgrid
                 + midskew_default_band_axis_unlock_offgrid
                 + low_edge_default_band_degrid_offgrid
+                + low_edge_midskew_default_band_followup_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -904,6 +926,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_default_band_axis_unlock_fan
                 + midskew_default_band_axis_unlock_fan
                 + low_edge_default_band_degrid_fan
+                + low_edge_midskew_default_band_followup_fan
             ),
         )
 
