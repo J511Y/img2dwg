@@ -1,6 +1,6 @@
 # Grid Artifact Regression Report
 
-- generated_at: `2026-03-20T11:27:45.589538+00:00`
+- generated_at: `2026-03-20T11:30:37.980083+00:00`
 - total_cases: `36`
 - passed_cases: `36`
 - failed_cases: `0`
@@ -35,7 +35,7 @@
 
 - `consensus_qa`: avg_axis_aligned_ratio: prev=0.0313, cur=0.0313, delta=0.0; avg_axis_margin_to_grid_threshold: prev=0.8687, cur=0.8687, delta=0.0; avg_line_count: prev=129.0, cur=129.0, delta=0.0
 - `hybrid_mvp`: avg_axis_aligned_ratio: prev=0.75, cur=0.75, delta=0.0; avg_axis_margin_to_grid_threshold: prev=0.15, cur=0.15, delta=0.0; avg_line_count: prev=8.0, cur=8.0, delta=0.0
-- `two_stage_baseline`: avg_axis_aligned_ratio: prev=0.0318, cur=0.0318, delta=0.0; avg_axis_margin_to_grid_threshold: prev=0.8682, cur=0.8682, delta=0.0; avg_line_count: prev=128.0833, cur=128.25, delta=0.1667
+- `two_stage_baseline`: avg_axis_aligned_ratio: prev=0.0318, cur=0.0318, delta=0.0; avg_axis_margin_to_grid_threshold: prev=0.8682, cur=0.8682, delta=0.0; avg_line_count: prev=128.25, cur=128.25, delta=0.0
 
 ## Strategy diagnostics
 
