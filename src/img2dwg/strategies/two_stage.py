@@ -238,6 +238,48 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         plan.segments.append((start, end))
         return 1
 
+    @staticmethod
+    def _inject_midskew_default_band_dense_edge_diag(
+        plan: object,
+        *,
+        aspect_ratio: float,
+        complexity: float,
+        edge_density: float,
+    ) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+        if right <= left or bottom <= top:
+            return 0
+
+        # v152: midskew default-band dense-edge relief. Residual two_stage
+        # grid pockets still appear when edge density rises beyond the v151
+        # bridge window. Inject one bounded diagonal in this denser pocket to
+        # keep coordinate diversity and reduce axis rebundling with fail=0.
+        gate = (
+            1.18 <= aspect_ratio <= 1.66
+            and 0.30 <= complexity <= 0.60
+            and 0.22 <= edge_density <= 0.42
+        )
+        if not gate:
+            return 0
+
+        gain = 0.00036 + (complexity * 0.00022)
+        start = (
+            round(left + ((right - left) * (0.312 + (gain * 0.71))), 5),
+            round(top + ((bottom - top) * (0.198 + (gain * 0.82))), 5),
+        )
+        end = (
+            round(left + ((right - left) * (0.776 - (gain * 0.63))), 5),
+            round(top + ((bottom - top) * (0.846 - (gain * 0.69))), 5),
+        )
+        plan.segments.append((start, end))
+        return 1
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -746,6 +788,24 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0015 if midskew_default_band_coord_bridge_gate else 0.0
         )
 
+        # v152: midskew default-band dense-edge bridge extension. Residual
+        # thesis pockets remain in the denser edge band just above v151.
+        # Add a tiny bounded lift for coordinate diversity while preserving fail=0.
+        midskew_default_band_dense_edge_gate = (
+            1.18 <= aspect_ratio <= 1.66
+            and 0.30 <= complexity <= 0.60
+            and 0.22 <= signals.edge_density <= 0.42
+        )
+        midskew_default_band_dense_edge_chords = (
+            1 if midskew_default_band_dense_edge_gate else 0
+        )
+        midskew_default_band_dense_edge_offgrid = (
+            0.0009 if midskew_default_band_dense_edge_gate else 0.0
+        )
+        midskew_default_band_dense_edge_fan = (
+            0.0011 if midskew_default_band_dense_edge_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -785,6 +845,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_default_band_axis_unlock_chords
                 + midskew_default_band_axis_unlock_chords
                 + midskew_default_band_coord_bridge_chords
+                + midskew_default_band_dense_edge_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -823,6 +884,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_default_band_axis_unlock_offgrid
                 + midskew_default_band_axis_unlock_offgrid
                 + midskew_default_band_coord_bridge_offgrid
+                + midskew_default_band_dense_edge_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -861,6 +923,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + near_square_default_band_axis_unlock_fan
                 + midskew_default_band_axis_unlock_fan
                 + midskew_default_band_coord_bridge_fan
+                + midskew_default_band_dense_edge_fan
             ),
         )
 
@@ -918,6 +981,17 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         if axis_relay_diag_added:
             plan.notes.append(
                 f"anti_grid_detail_diag:pair_v150_default_band_axis_relay_diag:{axis_relay_diag_added}"
+            )
+
+        dense_edge_diag_added = self._inject_midskew_default_band_dense_edge_diag(
+            plan,
+            aspect_ratio=aspect_ratio,
+            complexity=complexity,
+            edge_density=signals.edge_density,
+        )
+        if dense_edge_diag_added:
+            plan.notes.append(
+                f"anti_grid_detail_diag:pair_v152_midskew_default_band_dense_edge_diag:{dense_edge_diag_added}"
             )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
