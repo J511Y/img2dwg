@@ -214,14 +214,15 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         if right <= left or bottom <= top:
             return 0
 
-        # v156: default-band axis-escape diagonal. Residual two_stage pockets
-        # on web_floorplan_grid_v1 can still retain mild axis rebundling in
-        # the broad midskew/default band. Add one bounded non-axis segment to
-        # raise coordinate diversity and lower axis ratio while preserving fail=0.
+        # v157: widen default-band axis-escape diagonal gate. Residual
+        # two_stage pockets can still sit just below v156's complexity/edge
+        # floors, so they miss the extra non-axis relief and rebundle.
+        # Expand the gate slightly to pick up those mild/default-band cases
+        # while keeping deterministic fail=0 behavior.
         gate = (
-            1.10 <= aspect_ratio <= 1.92
-            and 0.33 <= complexity <= 0.64
-            and 0.16 <= edge_density <= 0.40
+            1.08 <= aspect_ratio <= 1.96
+            and 0.30 <= complexity <= 0.66
+            and 0.12 <= edge_density <= 0.42
         )
         if not gate:
             return 0
