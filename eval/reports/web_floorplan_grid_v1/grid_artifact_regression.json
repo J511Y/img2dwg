@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-20T11:57:45.656684+00:00",
+  "generated_at": "2026-03-20T12:30:06.311472+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 129.0,
+      "avg_line_count": 129.1667,
       "avg_axis_aligned_ratio": 0.0316,
-      "std_axis_aligned_ratio": 0.0048,
+      "std_axis_aligned_ratio": 0.0047,
       "avg_axis_margin_to_grid_threshold": 0.8684,
       "avg_axis_margin_score": 86.84,
-      "max_axis_aligned_ratio": 0.0444,
-      "max_axis_margin_to_grid_threshold": 0.8556,
-      "p95_axis_aligned_ratio": 0.0444,
-      "p95_axis_margin_to_grid_threshold": 0.8556,
+      "max_axis_aligned_ratio": 0.044,
+      "max_axis_margin_to_grid_threshold": 0.856,
+      "p95_axis_aligned_ratio": 0.044,
+      "p95_axis_margin_to_grid_threshold": 0.856,
       "min_axis_aligned_ratio": 0.0253,
       "min_axis_margin_to_grid_threshold": 0.8747,
-      "avg_unique_x_count": 245.0,
-      "avg_unique_y_count": 245.0
+      "avg_unique_x_count": 245.3333,
+      "avg_unique_y_count": 245.3333
     }
   },
   "top_problematic": [],
@@ -364,15 +364,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 90,
+        "total_entities": 91,
         "entity_type_counts": {
-          "LINE": 90
+          "LINE": 91
         },
         "unique_entity_types": 1,
-        "line_count": 90,
-        "axis_aligned_line_ratio": 0.0444,
-        "unique_x_count": 167,
-        "unique_y_count": 167
+        "line_count": 91,
+        "axis_aligned_line_ratio": 0.044,
+        "unique_x_count": 169,
+        "unique_y_count": 169
       }
     },
     {
@@ -459,15 +459,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 108,
+        "total_entities": 109,
         "entity_type_counts": {
-          "LINE": 108
+          "LINE": 109
         },
         "unique_entity_types": 1,
-        "line_count": 108,
-        "axis_aligned_line_ratio": 0.037,
-        "unique_x_count": 203,
-        "unique_y_count": 203
+        "line_count": 109,
+        "axis_aligned_line_ratio": 0.0367,
+        "unique_x_count": 205,
+        "unique_y_count": 205
       }
     },
     {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0318,
+        "previous": 0.0316,
         "current": 0.0316,
-        "delta": -0.0002
+        "delta": 0.0
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8682,
+        "previous": 0.8684,
         "current": 0.8684,
-        "delta": 0.0002
+        "delta": 0.0
       },
       "avg_line_count": {
-        "previous": 128.25,
-        "current": 129.0,
-        "delta": 0.75
+        "previous": 129.0,
+        "current": 129.1667,
+        "delta": 0.1667
       }
     }
   },

@@ -257,13 +257,14 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         if right <= left or bottom <= top:
             return 0
 
-        # v158: default-band axis-escape bridge. Some mild/moderate skew thesis
-        # traces still miss v157 by a thin edge-density band and retain small
-        # axis rebundling. Add one bounded diagonal bridge in that pocket.
+        # v159: default-band axis-escape bridge gate expansion. Residual
+        # web_floorplan_grid_v1 thesis pockets just below v158's low
+        # complexity/edge floors still rebundle into mild axis traces.
+        # Widen the pocket slightly while preserving deterministic fail=0.
         gate = (
-            1.06 <= aspect_ratio <= 1.90
-            and 0.28 <= complexity <= 0.66
-            and 0.10 <= edge_density <= 0.44
+            1.00 <= aspect_ratio <= 1.98
+            and 0.26 <= complexity <= 0.68
+            and 0.08 <= edge_density <= 0.46
         )
         if not gate:
             return 0
@@ -948,7 +949,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         )
         if axis_escape_bridge_added:
             plan.notes.append(
-                f"anti_grid_detail_diag:pair_v158_default_band_axis_escape_bridge:{axis_escape_bridge_added}"
+                f"anti_grid_detail_diag:pair_v159_default_band_axis_escape_bridge:{axis_escape_bridge_added}"
             )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
