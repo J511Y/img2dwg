@@ -219,9 +219,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         # the broad midskew/default band. Add one bounded non-axis segment to
         # raise coordinate diversity and lower axis ratio while preserving fail=0.
         gate = (
-            1.12 <= aspect_ratio <= 1.82
-            and 0.33 <= complexity <= 0.62
-            and 0.16 <= edge_density <= 0.34
+            1.10 <= aspect_ratio <= 1.92
+            and 0.33 <= complexity <= 0.64
+            and 0.16 <= edge_density <= 0.40
         )
         if not gate:
             return 0
