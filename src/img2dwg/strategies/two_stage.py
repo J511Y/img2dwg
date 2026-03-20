@@ -770,6 +770,25 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0010 if midskew_default_band_axis_unlock_gate else 0.0
         )
 
+        # v160: low-edge default-band degrid extension. Residual thesis pockets
+        # in web_floorplan_grid_v1 still appear around mild/moderate skew with
+        # slightly lower edge density where v136-v159 terms under-fire. Apply a
+        # tiny bounded boost to lift coordinate diversity and reduce axis bias.
+        low_edge_default_band_degrid_gate = (
+            1.06 <= aspect_ratio <= 1.78
+            and 0.24 <= complexity <= 0.56
+            and 0.08 <= signals.edge_density <= 0.18
+        )
+        low_edge_default_band_degrid_chords = (
+            1 if low_edge_default_band_degrid_gate else 0
+        )
+        low_edge_default_band_degrid_offgrid = (
+            0.0007 if low_edge_default_band_degrid_gate else 0.0
+        )
+        low_edge_default_band_degrid_fan = (
+            0.0009 if low_edge_default_band_degrid_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -808,6 +827,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_chords
                 + near_square_default_band_axis_unlock_chords
                 + midskew_default_band_axis_unlock_chords
+                + low_edge_default_band_degrid_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -845,6 +865,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_offgrid
                 + near_square_default_band_axis_unlock_offgrid
                 + midskew_default_band_axis_unlock_offgrid
+                + low_edge_default_band_degrid_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -882,6 +903,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_fan
                 + near_square_default_band_axis_unlock_fan
                 + midskew_default_band_axis_unlock_fan
+                + low_edge_default_band_degrid_fan
             ),
         )
 
