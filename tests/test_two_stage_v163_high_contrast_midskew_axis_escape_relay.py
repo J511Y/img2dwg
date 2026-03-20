@@ -17,11 +17,11 @@ def test_two_stage_v163_high_contrast_midskew_axis_escape_relay_injects_note(
 
     strategy = TwoStageBaselineStrategy()
 
-    # Out-of-gate: contrast just below relay lower bound.
+    # Out-of-gate: contrast below the expanded relay lower bound.
     monkeypatch.setattr(
         two_stage,
         "extract_image_signals",
-        lambda _: ImageSignals(width=160, height=100, contrast=0.69, edge_density=0.18),
+        lambda _: ImageSignals(width=160, height=100, contrast=0.64, edge_density=0.18),
     )
     out_no_gate = strategy.run(ConversionInput(image_path=image_path), tmp_path / "out_no_gate")
 

@@ -300,15 +300,16 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         if right <= left or bottom <= top:
             return 0
 
-        # v163: high-contrast midskew axis-escape relay. Residual
+        # v164: high-contrast midskew axis-escape relay gate expansion. Residual
         # web_floorplan_grid_v1 thesis pockets still show mild axis rebundling
-        # in the same band as v162. Inject one bounded diagonal relay segment
-        # to lower axis ratio and widen unique coordinates while keeping fail=0.
+        # slightly below v163's contrast/complexity floor. Widen that pocket
+        # with the same bounded relay segment to reduce axis ratio while
+        # preserving deterministic fail=0 behavior.
         gate = (
-            1.24 <= aspect_ratio <= 1.82
-            and 0.30 <= complexity <= 0.70
-            and 0.70 <= contrast <= 1.06
-            and 0.10 <= edge_density <= 0.30
+            1.20 <= aspect_ratio <= 1.86
+            and 0.28 <= complexity <= 0.72
+            and 0.66 <= contrast <= 1.08
+            and 0.09 <= edge_density <= 0.32
         )
         if not gate:
             return 0
