@@ -726,9 +726,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         )
         default_band_coord_diversity_chords = 1 if default_band_coord_diversity_gate else 0
         default_band_coord_diversity_offgrid = (
-            0.0006 if default_band_coord_diversity_gate else 0.0
+            0.0009 if default_band_coord_diversity_gate else 0.0
         )
-        default_band_coord_diversity_fan = 0.0008 if default_band_coord_diversity_gate else 0.0
+        default_band_coord_diversity_fan = 0.0012 if default_band_coord_diversity_gate else 0.0
 
         # v142: near-square default-band axis unlock bridge. Residual thesis
         # hotspots in web_floorplan_grid_v1 still include mildly skewed near-square
@@ -800,10 +800,29 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             1 if midskew_default_band_dense_edge_gate else 0
         )
         midskew_default_band_dense_edge_offgrid = (
-            0.0009 if midskew_default_band_dense_edge_gate else 0.0
+            0.0012 if midskew_default_band_dense_edge_gate else 0.0
         )
         midskew_default_band_dense_edge_fan = (
-            0.0011 if midskew_default_band_dense_edge_gate else 0.0
+            0.0015 if midskew_default_band_dense_edge_gate else 0.0
+        )
+
+        # v153: high-edge midskew default-band extension. Residual thesis
+        # axis pockets on web_floorplan_grid_v1 remain in the upper dense-edge
+        # pocket where v152 can under-fire. Add a tiny bounded lift focused on
+        # that pocket to reduce axis rebundling while preserving fail=0.
+        midskew_default_band_high_edge_gate = (
+            1.20 <= aspect_ratio <= 1.70
+            and 0.30 <= complexity <= 0.62
+            and 0.30 <= signals.edge_density <= 0.48
+        )
+        midskew_default_band_high_edge_chords = (
+            1 if midskew_default_band_high_edge_gate else 0
+        )
+        midskew_default_band_high_edge_offgrid = (
+            0.0010 if midskew_default_band_high_edge_gate else 0.0
+        )
+        midskew_default_band_high_edge_fan = (
+            0.0013 if midskew_default_band_high_edge_gate else 0.0
         )
 
         preset = replace(
@@ -846,6 +865,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_default_band_axis_unlock_chords
                 + midskew_default_band_coord_bridge_chords
                 + midskew_default_band_dense_edge_chords
+                + midskew_default_band_high_edge_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -885,6 +905,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_default_band_axis_unlock_offgrid
                 + midskew_default_band_coord_bridge_offgrid
                 + midskew_default_band_dense_edge_offgrid
+                + midskew_default_band_high_edge_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -924,6 +945,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_default_band_axis_unlock_fan
                 + midskew_default_band_coord_bridge_fan
                 + midskew_default_band_dense_edge_fan
+                + midskew_default_band_high_edge_fan
             ),
         )
 

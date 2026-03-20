@@ -371,6 +371,26 @@ class ConsensusQAStrategy(ConversionStrategy):
             0.0016 if high_midskew_default_band_tail_unlock_gate else 0.0
         )
 
+        # v140: default-band midskew dense-consensus bridge. Residual
+        # web_floorplan_grid_v1 consensus traces can still rebundle around
+        # mild-to-mid skew with moderate edge density. Add a tiny bounded lift
+        # in this broad pocket to improve coordinate diversity without fail=0 risk.
+        midskew_dense_consensus_bridge_gate = (
+            1.10 <= aspect_ratio <= 1.74
+            and 0.32 <= complexity <= 0.62
+            and 0.18 <= signals.edge_density <= 0.40
+            and 0.69 <= consensus_score <= 0.78
+        )
+        midskew_dense_consensus_bridge_chords = (
+            1 if midskew_dense_consensus_bridge_gate else 0
+        )
+        midskew_dense_consensus_bridge_offgrid = (
+            0.0008 if midskew_dense_consensus_bridge_gate else 0.0
+        )
+        midskew_dense_consensus_bridge_fan = (
+            0.0010 if midskew_dense_consensus_bridge_gate else 0.0
+        )
+
         tuned_preset = replace(
             preset,
             debias_chord_multiplier=(
@@ -398,6 +418,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_score_midskew_midedge_extension_chords
                 + near_square_midedge_bridge_chords
                 + high_midskew_default_band_tail_unlock_chords
+                + midskew_dense_consensus_bridge_chords
                 + 4
             ),
             offgrid_shift_ratio=(
@@ -424,6 +445,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_score_midskew_midedge_extension_offgrid
                 + near_square_midedge_bridge_offgrid
                 + high_midskew_default_band_tail_unlock_offgrid
+                + midskew_dense_consensus_bridge_offgrid
             ),
             diagonal_fan_ratio=(
                 preset.diagonal_fan_ratio
@@ -447,6 +469,7 @@ class ConsensusQAStrategy(ConversionStrategy):
                 + default_score_midskew_midedge_extension_fan
                 + near_square_midedge_bridge_fan
                 + high_midskew_default_band_tail_unlock_fan
+                + midskew_dense_consensus_bridge_fan
             ),
         )
 
