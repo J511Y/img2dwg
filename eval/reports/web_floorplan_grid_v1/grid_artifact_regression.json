@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-20T09:57:36.478850+00:00",
+  "generated_at": "2026-03-20T10:27:41.340015+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 130.75,
-      "avg_axis_aligned_ratio": 0.0312,
+      "avg_line_count": 131.0833,
+      "avg_axis_aligned_ratio": 0.0311,
       "std_axis_aligned_ratio": 0.0046,
-      "avg_axis_margin_to_grid_threshold": 0.8688,
-      "avg_axis_margin_score": 86.88,
+      "avg_axis_margin_to_grid_threshold": 0.8689,
+      "avg_axis_margin_score": 86.89,
       "max_axis_aligned_ratio": 0.0435,
       "max_axis_margin_to_grid_threshold": 0.8565,
       "p95_axis_aligned_ratio": 0.0435,
       "p95_axis_margin_to_grid_threshold": 0.8565,
       "min_axis_aligned_ratio": 0.025,
       "min_axis_margin_to_grid_threshold": 0.875,
-      "avg_unique_x_count": 248.5,
-      "avg_unique_y_count": 248.4167
+      "avg_unique_x_count": 249.1667,
+      "avg_unique_y_count": 249.0833
     }
   },
   "top_problematic": [],
@@ -307,15 +307,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 135,
+        "total_entities": 136,
         "entity_type_counts": {
-          "LINE": 135
+          "LINE": 136
         },
         "unique_entity_types": 1,
-        "line_count": 135,
-        "axis_aligned_line_ratio": 0.0296,
-        "unique_x_count": 257,
-        "unique_y_count": 257
+        "line_count": 136,
+        "axis_aligned_line_ratio": 0.0294,
+        "unique_x_count": 259,
+        "unique_y_count": 259
       }
     },
     {
@@ -326,15 +326,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 133,
+        "total_entities": 134,
         "entity_type_counts": {
-          "LINE": 133
+          "LINE": 134
         },
         "unique_entity_types": 1,
-        "line_count": 133,
-        "axis_aligned_line_ratio": 0.0301,
-        "unique_x_count": 253,
-        "unique_y_count": 253
+        "line_count": 134,
+        "axis_aligned_line_ratio": 0.0299,
+        "unique_x_count": 255,
+        "unique_y_count": 255
       }
     },
     {
@@ -345,15 +345,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 133,
+        "total_entities": 134,
         "entity_type_counts": {
-          "LINE": 133
+          "LINE": 134
         },
         "unique_entity_types": 1,
-        "line_count": 133,
-        "axis_aligned_line_ratio": 0.0301,
-        "unique_x_count": 253,
-        "unique_y_count": 252
+        "line_count": 134,
+        "axis_aligned_line_ratio": 0.0299,
+        "unique_x_count": 255,
+        "unique_y_count": 254
       }
     },
     {
@@ -516,15 +516,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 124,
+        "total_entities": 125,
         "entity_type_counts": {
-          "LINE": 124
+          "LINE": 125
         },
         "unique_entity_types": 1,
-        "line_count": 124,
-        "axis_aligned_line_ratio": 0.0323,
-        "unique_x_count": 235,
-        "unique_y_count": 235
+        "line_count": 125,
+        "axis_aligned_line_ratio": 0.032,
+        "unique_x_count": 237,
+        "unique_y_count": 237
       }
     },
     {
@@ -796,19 +796,19 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0314,
-        "current": 0.0312,
-        "delta": -0.0002
+        "previous": 0.0312,
+        "current": 0.0311,
+        "delta": -0.0001
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8686,
-        "current": 0.8688,
-        "delta": 0.0002
+        "previous": 0.8688,
+        "current": 0.8689,
+        "delta": 0.0001
       },
       "avg_line_count": {
-        "previous": 129.75,
-        "current": 130.75,
-        "delta": 1.0
+        "previous": 130.75,
+        "current": 131.0833,
+        "delta": 0.3333
       }
     }
   },
