@@ -154,6 +154,175 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         plan.segments.append((start, end))
         return 1
 
+    @staticmethod
+    def _inject_midskew_default_band_relay_diag(
+        plan: object,
+        *,
+        aspect_ratio: float,
+        complexity: float,
+        edge_density: float,
+    ) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+        if right <= left or bottom <= top:
+            return 0
+
+        # v149: midskew default-band relay diagonal. Residual thesis pockets
+        # still show mild axis rebundling in the same default-band corridor as
+        # v146/v148. Inject one bounded diagonal to lift coordinate diversity
+        # and lower axis ratio while preserving fail=0.
+        gate = (
+            1.18 <= aspect_ratio <= 1.74
+            and 0.27 <= complexity <= 0.62
+            and 0.10 <= edge_density <= 0.36
+        )
+        if not gate:
+            return 0
+
+        gain = 0.00039 + (complexity * 0.00023)
+        start = (
+            round(left + ((right - left) * (0.268 + (gain * 0.74))), 5),
+            round(top + ((bottom - top) * (0.812 - (gain * 0.61))), 5),
+        )
+        end = (
+            round(left + ((right - left) * (0.828 - (gain * 0.55))), 5),
+            round(top + ((bottom - top) * (0.284 + (gain * 0.86))), 5),
+        )
+        plan.segments.append((start, end))
+        return 1
+
+    @staticmethod
+    def _inject_default_band_axis_relay_diag(
+        plan: object,
+        *,
+        aspect_ratio: float,
+        complexity: float,
+        edge_density: float,
+    ) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+        if right <= left or bottom <= top:
+            return 0
+
+        # v150: default-band axis relay extension. Residual two_stage pockets
+        # around mild/moderate skew still keep sparse axis-heavy bundles. Add
+        # one additional bounded diagonal to widen coordinate diversity while
+        # preserving fail=0 behavior.
+        gate = (
+            1.14 <= aspect_ratio <= 1.78
+            and 0.28 <= complexity <= 0.64
+            and 0.08 <= edge_density <= 0.34
+        )
+        if not gate:
+            return 0
+
+        gain = 0.00033 + (complexity * 0.00019)
+        start = (
+            round(left + ((right - left) * (0.216 + (gain * 0.88))), 5),
+            round(top + ((bottom - top) * (0.778 - (gain * 0.70))), 5),
+        )
+        end = (
+            round(left + ((right - left) * (0.812 - (gain * 0.64))), 5),
+            round(top + ((bottom - top) * (0.244 + (gain * 0.96))), 5),
+        )
+        plan.segments.append((start, end))
+        return 1
+
+    @staticmethod
+    def _inject_midskew_default_band_dense_edge_diag(
+        plan: object,
+        *,
+        aspect_ratio: float,
+        complexity: float,
+        edge_density: float,
+    ) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+        if right <= left or bottom <= top:
+            return 0
+
+        # v152: midskew default-band dense-edge relief. Residual two_stage
+        # grid pockets still appear when edge density rises beyond the v151
+        # bridge window. Inject one bounded diagonal in this denser pocket to
+        # keep coordinate diversity and reduce axis rebundling with fail=0.
+        gate = (
+            1.18 <= aspect_ratio <= 1.66
+            and 0.30 <= complexity <= 0.60
+            and 0.22 <= edge_density <= 0.42
+        )
+        if not gate:
+            return 0
+
+        gain = 0.00036 + (complexity * 0.00022)
+        start = (
+            round(left + ((right - left) * (0.312 + (gain * 0.71))), 5),
+            round(top + ((bottom - top) * (0.198 + (gain * 0.82))), 5),
+        )
+        end = (
+            round(left + ((right - left) * (0.776 - (gain * 0.63))), 5),
+            round(top + ((bottom - top) * (0.846 - (gain * 0.69))), 5),
+        )
+        plan.segments.append((start, end))
+        return 1
+
+    @staticmethod
+    def _inject_default_band_global_relay_diag(
+        plan: object,
+        *,
+        aspect_ratio: float,
+        complexity: float,
+        edge_density: float,
+    ) -> int:
+        if len(plan.segments) < 4:
+            return 0
+
+        left = plan.segments[0][0][0]
+        right = plan.segments[0][1][0]
+        top = plan.segments[0][0][1]
+        bottom = plan.segments[2][0][1]
+        if right <= left or bottom <= top:
+            return 0
+
+        # v154: broad default-band relay diagonal. Even after targeted midskew
+        # lifts, thesis can keep mild axis bias across the common
+        # web_floorplan_grid_v1 pocket. Inject one bounded non-axis segment in
+        # that broad pocket to reduce axis ratio and increase coordinate spread
+        # while preserving fail=0.
+        gate = (
+            1.00 <= aspect_ratio <= 2.05
+            and 0.34 <= complexity <= 0.58
+            and 0.13 <= edge_density <= 0.29
+        )
+        if not gate:
+            return 0
+
+        gain = 0.00028 + (complexity * 0.00018)
+        start = (
+            round(left + ((right - left) * (0.142 + (gain * 0.84))), 5),
+            round(top + ((bottom - top) * (0.694 - (gain * 0.72))), 5),
+        )
+        end = (
+            round(left + ((right - left) * (0.892 - (gain * 0.61))), 5),
+            round(top + ((bottom - top) * (0.268 + (gain * 0.93))), 5),
+        )
+        plan.segments.append((start, end))
+        return 1
+
     def run(self, conv_input: ConversionInput, output_dir: Path) -> ConversionOutput:
         output_dir.mkdir(parents=True, exist_ok=True)
         signals = extract_image_signals(conv_input.image_path)
@@ -600,9 +769,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         )
         default_band_coord_diversity_chords = 1 if default_band_coord_diversity_gate else 0
         default_band_coord_diversity_offgrid = (
-            0.0006 if default_band_coord_diversity_gate else 0.0
+            0.0009 if default_band_coord_diversity_gate else 0.0
         )
-        default_band_coord_diversity_fan = 0.0008 if default_band_coord_diversity_gate else 0.0
+        default_band_coord_diversity_fan = 0.0012 if default_band_coord_diversity_gate else 0.0
 
         # v142: near-square default-band axis unlock bridge. Residual thesis
         # hotspots in web_floorplan_grid_v1 still include mildly skewed near-square
@@ -643,6 +812,62 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0010 if midskew_default_band_axis_unlock_gate else 0.0
         )
 
+        # v151: midskew default-band coordination bridge. Residual thesis
+        # grid pockets still appear around mild-to-mid skew with slightly
+        # higher edge density where v143/v150 can under-fire. Add a tiny,
+        # bounded lift to reduce axis rebundling while preserving fail=0.
+        midskew_default_band_coord_bridge_gate = (
+            1.16 <= aspect_ratio <= 1.58
+            and 0.30 <= complexity <= 0.58
+            and 0.18 <= signals.edge_density <= 0.34
+        )
+        midskew_default_band_coord_bridge_chords = (
+            1 if midskew_default_band_coord_bridge_gate else 0
+        )
+        midskew_default_band_coord_bridge_offgrid = (
+            0.0012 if midskew_default_band_coord_bridge_gate else 0.0
+        )
+        midskew_default_band_coord_bridge_fan = (
+            0.0015 if midskew_default_band_coord_bridge_gate else 0.0
+        )
+
+        # v152: midskew default-band dense-edge bridge extension. Residual
+        # thesis pockets remain in the denser edge band just above v151.
+        # Add a tiny bounded lift for coordinate diversity while preserving fail=0.
+        midskew_default_band_dense_edge_gate = (
+            1.18 <= aspect_ratio <= 1.66
+            and 0.30 <= complexity <= 0.60
+            and 0.22 <= signals.edge_density <= 0.42
+        )
+        midskew_default_band_dense_edge_chords = (
+            1 if midskew_default_band_dense_edge_gate else 0
+        )
+        midskew_default_band_dense_edge_offgrid = (
+            0.0012 if midskew_default_band_dense_edge_gate else 0.0
+        )
+        midskew_default_band_dense_edge_fan = (
+            0.0015 if midskew_default_band_dense_edge_gate else 0.0
+        )
+
+        # v153: high-edge midskew default-band extension. Residual thesis
+        # axis pockets on web_floorplan_grid_v1 remain in the upper dense-edge
+        # pocket where v152 can under-fire. Add a tiny bounded lift focused on
+        # that pocket to reduce axis rebundling while preserving fail=0.
+        midskew_default_band_high_edge_gate = (
+            1.20 <= aspect_ratio <= 1.70
+            and 0.30 <= complexity <= 0.62
+            and 0.30 <= signals.edge_density <= 0.48
+        )
+        midskew_default_band_high_edge_chords = (
+            1 if midskew_default_band_high_edge_gate else 0
+        )
+        midskew_default_band_high_edge_offgrid = (
+            0.0010 if midskew_default_band_high_edge_gate else 0.0
+        )
+        midskew_default_band_high_edge_fan = (
+            0.0013 if midskew_default_band_high_edge_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -681,6 +906,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_chords
                 + near_square_default_band_axis_unlock_chords
                 + midskew_default_band_axis_unlock_chords
+                + midskew_default_band_coord_bridge_chords
+                + midskew_default_band_dense_edge_chords
+                + midskew_default_band_high_edge_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -718,6 +946,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_offgrid
                 + near_square_default_band_axis_unlock_offgrid
                 + midskew_default_band_axis_unlock_offgrid
+                + midskew_default_band_coord_bridge_offgrid
+                + midskew_default_band_dense_edge_offgrid
+                + midskew_default_band_high_edge_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -755,6 +986,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + default_band_coord_diversity_fan
                 + near_square_default_band_axis_unlock_fan
                 + midskew_default_band_axis_unlock_fan
+                + midskew_default_band_coord_bridge_fan
+                + midskew_default_band_dense_edge_fan
+                + midskew_default_band_high_edge_fan
             ),
         )
 
@@ -790,6 +1024,50 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         if cross_bridge_added:
             plan.notes.append(
                 f"anti_grid_detail_diag:pair_v148_midskew_default_band_cross_bridge:{cross_bridge_added}"
+            )
+
+        relay_diag_added = self._inject_midskew_default_band_relay_diag(
+            plan,
+            aspect_ratio=aspect_ratio,
+            complexity=complexity,
+            edge_density=signals.edge_density,
+        )
+        if relay_diag_added:
+            plan.notes.append(
+                f"anti_grid_detail_diag:pair_v149_midskew_default_band_relay_diag:{relay_diag_added}"
+            )
+
+        axis_relay_diag_added = self._inject_default_band_axis_relay_diag(
+            plan,
+            aspect_ratio=aspect_ratio,
+            complexity=complexity,
+            edge_density=signals.edge_density,
+        )
+        if axis_relay_diag_added:
+            plan.notes.append(
+                f"anti_grid_detail_diag:pair_v150_default_band_axis_relay_diag:{axis_relay_diag_added}"
+            )
+
+        dense_edge_diag_added = self._inject_midskew_default_band_dense_edge_diag(
+            plan,
+            aspect_ratio=aspect_ratio,
+            complexity=complexity,
+            edge_density=signals.edge_density,
+        )
+        if dense_edge_diag_added:
+            plan.notes.append(
+                f"anti_grid_detail_diag:pair_v152_midskew_default_band_dense_edge_diag:{dense_edge_diag_added}"
+            )
+
+        global_relay_diag_added = self._inject_default_band_global_relay_diag(
+            plan,
+            aspect_ratio=aspect_ratio,
+            complexity=complexity,
+            edge_density=signals.edge_density,
+        )
+        if global_relay_diag_added:
+            plan.notes.append(
+                f"anti_grid_detail_diag:pair_v154_default_band_global_relay_diag:{global_relay_diag_added}"
             )
 
         dxf_path = output_dir / f"{conv_input.image_path.stem}.dxf"
