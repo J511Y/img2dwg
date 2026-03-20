@@ -825,6 +825,26 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             0.0013 if midskew_default_band_high_edge_gate else 0.0
         )
 
+        # v154: high-edge moderate-complexity axis unlock tail. A residual
+        # subset of web_floorplan_grid_v1 thesis samples remains axis-heavy in
+        # mild-to-mid skew with moderate complexity where v152/v153 can under-fire.
+        # Add a tiny bounded lift in that pocket to reduce axis rebundling
+        # while preserving fail=0.
+        high_edge_moderate_complexity_axis_unlock_gate = (
+            1.14 <= aspect_ratio <= 1.74
+            and 0.24 <= complexity <= 0.56
+            and 0.24 <= signals.edge_density <= 0.46
+        )
+        high_edge_moderate_complexity_axis_unlock_chords = (
+            2 if high_edge_moderate_complexity_axis_unlock_gate else 0
+        )
+        high_edge_moderate_complexity_axis_unlock_offgrid = (
+            0.0015 if high_edge_moderate_complexity_axis_unlock_gate else 0.0
+        )
+        high_edge_moderate_complexity_axis_unlock_fan = (
+            0.0020 if high_edge_moderate_complexity_axis_unlock_gate else 0.0
+        )
+
         preset = replace(
             self._preset,
             debias_chord_multiplier=(
@@ -866,6 +886,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_default_band_coord_bridge_chords
                 + midskew_default_band_dense_edge_chords
                 + midskew_default_band_high_edge_chords
+                + high_edge_moderate_complexity_axis_unlock_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -906,6 +927,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_default_band_coord_bridge_offgrid
                 + midskew_default_band_dense_edge_offgrid
                 + midskew_default_band_high_edge_offgrid
+                + high_edge_moderate_complexity_axis_unlock_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -946,6 +968,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_default_band_coord_bridge_fan
                 + midskew_default_band_dense_edge_fan
                 + midskew_default_band_high_edge_fan
+                + high_edge_moderate_complexity_axis_unlock_fan
             ),
         )
 
