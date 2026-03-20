@@ -1,6 +1,6 @@
 {
   "report_schema_version": 1,
-  "generated_at": "2026-03-20T13:30:11.772781+00:00",
+  "generated_at": "2026-03-20T13:58:46.050212+00:00",
   "summary": {
     "total_cases": 36,
     "passed_cases": 36,
@@ -54,19 +54,19 @@
       "avg_unique_y_count": 3.0
     },
     "two_stage_baseline": {
-      "avg_line_count": 130.5,
-      "avg_axis_aligned_ratio": 0.0313,
+      "avg_line_count": 131.3333,
+      "avg_axis_aligned_ratio": 0.0311,
       "std_axis_aligned_ratio": 0.0048,
-      "avg_axis_margin_to_grid_threshold": 0.8687,
-      "avg_axis_margin_score": 86.87,
+      "avg_axis_margin_to_grid_threshold": 0.8689,
+      "avg_axis_margin_score": 86.89,
       "max_axis_aligned_ratio": 0.044,
       "max_axis_margin_to_grid_threshold": 0.856,
       "p95_axis_aligned_ratio": 0.044,
       "p95_axis_margin_to_grid_threshold": 0.856,
       "min_axis_aligned_ratio": 0.0253,
       "min_axis_margin_to_grid_threshold": 0.8747,
-      "avg_unique_x_count": 248.0,
-      "avg_unique_y_count": 248.0
+      "avg_unique_x_count": 249.6667,
+      "avg_unique_y_count": 249.6667
     }
   },
   "top_problematic": [],
@@ -307,25 +307,6 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 134,
-        "entity_type_counts": {
-          "LINE": 134
-        },
-        "unique_entity_types": 1,
-        "line_count": 134,
-        "axis_aligned_line_ratio": 0.0299,
-        "unique_x_count": 255,
-        "unique_y_count": 255
-      }
-    },
-    {
-      "strategy_name": "two_stage_baseline",
-      "case_id": "case_002",
-      "image_path": "output/web_floorplan_grid_v1/images/Book_Building_second_floor_plan.png",
-      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0001-output__web_floorplan_grid_v1__images__Book_Building_second_floor_plan.png/Book_Building_second_floor_plan.dxf",
-      "flags": [],
-      "diagnostics": {
-        "cad_loadable": true,
         "total_entities": 136,
         "entity_type_counts": {
           "LINE": 136
@@ -339,21 +320,40 @@
     },
     {
       "strategy_name": "two_stage_baseline",
+      "case_id": "case_002",
+      "image_path": "output/web_floorplan_grid_v1/images/Book_Building_second_floor_plan.png",
+      "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0001-output__web_floorplan_grid_v1__images__Book_Building_second_floor_plan.png/Book_Building_second_floor_plan.dxf",
+      "flags": [],
+      "diagnostics": {
+        "cad_loadable": true,
+        "total_entities": 138,
+        "entity_type_counts": {
+          "LINE": 138
+        },
+        "unique_entity_types": 1,
+        "line_count": 138,
+        "axis_aligned_line_ratio": 0.029,
+        "unique_x_count": 263,
+        "unique_y_count": 263
+      }
+    },
+    {
+      "strategy_name": "two_stage_baseline",
       "case_id": "case_003",
       "image_path": "output/web_floorplan_grid_v1/images/Canada_Building_Saskatoon_floor_plan.png",
       "dxf_path": "output/benchmark/web_floorplan_grid_v1/two_stage_baseline/0002-output__web_floorplan_grid_v1__images__Canada_Building_Saskatoon_floor_plan.png/Canada_Building_Saskatoon_floor_plan.dxf",
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 132,
+        "total_entities": 134,
         "entity_type_counts": {
-          "LINE": 132
+          "LINE": 134
         },
         "unique_entity_types": 1,
-        "line_count": 132,
-        "axis_aligned_line_ratio": 0.0303,
-        "unique_x_count": 251,
-        "unique_y_count": 251
+        "line_count": 134,
+        "axis_aligned_line_ratio": 0.0299,
+        "unique_x_count": 255,
+        "unique_y_count": 255
       }
     },
     {
@@ -421,15 +421,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 135,
+        "total_entities": 137,
         "entity_type_counts": {
-          "LINE": 135
+          "LINE": 137
         },
         "unique_entity_types": 1,
-        "line_count": 135,
-        "axis_aligned_line_ratio": 0.0296,
-        "unique_x_count": 257,
-        "unique_y_count": 257
+        "line_count": 137,
+        "axis_aligned_line_ratio": 0.0292,
+        "unique_x_count": 261,
+        "unique_y_count": 261
       }
     },
     {
@@ -440,15 +440,15 @@
       "flags": [],
       "diagnostics": {
         "cad_loadable": true,
-        "total_entities": 135,
+        "total_entities": 137,
         "entity_type_counts": {
-          "LINE": 135
+          "LINE": 137
         },
         "unique_entity_types": 1,
-        "line_count": 135,
-        "axis_aligned_line_ratio": 0.0296,
-        "unique_x_count": 257,
-        "unique_y_count": 257
+        "line_count": 137,
+        "axis_aligned_line_ratio": 0.0292,
+        "unique_x_count": 261,
+        "unique_y_count": 261
       }
     },
     {
@@ -796,18 +796,18 @@
     },
     "two_stage_baseline": {
       "avg_axis_aligned_ratio": {
-        "previous": 0.0315,
-        "current": 0.0313,
+        "previous": 0.0313,
+        "current": 0.0311,
         "delta": -0.0002
       },
       "avg_axis_margin_to_grid_threshold": {
-        "previous": 0.8685,
-        "current": 0.8687,
+        "previous": 0.8687,
+        "current": 0.8689,
         "delta": 0.0002
       },
       "avg_line_count": {
-        "previous": 129.6667,
-        "current": 130.5,
+        "previous": 130.5,
+        "current": 131.3333,
         "delta": 0.8333
       }
     }

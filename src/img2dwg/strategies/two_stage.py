@@ -601,9 +601,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         # pockets that sit near but not always inside v112's edge gate.
         # Add a tiny deterministic fallback lift to reduce residual axis bias
         # while keeping fail=0 stability unchanged.
-        moderate_skew_fallback_gate = (
-            1.12 <= aspect_ratio <= 1.72 and 0.30 <= complexity <= 0.66
-        )
+        moderate_skew_fallback_gate = 1.12 <= aspect_ratio <= 1.72 and 0.30 <= complexity <= 0.66
         moderate_skew_fallback_chords = 2 if moderate_skew_fallback_gate else 0
         moderate_skew_fallback_offgrid = 0.0012 if moderate_skew_fallback_gate else 0.0
         moderate_skew_fallback_fan = 0.0015 if moderate_skew_fallback_gate else 0.0
@@ -676,9 +674,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             and 0.10 <= signals.edge_density <= 0.30
         )
         default_band_low_edge_bridge_chords = 1 if default_band_low_edge_bridge_gate else 0
-        default_band_low_edge_bridge_offgrid = (
-            0.0007 if default_band_low_edge_bridge_gate else 0.0
-        )
+        default_band_low_edge_bridge_offgrid = 0.0007 if default_band_low_edge_bridge_gate else 0.0
         default_band_low_edge_bridge_fan = 0.0009 if default_band_low_edge_bridge_gate else 0.0
 
         # v138: near-square low-edge default-band reinforcement. Residual thesis
@@ -690,7 +686,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             and 0.30 <= complexity <= 0.64
             and 0.08 <= signals.edge_density <= 0.20
         )
-        near_square_low_edge_default_band_chords = 1 if near_square_low_edge_default_band_gate else 0
+        near_square_low_edge_default_band_chords = (
+            1 if near_square_low_edge_default_band_gate else 0
+        )
         near_square_low_edge_default_band_offgrid = (
             0.0008 if near_square_low_edge_default_band_gate else 0.0
         )
@@ -726,9 +724,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             1.08 <= aspect_ratio <= 1.70 and 0.26 <= complexity <= 0.62
         )
         default_band_coord_diversity_chords = 1 if default_band_coord_diversity_gate else 0
-        default_band_coord_diversity_offgrid = (
-            0.0006 if default_band_coord_diversity_gate else 0.0
-        )
+        default_band_coord_diversity_offgrid = 0.0006 if default_band_coord_diversity_gate else 0.0
         default_band_coord_diversity_fan = 0.0008 if default_band_coord_diversity_gate else 0.0
 
         # v142: near-square default-band axis unlock bridge. Residual thesis
@@ -760,9 +756,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             and 0.28 <= complexity <= 0.60
             and 0.10 <= signals.edge_density <= 0.30
         )
-        midskew_default_band_axis_unlock_chords = (
-            1 if midskew_default_band_axis_unlock_gate else 0
-        )
+        midskew_default_band_axis_unlock_chords = 1 if midskew_default_band_axis_unlock_gate else 0
         midskew_default_band_axis_unlock_offgrid = (
             0.0008 if midskew_default_band_axis_unlock_gate else 0.0
         )
@@ -779,15 +773,9 @@ class TwoStageBaselineStrategy(ConversionStrategy):
             and 0.24 <= complexity <= 0.56
             and 0.08 <= signals.edge_density <= 0.18
         )
-        low_edge_default_band_degrid_chords = (
-            1 if low_edge_default_band_degrid_gate else 0
-        )
-        low_edge_default_band_degrid_offgrid = (
-            0.0007 if low_edge_default_band_degrid_gate else 0.0
-        )
-        low_edge_default_band_degrid_fan = (
-            0.0009 if low_edge_default_band_degrid_gate else 0.0
-        )
+        low_edge_default_band_degrid_chords = 1 if low_edge_default_band_degrid_gate else 0
+        low_edge_default_band_degrid_offgrid = 0.0007 if low_edge_default_band_degrid_gate else 0.0
+        low_edge_default_band_degrid_fan = 0.0009 if low_edge_default_band_degrid_gate else 0.0
 
         # v161: low-edge midskew default-band degrid follow-up. Remaining
         # web_floorplan_grid_v1 thesis pockets cluster around mild/moderate skew
@@ -808,6 +796,19 @@ class TwoStageBaselineStrategy(ConversionStrategy):
         low_edge_midskew_default_band_followup_fan = (
             0.0010 if low_edge_midskew_default_band_followup_gate else 0.0
         )
+
+        # v162: high-contrast midskew degrid bridge. Recent web_floorplan_grid_v1
+        # residual thesis pockets are concentrated in midskew plans with high
+        # contrast where low-contrast gates under-fire. Add a tiny bounded lift
+        # in this band to reduce axis rebundling while preserving fail=0.
+        high_contrast_midskew_degrid_gate = (
+            1.30 <= aspect_ratio <= 1.70
+            and 0.72 <= signals.contrast <= 1.02
+            and 0.13 <= signals.edge_density <= 0.24
+        )
+        high_contrast_midskew_degrid_chords = 1 if high_contrast_midskew_degrid_gate else 0
+        high_contrast_midskew_degrid_offgrid = 0.0009 if high_contrast_midskew_degrid_gate else 0.0
+        high_contrast_midskew_degrid_fan = 0.0012 if high_contrast_midskew_degrid_gate else 0.0
 
         preset = replace(
             self._preset,
@@ -849,6 +850,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_default_band_axis_unlock_chords
                 + low_edge_default_band_degrid_chords
                 + low_edge_midskew_default_band_followup_chords
+                + high_contrast_midskew_degrid_chords
             ),
             offgrid_shift_ratio=(
                 self._preset.offgrid_shift_ratio
@@ -888,6 +890,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_default_band_axis_unlock_offgrid
                 + low_edge_default_band_degrid_offgrid
                 + low_edge_midskew_default_band_followup_offgrid
+                + high_contrast_midskew_degrid_offgrid
             ),
             diagonal_fan_ratio=(
                 self._preset.diagonal_fan_ratio
@@ -927,6 +930,7 @@ class TwoStageBaselineStrategy(ConversionStrategy):
                 + midskew_default_band_axis_unlock_fan
                 + low_edge_default_band_degrid_fan
                 + low_edge_midskew_default_band_followup_fan
+                + high_contrast_midskew_degrid_fan
             ),
         )
 
