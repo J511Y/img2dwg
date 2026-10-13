@@ -1,0 +1,100 @@
+{
+  "schema": "img2dwg-component-inventory/v1",
+  "sample_count": 40,
+  "phases": {
+    "source": {
+      "entity_types": {
+        "LINE": 49123,
+        "TEXT": 2722,
+        "LWPOLYLINE": 14053,
+        "HATCH": 1394,
+        "MTEXT": 1314,
+        "DIMENSION": 1826,
+        "ARC": 869,
+        "CIRCLE": 204,
+        "MLINE": 106,
+        "INSERT": 151,
+        "ELLIPSE": 110,
+        "POLYLINE": 8,
+        "SPLINE": 8
+      },
+      "files_with_modelspace_insert": 13,
+      "files_with_groups": 0,
+      "block_definition_count": 3543,
+      "reachable_block_definition_count": 1894,
+      "files_with_missing_reachable_block": 0,
+      "files_with_block_cycles": 0,
+      "dimension_picture_present": 1826,
+      "dimension_nondefault_text_override": 0,
+      "closed_lwpolyline_count": 10197,
+      "dimassoc_object_count": 992,
+      "all_copied_inputs_unchanged": true
+    },
+    "before": {
+      "entity_types": {
+        "LINE": 22505,
+        "DIMENSION": 913,
+        "HATCH": 640,
+        "LWPOLYLINE": 5859,
+        "TEXT": 278,
+        "MTEXT": 640,
+        "ARC": 369,
+        "MLINE": 47,
+        "INSERT": 76,
+        "CIRCLE": 40,
+        "ELLIPSE": 55,
+        "POLYLINE": 4,
+        "SPLINE": 4
+      },
+      "files_with_modelspace_insert": 13,
+      "files_with_groups": 0,
+      "block_definition_count": 3543,
+      "reachable_block_definition_count": 981,
+      "files_with_missing_reachable_block": 0,
+      "files_with_block_cycles": 0,
+      "dimension_picture_present": 913,
+      "dimension_nondefault_text_override": 0,
+      "closed_lwpolyline_count": 4193,
+      "dimassoc_object_count": 700,
+      "all_copied_inputs_unchanged": true
+    },
+    "reopened": {
+      "entity_types": {
+        "LINE": 22505,
+        "DIMENSION": 913,
+        "HATCH": 640,
+        "LWPOLYLINE": 5859,
+        "TEXT": 278,
+        "MTEXT": 640,
+        "ARC": 369,
+        "MLINE": 47,
+        "INSERT": 76,
+        "CIRCLE": 40,
+        "ELLIPSE": 55,
+        "POLYLINE": 4,
+        "SPLINE": 4
+      },
+      "files_with_modelspace_insert": 13,
+      "files_with_groups": 0,
+      "block_definition_count": 2630,
+      "reachable_block_definition_count": 981,
+      "files_with_missing_reachable_block": 0,
+      "files_with_block_cycles": 0,
+      "dimension_picture_present": 913,
+      "dimension_nondefault_text_override": 0,
+      "closed_lwpolyline_count": 4193,
+      "dimassoc_object_count": 700,
+      "all_copied_inputs_unchanged": true
+    }
+  },
+  "source_documents_modified": false,
+  "model_training_run": false,
+  "before_additional_checks": {
+    "dimensions_with_reactor_handles": 303,
+    "files_with_balcony_text_candidates": 39,
+    "association_integrity_validated": false,
+    "component_semantics_approved": false,
+    "component_factory_implemented": false,
+    "copied_input_files_checked": 120
+  }
+}

@@ -24,3 +24,7 @@ DXF 작성 후보는 ezdxf, DWG 변환 후보는 설치된 ODA File Converter �
 ## 중심선·치수 생성 계약
 
 중심선/연결 그래프를 먼저 구성하고 승인된 치수 원장으로 전체 구조를 제약한 뒤 벽 두께·개구부·디테일을 작성한다. 중심선과 마감면 측정 기준·offset을 명시한다. 필요한 모든 치수의 출력 대응과 실제 endpoint 길이/투영 길이를 검증하며 text 보존/override만으로 통과시키지 않는다. 후속 반전 기능을 만들 경우 geometry/치수 관계/문 방향에 적용하고 문자는 읽을 수 있게 생성한다. 실제 반전 판별은 기본 복원의 선행 조건이 아니다. [상세 계획](research/2026-10-13-vector-first-training-plan.md)을 따른다.
+
+## 컴포넌트와 엔티티 계층
+
+주된 모델 출력은 wall/door/window/space/dimension/text의 종류·배치·parameter·관계다. native BLOCK/INSERT·DIMENSION을 보존하고 분해된 도형은 검수해 묶는다. builder가 지원 컴포넌트를 엔티티로 조립한다. block library 정의와 사용 instance, layer 이름과 semantic 정답을 구별한다. 원본 membership/provenance를 유지한다. [실제 감사와 상세 계약](research/2026-10-13-component-supervision-audit.md)을 따른다.

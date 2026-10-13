@@ -39,3 +39,7 @@
 ## 전유부·방향·치수 검수 확장
 
 manifest에 입력 ROI/CAD target 경계, 포함/제외/미확정 영역, 이미지↔학습 target의 방향/좌표 정규화 근거·검수자(실제 집 방향 추론은 복원 선행 조건 아님), 치수 원장 revision/hash를 추가한다. 도곽 crop과 전유부 선택은 다르다. 옆집/공용부를 미라벨 배경 정답으로 만들지 않으며 치수 체인은 ROI 밖까지 관계를 검토한다. 같은 평면의 반전 사례도 같은 split 그룹이다. [최신 계획](research/2026-10-13-vector-first-training-plan.md)을 따른다.
+
+## 컴포넌트 학습 정답
+
+component ID/type·parameter·native members·instance transform·style·host/space/dimension 관계와 검수 상태를 기록한다. dimension picture의 LINE/문자를 독립 정답으로 중복 집계하지 않는다. GROUP/BLOCK으로 묶이지 않은 도형도 검수 grouping 후보로 유지한다. 원본 handle은 provenance이며 학습 class/저장 순서 정답이 아니다. [CAD 구조 감사](research/2026-10-13-component-supervision-audit.md)를 따른다.

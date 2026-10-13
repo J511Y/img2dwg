@@ -54,3 +54,8 @@
 ## 첫 실행 선택
 
 현재 [벡터 우선 계획](2026-10-13-vector-first-training-plan.md)에 따라 EXP-012/021/024/025의 DINOv3 graph+합성 감독/치수 공통 경로를 먼저 구현하고, EXP-010 Raster2Seq를 비교한다. EXP-036 실제 반전 판별은 후속 기능으로 내리며 학습 target 방향 정규화와 구분한다. 전체 특징점 정합은 중단했다. GPU/모델 학습은 아직 planned다.
+
+| ID | 추가 후보 | 확인 조건 |
+| --- | --- | --- |
+| EXP-040 | native CAD→업무 컴포넌트 catalog/factory | [구조 감사](2026-10-13-component-supervision-audit.md), block/분해 도형·style·dimension 관계 보존, 5개 재구성과 검수 |
+| EXP-041 | component type/parameter/relation decoder | native representation 차이의 동등성, component AP·parameter/host/치수 오차, common writer |

@@ -26,3 +26,5 @@
 
 - ADR-017 · 입력 방향의 DWG 벡터 복원을 우선한다. 실제 좌우반전은 CAD 기존 기능/후속 편집으로 처리하며 복원을 막지 않는다. 학습 image/GT 방향 정규화는 별도 데이터 정확성 검사다.
 - ADR-018 · 첫 학습은 DINOv3 ViT-B/16+graph decoder, 첫 비교는 Raster2Seq다. 치수 OCR/association+solver는 공통 경로다. 실제 정합 실패를 합성 CAD 학습의 중단 사유로 두지 않는다.
+
+- ADR-019 · native CAD 구조 감사 후 업무 컴포넌트/parameter/관계를 주된 감독 단위로 정한다. LINE handle·entity 순서·block 정의 존재를 의미 정답으로 쓰지 않는다. catalog/factory 검증은 첫 학습 정답을 확정하는 최소 단계다.

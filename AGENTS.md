@@ -41,3 +41,7 @@
 ## 제품 판단 원칙
 
 추가 요구의 목적과 우선순위를 판단하고 CAD 기존 기능·간단한 HITL로 해결할 부분을 제안한다. 사용자의 설명을 모두 선행 모델/자동화 gate로 승격하지 않는다. 후보를 나열하는 대신 첫 선택·근거·실패 시 전환 조건을 정하고 최종 DWG까지 이어지는 작은 수직 기능을 우선한다. 성과 근거 규칙은 유지하되 검수 자동화 완성이 모든 모델 개발의 선행 조건은 아니다.
+
+## 컴포넌트 감독 보완
+
+`docs/research/2026-10-13-component-supervision-audit.md`를 첫 학습 계획에 함께 적용한다. native BLOCK/INSERT·DIMENSION·style·관계를 먼저 보존하고 분해된 geometry는 검수 업무 컴포넌트로 묶는다. block 정의 존재를 active instance/semantic label로 승격하지 않는다. 매 LINE/handle/저장 순서를 이미지 획과 강제로 대응시키지 않는다. component catalog와 5개 factory/GT roundtrip을 확인한 뒤 component type/parameter/relation head를 학습한다. backbone 후보는 유지한다.

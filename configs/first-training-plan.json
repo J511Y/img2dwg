@@ -11,7 +11,7 @@
   "primary": {
     "model_id": "facebook/dinov3-vitb16-pretrain-lvd1689m",
     "revision": "5931719e67bbdb9737e363e781fb0c67687896bc",
-    "head": "custom-junction-edge-opening-dimension-association",
+    "head": "custom-component-parameter-relation-with-internal-geometry",
     "head_implemented": false,
     "initial_backbone_frozen": true,
     "global_view_long_side_px": 1024,
@@ -38,7 +38,8 @@
     "split_unit": "building-layout-family-before-augmentation",
     "full_image_feature_alignment_required": false,
     "actual_unit_direction_required": false,
-    "initial_manual_roi_allowed": true
+    "initial_manual_roi_allowed": true,
+    "supervision_unit": "reviewed-workflow-components-and-relations"
   },
   "proposed_step_caps": {
     "tiny_debug": 1000,
@@ -59,5 +60,12 @@
     "core-editable-entities",
     "cad-open-edit-save-reopen"
   ],
-  "plan": "docs/research/2026-10-13-vector-first-training-plan.md"
+  "plan": "docs/research/2026-10-13-vector-first-training-plan.md",
+  "prerequisites": {
+    "storage_inventory": "completed-40-pilot-cases",
+    "component_catalog": "planned",
+    "dimension_reference_integrity": "planned",
+    "component_factory_roundtrip": "planned-five-debug-cases"
+  },
+  "component_plan": "docs/research/2026-10-13-component-supervision-audit.md"
 }

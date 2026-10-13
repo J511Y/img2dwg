@@ -2,6 +2,8 @@
 
 작성일: 2026-10-13 KST. 사용자 우선순위 수정에 따른 현재 실행 계획이다. 모델 학습·추론은 이번에 실행하지 않았다. 공식 구현/모델 카드·HF metadata와 사내 CAD 추출 코드를 읽었으며 가중치 다운로드, GPU 작업, 운영 변경은 하지 않았다.
 
+> **컴포넌트 감독 추가:** [실제 CAD 구조 감사](2026-10-13-component-supervision-audit.md)에 따라 매 LINE을 정답 단위로 쓰지 않는다. 첫 학습 전에 native block/치수와 업무 컴포넌트 catalog·factory를 확인하고 DINOv3 출력부를 component type/parameter/관계 중심으로 구체화한다. backbone 후보와 벡터 우선 목표는 유지한다.
+
 ## 1. 결론과 우선순위
 
 **첫 학습은 DINOv3 ViT-B/16 + 전용 벡터/관계 decoder, 첫 비교 학습은 Raster2Seq다.** 치수 판독은 PP-OCRv6 small을 먼저 실행 기준선으로 쓰고 숫자 crop의 오류를 확인한 뒤 필요한 모듈만 fine-tune한다. 이것은 사내 데이터에서 우위를 입증한 결과가 아니라 현재 선택이다.
@@ -47,7 +49,7 @@ HAWP/HEAT/RoomFormer, frontier VLM, JEPA/domain SSL, diffusion, 완전 scratch�
 
 모델은 모든 절대 길이를 이미지 픽셀에서 정확히 추측하는 역할을 맡지 않는다. 구조·연결·측정 대상의 후보를 내고, 확인된 치수가 최종 geometry를 결정한다. 충분한 치수 근거가 없으면 덜 제약된 geometry를 표시하고 부족한 치수만 사람에게 확인받는다. 문 폭 등 관행 값을 사실로 채우지 않는다.
 
-첫 geometry head는 junction 좌표, edge의 endpoint/연결, wall width, opening host·offset·폭과 불확실성을 예측한다. centerline GT가 DWG에 직접 존재하지 않으면 평행한 벽 양면선으로부터 검수 가능한 후보를 만들고 불명인 항목은 loss를 가린다. 모든 LINE을 wall centerline으로 처리하지 않는다. 경사/곡선·문 swing arc는 지원 범위를 명시하며 미지원 누락을 완료로 통과시키지 않는다.
+첫 출력부는 wall/door/window/space/dimension/text 컴포넌트 종류·배치·parameter·관계를 예측한다. 내부 geometry head는 junction/edge·wall width·opening host 등을 담당하며 native BLOCK/INSERT·DIMENSION을 독립 LINE으로 flatten한 것을 주 정답으로 쓰지 않는다. centerline GT가 DWG에 직접 존재하지 않으면 평행한 벽 양면선으로부터 검수 가능한 후보를 만들고 불명인 항목은 loss를 가린다. 모든 LINE을 wall centerline으로 처리하지 않는다. 경사/곡선·문 swing arc는 지원 범위를 명시하며 미지원 누락을 완료로 통과시키지 않는다.
 
 첫 loss는 endpoint/junction coordinate loss, edge/class loss, endpoint association, opening host loss다. 치수 branch에는 text→dimension line→측정 entity/endpoint 관계 감독을 붙인다. global CAD metric 좌표와 관측 이미지 좌표/warp를 분리한다. 단순 mask IoU 최적화로 목표를 대체하지 않는다.
 
@@ -69,7 +71,7 @@ HAWP/HEAT/RoomFormer, frontier VLM, JEPA/domain SSL, diffusion, 완전 scratch�
 
 | 단계 | 실행 범위 | 확인할 결과 | 실패 시 판단 |
 | --- | --- | --- | --- |
-| T0 · 데이터/writer | 5개 CAD annotation + GT→DXF/DWG | geometry/단위·치수 관계 보존, 지원 엔티티 누락 표 | compiler/GT 오류부터 수정. 모델 크기 증가 금지 |
+| T0 · 컴포넌트/writer | 40개 구조 inventory(완료) → 대표 catalog → 5개 검수 component factory/GT→DXF/DWG | geometry/단위·치수 관계 보존, 지원 엔티티 누락 표 | compiler/GT 오류부터 수정. 모델 크기 증가 금지 |
 | T1 · 첫 주력 학습 | DINOv3 freeze, 5개 clean/synthetic debug, 최대 1,000 steps | finite gradient와 파라미터 갱신, tiny graph overfit, predicted CAD-IR로 만든 DWG | 작은 정답도 못 배우면 좌표/표현/matcher/loss 진단. 대규모 job으로 확대 금지 |
 | T2 · 합성 일반화 | 검수 CAD 그룹에서 최대 5,000 steps; 같은 split의 Raster2Seq fine-tune 비교 | 보지 않은 CAD 계열의 topology/개구부·치수 연결·E2E DWG | 구조 부족인지 합성 도메인 부족인지 분리. decoder/representation 교체 또는 실패 후보 기록 |
 | T3 · 실제 보정 | 실제 검수 표본, 합성 혼합·마지막 blocks 선택적 unfreeze; 최초 최대 2,000 steps | 실제 준공도면에서 누락/잘못된 치수·HITL 수정량·처리시간 | synthetic 성공만으로 계속하지 않음. 실제 GT/augmentation/해상도 원인 확인 후 다음 비교 |
@@ -94,4 +96,4 @@ DINOv3가 이미 있는 segmentation/vectorizer 기준선보다 실제 graph/수
 - Raster2Seq 공식 환경은 Linux/Python 3.10/CUDA extension이다. Windows의 pilot Python 3.14 환경에 그대로 설치하지 않고 별도 학습 runtime을 사용한다.
 - 사내 `data-pipeline`의 raw CAD-IR exporter는 DIMENSION과 styles/blocks를 읽는 재사용 후보이며 중심선·치수 관계 학습 GT를 자동 완성하는 도구는 아니다. 다른 저장소의 수집 시점 작업 트리를 수정하거나 기존 실측을 새 성과로 승계하지 않았다.
 
-다음 구현은 이 계획의 T0/T1을 위한 CAD supervision builder, geometry decoder와 공통 writer/metric 연결이다. 전체 40개 사람이 승인할 때까지 아무 모델도 개발하지 않는 방식으로 진행하지 않는다.
+다음 구현은 component catalog·치수 reference 검증·5개 component factory roundtrip 후 해당 정답의 decoder와 writer/metric 연결이다. 전체 40개 사람이 승인할 때까지 아무 모델도 개발하지 않는 방식으로 진행하지 않는다.

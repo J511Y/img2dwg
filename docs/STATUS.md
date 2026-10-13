@@ -43,3 +43,9 @@ target CAD·DWG version, usable pair 수·정합·권리·외부처리, 예산, 
 다음 구현은 5개 CAD로 supervision/GT writer 확인 → DINOv3 freeze+graph decoder tiny 학습 → 합성 학습/Raster2Seq 비교 → 실제 표본 fine-tune → preview/HITL/새 DWG 생성이다. 합성 학습 준비와 실제 검수는 병행하며 전체 40개 승인 완료를 학습 개발 선행 조건으로 두지 않는다.
 
 이번에는 공식 모델 metadata와 Raster2Seq 512 config를 확인했고 DINOv3 weight dry-run만 했다. 모델 weight 다운로드·추론·학습·GPU job·운영 변경은 미실행이다. decoder/치수 association/solver/UI는 계획 상태다. 이전 913개 보존 pass는 입력 치수 완전성/실제 길이 검증이 아니다.
+
+## CAD 컴포넌트 구조 감사 완료
+
+[40개 감사](research/2026-10-13-component-supervision-audit.md): 로컬 source/before/reopened 120개 읽기 전용 검사. 변경전 DIMENSION 913개, INSERT 76개(13개 파일), 명시 GROUP 0개 파일, DIMASSOC object 700개를 확인했다. 보유 block 정의와 현재 사용 인스턴스·분해된 도형을 구분했다. 120개 SHA/size/mtime 무변경, 신규 auditor 테스트 2개 pass. 실제 컴포넌트 의미 승인·DIMASSOC 관계 검증·factory/모델 학습은 미실행이다.
+
+첫 학습 전 component catalog와 5개 factory/GT roundtrip을 수행한다. DINOv3 backbone 선택은 유지하며 출력부를 컴포넌트 type/parameter/관계와 내부 geometry로 구체화한다. 원본/기존 pilot receipt는 보존했다.

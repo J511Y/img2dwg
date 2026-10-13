@@ -48,3 +48,5 @@
 실제 데이터·원본 도면·가중치·실행 산출물·고객정보는 외부 저장소에서 관리한다. 이 공개 저장소에는 문서, 향후 코드, 비식별 예제만 저장한다. 코드·데이터·가중치의 라이선스는 각각 확인하며 프로젝트 자체의 공개 이용허락 라이선스는 아직 결정하지 않았다.
 
 최신 실행 정본은 [벡터 우선 학습 계획](docs/research/2026-10-13-vector-first-training-plan.md)이다. 첫 주력 DINOv3+graph decoder, 비교 Raster2Seq와 치수 OCR/association/solver로 입력→편집 가능한 DWG를 우선한다. 반전은 CAD/후속 편집이며 전체 특징점 정합은 중단했다.
+
+첫 학습 정답의 단위는 [CAD 컴포넌트 구조 감사](docs/research/2026-10-13-component-supervision-audit.md)를 따른다. 원래 블록·치수 객체와 분해된 업무 컴포넌트를 확인하고 catalog/factory를 검증한 뒤 학습한다.
