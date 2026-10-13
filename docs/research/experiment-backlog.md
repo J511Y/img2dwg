@@ -1,0 +1,30 @@
+# 실험 백로그 · 2026-10-13
+
+모두 **planned, 미실행**. 준비 순서는 P1/P2를 우선하지만 계열 간 탐색을 제한하지 않는다. 각 ID는 실행 시 `docs/experiments/YYYY-MM-DD-EXP-XXX.md`와 private run manifest를 연결한다. 새 접근법도 계속 추가하며 비적합·실패를 삭제하지 않는다.
+
+| ID | 방법 | 기술 가설·대조군 | 필요한 조건 / 중단·보류 기준 |
+| --- | --- | --- | --- |
+| EXP-001 | 의뢰 페어·전후상태·정합 감사 | 정합된 DWG가 올바른 supervision인가 | 권리·sample 검수, 틀린 상태/평면이면 학습 보류 |
+| EXP-002 | GT CAD-IR→DXF→DWG roundtrip | 모델 없이도 writer가 엔티티를 보존하는가 | 실제 CAD/단위/버전 고정, writer 실패면 모델 성능 판단 보류 |
+| EXP-003 | Hough/LSD/skeleton·line/arc fit | learned model 없이 어느 기하까지 가능한가 | clean/scan/photo별 baseline, 강제 직각 보정 on/off |
+| EXP-004 | frontier VLM 직접 IR | 큰 VLM이 zero/few-shot으로 구조를 복원하는가 | 승인된 입력·schema·동일 budget, hallucination/invalid IR 실패 |
+| EXP-005 | frontier global+tile·render critique | crop/제한적 repair가 작은 구조 오류를 줄이는가 | EXP-004 대비 iteration cap/총비용, test prompt tuning 금지 |
+| EXP-006 | SegFormer/Mask2Former/RF-DETR+geometry | mask 인식이 고전 기하보다 noise에 강한가 | 동일 label/split·후처리, 모델 vs solver 효과 분리 |
+| EXP-007 | HEAT graph | edge topology 직접 예측이 닫힘/연결을 개선하는가 | 실제 scan용 target·공식 protocol 대비 domain gap |
+| EXP-008 | RoomFormer | room queries가 복잡한 polygon을 효율적으로 복원하는가 | shared boundary/문·창, room-only 결과의 CAD 제한 기록 |
+| EXP-009 | Raster-to-Graph | autoregressive graph가 위상 일관성을 높이는가 | traversal/복잡도·외부 일반화, 긴 graph 실패 분석 |
+| EXP-010 | Raster2Seq 공식 checkpoint/재학습 | polygon sequence가 기하·위상을 함께 개선하는가 | Linux extension·license·공통 writer, room F1과 DWG 분리 |
+| EXP-011 | FloorplanVLM SFT→geometry reward | 구조 JSON 학습·reward가 schema/곡선 fidelity를 높이는가 | 공식 자원 확인/재구현 명시, reward hacking·GT leakage 검사 |
+| EXP-012 | DINOv2→DINOv3 encoder ablation | dense feature가 적은 라벨로 선/엔티티를 보존하는가 | 동일 decoder/data/해상도, feature 품질 아닌 downstream 평가 |
+| EXP-013 | I-JEPA/LeJEPA 도면 SSL | 미라벨 도면 학습이 라벨 효율·OOD를 높이는가 | train group만 SSL, label budget curve·인코더 대조군 |
+| EXP-014 | SAM 3 annotation/HITL | proposal이 검수시간을 줄이는가 | human label 품질/시간 비교, masks를 CAD 정답으로 간주 금지 |
+| EXP-015 | diffusion/flow vector reconstruction | 여러 geometry 후보가 불확실성을 개선하는가 | image-conditioned, observed fidelity·latency, 설계 생성 환각 분리 |
+| EXP-016 | LLaDA/vision diffusion structured output | AR 대비 병렬 decoding이 비용·일관성을 개선하는가 | 실제 image-capable checkpoint 확인, 동일 IR validity 검사 |
+| EXP-017 | 제약 최적화/ILP·graph repair | 동일 인식 결과의 topology repair가 개선되는가 | 직교·경사·곡선 별 ablation, 누락 구조 임의 생성 금지 |
+| EXP-018 | teacher→소형 entity decoder 증류 | frontier 품질을 낮은 비용에 근사할 수 있는가 | teacher label 수동 검수·권리, holdout·동일 writer |
+| EXP-019 | Jev / Laya / rule / 소형 classifier | typed routing·재시도·검수 판단이 E2E 비용을 낮추는가 | 동일 text/JSON 상태, 한국어·순서/후보수, calibration/test 분리 |
+| EXP-020 | uncertainty+HITL active learning | 같은 검수예산으로 복원 품질이 더 개선되는가 | random sampling 대조군·시간 기록, test 선택 편향 금지 |
+| EXP-021 | CAD render 합성+scan/photo augmentation | train CAD 합성이 실제 noise 일반화를 높이는가 | train-only layout, 합성/실제 gap·정합 유지·외부 holdout |
+| EXP-022 | retrieval aided reconstruction | 유사 평면 검색이 입력 근거 복원을 돕는가 | train-only retrieval, 복제/다른 상태 오류·fidelity 검사 |
+
+결과 상태는 `planned/running/succeeded/failed/blocked/rejected`. blocked/rejected는 이유·근거·재개 조건을 기록한다. 후보별 반복·예산 상한은 첫 run 전에 확정한다. "가능한 방법을 모두 시도"는 후보와 실행 결과를 추적한다는 뜻이며 비교 근거 없이 무제한 GPU/API 작업을 시작하지 않는다.

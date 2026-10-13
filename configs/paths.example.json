@@ -1,0 +1,14 @@
+{
+  "schema_version": "img2dwg-paths/v0.1",
+  "example_only": true,
+  "case_index_source": "work-case-linked-folders",
+  "source_roots": [],
+  "source_access": "read-only",
+  "private_case_index": null,
+  "private_dataset_manifest": null,
+  "output_root": null,
+  "cad_converter_executable": null,
+  "target_cad_application": null,
+  "target_dwg_version": null,
+  "external_data_approved": false
+}

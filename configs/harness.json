@@ -1,0 +1,16 @@
+{
+  "schema_version": "img2dwg-harness/v0.1",
+  "mode": "documentation-only",
+  "timezone": "Asia/Seoul",
+  "runtime_implemented": false,
+  "workflow": "docs/harness/workflow.md",
+  "evidence_contract": "docs/harness/evidence.md",
+  "evaluation_protocol": "docs/EVALUATION.md",
+  "experiment_template": "templates/experiment.md",
+  "run_template": "templates/run-manifest.example.json",
+  "data_access": "read-only",
+  "split_unit": "building-and-layout-family",
+  "gates": ["source-rights", "pair-alignment", "split-isolation", "cad-ir-validity", "geometry-topology", "dwg-roundtrip", "render-back", "human-review", "evidence-integrity"],
+  "candidate_statuses": ["planned", "running", "succeeded", "failed", "blocked", "rejected"],
+  "automatic_checks": []
+}
