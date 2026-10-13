@@ -8,6 +8,8 @@
 
 1차 범위는 2D 벽체·문·창·방 경계·주요 치수와 레이어다. 곡선·경사벽·기호·문자·블록 복원은 별도 축으로 평가한다. 구조적 안전성·법적 판단, BIM/3D, 변경 설계 자동 생성은 현재 범위에 포함되지 않는다.
 
+완벽한 무개입 변환을 전제로 하지 않는다. 중간 상태 preview·사람 수정·entity/constraint 잠금·부분 재복원·undo/resume을 정상 흐름으로 둔다. VLM 전체 controller, DL 일괄 복원, 두 이미지/상태 기반 빠른 다음-action controller를 같은 CAD tools와 HITL 예산에서 비교한다. [반복 그리기 설계](research/2026-10-13-closed-loop-hitl-design.md)를 함께 따른다.
+
 ## 해결할 불확실성
 
 | 불확실성 | 확인 방법 |

@@ -13,5 +13,7 @@
 | ADR-009 · 2026-10-13 | 기존 data-pipeline 자료는 재사용 후보로 조사한다 | dirty 자료/과거 집계는 이관 성과가 아님. snapshot·license·재현 검증 후 채택 |
 | ADR-010 · 2026-10-13 | canonical geometry·metric 치수/간격과 pixel semantics를 별도 감독 후 연결한다 | Jippin overlay 라벨만으로 CAD 정밀도 supervision 불충분. joint gold 검수 필요 |
 | ADR-011 · 2026-10-13 | 사내 데이터 중심 structured decoder 학습을 주력 후보로 둔다 | 공개 generic wall이 confirmed NB를 대신하지 않음. pretrained/domain-pretrained/scratch는 비교로 결정 |
+| ADR-012 · 2026-10-13 | 준공도면+변경전후.dwg의 변경전 평면을 주력 페어로 제한한다 | 사용자 파일/영역 지정. 기존 4종 reference 허용과 thumbnail crop은 그대로 채택 불가 |
+| ADR-013 · 2026-10-13 | 다음 CAD action controller와 중간 HITL을 정식 연구·제품 경로로 둔다 | 사용자 System-1 구상. 현재 Jev/Laya 모달리티와 별도 vision action policy 구분 |
 
 확인 필요: target CAD/DWG version, 정량 acceptance 목표, 승인된 데이터 범위·외부처리·compute budget, 자체 코드 라이선스.

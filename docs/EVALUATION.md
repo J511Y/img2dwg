@@ -17,6 +17,8 @@
 
 scale unknown 사례는 실물 mm 오차 평가에서 제외 사유를 표기하고 정규화 기하/픽셀 지표와 함께 별도 집계한다. 원본의 문자·치수·틀 때문에 전체 pixel IoU가 구조 품질을 가릴 수 있으므로 구조 layer 지표를 분리한다. 판독 불가능 입력은 보류·사람 검수 대상으로 평가하며 hallucinated geometry를 성공 처리하지 않는다.
 
+반복 controller는 candidate recall·action 선택·연속 좌표 parameter error·잘못된 tool/중복 action·종료/보류·누적 오류와 long-horizon 성공을 측정한다. 시각 모듈·렌더·solver·export·retry 비용까지 포함한다. 순수 자동과 HITL 허용량별 완료율·수정시간·intervention 수·잠금 위반·재작업을 분리한다. 최종 DWG에서 파생한 합성 action 이력을 실제 사람 작업 순서로 평가하지 않는다.
+
 동일 pilot 입력에서 rule/기하, frontier, segmentation, graph, sequence, hybrid를 비교한다. backbone만 바꿀 때 decoder/writer/postprocess를 고정하고, 후처리 효과는 on/off ablation한다. 모델+writer 전체 개선과 모델 자체 개선을 구분한다.
 
 기본 비교는 건물/평면 그룹 단위 bootstrap 신뢰구간 또는 paired 실패 표를 사용한다. 소표본 결과는 탐색으로 표시한다. 공개 논문의 room F1/IoU를 사내 DWG 성능과 직접 비교하지 않는다. 프롬프트·token budget·reasoning effort·SDK/model snapshot·retry policy를 고정하고 quota 실패를 기록한다.

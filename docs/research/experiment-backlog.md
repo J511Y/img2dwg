@@ -32,5 +32,11 @@
 | EXP-026 | homography vs learned dewarp vs canonical decoder | 이미지 평탄화가 실제 metric geometry 개선으로 이어지는가 | 종이 휨/원근별 실물 치수·선/간격 오차, DocRes 기존 보류 사유 |
 | EXP-027 | 사내 CAD 합성→실제 aligned gold curriculum | known warp 감독이 실제 사진 복원으로 전이되는가 | group split 먼저, synthetic-only 대조·실제 holdout |
 | EXP-028 | pretrained/domain-pretrained/full-scratch 대조 | 사내 감독 규모에서 어떤 초기화가 효율적인가 | 동일 decoder/data/예산, 수렴·라벨 효율·CAD 오차 |
+| EXP-029 | 준공도면+변경전 영역 페어 정책 감사 | 사용자 지정 입력/target만으로 usable gold를 만들 수 있는가 | 실제 DWG 영역·unit·before/after·dependencies 검수, thumbnail GT 금지 |
+| EXP-030 | VLM sequential/batched CAD actions | tool sequence/history 압축이 품질 유지하며 비용을 낮추는가 | 동일 tools·state·budget, 오차 누적·stop·repair 포함 |
+| EXP-031 | visual proposal+Jev/Laya next-action selector | 다음 그리기 판단 위임이 E2E 비용을 낮추는가 | candidate recall/좌표오차와 selector 정확도 분리, none/ask_human |
+| EXP-032 | paired-image vision action policy | 빠른 vision controller가 원본/현재 render의 차이에서 다음 동작을 찾는가 | 별도 학습 필요, long-horizon rollout·parameter·도구 검사 |
+| EXP-033 | final DWG→partial-state action trajectory | unordered 최종 CAD로 controller 감독을 만들 수 있는가 | 합성 이력임을 명시, multi-valid-order·error-state, GT inference leakage 금지 |
+| EXP-034 | 중간 HITL/잠금/국소 재복원 | 적은 개입으로 usable CAD 완료가 가능한가 | 수정시간·intervention·잠금위반·undo/resume·자동/HITL 지표 분리 |
 
 결과 상태는 `planned/running/succeeded/failed/blocked/rejected`. blocked/rejected는 이유·근거·재개 조건을 기록한다. 후보별 반복·예산 상한은 첫 run 전에 확정한다. "가능한 방법을 모두 시도"는 후보와 실행 결과를 추적한다는 뜻이며 비교 근거 없이 무제한 GPU/API 작업을 시작하지 않는다.

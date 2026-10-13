@@ -20,6 +20,10 @@ target CAD·DWG version, usable pair 수·정합·권리·외부처리, 예산, 
 
 [사내 자산 기반 보고서](research/2026-10-13-domain-reassessment.md)를 추가했다. Jippin 소비 코드·직원 확정 라벨·가공 manifest·HF endpoint 설정·기존 CAD-IR 보고 JSON을 읽기 전용으로 확인했다. 새 모델 실행·DWG 변환은 하지 않았다. 현재 후보 backlog는 28개이며 초기 22개 목록에 joint gold·dimension solver·dewarp·사내 학습 대조를 추가했다. 공개 후보 목록보다 사내 geometry/semantics 감독과 정밀도 계약을 우선한다.
 
-## 다음 구현 세션
+## 반복 그리기·HITL·페어 조건 추가 · 2026-10-13
+
+[사용자 구상 설계](research/2026-10-13-closed-loop-hitl-design.md)를 작성했다. 원본+현재 CAD render에서 다음 drawing action을 판단하는 세 후보, 준공도면+변경전후.dwg의 변경전 target, final CAD→합성 action trajectory, 중간 사람 수정·잠금·undo/resume을 반영했다. 후보는 34개다. 첨부 thumbnail과 기존 crop 코드를 읽었으며 원본 재추출·모델 실행은 하지 않았다.
+
+## 다음 구현 작업
 
 [로드맵](ROADMAP.md)의 P1: 의뢰 연결 인덱스 기반 소량 페어 감사와 P2: GT CAD writer roundtrip부터 시작한다. 구현 요청이 오면 현재 선언적 계약을 실제 validator/runner로 확장한다.
