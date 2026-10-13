@@ -1,0 +1,332 @@
+{
+  "schema_version": "img2dwg-domain-audit/v0.1",
+  "collected_at_kst": "2026-10-13T13:39:54.209755+09:00",
+  "classification": "research preparation; no new training/inference/conversion",
+  "repository_states": {
+    "floor-plan-model-train": {
+      "git_head": "0bb171b5d8817bfea282a65ab3fbc2e0df783a63",
+      "dirty": true,
+      "status_sha256": "60e624a72f84572e7d0a5fb94702a1472f50f5f9767fcb2d2267dc744482928b"
+    },
+    "jippin": {
+      "git_head": "10077af59837b257d86cabe640d708113b8bcfeb",
+      "dirty": false,
+      "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "data-pipeline": {
+      "git_head": "48bdc5f8254b29a5f755ef577e938e3617ed9e7f",
+      "dirty": true,
+      "status_sha256": "fc93c3a588b94c913b32a599c029fe506f7ef22f8e1c96bef933d255fe07a23b"
+    }
+  },
+  "sources": [
+    {
+      "repository": "floor-plan-model-train",
+      "relative_path": "README.md",
+      "sha256": "5218e450c9ee760370ffe778edc039cb6b61107b4d13fdc866bccaf89b674f73",
+      "bytes": 17074,
+      "tracked": true,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "tracked file verified in working tree"
+    },
+    {
+      "repository": "floor-plan-model-train",
+      "relative_path": "src/floorplan_cv/aihub.py",
+      "sha256": "adfedf4afeb7f3cc741a20f02432bc66fe24f8c0a63f9d562e062d8922501b21",
+      "bytes": 8139,
+      "tracked": true,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "tracked file verified in working tree"
+    },
+    {
+      "repository": "floor-plan-model-train",
+      "relative_path": "apps/label_manager_app.py",
+      "sha256": "3b279cedefd24a01149a835cd4b4a785174a6dd6bb6bd3dbc5d0a9393b3cb13c",
+      "bytes": 49541,
+      "tracked": true,
+      "working_tree_changed_or_untracked": true,
+      "source_state": "collection-time working tree"
+    },
+    {
+      "repository": "floor-plan-model-train",
+      "relative_path": "apps/label-manager-web/src/lib/types.ts",
+      "sha256": "442079e1104671080f5af8018dfa87598fb3468d98579eb8835b5c09b8baf6c2",
+      "bytes": 2888,
+      "tracked": true,
+      "working_tree_changed_or_untracked": true,
+      "source_state": "collection-time working tree"
+    },
+    {
+      "repository": "floor-plan-model-train",
+      "relative_path": "scripts/build_confirmed_tile_dataset.py",
+      "sha256": "c9e32186726c9af18b47685c87dc4875e13f9cea0e203d3d5839b10355886c62",
+      "bytes": 15107,
+      "tracked": false,
+      "working_tree_changed_or_untracked": true,
+      "source_state": "collection-time working tree"
+    },
+    {
+      "repository": "floor-plan-model-train",
+      "relative_path": "docs/30_실험_기록/2026-09-30_벽체모델_최종보고.md",
+      "sha256": "cf7ec9ddbc6f1a424743bb7f5dda4d1642bd8c235bc23bb1bef1a1a4a782b2ac",
+      "bytes": 18305,
+      "tracked": true,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "tracked file verified in working tree"
+    },
+    {
+      "repository": "floor-plan-model-train",
+      "relative_path": "docs/30_실험_기록/2026-09-22_R2a_운영_엔드포인트_교체.md",
+      "sha256": "f1c3367cc8866b73aff22b70557adcc044bdef98b19216ad7ca6bb542c55d57f",
+      "bytes": 7342,
+      "tracked": true,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "tracked file verified in working tree"
+    },
+    {
+      "repository": "floor-plan-model-train",
+      "relative_path": "docs/30_실험_기록/2026-05-26_wall_other_door_라벨_노이즈_진단.md",
+      "sha256": "cfe47e96e6e0d2c92cc6950bb3ab9ef84990b9741636a282abeb4724e9f7b27f",
+      "bytes": 16515,
+      "tracked": true,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "tracked file verified in working tree"
+    },
+    {
+      "repository": "floor-plan-model-train",
+      "relative_path": "docs/20_모델_연구/2026-05-07_DocRes_학습_가능성_검토.md",
+      "sha256": "8a5ad267e04186d1cf67a8ea05acb3642addbabdad9dd2fff476cde912456263",
+      "bytes": 6083,
+      "tracked": true,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "tracked file verified in working tree"
+    },
+    {
+      "repository": "jippin",
+      "relative_path": "apps/api/src/agent/tools/segmentation.py",
+      "sha256": "d9258286e940d73eadd43a506828b97e7a812d151a0bd68c284c0333db3340ec",
+      "bytes": 85368,
+      "tracked": true,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "tracked file verified in working tree"
+    },
+    {
+      "repository": "data-pipeline",
+      "relative_path": "data/floorplan-model/dataset_manifest.json",
+      "sha256": "d0c4ecc3e39228ef9e790c13977705da2e92159b273746ae42b387c6ec9ccecd",
+      "bytes": 2656999,
+      "tracked": false,
+      "working_tree_changed_or_untracked": true,
+      "source_state": "collection-time working tree"
+    },
+    {
+      "repository": "data-pipeline",
+      "relative_path": "reports/floorplan_cad_reconstruction/summary.json",
+      "sha256": "32ec8f170d362b9c4fbfe0425417b438990e7fdd3b28aa80e833b0a75951eee5",
+      "bytes": 1586,
+      "tracked": false,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "collection-time working tree"
+    },
+    {
+      "repository": "data-pipeline",
+      "relative_path": "reports/floorplan_cad_reconstruction/cad_ir_smoke_eval.json",
+      "sha256": "b3ea79b2453f223d099e110d87e2b6bac8cb339751118992cf2efbd921990399",
+      "bytes": 49514,
+      "tracked": false,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "collection-time working tree"
+    },
+    {
+      "repository": "data-pipeline",
+      "relative_path": "reports/floorplan_cad_reconstruction/roundtrip_eval.json",
+      "sha256": "f4538a8ead2084b47296e3ec3c5cad502d6a5881dd43d0343df3fc5dac231ec3",
+      "bytes": 41414,
+      "tracked": false,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "collection-time working tree"
+    },
+    {
+      "repository": "data-pipeline",
+      "relative_path": "reports/floorplan_cad_reconstruction/dwg_repair_dimension_fix_final_report/dimension_fix_aggregate.json",
+      "sha256": "8c6e5725239f914ddf7079736406159d49afd458d9fd19ad6b0956a45483c700",
+      "bytes": 11837,
+      "tracked": false,
+      "working_tree_changed_or_untracked": false,
+      "source_state": "collection-time working tree"
+    },
+    {
+      "repository": "data-pipeline",
+      "relative_path": "data/floorplan-cad-entity-v1/dataset_meta.json",
+      "sha256": "80f30cd907d1d0c3f22e0d8a7f073b9cf06d7f109abf1fb34850306bbc9e2a81",
+      "bytes": 548,
+      "tracked": false,
+      "working_tree_changed_or_untracked": true,
+      "source_state": "collection-time working tree"
+    },
+    {
+      "repository": "data-pipeline",
+      "relative_path": "data_pipeline/floorplan_model/prepare_manifest.py",
+      "sha256": "b2d3206de1e1884fc3c126d43ca59b7d241e65f3bd7eb762f78a5cc3f032f5d4",
+      "bytes": 7037,
+      "tracked": false,
+      "working_tree_changed_or_untracked": true,
+      "source_state": "collection-time working tree"
+    }
+  ],
+  "segmentation_snapshots": [
+    {
+      "source": "outputs/label_manager_confirmed/manifest.json",
+      "sha256": "44c8ac00d58d2199684be3c38c65f287c21979917754f4130fa1427a4b46e5d2",
+      "item_count": 573,
+      "declared_pair_count": 573,
+      "task_counts": {
+        "STR": 573
+      },
+      "fetch_status": {
+        "saved": 573
+      }
+    },
+    {
+      "source": "data/processed/mask2former_str_spa_confirmed573v4_19c_original/dataset.json",
+      "sha256": "9f21c2ba397013a6c27a028011be6058fdf5f25ce6430ffd33aace4a4ec07b76",
+      "image_records": 2123,
+      "annotation_records": 173685,
+      "categories": 19,
+      "image_split_counts": {
+        "train": 1663,
+        "val": 194,
+        "test": 266
+      },
+      "label_source_counts": {
+        "label_manager_confirmed": 573,
+        "str_spa_full_1536_replay": 1550
+      },
+      "nb_annotations": 27407,
+      "nb_image_records": 541,
+      "nb_split_counts": {
+        "train": 21857,
+        "val": 2103,
+        "test": 3447
+      },
+      "annotation_keys": [
+        "area",
+        "attributes",
+        "bbox",
+        "category_id",
+        "demolition_review_signal",
+        "id",
+        "image_id",
+        "iscrowd",
+        "region_id",
+        "requires_hitl",
+        "segmentation",
+        "source_annotation_id",
+        "source_category_name",
+        "source_label_file",
+        "source_task",
+        "uncertainty",
+        "wall_attribute"
+      ]
+    },
+    {
+      "source": "data/processed/mask2former_r2a_canvas_20260921/dataset.json",
+      "sha256": "116968f1b20114ad3175fea0e8bbe83d8cf8febfa21574f96b08c4984bc80084",
+      "image_records": 2101,
+      "annotation_records": 173685,
+      "categories": 19,
+      "image_split_counts": {
+        "train": 1641,
+        "val": 194,
+        "test": 266
+      },
+      "label_source_counts": {
+        "label_manager_confirmed": 573,
+        "str_spa_full_1536_replay": 1528
+      },
+      "nb_annotations": 27407,
+      "nb_image_records": 541,
+      "nb_split_counts": {
+        "train": 21857,
+        "val": 2103,
+        "test": 3447
+      },
+      "annotation_keys": [
+        "area",
+        "attributes",
+        "bbox",
+        "category_id",
+        "demolition_review_signal",
+        "id",
+        "image_id",
+        "iscrowd",
+        "region_id",
+        "requires_hitl",
+        "segmentation",
+        "source_annotation_id",
+        "source_category_name",
+        "source_label_file",
+        "source_task",
+        "uncertainty",
+        "wall_attribute"
+      ]
+    }
+  ],
+  "cad_pair_manifest": {
+    "records": 2286,
+    "missing_declared": 0,
+    "split_counts_declared": {
+      "test": 251,
+      "train": 1817,
+      "val": 218
+    },
+    "all_source_files_reopened": false,
+    "alignment_approved": false
+  },
+  "historical_roundtrip_report": {
+    "records": 20,
+    "compile_success": 20,
+    "render_success": 20,
+    "skipped_entity_type_totals": {
+      "DIMENSION": 476,
+      "ELLIPSE": 21,
+      "HATCH": 330,
+      "INSERT": 24,
+      "MLINE": 28
+    },
+    "geometry_quality_totals": {
+      "zero_length_or_degenerate_entities": 0,
+      "invalid_radius_entities": 0,
+      "empty_text_entities": 0,
+      "duplicate_entities": 1536
+    },
+    "limitations": [
+      "Minimal compiler supports LINE/LWPOLYLINE/POLYLINE/ARC/CIRCLE/TEXT/MTEXT only.",
+      "DIMENSION/HATCH/INSERT are preserved in raw CAD-IR but not compiled in this smoke.",
+      "Topology graph, loops/faces, and semantic associations are not normalized yet."
+    ]
+  },
+  "historical_repair_report": {
+    "records_total": 2286,
+    "unique_repaired_ids": 2286,
+    "missing_count": 0,
+    "index_gap_count": 0,
+    "sample_validation_count": 11,
+    "sample_parse_success": 11,
+    "sample_dimension_positive_count": 11
+  },
+  "hf_readonly_query": {
+    "success": true,
+    "repository": "youjunhyeok/floorplan-mask2former-r2a-scale-joint22",
+    "revision": "0d2400ee41b5c74823d1d75881130c2f9d32583e",
+    "state": "scaledToZero",
+    "inference_requested": false,
+    "source": "authenticated CLI endpoint describe; raw metadata redacted in private receipt"
+  },
+  "limits": [
+    "image records and annotations are not independent unique plan counts",
+    "old CAD reports were parsed, not rerun",
+    "gold correspondence between confirmed labels and CAD pairs is unverified",
+    "no new customer-session E2E or metric-performance measurement"
+  ]
+}

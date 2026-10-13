@@ -19,6 +19,7 @@
 ## 연구·검증 규칙
 
 - 목표는 편집 가능한 실제 DWG다. CAD-IR→DXF→DWG→실제 CAD 열기/수정/저장→render-back까지 구분해 증명한다.
+- 현재 적용 전략은 `docs/research/2026-10-13-domain-reassessment.md`다. Jippin 원본 픽셀 오버레이와 canonical CAD 좌표·치수·간격 복원을 구분한다. 사내 CAD geometry와 직원 확정 wall semantics를 연결하고, generic wall/기타벽을 비내력 정답으로 승격하지 않는다. 사내 데이터 학습 필요성과 모든 weight의 scratch 학습 필요성을 구분한다.
 - 좌표 변환·원점·y축·단위·축척·문 방향·레이어를 명시한다. 비직교 벽과 곡선을 무조건 직각화하지 않는다.
 - 프론티어, Jev/Laya System-1, 고전 기하, segmentation, graph, sequence, JEPA, diffusion, hybrid 후보를 배제하지 않고 백로그에 등록한다. 명칭·입력 모달리티·실제 가용성을 출처로 확인한다.
 - 동일 의뢰/건물/동일 평면 계열과 augmentation은 split 간 섞지 않는다. 테스트 자료로 프롬프트·threshold·routing을 튜닝하지 않는다.

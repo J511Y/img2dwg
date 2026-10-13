@@ -12,6 +12,12 @@
 
 파일명이 같거나 같은 의뢰 폴더에 있다는 이유만으로 정답 페어로 확정하지 않는다. 렌더한 DWG와 입력 이미지의 점/선 정합을 측정하고 다른 평면·전후상태·부착 이미지·틀린 crop을 분류한다. 자동 정합 confidence와 사람 승인도 분리한다.
 
+## 사내 자산 연결 계약 (2026-10-13 추가)
+
+직원 확정 segmentation 스냅샷과 기존 이미지–DWG manifest는 서로 다른 자산이다. 두 집합의 도면 교집합·정합을 먼저 검수하며 같은 sample이라고 가정하지 않는다. confirmed pixel semantics, canonical CAD geometry, 관측 왜곡/좌표변환을 각각 supervision 축으로 유지한다. geometry·host·dimension annotation이 없는 항목은 unknown/masked loss로 처리하고 negative로 만들지 않는다.
+
+`wall_nonbearing`은 직원 확정 비내력, `wall_other`는 미확정이며 generic wall·해치·레이어 이름만으로 승격하지 않는다. CAD 정답에는 unit/scale, 벽 폭·길이·간격, opening host, dimension text↔측정점, shared endpoint/adjacency와 검수 상태가 필요하다. 기존 polygon editor의 reviewed 상태가 CAD metric geometry 승인까지 뜻하지 않는다. 근거·현황은 [재조사 보고서](research/2026-10-13-domain-reassessment.md)에 있다.
+
 ## split과 평가 오염 방지
 
 - 같은 의뢰, 같은 건물, 동일 아파트 평면 계열, 시트 중복, scan/photo/render 및 augmentation은 하나의 그룹에 둔다.

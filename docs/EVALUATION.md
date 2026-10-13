@@ -2,6 +2,8 @@
 
 첫 baseline 전 dataset/split 및 metric 구현 revision, 좌표 tolerance, 목표 CAD·DWG version, 예산과 pass criteria를 고정한다. 현재 수치 목표는 미설정이며 성능 측정은 없다.
 
+왜곡된 이미지 위 mask 일치와 canonical CAD metric geometry 정확도를 별도 측정한다. 벽 폭·길이·벽간 간격·dimension residual·opening host의 실물 오차와 원본 재투영 오차를 모두 보고한다. metric anchor 보유/unknown/충돌, perspective/종이 휨/비등방 resize, synthetic/실제 도메인을 분리한다. dewarp·dimension association·solver 효과는 ablation한다. 비내력 GT coverage가 없으면 0점이 아니라 측정 불가다.
+
 | 축 | 측정 후보 | 필수 조건 |
 | --- | --- | --- |
 | 데이터 | 페어 승인율·정합 오차·제외 사유 | 검수 표본과 전체 분모, 정합 threshold 명시 |

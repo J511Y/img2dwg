@@ -32,6 +32,7 @@
 | [작업 하네스](docs/harness/workflow.md) | 시작→설계→실험→검증→인계 절차 |
 | [실험 증거 계약](docs/harness/evidence.md) | run manifest·실패·receipt |
 | [조사 보고서](docs/research/2026-10-13-survey.md) | 데이터셋·모델·최근 트렌드·출처 |
+| [사내 자산 기반 재조사](docs/research/2026-10-13-domain-reassessment.md) | Jippin·검수 라벨·HF·CAD 자산과 정밀 복원 학습 전략 |
 | [실험 백로그](docs/research/experiment-backlog.md) | 시도할 접근법과 개별 가설 |
 | [결정 기록](docs/DECISIONS.md) | 현재 결정·근거·재검토 조건 |
 | [연구노트 연결](docs/RESEARCH-NOTES.md) | 기존 주간·월간 예약 수집 계약 |

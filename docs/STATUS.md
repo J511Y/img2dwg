@@ -16,6 +16,10 @@
 
 target CAD·DWG version, usable pair 수·정합·권리·외부처리, 예산, metric threshold, 프로젝트 라이선스는 확인 필요다. 과거 data-pipeline 작업 트리는 재현 검증 전 성과로 승계하지 않는다.
 
-## 다음 세션
+## 사용자 추가 맥락 재조사 · 2026-10-13
+
+[사내 자산 기반 보고서](research/2026-10-13-domain-reassessment.md)를 추가했다. Jippin 소비 코드·직원 확정 라벨·가공 manifest·HF endpoint 설정·기존 CAD-IR 보고 JSON을 읽기 전용으로 확인했다. 새 모델 실행·DWG 변환은 하지 않았다. 현재 후보 backlog는 28개이며 초기 22개 목록에 joint gold·dimension solver·dewarp·사내 학습 대조를 추가했다. 공개 후보 목록보다 사내 geometry/semantics 감독과 정밀도 계약을 우선한다.
+
+## 다음 구현 세션
 
 [로드맵](ROADMAP.md)의 P1: 의뢰 연결 인덱스 기반 소량 페어 감사와 P2: GT CAD writer roundtrip부터 시작한다. 구현 요청이 오면 현재 선언적 계약을 실제 validator/runner로 확장한다.

@@ -26,5 +26,11 @@
 | EXP-020 | uncertainty+HITL active learning | 같은 검수예산으로 복원 품질이 더 개선되는가 | random sampling 대조군·시간 기록, test 선택 편향 금지 |
 | EXP-021 | CAD render 합성+scan/photo augmentation | train CAD 합성이 실제 noise 일반화를 높이는가 | train-only layout, 합성/실제 gap·정합 유지·외부 holdout |
 | EXP-022 | retrieval aided reconstruction | 유사 평면 검색이 입력 근거 복원을 돕는가 | train-only retrieval, 복제/다른 상태 오류·fidelity 검사 |
+| EXP-023 | confirmed pixel 라벨↔사내 CAD 교집합/정합 | 두 감독 축을 연결할 joint gold가 실제로 얼마나 있는가 | 동일 도면·전후상태·unit·검수, 단순 파일명 매칭 금지 |
+| EXP-024 | canonical geometry·host·dimension 검수 계약 | 기존 editor를 확장하면 정밀 CAD 정답을 일관되게 만들 수 있는가 | 검수자 일치도·변환/단위·unknown, 기존 운영 도구 변경은 별도 구현 |
+| EXP-025 | dimension-assisted constraint solver | 명시 치수와 연결 제약이 벽 폭·간격 오차를 줄이는가 | image-only/solver-off 대조, OCR 오독·anchor 충돌·곡선 보존 |
+| EXP-026 | homography vs learned dewarp vs canonical decoder | 이미지 평탄화가 실제 metric geometry 개선으로 이어지는가 | 종이 휨/원근별 실물 치수·선/간격 오차, DocRes 기존 보류 사유 |
+| EXP-027 | 사내 CAD 합성→실제 aligned gold curriculum | known warp 감독이 실제 사진 복원으로 전이되는가 | group split 먼저, synthetic-only 대조·실제 holdout |
+| EXP-028 | pretrained/domain-pretrained/full-scratch 대조 | 사내 감독 규모에서 어떤 초기화가 효율적인가 | 동일 decoder/data/예산, 수렴·라벨 효율·CAD 오차 |
 
 결과 상태는 `planned/running/succeeded/failed/blocked/rejected`. blocked/rejected는 이유·근거·재개 조건을 기록한다. 후보별 반복·예산 상한은 첫 run 전에 확정한다. "가능한 방법을 모두 시도"는 후보와 실행 결과를 추적한다는 뜻이며 비교 근거 없이 무제한 GPU/API 작업을 시작하지 않는다.
