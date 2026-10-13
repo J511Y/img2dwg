@@ -49,3 +49,9 @@ target CAD·DWG version, usable pair 수·정합·권리·외부처리, 예산, 
 [40개 감사](research/2026-10-13-component-supervision-audit.md): 로컬 source/before/reopened 120개 읽기 전용 검사. 변경전 DIMENSION 913개, INSERT 76개(13개 파일), 명시 GROUP 0개 파일, DIMASSOC object 700개를 확인했다. 보유 block 정의와 현재 사용 인스턴스·분해된 도형을 구분했다. 120개 SHA/size/mtime 무변경, 신규 auditor 테스트 2개 pass. 실제 컴포넌트 의미 승인·DIMASSOC 관계 검증·factory/모델 학습은 미실행이다.
 
 첫 학습 전 component catalog와 5개 factory/GT roundtrip을 수행한다. DINOv3 backbone 선택은 유지하며 출력부를 컴포넌트 type/parameter/관계와 내부 geometry로 구체화한다. 원본/기존 pilot receipt는 보존했다.
+
+## 1,000개 이상 확장·원격 릴리스 완료
+
+[데이터셋 v0.2](research/2026-10-13-dataset-v02-release.md): 1,400개 same-case 페어 수집/ODA/native 전처리 성공. 자동 변경전 조건을 충족한 1,383개를 새 비공개 HF img2dwg 버킷에 저장했다. 17개 영역 불확실은 별도 보존. DIMENSION 32,413개 crop 보존, source 무변경, exact pair/split identity 누수 0. 전체 22 shard 및 5,532 primary artifact 원격 readback 해시 일치. 테스트 15개 pass.
+
+이 사용자 확정 페어 정책이 앞선 구조 정합/사람 페어 승인 수집 gate를 대체한다. 업무 semantic assembly와 DIMASSOC target 보강·near-family grouping은 다음 전처리 상태이며 모델 학습은 미실행이다. 실행 방법은 [릴리스 하네스](harness/dataset-release.md), private URI/run은 local config에서 찾는다.

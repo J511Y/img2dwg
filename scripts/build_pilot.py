@@ -38,7 +38,11 @@ def dimension_snapshot(entity) -> dict:
     except Exception as exc:
         row["measurement_error"] = type(exc).__name__
     override = entity.override()
-    row["display_style"] = {k: override.get(k) for k in ["dimlfac", "dimscale", "dimtxt", "dimdec", "dimpost", "dimalt", "dimrnd"]}
+    from ezdxf.entities import DimStyle
+    # CAD save may materialize omitted DXF defaults. Compare effective behavior.
+    effective = {k: override.get(k) if override.get(k) is not None else DimStyle.DXFATTRIBS.get(k).default
+                 for k in ["dimlfac", "dimscale", "dimtxt", "dimdec", "dimpost", "dimalt", "dimrnd"]}
+    row["display_style"] = {k: float(v) if isinstance(v, (int, float)) else v for k,v in effective.items()}
     return row
 
 

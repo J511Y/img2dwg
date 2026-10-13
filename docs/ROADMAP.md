@@ -31,3 +31,5 @@
 [벡터 우선 학습 계획](research/2026-10-13-vector-first-training-plan.md)이 위 초기 실행 순서를 대체한다. 입력 방향의 편집 가능한 DWG 완성이 먼저이며 실제 반전은 CAD/후속 편집 기능이다. 5개 CAD supervision/GT writer → DINOv3 graph tiny 학습 → 합성 일반화/Raster2Seq 비교 → 실제 fine-tune → preview/HITL/새 DWG로 진행한다. 전유부 수동 ROI를 허용하고 합성 학습 준비와 실제 표본 검수를 병행한다. 전체 특징점 정합·40개 승인·자동 반전 판별 완성을 모델 개발 선행 조건으로 두지 않는다.
 
 첫 T0는 [컴포넌트 감사](research/2026-10-13-component-supervision-audit.md)의 inventory(완료) → catalog·치수 reference 검증 → 5개 component factory/GT roundtrip으로 구체화한다. 첫 decoder는 component/parameter/relation 출력과 내부 geometry를 연결한다.
+
+확장 데이터 준비: [v0.2 1,383개 릴리스](research/2026-10-13-dataset-v02-release.md) 완료. 같은 의뢰 폴더 페어 관계는 사용자 확정이며 별도 구조 정합 승인을 수집 조건으로 요구하지 않는다. 다음은 업무 컴포넌트/관계 전처리와 near-family/학습 노출 split 보강, 5개 factory debug 후 첫 학습 smoke다.

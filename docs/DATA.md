@@ -12,7 +12,7 @@
 
 `sample_id`, 비공개 `case_id` 매핑, `building_group`, `layout_family`, 입력/GT SHA-256, 원본 수집시각, 이미지 크기·페이지·orientation, DWG header/version, 변경전/변경후, layout/modelspace/viewport, crop bbox, 외부 참조·폰트·block 의존성, 좌표변환·단위·scale 근거, 권리·외부처리 허용, 검수자/검수일/정합 상태, split, 제외 사유.
 
-파일명이 같거나 같은 의뢰 폴더에 있다는 이유만으로 정답 페어로 확정하지 않는다. 렌더한 DWG와 입력 이미지의 점/선 정합을 측정하고 다른 평면·전후상태·부착 이미지·틀린 crop을 분류한다. 자동 정합 confidence와 사람 승인도 분리한다.
+2026-10-13 사용자 확정에 따라 같은 의뢰 연결 폴더의 준공도면+변경전후.dwg는 동일 현장의 input/output 페어로 취급한다. 별도 구조 정합 승인 없이 수집/전처리한다. 파일 무결성·변경전 crop·단위·컴포넌트 표현의 처리 상태는 페어 관계와 별도 기록한다.
 
 ## 사내 자산 연결 계약 (2026-10-13 추가)
 
@@ -43,3 +43,7 @@ manifest에 입력 ROI/CAD target 경계, 포함/제외/미확정 영역, 이미
 ## 컴포넌트 학습 정답
 
 component ID/type·parameter·native members·instance transform·style·host/space/dimension 관계와 검수 상태를 기록한다. dimension picture의 LINE/문자를 독립 정답으로 중복 집계하지 않는다. GROUP/BLOCK으로 묶이지 않은 도형도 검수 grouping 후보로 유지한다. 원본 handle은 provenance이며 학습 class/저장 순서 정답이 아니다. [CAD 구조 감사](research/2026-10-13-component-supervision-audit.md)를 따른다.
+
+## 확장 릴리스
+
+최소 1,000개 실제 의뢰 페어를 새 비공개 Hugging Face img2dwg 버킷으로 준비한다. 원본 read-only, full-resolution reference, original DWG/before DXF/native component IR, hash·split·shard·remote readback 계약은 [릴리스 실행 안내](harness/dataset-release.md)를 따른다. 사용자 승인은 버킷 데이터 준비에 적용되며 모델 학습/외부 API 호출은 별도 범위다.

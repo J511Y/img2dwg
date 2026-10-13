@@ -28,3 +28,6 @@
 - ADR-018 · 첫 학습은 DINOv3 ViT-B/16+graph decoder, 첫 비교는 Raster2Seq다. 치수 OCR/association+solver는 공통 경로다. 실제 정합 실패를 합성 CAD 학습의 중단 사유로 두지 않는다.
 
 - ADR-019 · native CAD 구조 감사 후 업무 컴포넌트/parameter/관계를 주된 감독 단위로 정한다. LINE handle·entity 순서·block 정의 존재를 의미 정답으로 쓰지 않는다. catalog/factory 검증은 첫 학습 정답을 확정하는 최소 단계다.
+
+- ADR-020 · 사용자 확정으로 같은 의뢰 폴더의 준공도면+변경전후.dwg를 현장의 input/output 페어로 인정한다. 별도 구조 정합 승인을 수집 gate로 두지 않는다. 변경전 추출·컴포넌트 전처리·파일 무결성은 계속 검사한다.
+- ADR-021 · 최소 1,000개 실제 페어를 새 비공개 img2dwg HF 버킷의 별도 version prefix에 준비한다. source paths는 local provenance에만 두고 클라우드 metadata는 비식별 ID로 연결한다. 업로드 후 전체 shard byte readback을 검증한다.

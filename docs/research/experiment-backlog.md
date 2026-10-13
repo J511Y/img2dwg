@@ -59,3 +59,7 @@
 | --- | --- | --- |
 | EXP-040 | native CAD→업무 컴포넌트 catalog/factory | [구조 감사](2026-10-13-component-supervision-audit.md), block/분해 도형·style·dimension 관계 보존, 5개 재구성과 검수 |
 | EXP-041 | component type/parameter/relation decoder | native representation 차이의 동등성, component AP·parameter/host/치수 오차, common writer |
+
+| ID | 추가 실행 | 상태 / 근거 |
+| --- | --- | --- |
+| EXP-042 | 1,000개 이상 동일 의뢰 페어·native CAD·버킷 릴리스 | 데이터 준비 succeeded, [1,383개 원격 검증](2026-10-13-dataset-v02-release.md); 모델 성능 아님 |

@@ -34,12 +34,14 @@
     "cad_pilot_count": 40,
     "debug_target_count": 5,
     "synthetic_first": true,
-    "real_hard_labels": "reviewed-only",
+    "real_hard_labels": "same-case-pairs; mask-unresolved-semantic-assemblies",
     "split_unit": "building-layout-family-before-augmentation",
     "full_image_feature_alignment_required": false,
     "actual_unit_direction_required": false,
     "initial_manual_roi_allowed": true,
-    "supervision_unit": "reviewed-workflow-components-and-relations"
+    "supervision_unit": "reviewed-workflow-components-and-relations",
+    "pair_authority": "user-confirmed-same-work-request-folder",
+    "minimum_dataset_records": 1000
   },
   "proposed_step_caps": {
     "tiny_debug": 1000,

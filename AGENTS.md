@@ -9,7 +9,7 @@
 
 ## 현재 권한과 범위
 
-- 현재 사용자는 원본을 보존한 데이터셋 pilot 구축·30~50개 샘플 추출·치수/정합 검사·검수 화면 구현을 허용했다. 모델 학습·유료 API·운영 배포는 시작하지 않았다. 현재 실행 방법과 결과는 `docs/harness/dataset-pilot.md`, `docs/experiments/2026-10-13-EXP-029-pilot.md`를 읽는다.
+- 현재 사용자는 원본을 보존한 데이터셋 pilot에 이어 최소 1,000개 의뢰 페어 준비와 새 비공개 Hugging Face img2dwg 버킷 생성/업로드를 허용했다. 모델 학습·유료 API·운영 배포는 시작하지 않았다. 현재 실행 방법과 결과는 `docs/harness/dataset-pilot.md`, `docs/experiments/2026-10-13-EXP-029-pilot.md`를 읽는다.
 - 후속 사용자가 구현·실험을 요청하면 해당 범위로 진행한다. 이 초기 상태를 영구적인 구현 금지로 해석하지 않는다.
 - 데이터 수집·변경전 crop·ODA roundtrip·치수/정합 검증 실행기가 추가됐다. 학습/배포 하네스·CI·canonical CAD-IR schema validator와 구분한다.
 - 사내 워크의 의뢰 연결 경로가 데이터 위치의 정본이다. 원본 폴더를 읽기 전용으로 사용하고 결과는 별도 run 폴더에 작성한다. 원본 DWG를 덮어쓰지 않는다.
@@ -45,3 +45,7 @@
 ## 컴포넌트 감독 보완
 
 `docs/research/2026-10-13-component-supervision-audit.md`를 첫 학습 계획에 함께 적용한다. native BLOCK/INSERT·DIMENSION·style·관계를 먼저 보존하고 분해된 geometry는 검수 업무 컴포넌트로 묶는다. block 정의 존재를 active instance/semantic label로 승격하지 않는다. 매 LINE/handle/저장 순서를 이미지 획과 강제로 대응시키지 않는다. component catalog와 5개 factory/GT roundtrip을 확인한 뒤 component type/parameter/relation head를 학습한다. backbone 후보는 유지한다.
+
+## 확장 데이터셋의 사용자 확정 정책
+
+같은 의뢰 폴더의 준공도면과 변경전후.dwg는 동일 현장의 input/output이다. 별도 구조/특징점 정합·사람 페어 승인으로 수집을 막지 않는다. 파일 무결성, 변경전 crop, 컴포넌트 전처리 상태와 페어 관계를 구분한다. 최소 1,000개 실제 페어를 준비하며 augmentation/entity 수를 의뢰 수로 세지 않는다. 비공개 Hugging Face img2dwg 버킷 사용이 명시적으로 승인됐다. 실행은 `docs/harness/dataset-release.md`를 따른다.

@@ -61,9 +61,9 @@ HAWP/HEAT/RoomFormer, frontier VLM, JEPA/domain SSL, diffusion, 완전 scratch�
 
 **합성 경로:** 검수 CAD → 렌더 이미지 + 정확한 graph/치수 관계 → blur/JPEG/색바램/선폭/원근/종이 휨 변형. 이미지와 CAD 정답의 변형 관계가 알려져 있으므로 실패한 전역 특징점 정합을 학습 준비 조건으로 삼지 않는다. 서로 다른 CAD의 train/dev/test 그룹을 먼저 나누고 그 안에서 augmentation을 생성한다. 많은 합성 변형이 독립 도면 수를 늘리지는 않는다.
 
-**실제 경로:** 준공도면은 실제 domain 성능을 측정하고 fine-tune할 핵심 자산이다. 전유부와 주요 graph/치수 관계를 검수한 사례만 hard label로 사용한다. 전체 시트 pixel homography가 없어도 canonical target supervision을 구성할 수 있지만 실제 같은 구조인지 확인은 필요하다. 이미지와 DWG가 반전 관계면 학습 target 좌표를 입력 기준으로 정규화하거나 검수된 동등 변환을 적용한다. 이는 잘못된 학습 정답 방지이며 실제 집의 반전 판별을 제품 선행 gate로 만드는 것이 아니다.
+**실제 경로:** 준공도면은 실제 domain 성능을 측정하고 fine-tune할 핵심 자산이다. 동일 의뢰 폴더의 준공도면+변경전후.dwg가 같은 현장의 input/output임은 사용자가 확정했다. 별도 구조 정합 승인으로 수집을 막지 않고 변경전 추출·컴포넌트/치수 전처리 상태에 맞춰 loss를 적용한다. 전체 시트 pixel homography를 선행 조건으로 삼지 않는다. 이미지와 DWG가 반전 관계면 학습 target 좌표를 입력 기준으로 정규화하거나 검수된 동등 변환을 적용한다. 이는 잘못된 학습 정답 방지이며 실제 집의 반전 판별을 제품 선행 gate로 만드는 것이 아니다.
 
-승인되지 않은 실제 40개를 통째로 hard target으로 학습하지 않는다. 대신 합성 학습과 실제 검수/평가를 동시에 진행한다. 기존 segmentation 라벨은 perception 보조에 사용하되 CAD 정답이 있다고 가정하지 않는다. 비내력 분류는 추가 semantic 축이며 벡터 복원 성공을 기다리게 하는 선행 과제가 아니다.
+사용자 확정 의뢰 페어를 전처리하되 미해석 컴포넌트/관계를 확정 semantic label로 승격하지 않는다. 대신 합성 학습과 실제 검수/평가를 동시에 진행한다. 기존 segmentation 라벨은 perception 보조에 사용하되 CAD 정답이 있다고 가정하지 않는다. 비내력 분류는 추가 semantic 축이며 벡터 복원 성공을 기다리게 하는 선행 과제가 아니다.
 
 ## 5. 첫 run 설계와 계속/중단 기준
 

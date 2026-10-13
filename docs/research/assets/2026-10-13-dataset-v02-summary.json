@@ -1,0 +1,100 @@
+{
+  "schema": "img2dwg-dataset-release/v0.2",
+  "date_kst": "2026-10-13",
+  "minimum_required": 1000,
+  "records": 1383,
+  "exact_pair_duplicates_in_release": 0,
+  "groups": 1258,
+  "split_records": {
+    "train": 1028,
+    "validation": 128,
+    "test": 150,
+    "calibration": 77
+  },
+  "split_groups": {
+    "train": 933,
+    "validation": 120,
+    "calibration": 71,
+    "test": 134
+  },
+  "entity_types": {
+    "LINE": 808383,
+    "HATCH": 23505,
+    "INSERT": 2145,
+    "DIMENSION": 32413,
+    "LWPOLYLINE": 222684,
+    "TEXT": 3755,
+    "CIRCLE": 2305,
+    "ARC": 17177,
+    "ELLIPSE": 1634,
+    "MTEXT": 25284,
+    "MLINE": 1409,
+    "POLYLINE": 105,
+    "SPLINE": 309,
+    "SOLID": 18,
+    "WIPEOUT": 1,
+    "LEADER": 16,
+    "3DFACE": 68
+  },
+  "native_component_types": {
+    "native_block_instance": 2145,
+    "native_dimension": 32413,
+    "native_text": 29039,
+    "native_mline": 1409
+  },
+  "dimensions_preserved": 32413,
+  "source_files_unchanged": true,
+  "pair_authority": "user-confirmed-same-work-request-folder",
+  "full_image_feature_alignment_required": false,
+  "semantic_component_catalog_complete": false,
+  "near_layout_family_grouping_complete": false,
+  "model_training_run": false,
+  "collection_success": 1400,
+  "collection_failures": 0,
+  "preprocessing_success": 1400,
+  "preprocessing_failures": 0,
+  "uncertain_crop_quarantine": 17,
+  "preprocessor_protocol_counts": {
+    "fd570a7e42e5349ca2e45a1f57b369690e1864dfbb762d8b02da01840bd0c35c": 672,
+    "82d117fed2f362d7c2b3cccceaf6806beeaae0b5bdc71ea2152362368100dd0e": 711
+  },
+  "exact_identity_cross_split_leaks": 0,
+  "shards": 22,
+  "shard_bytes": 4719688444,
+  "remote_verification": {
+    "schema": "img2dwg-remote-dataset-verification/v1",
+    "records": 1383,
+    "shards": 22,
+    "all_remote_shard_sha256_verified": true,
+    "primary_artifacts_verified": 5532,
+    "metadata_sha256_verified": true,
+    "elapsed_s": 152.96024799346924
+  },
+  "release_source_files": 2768,
+  "release_source_bytes": 4333361131,
+  "native_dimension_absent_records": 1,
+  "minimum_target_entities": 367,
+  "tests_passed": 15,
+  "reader_smoke": {
+    "schema": "img2dwg-dataset-reader-smoke/v1",
+    "source": "verified-remote-readback-shard",
+    "image_original_dimensions": [
+      2480,
+      3506
+    ],
+    "image_exif_oriented_dimensions": [
+      3506,
+      2480
+    ],
+    "native_entity_count": 1663,
+    "native_component_types": {
+      "native_block_instance": 28,
+      "native_dimension": 60,
+      "native_text": 18
+    },
+    "block_definitions": 235,
+    "native_ir_parsed": true,
+    "image_decoded": true,
+    "model_training_run": false
+  }
+}
