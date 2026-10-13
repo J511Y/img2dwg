@@ -4,7 +4,8 @@ from pathlib import Path
 import gradio as gr
 import torch
 from huggingface_hub import snapshot_download
-from img2dwg.inference import load_checkpoint,predict
+from img2dwg.inference import load_checkpoint,predict,normalize_image
+from img2dwg.grounding import baseline_graph
 from img2dwg.vector import exports,svg
 
 torch.set_num_threads(int(os.getenv('TORCH_THREADS','2')))
@@ -41,8 +42,19 @@ def infer(editor,width_mm,threshold):
     image=editor.get('composite') if isinstance(editor,dict) else editor
     if image is None: raise gr.Error('도면을 업로드해 주세요.')
     if image.width*image.height>60_000_000: raise gr.Error('이미지가 너무 큽니다. 전유부 영역을 잘라 다시 올려 주세요.')
-    model,config,sha=load()
-    graph,canvas=predict(model,config,image,threshold,width_mm,sha)
+    # The coordinate model failed on real scans. Do not publish it as conversion.
+    import time
+    started=time.perf_counter()
+    canvas,transform=normalize_image(image,768)
+    graph=baseline_graph(canvas,min_length=max(8,min(64,float(threshold))))
+    graph['model_status']='coordinate-model-rejected-on-real-input'
+    graph['model_sha256']=None
+    graph['input_transform']=transform
+    graph['elapsed_seconds']=time.perf_counter()-started
+    if width_mm and width_mm>0:
+        graph['scale']=float(width_mm)/transform['fitted_size'][0]; graph['units']='mm'
+        graph['scale_authority']='user-confirmed-width;no-dimension-solver'
+    sha=None
     folder=Path(tempfile.mkdtemp(prefix='img2dwg-'))
     receipt=exports(graph,folder)
     receipt.update({'model_sha256':sha,'elapsed_seconds':graph['elapsed_seconds'],
@@ -50,28 +62,29 @@ def infer(editor,width_mm,threshold):
         'vector_preview_contains_raster':False,'numeric_dimensions_verified':False})
     (folder/'receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
     counts=receipt['component_counts']
-    status=f"**벡터 초안 생성 · {len(graph['components'])}개 객체 · {graph['elapsed_seconds']:.1f}초**\n\n"
+    status=f"**원본 선 검출 기준선 · {len(graph['components'])}개 선분 · {graph['elapsed_seconds']:.1f}초**\n\n"
+    status+='기존 학습 모델은 실제 스캔에서 복원에 실패해 기본 출력에서 제외했습니다. **이 결과는 학습 모델의 CAD 복원 결과가 아닙니다.**\n\n'
     status+='선분 '+str(counts.get('segment',0))+' · 곡선 '+str(counts.get('arc',0))+' · 치수 후보 '+str(counts.get('dimension',0))+'\n\n'
     status+='축척: '+('선택한 이미지의 전체 폭을 기준으로 mm 적용.' if graph['units']=='mm' else '미확정. DXF는 단위 없음으로 저장됩니다.')
-    status+=' **치수 숫자 인식·누락 검사는 아직 미완료이며 치수 후보에는 ?를 표시합니다.**'
+    status+=' **중심선·치수·문·벽 컴포넌트 복원은 아직 완료하지 않았습니다.**'
     if not graph['components']: status+='\n\n객체를 찾지 못했습니다. 전유부를 더 크게 잘라 올리거나 검출 기준을 낮춰 보세요.'
     return viewer(graph),status,str(folder/'prediction.svg'),str(folder/'prediction.dxf'),str(folder/'prediction.json'),str(folder/'receipt.json')
 
-with gr.Blocks(title='img2dwg · 도면 벡터 변환',theme=gr.themes.Soft(),delete_cache=(3600,86400),analytics_enabled=False) as demo:
-    gr.Markdown('# 도면 벡터 변환\n도면을 올리고 전유부를 잘라낸 뒤 변환하세요. 결과는 확대 가능한 벡터이며 CAD에서 편집할 수 있습니다.')
-    gr.Markdown('**1차 실험 모델** · 벽·문·치수의 누락과 잘못된 형상을 검수해 주세요. 치수 정확성이 확인된 완성 도면은 아직 아닙니다.')
+with gr.Blocks(title='img2dwg · 복원 실패 진단',theme=gr.themes.Soft(),delete_cache=(3600,86400),analytics_enabled=False) as demo:
+    gr.Markdown('# 도면 복원 실험\n**1차 좌표 예측 모델은 실제 스캔 복원에 실패했습니다. 기본 사용을 중단하고 개선 중입니다.**')
+    gr.Markdown('아래는 입력에서 실제로 검출한 선을 확인하는 기하 기준선입니다. 치수에 맞는 CAD 복원 결과가 아닙니다.')
     with gr.Row():
         with gr.Column(scale=1):
             image=gr.ImageEditor(type='pil',image_mode='RGB',sources=['upload','clipboard'],transforms=['crop'],
                 brush=False,eraser=False,layers=False,label='준공도면 · 자르기로 전유부 선택',height=520,format='png')
             gr.Markdown('업로드 후 **Image → Crop → Confirm crop**으로 전유부를 선택할 수 있습니다.')
             width=gr.Number(value=0,minimum=0,label='선택한 이미지 전체 폭의 실제 길이 (mm, 모르면 0)',precision=1)
-            with gr.Accordion('검출 설정',open=False): threshold=gr.Slider(.05,.8,value=.25,step=.01,label='검출 기준')
-            run=gr.Button('벡터로 변환',variant='primary')
+            with gr.Accordion('선 검출 설정',open=False): threshold=gr.Slider(8,64,value=12,step=1,label='최소 선분 길이 (px)')
+            run=gr.Button('원본 선 구조 확인',variant='primary')
         with gr.Column(scale=1):
             preview=gr.HTML(label='벡터 결과'); status=gr.Markdown('도면을 올리면 여기에 결과가 표시됩니다.')
     with gr.Row():
-        download_svg=gr.File(label='SVG · 확대 가능한 벡터'); download_dxf=gr.File(label='DXF · CAD 편집용')
+        download_svg=gr.File(label='SVG · 관측 선 기준선'); download_dxf=gr.File(label='DXF · 관측 선 기준선')
     with gr.Accordion('변환 기록',open=False):
         download_json=gr.File(label='벡터 좌표'); download_receipt=gr.File(label='검증 기록')
     run.click(infer,[image,width,threshold],[preview,status,download_svg,download_dxf,download_json,download_receipt],api_name='infer',concurrency_limit=1)

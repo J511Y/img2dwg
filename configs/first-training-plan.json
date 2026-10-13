@@ -1,6 +1,6 @@
 {
   "schema": "img2dwg-first-training-plan/v1",
-  "status": "trained;private-Space-upload-contract-verified;quality-goals-unmet",
+  "status": "failed-on-real-scans;coordinate-model-withdrawn;observed-line-baseline-only",
   "date_kst": "2026-10-13",
   "priority": "input-floorplan-to-editable-dimension-consistent-dwg",
   "deferred": [
@@ -62,7 +62,11 @@
     "quality_gates_passed": false,
     "space": "youjunhyeok/img2dwg",
     "space_hardware": "cpu-basic",
-    "actual_billing_usd": null
+    "actual_billing_usd": null,
+    "space_mode": "observed-line-detection-baseline;not-model-restoration",
+    "rejected_models": [
+      "youjunhyeok/img2dwg-vector-first-v2"
+    ]
   },
   "release_checks": [
     "required-dimensions-covered",
@@ -88,6 +92,7 @@
     "revision": "e00f601e871db6cdaa401c2910fa0741c61616e7",
     "sha256": "0a5999ded25d4925417d9a07dee25c723deb94f8904fd3d3f1fdd6bd1ffdf072",
     "source": "CAD synthetic;not-real-coordinate-finetune",
-    "space_revision": "5b5b4a26a5a3a142bbf9e159fdca61d32fcbb851"
+    "space_revision": "5b5b4a26a5a3a142bbf9e159fdca61d32fcbb851",
+    "deployment_status": "withdrawn-after-user-real-scan-failure"
   }
 }

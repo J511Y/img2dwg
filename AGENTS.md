@@ -52,6 +52,12 @@
 
 ## 첫 학습·서빙의 해석
 
+**실제 실패 정정:** EXP-044가 EXP-043의 제품 해석을 대체한다. 첫 coordinate 모델은
+raw 준공도면에서 실패하여 기본 사용을 중단했다. 관측 선 기준선을 학습 모델 복원이나
+완성 CAD로 소개하지 않는다. 파일/동작 검증을 실제 구조 복원 품질로 승격하지 않는다.
+원본 RAW 입력–canonical CAD 감독과 typed component/관계·치수 제약을 우선하고,
+실제 입력의 train 재현/별도 validation의 시각·기하/치수 검사 전에 기본 배포하지 않는다.
+
 DINOv3 frozen + 4-slot component coordinate baseline이 구현됐다. source-identity group의
 train 1,028개/validation 128개 CAD 합성으로 학습하며 raw 준공도면 coordinate fine-tune과
 숫자 치수/OCR·host association은 아직 미실행이다. 세부 성능은 EXP-043과 private receipts로

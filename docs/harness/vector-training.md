@@ -1,5 +1,14 @@
 # 1차 벡터 학습·Space 하네스
 
+**현재 정정:** 첫 coordinate 모델은 실제 스캔 실패로 기본 배포에서 제외됐다.
+EXP-044를 따른다. 모델 재배포에는 실제 구조/필수 치수 검증이 필요하며,
+단순 upload/download receipt는 통과 근거로 사용할 수 없다. 지금 Space의 선 검출
+기준선은 학습 모델이나 완성 CAD 복원으로 표시하지 않는다.
+
+현재 `scripts/deploy_vector_space.py`는 명시적으로 표시된 관측 선 기준선만 배포한다.
+`--dry-run`으로 전체 패키지와 source marker를 확인할 수 있다. 새 모델 서빙은 아직
+구현하지 않았으며 아래 1차 모델 배포 명령·설명은 당시 기록이다.
+
 최신 사용자는 첫 모델 학습과 별도 HF inference Space 배포를 승인했다.
 원본 공유폴더는 이 실행에서 쓰지 않는다. v0.2 릴리스의 로컬 사본을 읽는다.
 
@@ -17,7 +26,7 @@
    입력에서 augmentation 후 endpoint 순서를 정규화한다. 자동 전유부 승인과 구분한다.
 6. 체크포인트, 로그, manifest, unordered component 평가, receipt를 private bucket와
    private model repo에 보존한다. 직접 dimension 숫자/association 학습은 포함하지 않는다.
-7. `scripts/deploy_vector_space.py`는 새 전용 private Space에 inference 파일만 올린다.
+7. 당시 `scripts/deploy_vector_space.py`는 새 전용 private Space에 inference 파일만 올렸다.
    model revision/SHA를 고정하며 데이터셋 mount와 정답 CAD 접근은 제공하지 않는다.
 8. `scripts/verify_vector_space.py --images <synthetic> <real> --output <private-check>`로
    실제 인증 upload → SVG/DXF download → raster-free SVG/DXF 재열기·SHA를 검사한다.

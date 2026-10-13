@@ -37,3 +37,8 @@
   4-slot·endpoint 정규화 variant를 선택한다. Geometry candidate를 먼저 실시간 벡터로
   제공하되 숫자 치수 미학습·미확정 축척을 `?`/unitless로 표시한다. 현 Space는 SVG·DXF이며
   DWG/치수 완전 목표의 완료로 승격하지 않는다. source CAD retrieval은 inference에서 금지한다.
+
+- ADR-023 · 실제 스캔에서 실패한 coordinate 모델은 기본 배포에서 제외한다. 파일 생성/학습
+  loss/합성 F1로 서비스 복원 품질을 대신하지 않는다. 실제 raw input–canonical output을
+  배우는 component/parameter/관계 경로를 우선하고, 실제 구조 및 필수 치수 검증 receipt
+  없이 학습 모델을 다시 기본 배포하지 않는다. 관측 선 기준선과 학습 모델의 출처를 구분한다.

@@ -7,3 +7,4 @@ safetensors==0.6.2
 numpy==2.2.6
 pillow==11.3.0
 ezdxf==1.4.4
+opencv-python-headless==4.11.0.86

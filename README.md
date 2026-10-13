@@ -2,7 +2,12 @@
 
 평면도 이미지에서 **CAD에서 열고 편집할 수 있는 DWG**를 복원하는 모델·파이프라인 연구 프로젝트.
 
-현재 단계: **첫 DINOv3 벡터 좌표 모델 학습과 비공개 inference Space를 연결했다.**
+현재 단계: **첫 좌표 모델은 실제 준공도면 복원에 실패해 기본 서비스 출력에서 제외했다.**
+[실패 분석](docs/experiments/2026-10-13-EXP-044-real-scan-failure.md).
+[Space](https://huggingface.co/spaces/youjunhyeok/img2dwg)는 현재 관측 선 검출 기준선만 제공하며
+이는 학습 모델의 CAD 복원 결과가 아니다. 중심선·컴포넌트·수치 치수 복원은 미완성이다.
+
+첫 실험의 당시 기록: DINOv3 벡터 좌표 모델 학습과 비공개 inference Space를 연결했다.
 [Space](https://huggingface.co/spaces/youjunhyeok/img2dwg)에서 전유부를 잘라 업로드하고
 확대 가능한 SVG·편집 가능한 DXF 초안을 확인한다. HF 소유 계정 로그인이 필요하다.
 CAD 합성 train 1,028개/validation 128개, full 2,500 steps.
