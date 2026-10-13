@@ -17,3 +17,9 @@
 | ADR-013 · 2026-10-13 | 다음 CAD action controller와 중간 HITL을 정식 연구·제품 경로로 둔다 | 사용자 System-1 구상. 현재 Jev/Laya 모달리티와 별도 vision action policy 구분 |
 
 확인 필요: target CAD/DWG version, 정량 acceptance 목표, 승인된 데이터 범위·외부처리·compute budget, 자체 코드 라이선스.
+
+## 추가 결정
+
+- ADR-014 · 전유부만 복원하고 실제 반전과 관측 왜곡을 구분한다. 방향 근거가 없으면 보류한다.
+- ADR-015 · 중심선→치수 제약→디테일과 치수 원장 누락/geometry 검사를 필수로 둔다. text 보존만으로 완료할 수 없다.
+- ADR-016 · 사용자 요청으로 전체 특징점 정합 재시도를 중단하고 기존 40개에서 5개 검수 기준선부터 진행한다. 기존 실험 증거는 보존한다.

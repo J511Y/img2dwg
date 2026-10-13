@@ -24,3 +24,7 @@ scale unknown 사례는 실물 mm 오차 평가에서 제외 사유를 표기하
 기본 비교는 건물/평면 그룹 단위 bootstrap 신뢰구간 또는 paired 실패 표를 사용한다. 소표본 결과는 탐색으로 표시한다. 공개 논문의 room F1/IoU를 사내 DWG 성능과 직접 비교하지 않는다. 프롬프트·token budget·reasoning effort·SDK/model snapshot·retry policy를 고정하고 quota 실패를 기록한다.
 
 최종 후보 선정 전 sealed test 평가 시점과 한도를 정한다. 실패·누락을 포함한 전체 결과 CSV/JSON과 CAD roundtrip, source/output hash가 있어야 성공으로 보고한다.
+
+## 최신 필수 평가 축
+
+검수된 전유부에서 평가하며 옆집/공용부 출력 혼입, 실제 방향별 결과·잘못된 반전을 별도로 센다. 필요한 표시 치수 coverage·미판독/미해결 충돌·출력 누락, 실제 vector 치수별/최대 residual·체인 폐합을 검사한다. 수치 tolerance는 5개 검수 기준선 실행 전에 고정한다. 전체 특징점 정합은 현재 중단하며 성공 조건이 아니다. 기존 pilot crop 치수 보존 측정은 입력 치수 완전성/실물 정확도와 구분한다. [최신 계획](research/2026-10-13-exclusive-unit-dimension-plan.md)을 따른다.

@@ -40,3 +40,13 @@
 | EXP-034 | 중간 HITL/잠금/국소 재복원 | 적은 개입으로 usable CAD 완료가 가능한가 | 수정시간·intervention·잠금위반·undo/resume·자동/HITL 지표 분리 |
 
 결과 상태는 `planned/running/succeeded/failed/blocked/rejected`. blocked/rejected는 이유·근거·재개 조건을 기록한다. 후보별 반복·예산 상한은 첫 run 전에 확정한다. "가능한 방법을 모두 시도"는 후보와 실행 결과를 추적한다는 뜻이며 비교 근거 없이 무제한 GPU/API 작업을 시작하지 않는다.
+
+## 추가 planned 실험
+
+| ID | 후보 | 검사 |
+| --- | --- | --- |
+| EXP-035 | 전유부 ROI·출력 범위 검수 | 5개→40개, 옆집/공용부 혼입·경계 불명·직원 승인 |
+| EXP-036 | 실제 세대 정방향/반전 확인 | 비대칭 anchor·의뢰 정보·직원 검수, 근거 없으면 unknown |
+| EXP-037 | 필요한 표시 치수 전수 원장 | 값·단위·측정점·중심선/마감면·출력 연결·미판독/충돌 |
+| EXP-038 | 중심선→치수→세부 요소 기준선 | 승인 GT, solver-off 대조·실제 residual·체인 폐합·roundtrip |
+| EXP-039 | 단계별 전유부/치수 검수 UI | 원본 치수↔CAD 측정점·누락/충돌·잠금·수정시간 |

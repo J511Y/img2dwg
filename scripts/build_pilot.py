@@ -75,6 +75,44 @@ def render(doc, rect, path: Path, long_side: int = 1600) -> dict:
     return {"width": width, "height": height, "cad_bbox": rect.to_list(), "y_axis": "CAD-up/pixel-down"}
 
 
+def reciprocal_matches(da, db, ka, kb):
+    """Mutual ratio matches, one descriptor and one rounded pixel per endpoint."""
+    matcher = cv2.BFMatcher(cv2.NORM_L2)
+    def ratio(a, b):
+        return [p[0] for p in matcher.knnMatch(a, b, k=2)
+                if len(p) == 2 and p[0].distance < .72 * p[1].distance]
+    reverse = {(m.trainIdx, m.queryIdx) for m in ratio(db, da)}
+    selected, used_src, used_dst = [], set(), set()
+    for m in sorted(ratio(da, db), key=lambda m: m.distance):
+        sp = tuple(np.rint(ka[m.queryIdx].pt).astype(int))
+        dp = tuple(np.rint(kb[m.trainIdx].pt).astype(int))
+        if (m.queryIdx, m.trainIdx) in reverse and sp not in used_src and dp not in used_dst:
+            selected.append(m); used_src.add(sp); used_dst.add(dp)
+    return selected
+
+
+def spatial_support(points, shape):
+    """Measure both endpoint distributions; tiny residual alone proves nothing."""
+    p = np.asarray(points, dtype=np.float32).reshape(-1, 2)
+    unique = np.unique(np.rint(p), axis=0)
+    eigen = np.linalg.eigvalsh(np.cov(p.T)) if len(p) >= 3 else np.zeros(2)
+    return {"unique_pixels": len(unique),
+            "hull_coverage": float(cv2.contourArea(cv2.convexHull(p)) / (shape[0] * shape[1])) if len(p) >= 3 else 0.,
+            "minor_major_variance_ratio": float(max(0., eigen[0]) / eigen[1]) if eigen[1] > 0 else 0.}
+
+
+def support_rejections(src_support, dst_support):
+    reasons = []
+    for name, support, minimum in [("cad", src_support, .15), ("reference", dst_support, .005)]:
+        if support['unique_pixels'] < 20:
+            reasons.append(name + '_too_few_unique_points')
+        if support['hull_coverage'] < minimum:
+            reasons.append(name + '_insufficient_spatial_coverage')
+        if support['minor_major_variance_ratio'] < .01:
+            reasons.append(name + '_collapsed_or_collinear_points')
+    return reasons
+
+
 def register(reference: np.ndarray, cad: np.ndarray, folder: Path) -> dict:
     """Estimate CAD-render to observed-image homography; always require human review."""
     scale = min(1.0, 1800 / max(reference.shape[:2]))
@@ -86,10 +124,9 @@ def register(reference: np.ndarray, cad: np.ndarray, folder: Path) -> dict:
         a,b = (cg,rg) if mode == "gray" else (cv2.Canny(cg, 60, 150), cv2.Canny(rg, 60, 150))
         ka, da = sift.detectAndCompute(a, None)
         kb, db = sift.detectAndCompute(b, None)
-        if da is None or db is None or len(db) < 2:
+        if da is None or db is None or len(da) < 2 or len(db) < 2:
             continue
-        pairs = cv2.BFMatcher(cv2.NORM_L2).knnMatch(da, db, k=2)
-        good = [x[0] for x in pairs if len(x)==2 and x[0].distance < .72*x[1].distance]
+        good = reciprocal_matches(da, db, ka, kb)
         if len(good) < 8:
             continue
         src = np.float32([ka[m.queryIdx].pt for m in good]).reshape(-1,1,2)
@@ -101,22 +138,29 @@ def register(reference: np.ndarray, cad: np.ndarray, folder: Path) -> dict:
         if int(chosen.sum()) < 4:
             continue
         residual = np.linalg.norm(cv2.perspectiveTransform(src, h).reshape(-1,2) - dst.reshape(-1,2), axis=1)
-        hull = cv2.convexHull(src[chosen].reshape(-1,2))
-        coverage = float(cv2.contourArea(hull)/(cad.shape[0]*cad.shape[1]))
+        source_support = spatial_support(src[chosen], cad.shape)
+        target_support = spatial_support(dst[chosen], ref.shape)
+        coverage = source_support['hull_coverage']
+        reasons = support_rejections(source_support, target_support)
         corners = np.float32([[0,0],[cad.shape[1],0],[cad.shape[1],cad.shape[0]],[0,cad.shape[0]]]).reshape(-1,1,2)
         mapped = cv2.perspectiveTransform(corners,h).reshape(-1,2)
         mapped_area = abs(cv2.contourArea(mapped)) / (ref.shape[0]*ref.shape[1])
-        valid = bool(chosen.sum() >= 20 and chosen.mean() >= .35 and coverage >= .15 and .005 < mapped_area < 1.5
-                     and cv2.isContourConvex(mapped.astype(np.float32)) and np.isfinite(mapped).all())
-        candidates.append((valid, int(chosen.sum()), coverage, h, src, dst, chosen, residual, good, ka, kb, mode, mapped_area))
+        if chosen.mean() < .35: reasons.append('low_inlier_ratio')
+        if not (.005 < mapped_area < 1.5 and np.isfinite(mapped).all() and cv2.isContourConvex(mapped.astype(np.float32))):
+            reasons.append('invalid_mapped_extent')
+        if not np.isfinite(h).all() or np.linalg.matrix_rank(h) < 3: reasons.append('singular_transform')
+        valid = not reasons
+        candidates.append((valid, int(chosen.sum()), coverage, h, src, dst, chosen, residual, good, ka, kb, mode, mapped_area, source_support, target_support, reasons))
     if not candidates:
-        return {"status": "no_reliable_matches", "approved": False, "model": "homography", "source_resize_scale": scale}
-    v,n,c,h,src,dst,chosen,res,good,ka,kb,mode,area = max(candidates, key=lambda x:(x[0],x[1],x[2]))
+        return {"status": "no_reliable_matches", "approved": False, "model": "homography", "source_resize_scale": scale,
+                "protocol": "reciprocal-spatial-v2", "rejection_reasons": ["insufficient_reciprocal_spatial_matches"]}
+    v,n,c,h,src,dst,chosen,res,good,ka,kb,mode,area,ss,ts,reasons = max(candidates, key=lambda x:(x[0],x[1],x[2]))
     result = {"status": "automatic_candidate_review_required" if v else "weak_or_degenerate_review_required", "approved": False,
               "matches":len(good), "inliers":n, "inlier_ratio":float(chosen.mean()), "cad_inlier_hull_coverage":c,
               "median_inlier_reprojection_px":float(np.median(res[chosen])), "mapped_area_fraction":area,
               "homography_cad_render_to_resized_reference":h.tolist(), "source_resize_scale":scale, "feature_mode":mode,
-              "limits":"feature reprojection is not mm accuracy or proof of correct before-state correspondence"}
+              "protocol":"reciprocal-spatial-v2", "cad_support":ss, "reference_support":ts, "rejection_reasons":reasons,
+              "limits":"feature reprojection is not mm accuracy, exclusive-unit selection or physical mirror confirmation"}
     marked = cv2.drawMatches(cad, ka, ref, kb, good, None, matchesMask=chosen.astype(int).tolist(),flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
     cv2.imwrite(str(folder/'matches.jpg'), marked)
     if v:

@@ -20,3 +20,7 @@ finite 좌표, 최소 길이, 중복/겹침, 자기교차, 닫힘, host 관계, 
 DXF 작성 후보는 ezdxf, DWG 변환 후보는 설치된 ODA File Converter 및 라이선스 확인 후 ODA SDK/실제 CAD 엔진이다. ezdxf 자체를 DWG writer라고 표현하지 않는다. 공식 [ezdxf 문서](https://ezdxf.readthedocs.io/en/stable/introduction.html)와 [ODA 변환기](https://www.opendesign.com/guestfiles/oda_file_converter)를 참조한다.
 
 확장자만 바꾼 DWG, 빈 파일, raster attachment만 포함한 결과는 실패다. 실제 target CAD 버전은 미확정이며 converter 설치 확인은 호환성 증거가 아니다. 모델 지표와 별개로 `DXF export`, `DWG convert`, `CAD open`, `entity edit`, `save/reopen`, `render-back` receipt를 각각 남긴다. conversion crash·timeout·외부참조 누락도 전체 입력 분모에 포함한다.
+
+## 중심선·치수 생성 계약
+
+중심선/연결 그래프를 먼저 구성하고 승인된 치수 원장으로 전체 구조를 제약한 뒤 벽 두께·개구부·디테일을 작성한다. 중심선과 마감면 측정 기준·offset을 명시한다. 필요한 모든 치수의 출력 대응과 실제 endpoint 길이/투영 길이를 검증하며 text 보존/override만으로 통과시키지 않는다. 반전은 geometry/치수 관계/문 방향에 적용하고 문자는 읽을 수 있게 생성한다. [상세 계획](research/2026-10-13-exclusive-unit-dimension-plan.md)을 따른다.

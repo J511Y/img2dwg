@@ -33,3 +33,9 @@ target CAD·DWG version, usable pair 수·정합·권리·외부처리, 예산, 
 수집/검수 runner와 비공개 HTML 비교 화면, 실제 실행 report notebook·manifest/receipt를 추가했다. [실행 안내](harness/dataset-pilot.md), private output 위치는 `configs/paths.local.json`을 참조한다. 직원은 비교 화면에서 before 영역·정합·치수·대응점과 메모를 검수하고 JSON으로 내보낼 수 있다.
 
 다음은 입력 ROI/대응점과 변경상태 승인, 종이 휨·도면 차이 분리, 3개 header/loader warning 진단이다. 승인되지 않은 40개를 학습에 투입하지 않는다. 실제 CAD UI의 수정·저장은 별도 확인한다.
+
+## 최신 방향 수정
+
+사용자 요청으로 전체 특징점 정합 재시도를 중단하고 기존 결과를 보존했다. 다대일 대응 방지·양방향/양쪽 공간 분포 검사를 추가했고 단위 테스트 9개를 통과했으나 실제 40개 재정합은 하지 않았다.
+
+다음은 기존 40개 중 5개의 전유부/변경전/실제 방향 검수와 치수 원장·중심선 GT 구축이다. 승인 치수에 맞는 geometry 기준선 → 비교 UI → 40개 확대 → 모델 실험 순으로 진행한다. 원장/solver/새 UI·직원 승인·학습은 미실행이다. 이전 913개 보존 pass는 입력 치수 완전성/실제 길이 검증이 아니다. [최신 계획](research/2026-10-13-exclusive-unit-dimension-plan.md)이 앞선 다음 작업 순서를 대체한다.

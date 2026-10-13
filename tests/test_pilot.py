@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import ezdxf,cv2,numpy as np
 from PIL import Image
-from build_pilot import dimension_snapshot,dimension_compare,render,register
+from build_pilot import dimension_snapshot,dimension_compare,render,register,spatial_support,support_rejections,reciprocal_matches
 from discover_pilot import discover
 from audit_cad import audit_file
 
@@ -52,6 +52,20 @@ class PilotTests(unittest.TestCase):
         ref=cv2.warpPerspective(cad,h,(800,600),borderValue=(255,255,255))
         with tempfile.TemporaryDirectory() as t:
             r=register(ref,cad,Path(t));self.assertEqual(r['status'],'automatic_candidate_review_required');self.assertLess(r['median_inlier_reprojection_px'],1);self.assertFalse(r['approved'])
+
+    def test_one_point_destination_is_rejected_despite_many_matches(self):
+        src=np.float32([(x,y) for x in range(20,780,100) for y in range(20,580,100)])
+        dst=np.repeat([[400.,300.]],len(src),axis=0)
+        reasons=support_rejections(spatial_support(src,(600,800)),spatial_support(dst,(600,800)))
+        self.assertIn('reference_collapsed_or_collinear_points',reasons)
+        self.assertIn('reference_too_few_unique_points',reasons)
+
+    def test_mutual_matches_deduplicate_sift_orientation_locations(self):
+        da=np.eye(4,dtype=np.float32)*100;db=da.copy()
+        ka=[cv2.KeyPoint(x,10,1) for x in [10,10,30,40]]
+        kb=[cv2.KeyPoint(x,20,1) for x in [10,20,30,30]]
+        good=reciprocal_matches(da,db,ka,kb)
+        self.assertEqual(len(good),2)
 
     def test_discovery_exact_names_immediate_children_only(self):
         with tempfile.TemporaryDirectory() as t:
