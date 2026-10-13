@@ -1,0 +1,45 @@
+{
+  "attempts": 40,
+  "extracted": 40,
+  "failed": 0,
+  "dimension_status": {
+    "pass": 40
+  },
+  "dimension_entities_checked": 913,
+  "alignment_status": {
+    "weak_or_degenerate_review_required": 38,
+    "no_reliable_matches": 2
+  },
+  "unit_preservation_pass": 40,
+  "originals_unchanged_verified": 40,
+  "human_approved": 0,
+  "split_assigned": false,
+  "training_ready": false,
+  "cad_integrity": {
+    "audited": 40,
+    "duplicate_handle_samples": 0,
+    "audit_error_samples": 0,
+    "audit_fix_samples": 0,
+    "header_handseed_conflict_samples": 3,
+    "loader_warning_samples": 3,
+    "dwg_reopened_duplicate_handle_samples": 0
+  },
+  "same_viewport_render_comparison": {
+    "measured": 40,
+    "max_mae_0_255": 0.11832076671511628
+  },
+  "source_file_final_verification_count": 80,
+  "verified_at_kst": "2026-10-13T14:20:02.200122+09:00",
+  "unit_tests_passed": 7,
+  "discovery": {
+    "index_count": 8764,
+    "inspected_folders": 125,
+    "candidate_count": 60,
+    "seed": 20261013,
+    "reference_extensions": {
+      ".jpg": 54,
+      ".png": 1,
+      ".jpeg": 5
+    }
+  }
+}

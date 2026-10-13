@@ -5,8 +5,8 @@
 | 단계 | 산출물 | 다음 단계 통과 기준 | 현재 |
 | --- | --- | --- | --- |
 | P0 기본 세팅 | 목표·AGENTS·하네스·문헌·예약 연결 | 문서/JSON/링크 검증, 중앙 수집 등록 | 완료 |
-| P1 데이터 감사 | 비공개 의뢰 인덱스, 페어 manifest, 정합·권리 검수 | 동일 평면/상태 확인, 중복 그룹·split 고정, 검수 제외 사유 | 미실행 |
-| P2 CAD 기준선 | 검수 GT CAD-IR, writer roundtrip, render 설정 | GT→DWG 재열기·수정·저장·재열기, 단위/레이어/geometry 검사 | 미실행 |
+| P1 데이터 감사 | 비공개 의뢰 인덱스, 페어 manifest, 정합·권리 검수 | 동일 평면/상태 확인, 중복 그룹·split 고정, 검수 제외 사유 | 40개 pilot 추출·자동 검사 완료, 정합/사람 검수 미통과 |
+| P2 CAD 기준선 | 검수 GT CAD-IR, writer roundtrip, render 설정 | GT→DWG 재열기·수정·저장·재열기, 단위/레이어/geometry 검사 | ODA crop roundtrip·치수 보존 검사 완료, canonical/실제 CAD 수정·저장 미검증 |
 | P3 넓은 후보 비교 | 고전/프론티어/segmentation/graph/sequence pilot | 동일 dev set·예산·평가, 실패 포함 재현 가능한 receipt | 미실행 |
 | P4 데이터 효율/제어 | JEPA/DINO·증류·diffusion·Jev/Laya 비교 | frozen split, downstream/E2E 이득 및 비용 평가 | 미실행 |
 | P5 밀봉 평가 | 최종 checkpoint·holdout·CAD 사용자 평가 | 오류/품질/검수 시간/호환성 기준 사전 고정 및 충족 | 미실행 |

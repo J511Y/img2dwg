@@ -10,7 +10,7 @@
 - 기존 data-pipeline 페어 DWG 10개 header를 소량 읽었으며 모두 `AC1032`였다. 업무 전체 버전 분포나 목표 버전을 확정하는 표본은 아니다.
 - 중앙 연구노트 지도에 7번째 프로젝트로 등록하고 기존 주간·월간 예약 prompt를 갱신했다. 정규화 prompt 일치·기존 주기/모델/프로젝트 보존을 확인했다.
 
-## 미실행과 불확실성
+## 초기 세팅 시점의 미실행과 불확실성
 
 모델/변환/학습 코드, 실행 하네스/CI, 데이터 전체 스캔·페어 승인·split, dataset 다운로드·GPU/API 호출, DWG 생성·실제 CAD 열기/수정/저장, metric 측정·배포는 미실행이다. 설치 확인은 CAD 호환성 검증이 아니다.
 
@@ -26,4 +26,10 @@ target CAD·DWG version, usable pair 수·정합·권리·외부처리, 예산, 
 
 ## 다음 구현 작업
 
-[로드맵](ROADMAP.md)의 P1: 의뢰 연결 인덱스 기반 소량 페어 감사와 P2: GT CAD writer roundtrip부터 시작한다. 구현 요청이 오면 현재 선언적 계약을 실제 validator/runner로 확장한다.
+## 데이터 pilot 실행 완료 · 2026-10-13
+
+[EXP-029](experiments/2026-10-13-EXP-029-pilot.md): 운영 의뢰 인덱스 기반으로 조건에 맞는 후보 60개를 찾고 40개 변경전 DXF/DWG를 추출·ODA 재열기했다. DIMENSION 913개 보존 pass, 원본 80개 hash/size/mtime 보존 확인. 자동 정합은 weak/degenerate 38·신뢰할 match 없음 2로 자동 승인 0이다. 최종 entity duplicate 0, header/loader warning 3을 기록했다. 모델 학습·직원 승인·gold split은 미실행이다.
+
+수집/검수 runner와 비공개 HTML 비교 화면, 실제 실행 report notebook·manifest/receipt를 추가했다. [실행 안내](harness/dataset-pilot.md), private output 위치는 `configs/paths.local.json`을 참조한다. 직원은 비교 화면에서 before 영역·정합·치수·대응점과 메모를 검수하고 JSON으로 내보낼 수 있다.
+
+다음은 입력 ROI/대응점과 변경상태 승인, 종이 휨·도면 차이 분리, 3개 header/loader warning 진단이다. 승인되지 않은 40개를 학습에 투입하지 않는다. 실제 CAD UI의 수정·저장은 별도 확인한다.

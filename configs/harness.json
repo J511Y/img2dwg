@@ -1,8 +1,8 @@
 {
   "schema_version": "img2dwg-harness/v0.1",
-  "mode": "documentation-only",
+  "mode": "dataset-pilot",
   "timezone": "Asia/Seoul",
-  "runtime_implemented": false,
+  "runtime_implemented": true,
   "workflow": "docs/harness/workflow.md",
   "evidence_contract": "docs/harness/evidence.md",
   "evaluation_protocol": "docs/EVALUATION.md",
@@ -10,7 +10,32 @@
   "run_template": "templates/run-manifest.example.json",
   "data_access": "read-only",
   "split_unit": "building-and-layout-family",
-  "gates": ["source-rights", "pair-alignment", "split-isolation", "cad-ir-validity", "geometry-topology", "dwg-roundtrip", "render-back", "human-review", "evidence-integrity"],
-  "candidate_statuses": ["planned", "running", "succeeded", "failed", "blocked", "rejected"],
-  "automatic_checks": []
+  "gates": [
+    "source-rights",
+    "pair-alignment",
+    "split-isolation",
+    "cad-ir-validity",
+    "geometry-topology",
+    "dwg-roundtrip",
+    "render-back",
+    "human-review",
+    "evidence-integrity"
+  ],
+  "candidate_statuses": [
+    "planned",
+    "running",
+    "succeeded",
+    "failed",
+    "blocked",
+    "rejected"
+  ],
+  "automatic_checks": [
+    "exact-reference-and-dwg-names",
+    "dimension-preservation",
+    "source-hash-size-mtime",
+    "registration-degeneracy",
+    "exact-render-resolution",
+    "cad-handle-audit"
+  ],
+  "implemented_stage": "discovery-extraction-audit-only"
 }
