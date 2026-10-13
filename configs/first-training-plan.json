@@ -1,0 +1,63 @@
+{
+  "schema": "img2dwg-first-training-plan/v1",
+  "status": "planned",
+  "date_kst": "2026-10-13",
+  "priority": "input-floorplan-to-editable-dimension-consistent-dwg",
+  "deferred": [
+    "actual-unit-mirror-inference",
+    "automatic-roi-model",
+    "per-line-vlm-controller"
+  ],
+  "primary": {
+    "model_id": "facebook/dinov3-vitb16-pretrain-lvd1689m",
+    "revision": "5931719e67bbdb9737e363e781fb0c67687896bc",
+    "head": "custom-junction-edge-opening-dimension-association",
+    "head_implemented": false,
+    "initial_backbone_frozen": true,
+    "global_view_long_side_px": 1024,
+    "preserve_aspect_ratio": true,
+    "dimension_crops": "original-resolution",
+    "weight_downloaded": false
+  },
+  "comparison": {
+    "model_id": "haopt/Raster2Seq",
+    "revision": "c9a9c439ba66594dab701b77b7df52a5f75a5fce",
+    "checkpoint_key": "raster2graph-512",
+    "target": "reviewed-room-polygons-to-common-cad-ir",
+    "weight_downloaded": false
+  },
+  "ocr_baseline": [
+    "PaddlePaddle/PP-OCRv6_small_det_safetensors",
+    "PaddlePaddle/PP-OCRv6_small_rec_safetensors"
+  ],
+  "data": {
+    "cad_pilot_count": 40,
+    "debug_target_count": 5,
+    "synthetic_first": true,
+    "real_hard_labels": "reviewed-only",
+    "split_unit": "building-layout-family-before-augmentation",
+    "full_image_feature_alignment_required": false,
+    "actual_unit_direction_required": false,
+    "initial_manual_roi_allowed": true
+  },
+  "proposed_step_caps": {
+    "tiny_debug": 1000,
+    "synthetic_first": 5000,
+    "real_finetune_first": 2000
+  },
+  "runtime": {
+    "separate_training_environment": true,
+    "hardware": null,
+    "cost_cap": null,
+    "numeric_tolerance_mm": null,
+    "paid_job_started": false
+  },
+  "release_checks": [
+    "required-dimensions-covered",
+    "no-unresolved-dimension-conflicts",
+    "actual-geometry-residual-within-frozen-tolerance",
+    "core-editable-entities",
+    "cad-open-edit-save-reopen"
+  ],
+  "plan": "docs/research/2026-10-13-vector-first-training-plan.md"
+}

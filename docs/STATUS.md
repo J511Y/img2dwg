@@ -34,8 +34,12 @@ target CAD·DWG version, usable pair 수·정합·권리·외부처리, 예산, 
 
 다음은 입력 ROI/대응점과 변경상태 승인, 종이 휨·도면 차이 분리, 3개 header/loader warning 진단이다. 승인되지 않은 40개를 학습에 투입하지 않는다. 실제 CAD UI의 수정·저장은 별도 확인한다.
 
-## 최신 방향 수정
+## 최신 실행 우선순위 수정
 
-사용자 요청으로 전체 특징점 정합 재시도를 중단하고 기존 결과를 보존했다. 다대일 대응 방지·양방향/양쪽 공간 분포 검사를 추가했고 단위 테스트 9개를 통과했으나 실제 40개 재정합은 하지 않았다.
+사용자 요청으로 전체 특징점 정합 재시도는 중단했고 기존 결과를 보존했다. 다대일 대응 방지 단위 테스트 9개는 통과했으나 실제 40개 재정합은 하지 않았다.
 
-다음은 기존 40개 중 5개의 전유부/변경전/실제 방향 검수와 치수 원장·중심선 GT 구축이다. 승인 치수에 맞는 geometry 기준선 → 비교 UI → 40개 확대 → 모델 실험 순으로 진행한다. 원장/solver/새 UI·직원 승인·학습은 미실행이다. 이전 913개 보존 pass는 입력 치수 완전성/실제 길이 검증이 아니다. [최신 계획](research/2026-10-13-exclusive-unit-dimension-plan.md)이 앞선 다음 작업 순서를 대체한다.
+현재 정본은 [벡터 우선 학습 계획](research/2026-10-13-vector-first-training-plan.md)이다. 입력 방향의 전유부→치수에 맞는 DWG가 핵심이며 실제 좌우반전은 CAD/후속 기능으로 처리한다. 초기 전유부 선택은 수동 ROI를 허용한다.
+
+다음 구현은 5개 CAD로 supervision/GT writer 확인 → DINOv3 freeze+graph decoder tiny 학습 → 합성 학습/Raster2Seq 비교 → 실제 표본 fine-tune → preview/HITL/새 DWG 생성이다. 합성 학습 준비와 실제 검수는 병행하며 전체 40개 승인 완료를 학습 개발 선행 조건으로 두지 않는다.
+
+이번에는 공식 모델 metadata와 Raster2Seq 512 config를 확인했고 DINOv3 weight dry-run만 했다. 모델 weight 다운로드·추론·학습·GPU job·운영 변경은 미실행이다. decoder/치수 association/solver/UI는 계획 상태다. 이전 913개 보존 pass는 입력 치수 완전성/실제 길이 검증이 아니다.

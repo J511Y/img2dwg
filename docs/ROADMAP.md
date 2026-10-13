@@ -5,9 +5,9 @@
 | 단계 | 산출물 | 다음 단계 통과 기준 | 현재 |
 | --- | --- | --- | --- |
 | P0 기본 세팅 | 목표·AGENTS·하네스·문헌·예약 연결 | 문서/JSON/링크 검증, 중앙 수집 등록 | 완료 |
-| P1 데이터 감사 | 비공개 의뢰 인덱스, 페어 manifest, 정합·권리 검수 | 동일 평면/상태 확인, 중복 그룹·split 고정, 검수 제외 사유 | 40개 pilot 추출·자동 검사 완료, 정합/사람 검수 미통과 |
+| P1 데이터 감사 | 비공개 의뢰 인덱스, 페어 manifest, 정합·권리 검수 | 실제 hard label은 동일 구조 확인, 합성은 CAD 감독 검증; 그룹 split·제외 사유 | 40개 pilot 추출·자동 검사 완료, 정합/사람 검수 미통과 |
 | P2 CAD 기준선 | 검수 GT CAD-IR, writer roundtrip, render 설정 | GT→DWG 재열기·수정·저장·재열기, 단위/레이어/geometry 검사 | ODA crop roundtrip·치수 보존 검사 완료, canonical/실제 CAD 수정·저장 미검증 |
-| P3 넓은 후보 비교 | 고전/프론티어/segmentation/graph/sequence pilot | 동일 dev set·예산·평가, 실패 포함 재현 가능한 receipt | 미실행 |
+| P3 넓은 후보 비교 | 고전/프론티어/segmentation/graph/sequence pilot | DINOv3 graph/Raster2Seq부터 동일 dev·예산·평가, 실패 포함 receipt | 미실행 |
 | P4 데이터 효율/제어 | JEPA/DINO·증류·diffusion·Jev/Laya 비교 | frozen split, downstream/E2E 이득 및 비용 평가 | 미실행 |
 | P5 밀봉 평가 | 최종 checkpoint·holdout·CAD 사용자 평가 | 오류/품질/검수 시간/호환성 기준 사전 고정 및 충족 | 미실행 |
 | P6 업무 적용 | 검수 UI·배치·배포·모니터링 | 실제 요청 흐름, 원본 보호·실패복구, 담당자 사용 검수 | 미실행 |
@@ -28,4 +28,4 @@
 
 ## 최신 다음 실행 순서
 
-[전유부·치수 계획](research/2026-10-13-exclusive-unit-dimension-plan.md)에 따라 전체 특징점 정합은 중단한다. 기존 40개에서 5개 전유부/방향/치수 원장·중심선 검수 → 치수 제약 기준선 → 단계별 비교 UI → 40개 확대 → 승인 GT 기반 모델 실험 순으로 진행한다. 전체 재수집은 필요하지 않다. 이 순서가 앞선 첫 구현 세션 순서를 대체한다.
+[벡터 우선 학습 계획](research/2026-10-13-vector-first-training-plan.md)이 위 초기 실행 순서를 대체한다. 입력 방향의 편집 가능한 DWG 완성이 먼저이며 실제 반전은 CAD/후속 편집 기능이다. 5개 CAD supervision/GT writer → DINOv3 graph tiny 학습 → 합성 일반화/Raster2Seq 비교 → 실제 fine-tune → preview/HITL/새 DWG로 진행한다. 전유부 수동 ROI를 허용하고 합성 학습 준비와 실제 표본 검수를 병행한다. 전체 특징점 정합·40개 승인·자동 반전 판별 완성을 모델 개발 선행 조건으로 두지 않는다.

@@ -26,3 +26,5 @@
 ## 하네스 구현 시 순서
 
 P1 수집 감사 CLI와 manifest validator → P2 CAD-IR schema/GT writer/roundtrip checker → P3 공통 candidate adapter와 metric runner → P4 System-1 adapter/비용 ledger → CI에는 비식별 synthetic smoke만 추가한다. CI에서 SMB 접근, 사내 도면 upload, 유료 모델 호출을 자동 실행하지 않는다.
+
+첫 학습 후보·run 범위·중단 조건은 [벡터 우선 계획](../research/2026-10-13-vector-first-training-plan.md)과 [선언 설정](../../configs/first-training-plan.json)을 참조한다. 선언 설정은 GPU 작업 runner/예약이 아니며 현재 학습은 미실행이다.
