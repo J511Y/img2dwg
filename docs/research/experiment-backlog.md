@@ -63,3 +63,8 @@
 | ID | 추가 실행 | 상태 / 근거 |
 | --- | --- | --- |
 | EXP-042 | 1,000개 이상 동일 의뢰 페어·native CAD·버킷 릴리스 | 데이터 준비 succeeded, [1,383개 원격 검증](2026-10-13-dataset-v02-release.md); 모델 성능 아님 |
+
+| EXP-043 | DINOv3 native-component/coordinate 첫 학습 + vector Space | 학습/서빙 계약 실행, [결과](../experiments/2026-10-13-EXP-043-vector-first.md); 합성 선분 F1 0.396, 치수 정확성/완성 CAD 미달 |
+
+EXP-012/040/041/027의 첫 구현은 EXP-043에서 일부 실행됐다. relation/업무 semantics/실제
+입력 fine-tune/숫자 치수·제약 solver는 계속 planned다. EXP-010 Raster2Seq 비교 미실행.

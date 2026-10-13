@@ -2,7 +2,17 @@
 
 평면도 이미지에서 **CAD에서 열고 편집할 수 있는 DWG**를 복원하는 모델·파이프라인 연구 프로젝트.
 
-현재 단계: **2026-10-13 사내 input/output 페어 1,383개를 새 비공개 HF img2dwg 버킷에 준비하고 전체 원격 해시 검증 완료**. 변경전 DXF와 native 컴포넌트 데이터를 포함한다. [릴리스 결과](docs/research/2026-10-13-dataset-v02-release.md), [재실행 안내](docs/harness/dataset-release.md)를 참조한다. 업무 semantic assembly/관계 보강과 모델 학습은 다음 단계다.
+현재 단계: **첫 DINOv3 벡터 좌표 모델 학습과 비공개 inference Space를 연결했다.**
+[Space](https://huggingface.co/spaces/youjunhyeok/img2dwg)에서 전유부를 잘라 업로드하고
+확대 가능한 SVG·편집 가능한 DXF 초안을 확인한다. HF 소유 계정 로그인이 필요하다.
+CAD 합성 train 1,028개/validation 128개, full 2,500 steps.
+합성 validation 선분 F1 0.396이며 실제 입력의 정밀도·치수 완전성·직접 DWG 다운로드는
+아직 완료하지 않았다. [실험 결과](docs/experiments/2026-10-13-EXP-043-vector-first.md),
+[학습/배포 하네스](docs/harness/vector-training.md)를 참조한다.
+
+사내 input/output 1,383개와 변경전/native CAD는 private HF img2dwg bucket에 저장하고
+전체 원격 해시 검증을 마쳤다. [데이터 릴리스](docs/research/2026-10-13-dataset-v02-release.md),
+[재실행 안내](docs/harness/dataset-release.md).
 
 ## 목표와 기본 경로
 

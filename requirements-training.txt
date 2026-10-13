@@ -1,0 +1,9 @@
+# Actual cloud run uses pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime.
+torch==2.8.0
+transformers==4.57.6
+huggingface-hub==0.36.2
+numpy==2.2.6
+scipy==1.15.3
+pillow==11.3.0
+ezdxf==1.4.4
+safetensors==0.6.2

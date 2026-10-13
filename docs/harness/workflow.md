@@ -1,6 +1,9 @@
 # 작업 하네스
 
-문서·설정·템플릿에 데이터 pilot 실행기를 추가했다. [pilot 실행 안내](dataset-pilot.md)의 read-only 수집·crop·치수/정합·무결성·화면 검증을 사용할 수 있다. 모델 학습/배포 실행기·CI·canonical schema validator는 아직 없다. 수행되지 않은 명령을 완료로 체크하지 않는다.
+데이터 pilot/릴리스에 이어 [1차 벡터 학습·배포](vector-training.md) 실행기를 추가했다.
+지원 벡터 schema·DXF factory·학습 gradient·실제 Space 업로드/다운로드를 검증한다.
+완전한 CAD-IR semantics/association validator와 CI는 별도 미구현이다.
+수행되지 않은 명령을 완료로 체크하지 않는다.
 
 ## 세션 루프
 

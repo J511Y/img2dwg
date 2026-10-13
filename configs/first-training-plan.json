@@ -1,6 +1,6 @@
 {
   "schema": "img2dwg-first-training-plan/v1",
-  "status": "planned",
+  "status": "trained;private-Space-upload-contract-verified;quality-goals-unmet",
   "date_kst": "2026-10-13",
   "priority": "input-floorplan-to-editable-dimension-consistent-dwg",
   "deferred": [
@@ -11,13 +11,15 @@
   "primary": {
     "model_id": "facebook/dinov3-vitb16-pretrain-lvd1689m",
     "revision": "5931719e67bbdb9737e363e781fb0c67687896bc",
-    "head": "custom-component-parameter-relation-with-internal-geometry",
-    "head_implemented": false,
+    "head": "frozen-DINOv3-4-slot-component-center-coordinate-layer-role",
+    "head_implemented": true,
     "initial_backbone_frozen": true,
     "global_view_long_side_px": 1024,
     "preserve_aspect_ratio": true,
     "dimension_crops": "original-resolution",
-    "weight_downloaded": false
+    "weight_downloaded": true,
+    "initial_global_view_long_side_px": 768,
+    "relation_head_implemented": false
   },
   "comparison": {
     "model_id": "haopt/Raster2Seq",
@@ -50,10 +52,17 @@
   },
   "runtime": {
     "separate_training_environment": true,
-    "hardware": null,
+    "hardware": "a100-large",
     "cost_cap": null,
     "numeric_tolerance_mm": null,
-    "paid_job_started": false
+    "paid_job_started": true,
+    "cost_cap_per_job_usd": 3.75,
+    "job_timeout_seconds": 5400,
+    "exact_billing_usd": null,
+    "quality_gates_passed": false,
+    "space": "youjunhyeok/img2dwg",
+    "space_hardware": "cpu-basic",
+    "actual_billing_usd": null
   },
   "release_checks": [
     "required-dimensions-covered",
@@ -64,10 +73,21 @@
   ],
   "plan": "docs/research/2026-10-13-vector-first-training-plan.md",
   "prerequisites": {
-    "storage_inventory": "completed-40-pilot-cases",
-    "component_catalog": "planned",
-    "dimension_reference_integrity": "planned",
-    "component_factory_roundtrip": "planned-five-debug-cases"
+    "storage_inventory": "completed-1383-private-pairs",
+    "component_catalog": "native-types+unresolved-layer-role-candidates;business-semantics-pending",
+    "dimension_reference_integrity": "numeric-geometry-factory-tested;association-pending",
+    "component_factory_roundtrip": "five-supported-cases-completed"
   },
-  "component_plan": "docs/research/2026-10-13-component-supervision-audit.md"
+  "component_plan": "docs/research/2026-10-13-component-supervision-audit.md",
+  "executed_steps": {
+    "tiny": 100,
+    "full": 2500
+  },
+  "selected_model": {
+    "repo": "youjunhyeok/img2dwg-vector-first-v2",
+    "revision": "e00f601e871db6cdaa401c2910fa0741c61616e7",
+    "sha256": "0a5999ded25d4925417d9a07dee25c723deb94f8904fd3d3f1fdd6bd1ffdf072",
+    "source": "CAD synthetic;not-real-coordinate-finetune",
+    "space_revision": "5b5b4a26a5a3a142bbf9e159fdca61d32fcbb851"
+  }
 }

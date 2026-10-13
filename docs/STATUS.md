@@ -1,5 +1,30 @@
 # 현재 상태 · 2026-10-13 KST
 
+## 최신: 첫 학습·벡터 inference Space
+
+사용자 승인으로 DINOv3 frozen + 4-slot component coordinate head를 학습하고 별도
+[private Space](https://huggingface.co/spaces/youjunhyeok/img2dwg)에 배포했다.
+CAD 합성 train 1,028/validation 128개, tiny 100/full 2,500 steps, A100/BF16.
+합성 validation 64개 선분 F1 0.396, curve 0.102, dimension candidate 0.016.
+이 수치는 raw 준공도면/mm/치수 숫자 성능이 아니다. near-family 검수도 미완료다.
+
+첫 FP16 overflow 실패와 single-slot/endpoint 불일치 baseline을 보존하고 endpoint
+정규화/4-slot/border 후보 제거·등방 compact로 보완했다. 현재 학습 정답 충돌 누락
+3,248개는 별도 제한으로 기록한다. 모델 출력의 구조/치수 정밀도는 완료 기준에 미달한다.
+
+Space는 crop, 벡터 확대/이동, SVG/DXF/좌표/receipt 다운로드를 제공한다. inference에
+source CAD 접근이 없으며 SVG에는 raster embed가 없다. 치수 후보 `?`, 축척 미확정은
+unitless다. 직접 DWG 다운로드와 실제 CAD UI 편집 검증은 미완료다.
+5개 GT factory는 ODA DXF→DWG→DXF에서 DIMENSION 148/INSERT 26과 mm를 보존했다.
+이는 모델 복원 정확성과 별도 검사다.
+
+최신 [EXP-043](experiments/2026-10-13-EXP-043-vector-first.md),
+[실행 하네스](harness/vector-training.md)를 읽는다. private run/model/deployment/실제
+업로드 receipt는 local config에서 찾는다. 다음은 실제 domain fine-tune,
+dimension text 위치 감독/OCR·association·solver와 native 업무 컴포넌트/host 관계다.
+
+아래는 단계별 당시 기록이다. 초기 미실행 상태를 현재 학습 금지로 해석하지 않는다.
+
 ## 완료한 기본 세팅
 
 - empty GitHub repo를 현 폴더로 clone하고 목표·README·AGENTS·선택/검증 기준을 구성했다.
