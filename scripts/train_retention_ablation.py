@@ -51,10 +51,10 @@ def candidate_pass(m):
         m['invalid_repeated_node_references']==0 and m['unsupported_components']==0 and (res is None or res<=1))
 
 @torch.no_grad()
-def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=False,save=False):
+def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=False,save=False,fixed_capacity=None):
     model.eval();result=[]
     for r in rows:
-        key=r['sample_id'];cap=None if inferred else ([959,726] if r['cohort']=='original' else config['diagnostic_fixed_capacity'])
+        key=r['sample_id'];cap=None if inferred else (fixed_capacity or ([959,726] if r['cohort']=='original' else config['diagnostic_fixed_capacity']))
         pred=model(bank[key],capacities=cap);raw=decode(pred,config['texts'],templates=library);solved=project(raw)
         folder=out/key;error=None;factory=None
         try:

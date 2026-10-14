@@ -42,13 +42,14 @@ def balanced_weights(continuous_norm,categorical_norm,minimum=.01):
     weights={k:v*(continuous_scale if k in CONTINUOUS_TERMS else categorical_scale) for k,v in DEFAULT_LOSS_WEIGHTS.items()}
     return weights,continuous_scale,categorical_scale
 
-def calibrate_balance(model,rows,bank,targets,capacity):
+def calibrate_balance(model,rows,bank,targets,capacity,*,all_trainable=False):
     """Freeze a scale from mean gradients on the same ten TRAIN observations.
 
     The larger group is downweighted, keeping each group's internal weight ratio.
     The shared feature/MLP trunk, not head size, defines gradient balance.
 """
-    model.eval();named=[(k,p) for k,p in model.named_parameters() if k.startswith(('image.','condition.','image_attention.','node_mlp.','component_mlp.'))]
+    model.eval();named=[(k,p) for k,p in model.named_parameters() if p.requires_grad and (all_trainable or k.startswith(('image.','condition.','image_attention.','node_mlp.','component_mlp.')))]
+    if not named:raise ValueError('No trainable parameters for loss calibration')
     params=[p for _,p in named];cg=[torch.zeros_like(p) for p in params];dg=[torch.zeros_like(p) for p in params]
     categorical_zero={k:0. for k in DEFAULT_LOSS_WEIGHTS if k not in CONTINUOUS_TERMS}
     for r in rows:
@@ -66,9 +67,10 @@ def calibrate_balance(model,rows,bank,targets,capacity):
             'continuous_shared_gradient_L2':cn,'categorical_shared_gradient_L2':dn,
             'continuous_scale':continuous_scale,'categorical_scale':categorical_scale,'term_weights':weights,'calibration_cases':len(rows),
             'calibration_updates':0,'frozen_after_initialization':True,
-            'shared_parameters':[k for k,_ in named],'minimum_scale':.01,'within_group_weight_ratios_unchanged':True}
+            'shared_parameters':[k for k,_ in named],'parameter_scope':'all-trainable' if all_trainable else 'shared-trunk',
+            'minimum_scale':.01,'within_group_weight_ratios_unchanged':True}
 
-def guarded_step(model,optimizer,capture,origin,original_ids,*,step_mm=2.,retention_mm=10.,backtracks=8):
+def guarded_step(model,optimizer,capture,origin,original_ids,*,step_mm=2.,retention_mm=10.,backtracks=8,additional_step_mm=None):
     """Scale the proposed Adam parameter delta until measured outputs are safe.
 
 Accepted scaled updates keep the proposed Adam moments. Rejected updates
@@ -83,8 +85,12 @@ restore both weights and optimizer state; no rejected attempt becomes progress.
         with torch.no_grad():
             for p,q,d in zip(parameters,old,delta):p.copy_(q+alpha*d)
         after=capture();step=maximum_movement(before,after)
+        original_step=maximum_movement({k:before[k] for k in original_ids},{k:after[k] for k in original_ids})
+        other=[k for k in before if k not in original_ids]
+        additional_step=maximum_movement({k:before[k] for k in other},{k:after[k] for k in other}) if other else 0.
         retention=maximum_movement({k:origin[k] for k in original_ids},{k:after[k] for k in original_ids})
-        if step<=step_mm and retention<=retention_mm:accepted=True;break
+        within_step=step<=step_mm if additional_step_mm is None else original_step<=step_mm and additional_step<=additional_step_mm
+        if within_step and retention<=retention_mm:accepted=True;break
     if not accepted:
         with torch.no_grad():
             for p,q in zip(parameters,old):p.copy_(q)
@@ -93,4 +99,6 @@ restore both weights and optimizer state; no rejected attempt becomes progress.
             'measured_step_mm':step if math.isfinite(step) else None,
             'measured_original_drift_mm':retention if math.isfinite(retention) else None,
             'step_limit_mm':step_mm,'original_total_limit_mm':retention_mm,
+            'additional_step_limit_mm':additional_step_mm,'measured_original_step_mm':original_step,
+            'measured_additional_step_mm':additional_step,
             'optimizer_restored_on_rejection':not accepted}

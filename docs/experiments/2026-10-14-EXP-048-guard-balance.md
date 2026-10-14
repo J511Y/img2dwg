@@ -1,6 +1,6 @@
 # EXP-048 · 실제 좌표 이동 제한과 loss 균형의 분리 비교
 
-상태: implemented / 테스트·GPU 진단 준비. 결과 미확정.
+상태: completed diagnostics / 기존5 유지 성공·신규5 학습 실패 / 목표 지속 중.
 최신 사용자 승인: 기존5 유지＋추가5의 구조·치수 재현을 위한 작은 비교.
 **10개가 함께 통과하기 전 1,028개 본학습/Space 배포 금지.** 이번 실행은 10개만이다.
 
@@ -75,3 +75,31 @@ A100 4조건, 각 trainer10분·suite50분, job75분의 자원 상한이다. exp
 이번10개가 통과해도 실제 일반화나 DWG/CAD UI 검증 완료가 아니며 자동 배포하지 않는다.
 실행은 `train_guard_balance.py`, package는 허용된10개 trainer만 선택한다.
 직접 시각 검수, 비교 화면, final DXF 재열기 및 실행·연구노트 receipt로 마무리한다.
+
+## 실제 종료 결과
+
+job6acf434cc66288145223c97d는 COMPLETED,4/4조건 종료, trainer2838.7882초다.
+원격 code/data byte readback과 최종4개 model hash를 대조했다. GPU 초기 shared gradient는
+continuous9.4719448 / categorical82.9569855로 scale1.0/.1141789899를 고정했다.
+EXP-047의 원래5/all-parameter gradient norm과 이번10/shared-trunk norm은 직접 비교하지 않는다.
+
+| 조건 | 실제 노출 dose | accepted/attempted | 기존5 pass | 구조 F1 | 기존 joint DIM | 신규 joint DIM |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| control |224|448/448|0/5|.0002293|2/112|0/140|
+| coordinate-guard |128|9/256|5/5|.9868860|112/112|0/140|
+| loss-balance |224|448/448|0/5|.0168757|35/112|0/140|
+| guard-and-balance |168|12/336|5/5|.9933238|112/112|0/140|
+
+서로 다른 최종 노출량이므로128회 공통 history도 별도 비교한다. guard는 실제 기하·치수
+재현을 보호했지만 신규 학습을 멈췄다. 누적 경계에 가까워지면1/256까지 줄인 proposal도
+초기 대비10mm를 넘어 모든 가중치/Adam 상태가 rollback됐다. max accepted drift는
+guard9.9856873mm / 결합9.8677311mm다. 모든parameter delta를 함께 줄였기 때문에
+신규 숫자/종류/관계 head의 학습까지 제한했다. 이를10개 재현 성공으로 소개하지 않는다.
+
+최종 fixed/image-count native DXF80개를 독립 재열어 audit0/mm/DIM 수/raster 없음과
+checkpoint hash를 확인했다. 파일 audit 성공은 신규 구조 실패를 대신하지 않는다.
+네 조건×기존5/신규5의 실제 입력/GT/예측 비교 그림을 생성해 직접 검수한다.
+[비식별 결과](../research/assets/2026-10-14-guard-balance-summary.json),
+localhost8777의 retention-review.html이 비교 화면이다. 직원 승인과 Codex 검수를 구분한다.
+사용자 지속 승인에 따라 [EXP-049](2026-10-14-EXP-049-protected-adapter.md)의 기능 보호
+잔차 adapter로 이어가며1,028개 본학습/Space 배포/holdout20은 사용하지 않는다.

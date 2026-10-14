@@ -1,0 +1,570 @@
+{
+  "schema": "guard-balance-summary/v1",
+  "training_cases": 10,
+  "original_dimensions": 112,
+  "additional_dimensions": 140,
+  "conditions": [
+    {
+      "variant": {
+        "lr": 3e-05,
+        "batch": "accumulate",
+        "order_seed": 20261014,
+        "refresh_every": 20,
+        "coordinate_guard": false,
+        "gradient_balance": false,
+        "step_mm": 2.0,
+        "retention_mm": 10.0,
+        "name": "control"
+      },
+      "stopping_reason": "trial-resource-cap;not-fit",
+      "updates": 448,
+      "accepted_updates": 448,
+      "exposures": 2240,
+      "model_sha256": "e1e6efaeb063637e2701b1ae32fae91446a13d7fe570f73c20af4e24a73b6c05",
+      "guard_summary": {
+        "attempts": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "mean_alpha": null,
+        "max_accepted_step_mm": null,
+        "max_accepted_original_drift_mm": null
+      },
+      "loss_balance": null,
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00022930520522815867,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 2,
+          "dimensions_missing_or_incorrect": 110,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.001210386512712094,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00022925263640531865,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 2,
+          "dimensions_missing_or_incorrect": 110,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.001210386512712094,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "common_dose_128": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0018333906267904206,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 5,
+          "dimensions_missing_or_incorrect": 107,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": false,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.002774573052899932,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": false,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      }
+    },
+    {
+      "variant": {
+        "lr": 3e-05,
+        "batch": "accumulate",
+        "order_seed": 20261014,
+        "refresh_every": 20,
+        "coordinate_guard": true,
+        "gradient_balance": false,
+        "step_mm": 2.0,
+        "retention_mm": 10.0,
+        "name": "coordinate-guard"
+      },
+      "stopping_reason": "structure-dimension-and-physical-plateau",
+      "updates": 256,
+      "accepted_updates": 9,
+      "exposures": 1280,
+      "model_sha256": "eaa8919a4a2315aec4c9083feee61784be2343e16b3c081e7551aaa787dd9928",
+      "guard_summary": {
+        "attempts": 256,
+        "accepted": 9,
+        "rejected": 247,
+        "mean_alpha": 0.0001373291015625,
+        "max_accepted_step_mm": 1.9608350992202759,
+        "max_accepted_original_drift_mm": 9.985687255859375
+      },
+      "loss_balance": null,
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9868860276585598,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9898736959673012,
+          "shared_reference_f1": 0.9934607292182344
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 4,
+          "structure_f1": 0.9856938483547926,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 4,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9885777996390075,
+          "shared_reference_f1": 0.991917179052854
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 5,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "common_dose_128": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.9868860276585598,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": false,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9898736959673012,
+          "shared_reference_f1": 0.9934607292182344
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": false,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      }
+    },
+    {
+      "variant": {
+        "lr": 3e-05,
+        "batch": "accumulate",
+        "order_seed": 20261014,
+        "refresh_every": 20,
+        "coordinate_guard": false,
+        "gradient_balance": true,
+        "step_mm": 2.0,
+        "retention_mm": 10.0,
+        "name": "loss-balance"
+      },
+      "stopping_reason": "trial-resource-cap;not-fit",
+      "updates": 448,
+      "accepted_updates": 448,
+      "exposures": 2240,
+      "model_sha256": "60be6814da8469469f410d48e2f2d8b40ee58e625bdecce8cf346e78cb859c65",
+      "guard_summary": {
+        "attempts": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "mean_alpha": null,
+        "max_accepted_step_mm": null,
+        "max_accepted_original_drift_mm": null
+      },
+      "loss_balance": {
+        "schema": "group-gradient-balance/v1",
+        "continuous_terms": [
+          "node",
+          "proposal",
+          "parameter",
+          "dimension"
+        ],
+        "continuous_shared_gradient_L2": 9.471944808959961,
+        "categorical_shared_gradient_L2": 82.95698547363281,
+        "continuous_scale": 1.0,
+        "categorical_scale": 0.1141789899293115,
+        "term_weights": {
+          "node": 100.0,
+          "node_precision": 0.1141789899293115,
+          "proposal": 40.0,
+          "node_objectness": 0.1141789899293115,
+          "type": 0.1141789899293115,
+          "pointer": 0.1141789899293115,
+          "parameter": 20.0,
+          "role": 0.0228357979858623,
+          "numeric": 0.1141789899293115,
+          "text": 0.03425369697879345,
+          "template": 0.1141789899293115,
+          "bearing": 0.1141789899293115,
+          "scalar": 0.1141789899293115,
+          "axis": 0.03425369697879345,
+          "host": 0.03425369697879345,
+          "dimension": 4.0,
+          "count": 0.1141789899293115
+        },
+        "calibration_cases": 10,
+        "calibration_updates": 0,
+        "frozen_after_initialization": true,
+        "shared_parameters": [
+          "image.weight",
+          "image.bias",
+          "condition.0.weight",
+          "condition.0.bias",
+          "condition.2.weight",
+          "condition.2.bias",
+          "image_attention.in_proj_weight",
+          "image_attention.in_proj_bias",
+          "image_attention.out_proj.weight",
+          "image_attention.out_proj.bias",
+          "node_mlp.0.weight",
+          "node_mlp.0.bias",
+          "node_mlp.2.weight",
+          "node_mlp.2.bias",
+          "component_mlp.0.weight",
+          "component_mlp.0.bias",
+          "component_mlp.2.weight",
+          "component_mlp.2.bias"
+        ],
+        "minimum_scale": 0.01,
+        "within_group_weight_ratios_unchanged": true
+      },
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.016875712656784492,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 35,
+          "dimensions_missing_or_incorrect": 77,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.02922679621391777,
+          "shared_reference_f1": 0.036279952489351286
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.00021798365122615806,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.01685457237216718,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 35,
+          "dimensions_missing_or_incorrect": 77,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.02921222736091143,
+          "shared_reference_f1": 0.036279952489351286
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "common_dose_128": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.011811470755252698,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 38,
+          "dimensions_missing_or_incorrect": 74,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": false,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.02143432189478642,
+          "shared_reference_f1": 0.015141386107248555
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": false,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      }
+    },
+    {
+      "variant": {
+        "lr": 3e-05,
+        "batch": "accumulate",
+        "order_seed": 20261014,
+        "refresh_every": 20,
+        "coordinate_guard": true,
+        "gradient_balance": true,
+        "step_mm": 2.0,
+        "retention_mm": 10.0,
+        "name": "guard-and-balance"
+      },
+      "stopping_reason": "structure-dimension-and-physical-plateau",
+      "updates": 336,
+      "accepted_updates": 12,
+      "exposures": 1680,
+      "model_sha256": "f69f42840efc04960e4174f34909d6383a181f5a0998cae21334e24efb4fa07a",
+      "guard_summary": {
+        "attempts": 336,
+        "accepted": 12,
+        "rejected": 324,
+        "mean_alpha": 0.00013950892857142856,
+        "max_accepted_step_mm": 1.930934190750122,
+        "max_accepted_original_drift_mm": 9.867731094360352
+      },
+      "loss_balance": {
+        "schema": "group-gradient-balance/v1",
+        "continuous_terms": [
+          "node",
+          "proposal",
+          "parameter",
+          "dimension"
+        ],
+        "continuous_shared_gradient_L2": 9.471944808959961,
+        "categorical_shared_gradient_L2": 82.95698547363281,
+        "continuous_scale": 1.0,
+        "categorical_scale": 0.1141789899293115,
+        "term_weights": {
+          "node": 100.0,
+          "node_precision": 0.1141789899293115,
+          "proposal": 40.0,
+          "node_objectness": 0.1141789899293115,
+          "type": 0.1141789899293115,
+          "pointer": 0.1141789899293115,
+          "parameter": 20.0,
+          "role": 0.0228357979858623,
+          "numeric": 0.1141789899293115,
+          "text": 0.03425369697879345,
+          "template": 0.1141789899293115,
+          "bearing": 0.1141789899293115,
+          "scalar": 0.1141789899293115,
+          "axis": 0.03425369697879345,
+          "host": 0.03425369697879345,
+          "dimension": 4.0,
+          "count": 0.1141789899293115
+        },
+        "calibration_cases": 10,
+        "calibration_updates": 0,
+        "frozen_after_initialization": true,
+        "shared_parameters": [
+          "image.weight",
+          "image.bias",
+          "condition.0.weight",
+          "condition.0.bias",
+          "condition.2.weight",
+          "condition.2.bias",
+          "image_attention.in_proj_weight",
+          "image_attention.in_proj_bias",
+          "image_attention.out_proj.weight",
+          "image_attention.out_proj.bias",
+          "node_mlp.0.weight",
+          "node_mlp.0.bias",
+          "node_mlp.2.weight",
+          "node_mlp.2.bias",
+          "component_mlp.0.weight",
+          "component_mlp.0.bias",
+          "component_mlp.2.weight",
+          "component_mlp.2.bias"
+        ],
+        "minimum_scale": 0.01,
+        "within_group_weight_ratios_unchanged": true
+      },
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9933237958989032,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9940905634371806,
+          "shared_reference_f1": 0.9983978138935401
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 4,
+          "structure_f1": 0.9920133508165455,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 4,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9926517145163174,
+          "shared_reference_f1": 0.9968542637281598
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 5,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "common_dose_128": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.9933237958989032,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": false,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9940905634371806,
+          "shared_reference_f1": 0.9983978138935401
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": false,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      }
+    }
+  ],
+  "trainer_elapsed_seconds": 2838.7881940400694,
+  "matched_common_dose": 128,
+  "source_receipt_sha256": "12e4321a293f2f22cac9946c02acf4b6519cae7187b03c21ecf0579c3a6d1c61",
+  "full_training_executed": false,
+  "Space_deployed": false,
+  "twenty_used": false
+}

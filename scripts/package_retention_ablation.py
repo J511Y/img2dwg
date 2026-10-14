@@ -5,12 +5,12 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--data-archive',type=Path,required=True);p.add_argument('--release',type=Path,required=True)
     p.add_argument('--remote-data',required=True);p.add_argument('--remote-output',required=True)
     p.add_argument('--suite-minutes',type=float,default=65);p.add_argument('--trial-minutes',type=float,default=4)
-    p.add_argument('--comparison-plan');p.add_argument('--trainer',choices=['train_retention_ablation.py','train_guard_balance.py'],default='train_retention_ablation.py');a=p.parse_args()
+    p.add_argument('--comparison-plan');p.add_argument('--trainer',choices=['train_retention_ablation.py','train_guard_balance.py','train_protected_adapter.py'],default='train_retention_ablation.py');a=p.parse_args()
     if a.release.exists():raise FileExistsError('Use a fresh immutable release')
     a.release.mkdir(parents=True)
     with tarfile.open(a.release/'code.tar.gz','w:gz') as arc:
         for path in sorted(Path('img2dwg').glob('*.py')):arc.add(path,arcname=path.as_posix())
-        for name in sorted({'train_retention_ablation.py',a.trainer}):
+        for name in sorted({'train_retention_ablation.py','train_guard_balance.py',a.trainer}):
             arc.add(Path('scripts')/name,arcname='scripts/'+name)
     d={'schema':'img2dwg-retention-release/v1','code_sha256':hashlib.sha256((a.release/'code.tar.gz').read_bytes()).hexdigest(),
        'data_sha256':hashlib.sha256(a.data_archive.read_bytes()).hexdigest(),'data_prefix':a.remote_data,
@@ -29,7 +29,7 @@ for path,key,dest in [(release/'code.tar.gz','code_sha256',work),(root/p['data_p
     with tarfile.open(path) as archive:archive.extractall(dest,filter='data')
 env=os.environ.copy();env.update(PYTHONUNBUFFERED='1')
 trainer=p.get('trainer','train_retention_ablation.py')
-if trainer not in ('train_retention_ablation.py','train_guard_balance.py'):raise ValueError('Unsupported diagnostic runner')
+if trainer not in ('train_retention_ablation.py','train_guard_balance.py','train_protected_adapter.py'):raise ValueError('Unsupported diagnostic runner')
 command=[sys.executable,str(work/'scripts'/trainer),'--data',str(data),
     '--output',str(root/p['output_prefix']),'--suite-minutes',str(p['suite_minutes']),
     '--trial-minutes',str(p['trial_minutes'])]

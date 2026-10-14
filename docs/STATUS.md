@@ -1,5 +1,14 @@
 # 현재 상태 · 2026-10-14 KST
 
+## 지속 목표: 실제10개 동시 재현
+
+사용자가 목표 달성까지 계속 진행하도록 명시 승인하여 active goal을 설정했다.
+EXP-048의4조건은 completed지만 신규5는0/140이며10개 동시 재현은 실패다.
+guard 단독/결합은 기존5 5/5·112/112를 유지했으나9/256 및12/336 update만 허용했다.
+다음 [EXP-049](experiments/2026-10-14-EXP-049-protected-adapter.md)은 실제 입력 특징의
+보호 subspace에서 잔차0인 adapter를 사용한다. CPU preflight는 기존5 5/5·112/112,
+신규5는0/5·0/140이며 GPU 학습 성공은 아직 미확인이다. 원본/holdout/Space를 보존한다.
+
 ## 현재 실행: 좌표 제한과 loss 균형의 분리 비교
 
 [EXP-048](experiments/2026-10-14-EXP-048-guard-balance.md): 같은 TRAIN10에서
