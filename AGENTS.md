@@ -5,7 +5,8 @@
 **지속 목표:** 사용자가 다음 출근 때 확인할 수 있도록 목표 달성까지 계속 진행하도록
 명시 승인했다. 같은 실제 TRAIN10의 동시 구조/치수 재현을 active goal로 추구한다.
 EXP-048 하드 guard의 신규학습 정지 결과를 보존하고 EXP-049의 조건부 잔차 adapter를
-bounded job으로 비교한다. 필요한 작은 후속 실험을 이어가되 각 실행의 scope/cap/hash를
+bounded job으로 비교한다. EXP-050은 같은 plain final 모델/Adam/assignment를 보존하고
+학습률만 .0003/.0001로 낮춘다(각20분/suite50분/job65분). 필요한 작은 후속 실험을 이어가되 각 실행의 scope/cap/hash를
 기록한다.1,028개 본학습/Space 배포와 holdout20 사용은 계속 금지다. 실패를 완료로 바꾸지 않는다.
 
 **현재 요청:** EXP-048의 같은 TRAIN10에 좌표 업데이트 guard와 loss group balance를

@@ -5,7 +5,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from img2dwg.vector import svg
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--run',type=Path,required=True,nargs='+');p.add_argument('--experiment',choices=['EXP-047','EXP-048'],default='EXP-047');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--run',type=Path,required=True,nargs='+');p.add_argument('--experiment',choices=['EXP-047','EXP-048','EXP-049','EXP-050'],default='EXP-047');a=p.parse_args()
     rows=json.loads((a.root/'data/index.json').read_text());conditions=[]
     for file in sorted(file for run in a.run for file in run.glob('*/receipt.json')):
         d=json.loads(file.read_text());conditions.append({'name':d['variant']['name'],'variant':d['variant'],
@@ -47,6 +47,12 @@ $('history').innerHTML='';for(const h of v.history){const g=h.groups.original,n=
         html=html.replace('원래 5개 유지 · 추가 5개 재현 — 단일 조건 비교','좌표 이동 제한 · loss 균형 — 기존5 유지와 추가5 재현')
         html=html.replace("v.name==='five-safe-lr'","v.name==='guard-and-balance'")
         html=html.replace("<h3>같은 이미지 노출량에서 구조·치수 유지</h3>","<p>좌표 guard: update2mm / 기존5 누적10mm. loss balance: 같은 TRAIN10의 초기 shared gradient로 정한 고정 scale. 최종 native 검사와 원자료를 확인하세요. 조건별 자원 상한이므로 같은 노출량의 history도 함께 비교합니다.</p><h3>같은 이미지 노출량에서 구조·치수 유지</h3>")
+    if a.experiment in ('EXP-049','EXP-050'):
+        html=html.replace('EXP-047 · 재현 유지 원인 비교',a.experiment+' · 보호된 잔차 컴포넌트 학습')
+        html=html.replace('고정 count','공통 query reserve').replace('고정 capacity 진단','공통 query reserve').replace('이미지 예측 count','이미지 active/no-object 선택')
+        html=html.replace('고정 count 원래5','query reserve 원래5').replace('이미지 count','active/no-object')
+        html=html.replace('동일 초기 가중치에서 시작한 실제 학습 예측입니다.','각 실험 내 동일 초기 가중치에서 시작한 실제 학습 예측입니다. EXP-049는 frozen five-safe base + 조건부 residual입니다.')
+        html=html.replace('<h3>같은 이미지 노출량에서 구조·치수 유지</h3>','<p>두 모드는 같은 query reserve와 이미지 기반 객체 선택을 사용합니다. 정답 개수·CAD 조회·case ID routing은 없습니다. 기존5 입력 특징의 보호는 이 10개 train 재현 범위이며 일반화 증명이 아닙니다.</p><h3>동일 조건의 실제 노출량과 구조·치수</h3>')
     (a.root/'retention-review.html').write_text(html,encoding='utf-8')
     print(json.dumps({'conditions':len(conditions),'review':str(a.root/'retention-review.html')}))
 if __name__=='__main__':main()

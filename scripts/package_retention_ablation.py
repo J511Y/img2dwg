@@ -5,7 +5,7 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--data-archive',type=Path,required=True);p.add_argument('--release',type=Path,required=True)
     p.add_argument('--remote-data',required=True);p.add_argument('--remote-output',required=True)
     p.add_argument('--suite-minutes',type=float,default=65);p.add_argument('--trial-minutes',type=float,default=4)
-    p.add_argument('--comparison-plan');p.add_argument('--trainer',choices=['train_retention_ablation.py','train_guard_balance.py','train_protected_adapter.py'],default='train_retention_ablation.py');a=p.parse_args()
+    p.add_argument('--comparison-plan');p.add_argument('--continuation');p.add_argument('--trainer',choices=['train_retention_ablation.py','train_guard_balance.py','train_protected_adapter.py'],default='train_retention_ablation.py');a=p.parse_args()
     if a.release.exists():raise FileExistsError('Use a fresh immutable release')
     a.release.mkdir(parents=True)
     with tarfile.open(a.release/'code.tar.gz','w:gz') as arc:
@@ -15,7 +15,7 @@ def main():
     d={'schema':'img2dwg-retention-release/v1','code_sha256':hashlib.sha256((a.release/'code.tar.gz').read_bytes()).hexdigest(),
        'data_sha256':hashlib.sha256(a.data_archive.read_bytes()).hexdigest(),'data_prefix':a.remote_data,
        'output_prefix':a.remote_output,'suite_minutes':a.suite_minutes,'trial_minutes':a.trial_minutes,
-       'comparison_plan':a.comparison_plan,'trainer':a.trainer,'cases':10,
+       'comparison_plan':a.comparison_plan,'continuation':a.continuation,'trainer':a.trainer,'cases':10,
        'full_training_allowed':False,'Space_deployment_allowed':False}
     (a.release/'protocol.json').write_text(json.dumps(d,indent=2))
     script="""import hashlib,json,os,subprocess,sys,tarfile
@@ -34,6 +34,7 @@ command=[sys.executable,str(work/'scripts'/trainer),'--data',str(data),
     '--output',str(root/p['output_prefix']),'--suite-minutes',str(p['suite_minutes']),
     '--trial-minutes',str(p['trial_minutes'])]
 if p.get('comparison_plan'):command+=['--comparison-plan',str(data/p['comparison_plan'])]
+if p.get('continuation'):command+=['--continuation',str(data/p['continuation'])]
 subprocess.run(command,env=env,check=True)
 """
     (a.release/'bootstrap.py').write_text(script)

@@ -7,12 +7,20 @@ EXP-048의4조건은 completed지만 신규5는0/140이며10개 동시 재현은
 guard 단독/결합은 기존5 5/5·112/112를 유지했으나9/256 및12/336 update만 허용했다.
 다음 [EXP-049](experiments/2026-10-14-EXP-049-protected-adapter.md)은 실제 입력 특징의
 보호 subspace에서 잔차0인 adapter를 사용한다. CPU preflight는 기존5 5/5·112/112,
-신규5는0/5·0/140이며 GPU 학습 성공은 아직 미확인이다. 원본/holdout/Space를 보존한다.
+신규5는0/5·0/140이었다. EXP-049 GPU 두 조건 중 plain이 완료됐으며 최고 점수
+checkpoint의 별도 CPU 재검사에서 기존5 5/5·112/112, 신규5 2/5·112/140이다.
+plain 최종은 신규0/5·44/140으로 다시 악화했다. balanced는 running이다.
+좋은 중간 결과와 최종 결과를 구분하며10개 동시 통과를 선언하지 않는다.
+관측된 흔들림에 대한 [EXP-050](experiments/2026-10-14-EXP-050-adapter-refinement.md)은
+같은 final checkpoint/Adam/assignment를 보존하고 학습률만 낮추는 bounded 비교를 준비한다.
+원본/holdout/Space를 보존한다.
 
 ## 현재 실행: 좌표 제한과 loss 균형의 분리 비교
 
 [EXP-048](experiments/2026-10-14-EXP-048-guard-balance.md): 같은 TRAIN10에서
-control/좌표 guard/loss group balance/결합4조건을 구현했다. GPU 실행·결과는 아직 미확정이다.
+control/좌표 guard/loss group balance/결합4조건을 완료했다. 신규5는 모두0/140으로
+실패했으며 guard가 있는 두 조건만 기존5 fixed 진단5/5·112/112를 유지했다.
+legacy prefix-count 추론은 두 조건 모두4/5로 fixed 결과와 구분한다.
 guard는 node/anchor/숫자 치환 좌표mm의 step2mm·기존5 누적10mm를 검사하며 거부 시
 가중치와 Adam 상태를 복구한다. loss는 초기 shared gradient의 큰 그룹만 downweight한다.
 10개 실제 구조·치수 동시 통과 전 1,028개 본학습/Space 배포를 하지 않는다.

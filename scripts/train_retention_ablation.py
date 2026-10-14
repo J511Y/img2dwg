@@ -84,7 +84,8 @@ def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=Fal
                    component_f1=float(np.mean([m['component_f1'] for m in rr])),
                    shared_reference_f1=float(np.mean([m['shared_reference_f1'] for m in rr])))
         groups[group]=agg
-    return {'groups':groups,'rows':result,'capacity_mode':'image-predicted' if inferred else 'fixed-diagnostic-prefix'}
+    mode='image-active-no-object-selection;fixed-query-reserve' if hasattr(model,'protected_features') else ('image-predicted' if inferred else 'fixed-diagnostic-prefix')
+    return {'groups':groups,'rows':result,'capacity_mode':mode}
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--data',type=Path,required=True);parser.add_argument('--output',type=Path,required=True)

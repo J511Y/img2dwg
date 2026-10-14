@@ -15,15 +15,19 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--run',type=Path,required=True);a=p.parse_args()
     started=time.monotonic();rows=json.loads((a.root/'data/index.json').read_text());verified=[];models=[]
     done=json.loads((a.run/'receipt.json').read_text());assert done['training_cases']==10 and not done['full_training_executed'] and not done['Space_deployed']
-    for v in variants():
+    conditions=[json.loads(file.read_text())['variant'] for file in sorted(a.run.glob('*/receipt.json'))]
+    for v in conditions:
         folder=a.run/v['name'];r=json.loads((folder/'receipt.json').read_text());assert r['variant']==v
         assert sha(folder/'model.safetensors')==r['model_sha256'];models.append({'variant':v['name'],'sha256':r['model_sha256']})
-        if v['coordinate_guard']:
+        if v.get('coordinate_guard') or 'additional_step_limit_mm' in json.loads((folder/'guard-history.json').read_text())[0]:
             guards=json.loads((folder/'guard-history.json').read_text());assert len(guards)==r['guard_summary']['attempts']
             assert sum(g['accepted'] for g in guards)==r['accepted_updates']
             for g in guards:
                 if g['accepted']:
-                    assert g['measured_step_mm']<=2. and g['measured_original_drift_mm']<=10.
+                    if g.get('additional_step_limit_mm'):
+                        assert g['measured_original_step_mm']<=2. and g['measured_additional_step_mm']<=g['additional_step_limit_mm']
+                    else:assert g['measured_step_mm']<=2.
+                    assert g['measured_original_drift_mm']<=10.
                 else:assert g['alpha']==0 and g['optimizer_restored_on_rejection']
         for mode in ['fixed-final','inferred-final']:
             for row in rows:

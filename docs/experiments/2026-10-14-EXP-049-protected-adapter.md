@@ -1,6 +1,6 @@
 # EXP-049 · 기존 응답을 보호하는 이미지 특징 조건부 잔차 그래프
 
-상태: implemented / CPU preflight 통과 / GPU 준비. 신규5 학습 성공은 아직 미확인.
+상태: GPU running(두 조건 중 plain 완료). 신규5 전체 성공은 아직 미확인.
 사용자는 다음 출근 시 확인할 수 있도록 목표 달성까지 계속 진행하도록 명시 승인했다.
 목표는 같은 실제 TRAIN10의 구조·치수252개 동시 재현과 직접 검수이며
 1,028개 본학습/Space 배포는 수행하지 않는다. 자동 goal은 active다.
@@ -71,3 +71,19 @@ guard는 원래 step2mm/누적10mm, 신규 step50mm다. 기존 function 보호 �
 이 방법은 작은 표본의 재현/연속 학습 실험이다. 보호 subspace 밖의 신규/OOD 입력,
 다른 해상도/전처리/encoder 변경, 공간 안에서 원래와 다른 geometry의 입력은 별도
 불확실성이다.10개 재현이 generalization/1,028개 학습/DWG CAD UI 완료를 뜻하지 않는다.
+
+## 중간 판정 · plain 완료 / balanced 진행 중
+
+Job `6acf5af65ccb47ba0f799906`, source `8823dd9`, code SHA
+`837290a6ef6be9e9181e086a36e832d519500b76cd03262802111b0a40ac17bb`,
+data SHA `81e8490d2f3ddba13afc039a5be07f9f10ebafeeaac6a22209b79b6908fcda74`.
+25분 상한의 plain은4740updates 모두 accepted, 원래5 actual drift0이었다.
+최고 점수 시점4728에서 신규 node mean4.4556mm/F1 .956867761/치수112/140이었다.
+해당 별도 readback checkpoint를 CPU로 실제 forward/nativeDXF 재검사하니 기존5
+5/5·112/112와 신규5 2/5·112/140이 재현됐다.10개 전체 통과는 아니다.
+실제 input.png에서 DINO 특징을 새로 계산한 CPU 추론도 같은 결과를 재현했고
+캐시 관측값의 정확한 재현 여부와 모델/입력 SHA를 별도 receipt로 저장했다.
+직접 확인한5개 비교 이미지에는1/3/5번째 신규 사례의 잘못된 연결/남은 선이 보인다.
+최종 checkpoint는 신규F1 .511191644·0/5·44/140으로 다시 악화했다.
+좋은 중간 모델을 final로 바꿔 기록하지 않았다. 작은 평균 노드 오차만으로
+모든 참조/치수 복원이 보장되지 않는다. EXP-050은 이 흔들림의 학습률 영향을 분리한다.
