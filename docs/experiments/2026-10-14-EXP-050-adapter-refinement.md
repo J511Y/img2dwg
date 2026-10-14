@@ -1,6 +1,6 @@
 # EXP-050 · 동일 adapter 상태에서 학습률만 낮춘 구조·치수 안정화
 
-상태: implemented / GPU planned.10개 통과 미확인. active goal의 bounded 후속 실험이다.
+상태: GPU running.10개 통과 미확인. active goal의 bounded 후속 실험이다.
 1,028개 본학습·Space 배포·holdout20 사용은 하지 않는다.
 
 EXP-049 plain은 기존5의 실제 함수를 보존하면서 추가5의 노드 오차를1.9m→수mm로
@@ -26,3 +26,11 @@ DXF audit를90초마다 확인하고10/10·252/252가 두 checkpoint에서 연�
 통과 후보는 실제 이미지에서 DINO를 새로 실행한 CPU 추론과10개 직접 시각 검수를 한다.
 평균 노드 오차와 loss만으로 성공을 선언하지 않는다. 실패/불안정이 남으면 해당 head와
 matcher 변경을 별도 후속 요인으로 기록한다. 임의 step 연장만으로 해결됐다고 주장하지 않는다.
+
+실행 Job `6acf67f15ccb47ba0f799dd9`, source `4c87b38`, code SHA
+`b5414a99a3a8482556c536d372e0e7f6b7de13069f96f1dcda967b30006022b1`,
+data SHA `460eb6a59951840286726e3cc7538e7a6069696ba9de23ca939853363863180f`.
+원 checkpoint `0895fd9bfe4a5cb4e61a781eaaa80ee85914a0fb3961792e128b9b0e59c7723f`의
+4740 Adam/assignment 상태를 복원한다. archive 원격 byte readback4개와 CPU preflight의
+기존5 5/5·112/112를 확인한 후 실행했다. 기존 Space/model revision을 직전에 read-only
+확인하여 무변경을 증명했다. 결과는 아직 최종 판정하지 않았다.

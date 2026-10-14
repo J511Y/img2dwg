@@ -9,10 +9,11 @@ guard 단독/결합은 기존5 5/5·112/112를 유지했으나9/256 및12/336 up
 보호 subspace에서 잔차0인 adapter를 사용한다. CPU preflight는 기존5 5/5·112/112,
 신규5는0/5·0/140이었다. EXP-049 GPU 두 조건 중 plain이 완료됐으며 최고 점수
 checkpoint의 별도 CPU 재검사에서 기존5 5/5·112/112, 신규5 2/5·112/140이다.
-plain 최종은 신규0/5·44/140으로 다시 악화했다. balanced는 running이다.
+plain 최종은 신규0/5·44/140으로 다시 악화했다. balanced도 완료했으며 신규0/5·43/140이다.
 좋은 중간 결과와 최종 결과를 구분하며10개 동시 통과를 선언하지 않는다.
 관측된 흔들림에 대한 [EXP-050](experiments/2026-10-14-EXP-050-adapter-refinement.md)은
-같은 final checkpoint/Adam/assignment를 보존하고 학습률만 낮추는 bounded 비교를 준비한다.
+같은 final checkpoint/Adam/assignment를 보존하고 학습률만 낮추는 bounded 비교가 running이다.
+EXP-050 job `6acf67f15ccb47ba0f799dd9`이며 고정10개 외 자료는 사용하지 않는다.
 원본/holdout/Space를 보존한다.
 
 ## 현재 실행: 좌표 제한과 loss 균형의 분리 비교

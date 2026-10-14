@@ -1,6 +1,6 @@
 # EXP-049 · 기존 응답을 보호하는 이미지 특징 조건부 잔차 그래프
 
-상태: GPU running(두 조건 중 plain 완료). 신규5 전체 성공은 아직 미확인.
+상태: GPU completed /10개 동시 품질 failed. 다음 EXP-050은 별도 running이다.
 사용자는 다음 출근 시 확인할 수 있도록 목표 달성까지 계속 진행하도록 명시 승인했다.
 목표는 같은 실제 TRAIN10의 구조·치수252개 동시 재현과 직접 검수이며
 1,028개 본학습/Space 배포는 수행하지 않는다. 자동 goal은 active다.
@@ -72,7 +72,7 @@ guard는 원래 step2mm/누적10mm, 신규 step50mm다. 기존 function 보호 �
 다른 해상도/전처리/encoder 변경, 공간 안에서 원래와 다른 geometry의 입력은 별도
 불확실성이다.10개 재현이 generalization/1,028개 학습/DWG CAD UI 완료를 뜻하지 않는다.
 
-## 중간 판정 · plain 완료 / balanced 진행 중
+## 실제 판정 · 두 조건 완료
 
 Job `6acf5af65ccb47ba0f799906`, source `8823dd9`, code SHA
 `837290a6ef6be9e9181e086a36e832d519500b76cd03262802111b0a40ac17bb`,
@@ -87,3 +87,24 @@ data SHA `81e8490d2f3ddba13afc039a5be07f9f10ebafeeaac6a22209b79b6908fcda74`.
 최종 checkpoint는 신규F1 .511191644·0/5·44/140으로 다시 악화했다.
 좋은 중간 모델을 final로 바꿔 기록하지 않았다. 작은 평균 노드 오차만으로
 모든 참조/치수 복원이 보장되지 않는다. EXP-050은 이 흔들림의 학습률 영향을 분리한다.
+
+| 실제 이미지 기반 set 추론, 최종 | updates | 기존5 pass·DIM | 신규5 pass·DIM | 신규 구조 F1 |
+| --- | ---: | --- | --- | ---: |
+| protected-plain | 4740 | 5/5·112/112 | 0/5·44/140 | .511191644 |
+| protected-balanced | 4665 | 5/5·112/112 | 0/5·43/140 | .607500352 |
+
+두 조건 모두 기존5 actual drift0, updates 모두 accepted이며 resource-cap 종료다.
+final dose가 다르므로 최종 표를 동일 update량의 우열로 해석하지 않는다. 원 history의
+공통1/8/32와 실제 경과를 함께 보존했다. balance의 초기 adapter gradient는continuous
+.01924676448/categorical .19894124568, categorical scale .09674597349다. EXP-048의
+shared trunk calibration과 다른 measurement이며 동일 수치의 전후 비교가 아니다.
+최종 nativeDXF40개를 독립 재열기하여 audit0/mm/DIMcount/raster0와두 모델 SHA를
+검사했다. 실제 최종 예측20개를4개 contact sheet로 직접 봤으며 기존5는 보존,
+신규5는 잘못된 연결/치수선·문/세부 형상 오류가 남아 미통과다. native 파일이 유효한
+사실을 구조 재현으로 승격하지 않았다. trainer elapsed3253.848666167초이며
+자원 cap을 수렴이나 해결 불가능으로 소개하지 않는다.
+원본/holdout20/Space 무변경이고1,028개 재학습하지 않았다.
+
+aggregate evidence: [결과 JSON](../research/assets/2026-10-14-protected-adapter-summary.json).
+비공개 비교 화면은 `http://127.0.0.1:8778/retention-review.html`, 원자료·모델·검수·fresh
+CPU receipt는 `outputs/protected-adapter-2026-10-14-v1/`와private HF bucket의동명run이다.

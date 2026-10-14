@@ -1,0 +1,131 @@
+{
+  "schema": "protected-adapter-summary/v1",
+  "job_id": "6acf5af65ccb47ba0f799906",
+  "source_commit": "8823dd9",
+  "receipt_sha256": "c0d1b5e1efa9ba9784f15576c36b9a4719995fe938ea0a9e94b69ca9f9d37ec0",
+  "elapsed_seconds": 3253.848666167003,
+  "cases": 10,
+  "conditions": [
+    {
+      "variant": {
+        "name": "protected-plain",
+        "balance": false
+      },
+      "updates": 4740,
+      "model_sha256": "0895fd9bfe4a5cb4e61a781eaaa80ee85914a0fb3961792e128b9b0e59c7723f",
+      "stop": "resource-cap;not-fit",
+      "actual_inference_groups": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9992846924177397,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9990031130438914,
+          "shared_reference_f1": 0.9996431608684742
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.511191643572799,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 44,
+          "dimensions_missing_or_incorrect": 96,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.470242733641481,
+          "shared_reference_f1": 0.5022803281293693
+        }
+      },
+      "guard": {
+        "attempts": 4740,
+        "accepted": 4740,
+        "rejected": 0,
+        "mean_alpha": 0.45255801687763714,
+        "max_accepted_original_drift_mm": 0.0
+      }
+    },
+    {
+      "variant": {
+        "name": "protected-balanced",
+        "balance": true
+      },
+      "updates": 4665,
+      "model_sha256": "c4166ebac872bdb497efd9eb358e09b08c32952af0439cde0c9b913f2c8efc31",
+      "stop": "resource-cap;not-fit",
+      "actual_inference_groups": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9992846924177397,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9990031130438914,
+          "shared_reference_f1": 0.9996431608684742
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.607500352460172,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 43,
+          "dimensions_missing_or_incorrect": 97,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.5792686855734905,
+          "shared_reference_f1": 0.6397867057833546
+        }
+      },
+      "guard": {
+        "attempts": 4665,
+        "accepted": 4665,
+        "rejected": 0,
+        "mean_alpha": 0.480037513397642,
+        "max_accepted_original_drift_mm": 0.0
+      }
+    }
+  ],
+  "fresh_best_plain_groups": {
+    "original": {
+      "cases": 5,
+      "passed_cases": 5,
+      "structure_f1": 0.9992846924177397,
+      "required_dimensions": 112,
+      "dimensions_correct_geometry_and_value": 112,
+      "dimensions_missing_or_incorrect": 0,
+      "geometry_candidate_cases": 5,
+      "actual_DXF_audit_executed": true,
+      "capacity_below_required_cases": 0,
+      "component_f1": 0.9990031130438914,
+      "shared_reference_f1": 0.9996431608684742
+    },
+    "additional": {
+      "cases": 5,
+      "passed_cases": 2,
+      "structure_f1": 0.9568677609607049,
+      "required_dimensions": 140,
+      "dimensions_correct_geometry_and_value": 112,
+      "dimensions_missing_or_incorrect": 28,
+      "geometry_candidate_cases": 2,
+      "actual_DXF_audit_executed": true,
+      "capacity_below_required_cases": 0,
+      "component_f1": 0.9475103876077517,
+      "shared_reference_f1": 0.9182915234482477
+    }
+  },
+  "fresh_best_checkpoint_sha256": "190555b8d78db1e9edd3962697da6f50027e0619d122f1fd0271c5ffdcfd7cd8",
+  "generalization_validated": false,
+  "twenty_used": false,
+  "full_training_executed": false,
+  "Space_deployed": false
+}
