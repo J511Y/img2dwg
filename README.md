@@ -2,6 +2,14 @@
 
 평면도 이미지에서 **CAD에서 열고 편집할 수 있는 DWG**를 복원하는 모델·파이프라인 연구 프로젝트.
 
+최신 완료: [EXP-053](docs/experiments/2026-10-14-EXP-053-ranked-consistent-decoder.md)의
+실제 TRAIN10(기존5+추가5)은연속2checkpoint·fresh image추론에서10/10·필수치수252/252다.
+10개를직접검수했고모델DXF→DWG→DXF 재열기/실제브라우저DWG다운로드를확인했다.
+과잉DIMENSION을무검증hard constraint로적용하던decoder를수정했다.
+비교화면: `http://127.0.0.1:8780/retention-review.html`.
+실제CAD UI edit/save·일반화는미확인이고1,028개본학습/holdout20/Space는새로실행하지않았다.
+아래실패한본학습/기존Space는별도과거모델이며이통과weight로자동교체하지않았다.
+
 현재 단계: **1,028개 실제 페어 본학습은 완료했으나 구조·치수 복원은 실패했다.**
 본학습 선택 모델은 원래 5개 0/5·치수 0/112, 별도 20개 0/20·치수 0/476이다.
 20개를 직접 시각 검수했고 Space에 교체하지 않았다. 이후
