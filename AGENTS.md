@@ -2,6 +2,10 @@
 
 ## 2026-10-14 실행 권한
 
+**현재 요청:** EXP-048의 같은 TRAIN10에 좌표 업데이트 guard와 loss group balance를
+각각/결합 비교한다. bounded A100 4조건만이며 구조·치수 직접 검수와 비교 화면을 남긴다.
+10개 동시 통과 전 1,028개 본학습/Space 배포를 하지 않는다. 이전 20개/test는 튜닝에 쓰지 않는다.
+
 **최신 사용자 요청은 작은 데이터의 원인 분리 실험이다.**
 EXP-047-retention-ablation.md를 따른다. 원래5+train 추가5,
 batch/capacity/count/loss 단일 요인과 관측된 LR/assignment 차이를 bounded GPU job으로

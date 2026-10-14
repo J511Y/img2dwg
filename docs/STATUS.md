@@ -1,5 +1,14 @@
 # 현재 상태 · 2026-10-14 KST
 
+## 현재 실행: 좌표 제한과 loss 균형의 분리 비교
+
+[EXP-048](experiments/2026-10-14-EXP-048-guard-balance.md): 같은 TRAIN10에서
+control/좌표 guard/loss group balance/결합4조건을 구현했다. GPU 실행·결과는 아직 미확정이다.
+guard는 node/anchor/숫자 치환 좌표mm의 step2mm·기존5 누적10mm를 검사하며 거부 시
+가중치와 Adam 상태를 복구한다. loss는 초기 shared gradient의 큰 그룹만 downweight한다.
+10개 실제 구조·치수 동시 통과 전 1,028개 본학습/Space 배포를 하지 않는다.
+직전 EXP-047과 원본/holdout/Space를 보존한다.
+
 ## 최신 작업: 작은 데이터의 5개 재현 유지 원인 분리
 
 사용자 후속 요청으로 [EXP-047](experiments/2026-10-14-EXP-047-retention-ablation.md)을

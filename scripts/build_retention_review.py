@@ -5,18 +5,19 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from img2dwg.vector import svg
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--run',type=Path,required=True,nargs='+');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--run',type=Path,required=True,nargs='+');p.add_argument('--experiment',choices=['EXP-047','EXP-048'],default='EXP-047');a=p.parse_args()
     rows=json.loads((a.root/'data/index.json').read_text());conditions=[]
     for file in sorted(file for run in a.run for file in run.glob('*/receipt.json')):
         d=json.loads(file.read_text());conditions.append({'name':d['variant']['name'],'variant':d['variant'],
              'model_sha256':d['model_sha256'],'stopping_reason':d['stopping_reason'],'updates':d['updates'],'exposures':d['exposures'],
              'fixed':d['fixed_final']['groups'],'inferred':d['inferred_final']['groups'],'history':d['history'],
-             'path':file.parent.relative_to(a.root).as_posix()})
+             'path':file.parent.relative_to(a.root).as_posix(),'guard':d.get('guard_summary'),
+             'balance':d.get('loss_balance'),'accepted_updates':d.get('accepted_updates',d['updates'])})
     if not conditions:raise ValueError('No completed diagnostic condition')
     for r in rows:
         folder=a.root/'data'/r['sample_id'];g=json.loads((folder/'target.json').read_text(encoding='utf-8'))
         (folder/'target.svg').write_text(svg(g),encoding='utf-8')
-    state={'schema':'retention-review/v1','rows':rows,'conditions':conditions,'actual_model_only':True,
+    state={'schema':'retention-review/v1','experiment':a.experiment,'rows':rows,'conditions':conditions,'actual_model_only':True,
            'complete_DWG_product_passed':False,'Space_deployed':False,'full_training_executed':False}
     (a.root/'retention-review-state.json').write_text(json.dumps(state,ensure_ascii=False),encoding='utf-8')
     html='''<!doctype html><html lang="ko"><meta charset="utf-8"><title>EXP-047 · 재현 유지 원인 비교</title>
@@ -40,6 +41,11 @@ $('prediction').innerHTML=await response.text();const m=await(await fetch(path+'
 $('download').innerHTML='<a href="'+path+'/prediction.dxf">실제 모델 DXF</a> · <a href="'+path+'/metrics.json">개별 검사 원자료</a> · <a href="'+path+'/raw.svg">제약 적용 전</a>';
 $('history').innerHTML='';for(const h of v.history){const g=h.groups.original,n=h.groups.additional;const tr=document.createElement('tr');[h.dose,h.updates,g.structure_f1.toFixed(6),g.dimensions_correct_geometry_and_value+'/'+g.required_dimensions,n?n.structure_f1.toFixed(6):'—',n?n.dimensions_correct_geometry_and_value+'/'+n.required_dimensions:'—'].forEach(x=>{const td=document.createElement('td');td.textContent=x;tr.append(td)});$('history').append(tr)}}
 ['variant','case','mode'].forEach(id=>$(id).onchange=show);$('reset').onclick=()=>document.querySelectorAll('.view svg').forEach(s=>s.style.transform='');document.querySelectorAll('.view').forEach(v=>{let z=1,x=0,y=0,start=null;v.onwheel=e=>{const s=v.querySelector('svg');if(!s)return;e.preventDefault();z=Math.max(.1,Math.min(30,z*Math.exp(-e.deltaY*.001)));s.style.transform='translate('+x+'px,'+y+'px) scale('+z+')'};v.onpointerdown=e=>{start=[e.clientX-x,e.clientY-y];v.setPointerCapture(e.pointerId)};v.onpointermove=e=>{if(start){x=e.clientX-start[0];y=e.clientY-start[1];const s=v.querySelector('svg');if(s)s.style.transform='translate('+x+'px,'+y+'px) scale('+z+')'}};v.onpointerup=()=>start=null});load();</script></html>'''
+    if a.experiment=='EXP-048':
+        html=html.replace('EXP-047 · 재현 유지 원인 비교','EXP-048 · 좌표 제한과 loss 균형 비교')
+        html=html.replace('원래 5개 유지 · 추가 5개 재현 — 단일 조건 비교','좌표 이동 제한 · loss 균형 — 기존5 유지와 추가5 재현')
+        html=html.replace("v.name==='five-safe-lr'","v.name==='guard-and-balance'")
+        html=html.replace("<h3>같은 이미지 노출량에서 구조·치수 유지</h3>","<p>좌표 guard: update2mm / 기존5 누적10mm. loss balance: 같은 TRAIN10의 초기 shared gradient로 정한 고정 scale. 최종 native 검사와 원자료를 확인하세요. 조건별 자원 상한이므로 같은 노출량의 history도 함께 비교합니다.</p><h3>같은 이미지 노출량에서 구조·치수 유지</h3>")
     (a.root/'retention-review.html').write_text(html,encoding='utf-8')
     print(json.dumps({'conditions':len(conditions),'review':str(a.root/'retention-review.html')}))
 if __name__=='__main__':main()

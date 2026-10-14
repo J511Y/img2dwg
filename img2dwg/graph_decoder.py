@@ -11,6 +11,10 @@ from torch.nn import functional as F
 from scipy.optimize import linear_sum_assignment
 from img2dwg.structured import TYPES, MAX_REFS, PARAMS, UNIT, decode_component
 
+DEFAULT_LOSS_WEIGHTS=dict(node=100,node_precision=1,proposal=40,node_objectness=1,type=1,pointer=1,
+                         parameter=20,role=.2,numeric=1,text=.3,template=1,bearing=1,scalar=1,
+                         axis=.3,host=.3,dimension=4,count=1)
+
 
 class SharedGraphDecoder(nn.Module):
     def __init__(self, nodes, components, texts=1, hidden=192, input_dim=768, templates=1,coord_digits=6,measure_digits=5,adaptive_capacity=False,minimum_nodes=32,minimum_components=32):
@@ -184,9 +188,7 @@ def loss(pred,targets,matches=None,*,term_weights=None,precision_digits=None):
                    type=type_loss,pointer=pointer,parameter=parameter,role=roles,numeric=numeric,
                    text=text_loss,template=template_loss,bearing=bearing_loss,scalar=scalar_loss,
                    axis=axis,host=host_loss,dimension=dimension,count=count_loss)
-        default_weights=dict(node=100,node_precision=1,proposal=40,node_objectness=1,type=1,pointer=1,
-                             parameter=20,role=.2,numeric=1,text=.3,template=1,bearing=1,scalar=1,
-                             axis=.3,host=.3,dimension=4,count=1)
+        default_weights=DEFAULT_LOSS_WEIGHTS
         for name,weight in (term_weights or {}).items():
             if name not in terms:raise ValueError('Unknown loss term: '+name)
             value=value+(weight-default_weights[name])*terms[name]
