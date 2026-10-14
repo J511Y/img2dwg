@@ -17,7 +17,12 @@ EXP-050 두 조건 모두기존5/5·112/112,신규2/5이며finalDIM89/140·96/14
 EXP-051 물리 참조 후보 검사는anchor 오류까지 있어해결 가설을 기각했다.
 EXP-052는같은source best/Adam/assignment에서query 비선형 residual만비교한다.
 CPU neutral 초기화는실제10개180개 출력tensor의bit equality와기존5/5·신규2/5를 확인했다.
-GPU는준비 단계이며 고정10개 외 자료는 사용하지 않는다.
+EXP-052는원인재진단으로cancelled-diagnostic-pivot 상태다. before_constraints를읽으니
+현재model의raw 구조는이미재현됐으나3개사례의과잉DIMENSION9개가hard projection을
+오염시켜최대3.8m 이동했다. [EXP-053](experiments/2026-10-14-EXP-053-ranked-consistent-decoder.md)은
+image-count ranked set/치수기하일치/보정trust region을분리검사했다. 같은.0003 weight는
+10/10·252/252 nativeCPU통과다. 다른.0001 weight는fresh9/10·251/252로미채택이다.
+연속2checkpoint·fresh/직접검수/DWG 재열기 전최종완료로선언하지않는다.
 원본/holdout/Space를 보존한다.
 
 ## 현재 실행: 좌표 제한과 loss 균형의 분리 비교

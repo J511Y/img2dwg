@@ -199,8 +199,10 @@ def loss(pred,targets,matches=None,*,term_weights=None,precision_digits=None):
 
 
 @torch.no_grad()
-def decode(pred,texts,threshold=.5,batch=0,templates=None,reference_radius_mm=None):
+def decode(pred,texts,threshold=.5,batch=0,templates=None,reference_radius_mm=None,set_selection='no-object',dimension_consistency_mm=None):
     if reference_radius_mm is not None and reference_radius_mm<=0:raise ValueError('Positive physical reference radius required')
+    if set_selection not in ('no-object','image-count-topk'):raise ValueError('Unknown query set selection')
+    if dimension_consistency_mm is not None and dimension_consistency_mm<=0:raise ValueError('Positive equation consistency tolerance required')
     xy=pred['xy'][batch].cpu().numpy()*UNIT
     probability=pred['node_digits'][batch].softmax(-1);digit_conf=probability.amax(-1).amin(-1).amin(-1)
     precise=(probability.argmax(-1)*probability.new_tensor([10**i for i in range(probability.shape[-2]-1,-1,-1)])).sum(-1).cpu().numpy()/10
@@ -209,8 +211,23 @@ def decode(pred,texts,threshold=.5,batch=0,templates=None,reference_radius_mm=No
     consistent=torch.from_numpy(np.abs(precise-xy).max(-1)<=10).to(digit_conf.device)
     mask=((digit_conf>.99)&(sign_conf>.99)&consistent).cpu().numpy();xy[mask]=precise[mask]
     probs=pred['kind'][batch].softmax(-1); conf,kind=probs.max(-1)
-    reference_logits=pred['refs'][batch].clone()
     active=pred['active'][batch].sigmoid()>.5
+    selected=torch.ones(len(kind),device=kind.device,dtype=torch.bool);selection_receipt={'mode':set_selection,'source_CAD_or_GT_access':False}
+    object_odds=None;component_limit=None
+    if set_selection=='image-count-topk':
+        forecast=pred['log_count'][batch].exp()
+        if not torch.isfinite(forecast).all():raise ValueError('Nonfinite image cardinality forecast')
+        requested=[max(1,int(round(float(v)))) for v in forecast]
+        n=min(requested[0],len(active));c=min(requested[1],len(kind))
+        active=torch.zeros_like(active);active[pred['active'][batch].topk(n).indices]=True
+        logits=pred['kind'][batch];object_odds=torch.logsumexp(logits[:,:-1],dim=-1)-logits[:,-1]
+        selected.zero_();selected[object_odds.topk(c).indices]=True
+        component_limit=c
+        selection_receipt.update(predicted_counts_float=forecast.cpu().tolist(),predicted_counts_rounded=requested,
+            reserve_nodes=len(active),reserve_components=len(kind),selected_nodes=n,selected_queries=c,
+            capacity_limited=bool(requested[0]>len(active) or requested[1]>len(kind)),
+            ranking='node active logits;component foreground/no-object log odds;entire reserve;no prefix')
+    reference_logits=pred['refs'][batch].clone()
     if int(active.sum())>=MAX_REFS:reference_logits[...,~active]=-float('inf')
     refs=reference_logits.argmax(-1).cpu().numpy(); params=pred['params'][batch].cpu().numpy()
     digits=pred['digits'][batch].argmax(-1).cpu().numpy(); text=pred['text'][batch].argmax(-1).cpu().numpy()
@@ -219,6 +236,26 @@ def decode(pred,texts,threshold=.5,batch=0,templates=None,reference_radius_mm=No
     bearing=pred['bearing'][batch].argmax(-1).cpu().numpy()
     sizes=(pred['size_digits'][batch].argmax(-1)*pred['size_digits'].new_tensor([10**i for i in range(pred['size_digits'].shape[-2]-1,-1,-1)])).sum(-1).cpu().numpy()
     sizes*=np.where(pred['size_sign'][batch].argmax(-1).cpu().numpy(),-1,1)
+    rejected_dimensions=[]
+    if dimension_consistency_mm is not None:
+        # Check before ranked selection: phantom dimensions must not displace a
+        # genuine object simply because their unsupervised logits are confident.
+        for i in range(len(kind)):
+            if int(kind[i])!=TYPES.index('dimension') or float(conf[i])<threshold:continue
+            p=decode_component('dimension',params[i],digits[i],text[i],texts)
+            if bearing[i]<4:p['angle_cad']=int(bearing[i])*90
+            delta=xy[refs[i,1]]-xy[refs[i,0]];theta=math.radians(p['angle_cad'])
+            length=abs(float(delta@np.array([math.cos(theta),-math.sin(theta)]))) if p['dimension_kind']==0 else float(np.linalg.norm(delta))
+            residual=abs(length-p['value_mm'])
+            if p['value_mm']<=0 or residual>dimension_consistency_mm:
+                selected[i]=False
+                if object_odds is not None:object_odds[i]=-float('inf')
+                rejected_dimensions.append({'query':f'Q{i:04d}','value_mm':p['value_mm'],'raw_geometry_length_mm':length,'residual_mm':residual,
+                    'reason':'nonpositive-value-or-inconsistent-equation;not-applied-as-hard-constraint'})
+        if object_odds is not None:
+            selected.zero_();eligible=int(torch.isfinite(object_odds).sum());selected[object_odds.topk(min(component_limit,eligible)).indices]=True
+        selection_receipt['dimension_consistency_mm']=dimension_consistency_mm
+        selection_receipt['rejected_dimension_candidates']=rejected_dimensions
     components=[]; query_to_component={}; bad=0;missing_candidates=0;changed_references=0
     candidate_mask=None
     if reference_radius_mm is not None:
@@ -227,7 +264,7 @@ def decode(pred,texts,threshold=.5,batch=0,templates=None,reference_radius_mm=No
         candidate_mask&=active[None,None]
     for i in range(len(kind)):
         k=int(kind[i]); score=float(conf[i])
-        if k==len(TYPES) or score<threshold: continue
+        if not bool(selected[i]) or k==len(TYPES) or score<threshold: continue
         name=TYPES[k]; length=3 if name=='dimension' else 2 if name in ('centerline','unresolved_edge','symbol') else 1
         if name=='native_path': length=int(np.clip(round(params[i,1]*MAX_REFS),2,MAX_REFS))
         ids=refs[i,:length].tolist()
@@ -277,5 +314,6 @@ def decode(pred,texts,threshold=.5,batch=0,templates=None,reference_radius_mm=No
             'templates':library,
             'reference_resolution_receipt':{'radius_mm':reference_radius_mm,'changed_reference_slots':changed_references,
                 'unresolved_slots':missing_candidates,'source_CAD_or_GT_access':False},
+            'query_selection_receipt':selection_receipt,
             'high_confidence_0_1mm_coordinate_nodes':int(mask.sum()),
             'source':'image-model-prediction','invalid_repeated_references':bad,'complete_business_semantics':False}

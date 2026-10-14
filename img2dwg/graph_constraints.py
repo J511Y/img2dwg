@@ -6,7 +6,8 @@ from scipy.sparse import coo_matrix
 from scipy.sparse.linalg import lsqr
 
 
-def project(bundle,axis_tolerance_mm=1.):
+def project(bundle,axis_tolerance_mm=1.,maximum_displacement_mm=None):
+    if maximum_displacement_mm is not None and maximum_displacement_mm<=0:raise ValueError('Positive projection trust region required')
     out=copy.deepcopy(bundle); points=np.asarray(out['nodes_mm'],float); rows=[]; rhs=[]
     # Only confidently predicted links are enforced; the model must learn them.
     axis=out.get('axis_links',[]); confidence=out.get('axis_confidence',[]); rejected_axes=0
@@ -32,10 +33,17 @@ def project(bundle,axis_tolerance_mm=1.):
         matrix=coo_matrix((vv,(rr,cc)),shape=(len(rows),points.size)).tocsr()
         residual=np.asarray(rhs)-matrix@points.ravel()
         delta=lsqr(matrix,residual,atol=1e-11,btol=1e-11,iter_lim=points.size*2)[0]
+        displacement=float(np.linalg.norm(delta.reshape(-1,2),axis=1).max())
+        if maximum_displacement_mm is not None and displacement>maximum_displacement_mm:
+            out['constraint_receipt']={'status':'rejected-displacement','equations':len(rows),
+                'max_residual_mm':float(np.max(np.abs(residual))),'maximum_node_displacement_mm':0.,
+                'proposed_maximum_displacement_mm':displacement,'maximum_allowed_displacement_mm':maximum_displacement_mm,
+                'source_CAD_or_GT_access':False,'axis_tolerance_mm':axis_tolerance_mm,'rejected_axis_proposals':rejected_axes}
+            return out
         out['nodes_mm']=(points+delta.reshape(-1,2)).tolist()
         final=np.asarray(rhs)-matrix@np.asarray(out['nodes_mm']).ravel()
         out['constraint_receipt']={'equations':len(rows),'max_residual_mm':float(np.max(np.abs(final))),
-                                   'maximum_node_displacement_mm':float(np.linalg.norm(delta.reshape(-1,2),axis=1).max()),
+                                   'maximum_node_displacement_mm':displacement,
                                    'axis_tolerance_mm':axis_tolerance_mm,'rejected_axis_proposals':rejected_axes,
                                    'source_CAD_or_GT_access':False}
     else: out['constraint_receipt']={'equations':0,'max_residual_mm':None,'source_CAD_or_GT_access':False,

@@ -55,6 +55,12 @@ step만 늘린 후속 GPU job은 사용자 지적 후 취소했다. `docs/resear
 
 ## 시작 순서
 
+**현재진행:** EXP-053을읽는다. EXP-052는projection원인확인으로cancelled-diagnostic-pivot이다.
+과잉DIM9개가거의맞는raw graph를hard constraint로파괴했다. image count ranked set와
+치수equation consistency10mm/보정trust region10mm로동일weight10/10·252/252가CPU에서
+통과했다. source9052 final/model·Adam을보존한LR1e-6의작은연속quality확인(5분/suite8분/
+job20분)과fresh/직접10개검수/DWG roundtrip을마친다.1,028학습/holdout/Space는사용하지않는다.
+
 1. 이 파일, `README.md`, `docs/STATUS.md`, `docs/PROJECT.md`, `docs/DECISIONS.md`, `docs/harness/workflow.md`를 읽는다.
 2. `git status --short --branch`, 원격, 관련 변경을 확인하고 기존 작업을 보존한다.
 3. 작업에 따라 `docs/DATA.md`, `docs/CAD.md`, `docs/EVALUATION.md`, 조사·백로그를 읽는다.

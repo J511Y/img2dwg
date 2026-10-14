@@ -39,6 +39,13 @@ class SharedGraphTests(unittest.TestCase):
         dim=next(c for c in g['components'] if c['kind']=='dimension')
         self.assertAlmostEqual(abs(dim['points'][1][0]-dim['points'][0][0])*g['scale'],1100,places=6)
         self.assertFalse(out['constraint_receipt']['source_CAD_or_GT_access'])
+
+    def test_projection_cannot_destroy_a_nearly_correct_plan_for_a_bad_number(self):
+        b=prepare(self.graph());b['components'][0]['parameters']['value_mm']=1100
+        safe=project(b,maximum_displacement_mm=10)
+        self.assertEqual(safe['nodes_mm'],b['nodes_mm'])
+        self.assertEqual(safe['constraint_receipt']['status'],'rejected-displacement')
+        self.assertGreater(safe['constraint_receipt']['proposed_maximum_displacement_mm'],10)
     def test_forward_backward_and_invalid_capacity(self):
         b=prepare(self.graph()); t={k:torch.from_numpy(v) for k,v in encode(b,{}).items()}
         m=SharedGraphDecoder(8,6,hidden=48); pred=m(torch.randn(1,4,768))

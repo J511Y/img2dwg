@@ -14,7 +14,9 @@ from scripts.train_retention_ablation import digest,make_model,measurement,write
 def main():
     p=argparse.ArgumentParser();p.add_argument('--data',type=Path,required=True)
     p.add_argument('--config',type=Path,required=True);p.add_argument('--checkpoint',type=Path,required=True)
-    p.add_argument('--output',type=Path,required=True);p.add_argument('--fresh-features',action='store_true');p.add_argument('--reference-radius-mm',type=float);a=p.parse_args()
+    p.add_argument('--output',type=Path,required=True);p.add_argument('--fresh-features',action='store_true');p.add_argument('--reference-radius-mm',type=float)
+    p.add_argument('--set-selection',choices=['no-object','image-count-topk'],default='no-object');p.add_argument('--dimension-consistency-mm',type=float)
+    p.add_argument('--projection-limit-mm',type=float);a=p.parse_args()
     if a.output.exists():raise FileExistsError('Use a fresh verification directory')
     started=time.monotonic();torch.set_num_threads(6)
     rows=json.loads((a.data/'index.json').read_text());c=json.loads(a.config.read_text())
@@ -36,10 +38,13 @@ def main():
         diffs[k]=float((bank[k]-cached).abs().max())
         bundles[k]=json.loads((d/'components.json').read_text(encoding='utf-8'));graphs[k]=json.loads((d/'target.json').read_text(encoding='utf-8'))
     library=json.loads((a.data/'library.json').read_text(encoding='utf-8'))
-    result=measurement(model,rows,bank,bundles,graphs,c,library,a.output/'inferred-final',inferred=True,save=True,reference_radius_mm=a.reference_radius_mm)
+    result=measurement(model,rows,bank,bundles,graphs,c,library,a.output/'inferred-final',inferred=True,save=True,reference_radius_mm=a.reference_radius_mm,set_selection=a.set_selection,dimension_consistency_mm=a.dimension_consistency_mm,projection_limit_mm=a.projection_limit_mm)
     write(a.output/'receipt.json',{'schema':'protected-adapter-independent-evaluation/v1','model_sha256':digest(a.checkpoint),
         'config_sha256':digest(a.config),'fresh_image_features':a.fresh_features,'feature_max_absolute_differences':diffs,
         'reference_radius_mm':a.reference_radius_mm,
+        'set_selection':a.set_selection,
+        'dimension_consistency_mm':a.dimension_consistency_mm,
+        'projection_limit_mm':a.projection_limit_mm,
         'model_forward_inputs':'vision features only;fixed query reserve;active/no-object selection',
         'target_CAD_used_only_after_forward_for_evaluation':True,'holdout_accessed':False,'Space_deployed':False,
         'evaluation':result,'elapsed_seconds':time.monotonic()-started})
