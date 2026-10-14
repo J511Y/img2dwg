@@ -30,4 +30,8 @@
 
 P1 수집 감사 CLI와 manifest validator → P2 CAD-IR schema/GT writer/roundtrip checker → P3 공통 candidate adapter와 metric runner → P4 System-1 adapter/비용 ledger → CI에는 비식별 synthetic smoke만 추가한다. CI에서 SMB 접근, 사내 도면 upload, 유료 모델 호출을 자동 실행하지 않는다.
 
-첫 학습 후보·run 범위·중단 조건은 [벡터 우선 계획](../research/2026-10-13-vector-first-training-plan.md)과 [선언 설정](../../configs/first-training-plan.json)을 참조한다. 선언 설정은 GPU 작업 runner/예약이 아니며 현재 학습은 미실행이다.
+첫 학습 후보·run 범위·중단 조건은 [벡터 우선 계획](../research/2026-10-13-vector-first-training-plan.md)과 [선언 설정](../../configs/first-training-plan.json)을 참조한다. 선언 설정은 GPU 작업 runner/예약이 아니다.
+초기 세팅 당시 미실행 상태와 이후 실제 실행을 구분한다. 실제 실행은 EXP-043~046과
+[shared 하네스](shared-graph-training.md), 현재 판정은
+[실험 회고](../research/2026-10-14-experiment-retrospective.md)를 따른다.
+본학습은 completed/quality-failed이며 사용자 요청으로 추가 실험을 중단했다.

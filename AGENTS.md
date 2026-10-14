@@ -2,19 +2,27 @@
 
 ## 2026-10-14 실행 권한
 
+**최신 사용자 요청은 실험 회고다.** 새 방법 선정·추가 GPU/API 실험·재배포를 중단하고
+`docs/research/2026-10-14-experiment-retrospective.md`를 먼저 읽는다. full-v1은 실행
+completed / 품질 failed이며 GPU 5개 0/5·0/112, 별도 20개 0/20·0/476이다.
+직접 시각 검수도 실패다. full checkpoint SHA는 `52cdda59…`, 기존 Space의 승인된
+five-case pilot SHA는 `05a545dd…`로 서로 다르다. 본학습으로 자동 교체하지 않았다.
+아래의 이전 실행 승인은 새 유료 후속 실험의 승인이 아니다.
+
 **최신 실행 정본:** `docs/experiments/2026-10-14-EXP-046-shared-decoder.md`와
 `docs/harness/shared-graph-training.md`. shared node/component decoder를 실제 구현·학습했다.
 사용자가 비교 화면의 오차를 수용하고 모델 배포·Space 갱신을 명시 요청하여 **5개 재현
 실험 모델**의 private 배포를 승인했다. 이는 이전의 20개 전체 pass gate에 대한 실험
 미리보기 예외이며, 검증 성공으로 재작성하지 않는다. GPU 5/5·112/112 치수, CPU 4/5·
-112/112 치수, 별도 CPU 20개 0/20·0/476이다. 1,028개 본학습은 새 bounded job이며
-완료 상태는 STATUS/실제 receipt로 확인한다. 미통과 본학습 모델을 자동 교체하지 않는다.
+112/112 치수, 별도 CPU 20개 0/20·0/476이다. 1,028개 본학습 bounded job은
+quality-plateau로 종료했고 품질 실패다. 미통과 본학습 모델을 자동 교체하지 않는다.
 `deploy_shared_space.py`가 최신 deployer이고 관측 선 기준선 deployer는 폐기했다.
 
 사용자가 실제 준공도면–CAD 페어의 5개 재현 학습, 별도 20개 검증, 비교 화면과
 검증된 모델의 Space 재배포를 명시적으로 요청했다. EXP-045와
 `docs/harness/raw-pair-training.md`를 따른다. 실패한 모델은 재배포하지 않는다.
-현재 두 실행은 각각 A100/90분으로 제한한다. 원본과 기존 운영 모델은 보존한다.
+EXP-045 당시 두 실행은 각각 A100/90분으로 제한했다. 현재 실행 중인 작업으로
+해석하지 않는다. 원본과 기존 운영 모델은 보존한다.
 
 **후속 정정:** EXP-045의 primitive canonical-query 모델도 실패했고, 컴포넌트 구현 없이
 step만 늘린 후속 GPU job은 사용자 지적 후 취소했다. `docs/research/2026-10-14-component-decoder-correction.md`
@@ -30,7 +38,7 @@ step만 늘린 후속 GPU job은 사용자 지적 후 취소했다. `docs/resear
 
 ## 현재 권한과 범위
 
-- 현재 사용자는 원본 보존 데이터셋 pilot·최소 1,000개 페어·private HF 버킷에 이어 첫 모델 학습과 새 private inference Space 배포를 승인했다. 원본·기존 Jippin 운영 모델을 변경하지 않는다. 최신 모델 실행은 `docs/harness/vector-training.md`, `docs/experiments/2026-10-13-EXP-043-vector-first.md`를 읽는다. 유료 VLM/API 호출이나 무제한 후속 GPU 실험까지 승계하지 않는다.
+- 사용자는 원본 보존 데이터셋 pilot·최소 1,000개 페어·private HF 버킷에 이어 첫 모델 학습과 새 private inference Space 배포를 승인했었다. 원본·기존 Jippin 운영 모델을 변경하지 않는다. 최신 모델 실행 기록은 EXP-046/shared-graph-training, 현재 판단은 위의 실험 회고다. EXP-043/vector-training은 첫 합성 모델의 과거 기록이다. 유료 VLM/API 호출이나 무제한 후속 GPU 실험까지 승계하지 않는다.
 - 후속 사용자가 구현·실험을 요청하면 해당 범위로 진행한다. 이 초기 상태를 영구적인 구현 금지로 해석하지 않는다.
 - 데이터 수집·변경전 crop·ODA roundtrip·치수/정합 검증 실행기가 추가됐다. 학습/배포 하네스·CI·canonical CAD-IR schema validator와 구분한다.
 - 사내 워크의 의뢰 연결 경로가 데이터 위치의 정본이다. 원본 폴더를 읽기 전용으로 사용하고 결과는 별도 run 폴더에 작성한다. 원본 DWG를 덮어쓰지 않는다.
@@ -79,6 +87,7 @@ raw 준공도면에서 실패하여 기본 사용을 중단했다. 관측 선 �
 원본 RAW 입력–canonical CAD 감독과 typed component/관계·치수 제약을 우선하고,
 실제 입력의 train 재현/별도 validation의 시각·기하/치수 검사 전에 기본 배포하지 않는다.
 
+**아래 문단은 EXP-043 당시의 상태다. 현재 구현/학습 상태는 EXP-046과 회고를 따른다.**
 DINOv3 frozen + 4-slot component coordinate baseline이 구현됐다. source-identity group의
 train 1,028개/validation 128개 CAD 합성으로 학습하며 raw 준공도면 coordinate fine-tune과
 숫자 치수/OCR·host association은 아직 미실행이다. 세부 성능은 EXP-043과 private receipts로

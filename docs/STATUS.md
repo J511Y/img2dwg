@@ -1,5 +1,29 @@
 # 현재 상태 · 2026-10-14 KST
 
+## 최신 판정: 본학습 완료·품질 실패, 실험 회고
+
+사용자 요청으로 새 방법 선정·추가 실험·재배포를 중단하고
+[상세 리뷰](research/2026-10-14-experiment-retrospective.md)를 작성했다.
+HF job `6acef50cc662881452234b24`는 completed, 종료 이유 quality-plateau,
+28 epoch 진입/28,157 updates, trainer elapsed 4,323.4385초다.
+checkpoint SHA256 `52cdda59bb3023c7c71f8d9774dcfb59fb28a0a13ee31d0c75e5d3d82ca86138`.
+
+| 본학습 최종 선택 모델, GPU | 통과 | 구조 F1 | 숫자·위치·실제 길이 joint 치수 |
+| --- | ---: | ---: | ---: |
+| 원래 학습 5개 | 0/5 | 0 | 0/112 |
+| 별도 20개 | 0/20 | 0.0002080570 | 0/476 |
+
+전체 20개 입력/GT/실제 예측을 직접 시각 검수했으며 모두 구조 복원 실패다.
+native DIMENSION 804개, DXF audit error 0이지만 정확한 도면은 아니다.
+검수 기록은 원 receipt와 별도로 보존했다. 직원의 승인을 주장하지 않는다.
+선택된 본학습 모델을 Space에 올리지 않았다. 아래 Space는 별도 tiny-v4 pilot다.
+
+완료된 CPU 초기화 대조: 원래 5개 input/컴포넌트 target 불변, 동일 capacity에서
+tiny 원본과 full 확장 직후 모두 4/5·112/112였고 full 학습 후 0/5·0/112다.
+확장 즉시의 복사 오류만으로 설명되지 않으며 학습 중 악화가 관측됐다.
+optimizer/assignment/감독/이미지 조건 등의 개별 실패 원인은 아직 분리하지 못했다.
+모델/데이터 크기만으로 해결된다고 결론 내리지 않는다.
+
 ## 현재 배포: 공유 노드 컴포넌트 5개 재현 실험 모델
 
 [EXP-046](experiments/2026-10-14-EXP-046-shared-decoder.md): tiny-v4의 GPU 재현은
@@ -19,10 +43,10 @@ DWG→DXF 재열기는 통과했다. 실제 업무 CAD UI 수정·저장과 직�
 Space revision `402d7958db12605f8346b682e64a51f0d1a5c395`, private CPU basic.
 학습된 feature/parameter 기반 예측이며 원본/정답 CAD retrieval이나 관측 선 fallback이 없다.
 
-1,028개 본학습: HF job `6acef50cc662881452234b24` **running**.
-16개 development로 checkpoint를 선택하고 별도 20개는 종료 후 한 번 평가한다.
-GPU 학습 상한 90분, job 전체 상한 150분이며 fit 판정이 아니다. 아직 본학습 성공을
-주장하지 않고, 실패 체크포인트로 Space를 자동 교체하지 않는다.
+1,028개 본학습은 위의 completed/quality-failed 판정이 정본이다.
+16개 development로 checkpoint를 선택하고 별도 20개는 종료 후 한 번 평가했다.
+GPU 학습 상한 90분, job 전체 상한 150분은 fit 판정이 아니다.
+기존 five-case pilot 배포와 본학습 품질 실패를 구분한다.
 
 ## 구현 및 초기 실행 기록
 
@@ -39,7 +63,7 @@ node 위치/참조 gradient 분리, 위치 기반 proposal, 숫자 parameter, FP
 체크포인트 선택에 사용하지 않았다. 초기 실패·취소 기록은 보존한다.
 private 새 비교 화면은 실제 모델 예측이며 GT factory와 구분한다.
 
-## 실제 페어 5개 학습·20개 검증 진행
+## 과거 기록: EXP-045 실제 페어 5개 학습·20개 검증
 
 [EXP-045](experiments/2026-10-14-EXP-045-real-pairs.md): v0.2의 실제 준공도면에서
 5개 학습/20개 검증을 고정했고 native 치수 588개를 보존했다. 입력은 합성이 아니다.
@@ -53,13 +77,13 @@ private 새 비교 화면은 실제 모델 예측이며 GT factory와 구분한�
 노출된 20개는 pilot validation이며 독립 최종 test라고 부르지 않는다. 취소된 후속
 실행에서 새로운 20개 평가 결과를 만든 것으로 기록하지 않는다.
 
-현재 [컴포넌트 정정](research/2026-10-14-component-decoder-correction.md): CAD-derived
+당시 [컴포넌트 정정](research/2026-10-14-component-decoder-correction.md): CAD-derived
 조립기에서 문짝+원호 34개, 벽 양면 148개, 사각 루프 240개를 parameter로 재조립하고
 422개 실제 BLOCK/INSERT를 작성했다. 5개 GT의 형상과 치수 112개를 보존했다.
 이는 모델 예측이 아니다. 원래 도형 4,306개 중 2,542개(59.03%)는 아직 미분류다.
 완성된 컴포넌트 정답/새 decoder 학습/모델 Space 재배포는 미완료다.
 
-## 최신 정정: 실제 스캔 복원 실패 · 모델 기본 사용 중단
+## 과거 기록: EXP-044 실제 스캔 복원 실패 · 모델 기본 사용 중단
 
 사용자가 제공한 실제 입력 결과에서 거대한 원호/흩어진 선이 확인됐다.
 첫 모델은 raw 준공도면 페어를 학습하지 않고 CAD 합성 렌더만 학습했다.
@@ -76,7 +100,7 @@ private 새 비교 화면은 실제 모델 예측이며 GT factory와 구분한�
 canonical 출력 구분, 관계/제약·ARC parameterization, 실제 5개 train 재현과
 20개 별도 validation 구조/치수 평가. 실제 도면 품질을 확인하기 전 모델을 기본 배포하지 않는다.
 
-## 최신: 첫 학습·벡터 inference Space
+## 과거 기록: EXP-043 첫 학습·벡터 inference Space
 
 사용자 승인으로 DINOv3 frozen + 4-slot component coordinate head를 학습하고 별도
 [private Space](https://huggingface.co/spaces/youjunhyeok/img2dwg)에 배포했다.

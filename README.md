@@ -2,10 +2,15 @@
 
 평면도 이미지에서 **CAD에서 열고 편집할 수 있는 DWG**를 복원하는 모델·파이프라인 연구 프로젝트.
 
-현재 단계: **공유 노드·컴포넌트 decoder 구현과 실제 5개 재현 학습을 완료하고 private Space를 갱신했다.**
+현재 단계: **1,028개 실제 페어 본학습은 완료했으나 구조·치수 복원은 실패했다.**
+본학습 선택 모델은 원래 5개 0/5·치수 0/112, 별도 20개 0/20·치수 0/476이다.
+20개를 직접 시각 검수했고 Space에 교체하지 않았다. 추가 실험을 중단하고
+[상세 실험 리뷰](docs/research/2026-10-14-experiment-retrospective.md)를 작성했다.
+
+현재 private Space는 앞서 승인된 **5개 재현 실험 모델**이다.
 GPU 재현은 5/5·치수 112/112, CPU 서빙 재현은 4/5·치수 112/112다.
 별도 CPU 20개 검증은 0/20이므로 Space에는 사용자가 승인한 **5개 재현 실험 모델**로
-표시한다. 본학습 1,028개는 별도 실행 중이며 일반화 성공을 주장하지 않는다.
+표시한다. 이 모델과 실패한 본학습 모델을 구분하며 일반화 성공을 주장하지 않는다.
 [EXP-046](docs/experiments/2026-10-14-EXP-046-shared-decoder.md),
 [공유 노드 학습 하네스](docs/harness/shared-graph-training.md).
 Space는 실제 모델의 raster-free SVG·native BLOCK/INSERT와 DIMENSION을 갖는 DXF를
@@ -65,6 +70,7 @@ CAD 합성 train 1,028개/validation 128개, full 2,500 steps.
 | [결정 기록](docs/DECISIONS.md) | 현재 결정·근거·재검토 조건 |
 | [연구노트 연결](docs/RESEARCH-NOTES.md) | 기존 주간·월간 예약 수집 계약 |
 | [현재 상태](docs/STATUS.md) | 완료·미실행·다음 작업 |
+| [실험 리뷰](docs/research/2026-10-14-experiment-retrospective.md) | 목표 대비 진척, 실행별 실패, 초기화 대조, 판단 회고 |
 
 설정은 [configs/paths.example.json](configs/paths.example.json), [configs/harness.json](configs/harness.json), 실험 기록은 [templates/experiment.md](templates/experiment.md)와 [templates/run-manifest.example.json](templates/run-manifest.example.json)에서 시작한다. 실제 경로 설정과 원자료는 Git에 넣지 않는다.
 

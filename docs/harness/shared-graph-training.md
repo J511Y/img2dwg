@@ -1,5 +1,10 @@
 # 공유 노드·컴포넌트 학습 하네스
 
+현재 상태: full-v1은 completed/quality-failed, 원래 5개 0/5·0/112와 별도 20개
+0/20·0/476이다. 새 실험은 중단하고
+[상세 회고](../research/2026-10-14-experiment-retrospective.md)를 먼저 진행한다.
+아래 명령은 기존 실행 재현 안내이며 새로운 유료 실행 승인이 아니다.
+
 실행 구현: `structured.py` → `graph_decoder.py` → `graph_constraints.py` →
 `graph_evaluation.py`. 원본 준공도면과 canonical CAD의 프레임을 분리한다.
 입력은 실제 준공도면의 EXIF 보정/512 letterbox이며 합성 CAD 렌더가 아니다.
@@ -36,7 +41,7 @@ source 저장 순서나 handle identity를 고정하는 방식과 다르다.
 
 ## 학습 판정과 배포
 
-45초마다 실제 예측으로 구조 F1, component F1, shared-reference F1, 필수 치수 숫자·위치·
+직전 검사 완료 후 45초 이상 경과하면 실제 예측으로 구조 F1, component F1, shared-reference F1, 필수 치수 숫자·위치·
 실제 길이, invalid references, known geometric host를 확인한다. 구조 >=.90,
 component/shared-reference >=.95, 치수 누락·오류 0, 기하 tolerance 10mm/치수 1mm다.
 서로 다른 checkpoint 두 번의 전체 pass를 stable pass로 정한다.

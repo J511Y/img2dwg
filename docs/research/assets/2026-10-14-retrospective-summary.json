@@ -1,0 +1,152 @@
+{
+  "schema": "img2dwg-retrospective-evidence-index/v1",
+  "recorded_date_kst": "2026-10-14",
+  "review_period": [
+    "2026-10-13",
+    "2026-10-14"
+  ],
+  "review_status": "existing-experiments-reviewed;no-new-training",
+  "complete_DWG_product_passed": false,
+  "metric_protocol": "shared-component-set/v2;raw_evaluation;10mm geometry;1mm dimension number/anchors/length",
+  "input_protocol": "actual as-built;EXIF+512 letterbox;seed20261014;threshold0.5;frozen DINOv3@5931719e67bbdb9737e363e781fb0c67687896bc",
+  "full": {
+    "job_id": "6acef50cc662881452234b24",
+    "status": "completed",
+    "quality_status": "failed",
+    "stopping_reason": "quality-plateau",
+    "epochs_entered": 28,
+    "updates": 28157,
+    "trainer_elapsed_seconds": 4323.438516877941,
+    "model_sha256": "52cdda59bb3023c7c71f8d9774dcfb59fb28a0a13ee31d0c75e5d3d82ca86138",
+    "train_pairs": 1028,
+    "development_pairs": 16,
+    "evaluation_device": "GPU",
+    "five": {
+      "cases": 5,
+      "passed_cases": 0,
+      "structure_f1": 0.0,
+      "required_dimensions": 112,
+      "dimensions_correct_geometry_and_value": 0,
+      "dimensions_missing_or_incorrect": 112,
+      "component_f1": 0.0,
+      "shared_reference_f1": 0.0,
+      "median_node_set_error_mm": 243.84351956362914
+    },
+    "twenty": {
+      "cases": 20,
+      "passed_cases": 0,
+      "structure_f1": 0.0002080570076200879,
+      "required_dimensions": 476,
+      "dimensions_correct_geometry_and_value": 0,
+      "dimensions_missing_or_incorrect": 476,
+      "component_f1": 8.278145695364238e-05,
+      "shared_reference_f1": 0.0,
+      "median_node_set_error_mm": 217.77727361550416
+    },
+    "native_dimensions_predicted_twenty": 804,
+    "native_DXF_audit_errors_twenty": 0,
+    "known_unique_geometric_hosts_required": 1,
+    "known_unique_geometric_hosts_correct": 0,
+    "constraint_residual_over_1mm_cases": 14,
+    "constraint_residual_max_mm": 7350.000000009113,
+    "development_quality_checks": 28,
+    "development_joint_dimensions_correct_max": 0,
+    "development_structure_F1_max": 0.00029452189279403104,
+    "twenty_used_for_checkpoint_selection": false,
+    "Space_replaced": false
+  },
+  "initializer_control": {
+    "training_executed": false,
+    "twenty_accessed": false,
+    "five_inputs_and_component_targets_unchanged": true,
+    "conditions": "CPU six threads;fixed existing threshold;initializer exact replay including random seed",
+    "five_inference_capacities_nodes_components": [
+      959,
+      726
+    ],
+    "results": {
+      "tiny-source": {
+        "cases": 5,
+        "passed_cases": 4,
+        "structure_f1": 0.9835479256080114,
+        "required_dimensions": 112,
+        "dimensions_correct_geometry_and_value": 112,
+        "dimensions_missing_or_incorrect": 0
+      },
+      "expanded-before-training": {
+        "cases": 5,
+        "passed_cases": 4,
+        "structure_f1": 0.9835479256080114,
+        "required_dimensions": 112,
+        "dimensions_correct_geometry_and_value": 112,
+        "dimensions_missing_or_incorrect": 0
+      },
+      "full-trained": {
+        "cases": 5,
+        "passed_cases": 0,
+        "structure_f1": 0.0,
+        "required_dimensions": 112,
+        "dimensions_correct_geometry_and_value": 0,
+        "dimensions_missing_or_incorrect": 112
+      }
+    },
+    "interpretation": "five ability survived immediate expansion and failed after full optimization;exact training cause not established"
+  },
+  "private_sources": [
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/tiny-v4-final/receipt.json",
+      "sha256": "52627e738a4a38cc979271bf5df99c62c322bf055042f54cfae47808b0c804a9",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/pilot-local-verification/receipt.json",
+      "sha256": "e3ba543692ee0f53ade4a025b56da47eb1a68262f8547f38c8e2eaa6a88e9d76",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/full-v1-terminal-receipt.json",
+      "sha256": "6f6f5ea1b46fc82476a21379bcf0d0ce763827ed54a2787d6daa3cfe2612b6b9",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/full-v1-completed/manifest.json",
+      "sha256": "c11564c380c0017b3619af6016dc9eb03059a132acf8476c77415d33df326cb4",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/full-v1-completed/config.json",
+      "sha256": "538442376a7b2271a43aa677b40d85b71cc79606cdcad3aec5abc4d57cfb057c",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/full-v1-completed/quality-history.json",
+      "sha256": "bd3a97283304b4096843b46c0d84a3a9b0a359f6721f511abe5d9a38243e3033",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/full-v1-completed/best-evaluation.json",
+      "sha256": "9297835be1ab5ad25769619843055745a7be094165503986976875efc3d437c0",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/full-review-verification.json",
+      "sha256": "1fadb3c9c29392731512d8ebb78a62f50886febb6b319e3e7fd8d6ecccb067df",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/full-review-notes.json",
+      "sha256": "cb098aa3a65cd5e4e1a7c0de8f52a29534955cd4849e1f218e1ed2886c0e5add",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/transfer-control/receipt.json",
+      "sha256": "e6f2910642b1e82d52d4e085f8c5a34c7760d437ae72bfb85ebc657bf2775e3f",
+      "distribution": "private;aggregate-only-public-index"
+    },
+    {
+      "relative_path": "outputs/shared-graph-2026-10-14/audit_initialization.py",
+      "sha256": "fb0f1242e3d14c55ce7a1c2c5e6d4e730a4428ab3214ebf46c88d5a1abf4e6be",
+      "distribution": "private;aggregate-only-public-index"
+    }
+  ]
+}

@@ -1,8 +1,10 @@
 # EXP-046 · 실제 이미지 기반 공유 노드·컴포넌트 decoder
 
-상태: **5개 GPU 재현 succeeded / CPU 20개 failed / 본학습 running / pilot Space deployed**.
+상태: **5개 GPU 재현 succeeded / CPU 20개 failed / 본학습 completed·품질 failed / pilot Space deployed**.
 날짜: 2026-10-14 KST. 연구 분류: decoder/감독·참조·제약 실험은 R&D 핵심,
-Space 배포는 연구지원/제품 통합이다. 본학습 완료나 범용 도면 변환 성공이 아니다.
+Space 배포는 연구지원/제품 통합이다. 본학습 실행 완료는 범용 도면 변환 성공이 아니다.
+사용자의 최신 요청으로 추가 실험을 중단하고
+[상세 회고](../research/2026-10-14-experiment-retrospective.md)를 작성했다.
 
 ## 질문과 가설
 
@@ -78,4 +80,30 @@ data SHA `9013f5470991f6e9a482df6f6cb4d79d9633b64ce830d5e96e77047a1d82a9dc`.
 Adaptive capacity/count heads와 6,381개 train-only prototypes를 사용한다.
 full-data-v3는 coincident native DIM dedup로 누락됐던 26개 annotation을 복구했다.
 건물/평면 계열의 완전한 split 독립성, OCR/고해상도 판단, semantic host 연결은 다음
-불확실성이다. 본학습 품질·checkpoint 선택·20개 결과는 실제 종료 receipt로 갱신한다.
+불확실성이다. 아래는 본학습 종료 및 사후 직접 검수 기록이다.
+
+## 본학습 종료와 직접 검수
+
+job은 completed, 종료 이유 quality-plateau, 28 epoch 진입/28,157 updates,
+trainer elapsed 4,323.4385초다. 선택된 best model SHA256:
+`52cdda59bb3023c7c71f8d9774dcfb59fb28a0a13ee31d0c75e5d3d82ca86138`.
+28회 development 검사에서 joint 치수 0/369·사례 0/16이 계속됐다.
+
+| full 선택 모델, GPU | 사례 pass | 구조 F1 | joint 치수 |
+| --- | ---: | ---: | ---: |
+| 원래 5개 재현 | 0/5 | 0 | 0/112 |
+| 종료 후 별도 20개 | 0/20 | 0.0002080570 | 0/476 |
+
+별도 20개 component F1 0.0000827815, shared-reference F1 0이다.
+native DIMENSION 804개와 DXF audit error 0은 파일 형식의 성공일 뿐이다.
+전체 20개 input/GT/actual model contact sheet를 직접 보았고 구조·배치·치수 실패를
+기록했다. known geometric host는 정답 1/맞힌 것 0이며 aggregate .95를 성공으로 쓰지 않는다.
+본학습 모델은 Space에 배포하지 않았다. 기존 tiny-v4 미리보기 모델은 유지했다.
+
+사후 CPU 대조에서 원래 5개 input/컴포넌트 target과 capacity 959/726이 같았다.
+tiny-v4와 full 구조 확장 직후는 모두 4/5·112/112, full 선택 모델은 0/5·0/112다.
+새 optimizer update/20개 접근 없이 initializer를 그대로 재실행한 진단이다.
+즉시 expansion corruption만으로 설명할 수 없지만 optimizer/assignment/감독/해상도 등의
+기여는 분리하지 않았다. 원 receipt의 visual_inspection_pending은 수정하지 않고
+`full-review-notes.json`에 후속 직접 검수를 기록했다. private `full-review.html`에
+원래 5개와 별도 20개 실패 결과를 모두 보존한다.
