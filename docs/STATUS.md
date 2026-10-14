@@ -1,5 +1,44 @@
 # 현재 상태 · 2026-10-14 KST
 
+## 현재 배포: 공유 노드 컴포넌트 5개 재현 실험 모델
+
+[EXP-046](experiments/2026-10-14-EXP-046-shared-decoder.md): tiny-v4의 GPU 재현은
+5/5 통과·구조 F1 0.999523·치수 112/112다. stable quality pass로 종료했다.
+CPU 실제 원본 입력 검사는 4/5·구조 F1 0.983548·치수 112/112이며 1개는
+geometry/component/shared-reference 기준 미달이다. 별도 CPU 20개는 0/20·치수 0/476이다.
+같은 체크포인트의 GPU/CPU 측정 조건을 구분하며 5개 암기 재현을 일반화로 소개하지 않는다.
+
+사용자가 오차 수용 후 모델 배포·Space 갱신을 명시 요청하여 **5개 재현 실험 모델**로
+private Space를 갱신했다. 실제 인증 업로드→vector SVG→native editable DXF 다운로드를
+검사했다. 예제 1개에서 INSERT 75/DIMENSION 19, mm, audit 0, raster 0이며 선택
+100mm 보정 전후의 치수값·공유 좌표 보존도 확인했다. 실제 다운로드 DXF의 ODA
+DWG→DXF 재열기는 통과했다. 실제 업무 CAD UI 수정·저장과 직접 DWG 서빙은 미실행이다.
+
+모델: `youjunhyeok/img2dwg-shared-components-v1`, SHA256
+`05a545dd74100f072e56b359fcfa1006eae39e104b076f15ad10df75d0694911`.
+Space revision `402d7958db12605f8346b682e64a51f0d1a5c395`, private CPU basic.
+학습된 feature/parameter 기반 예측이며 원본/정답 CAD retrieval이나 관측 선 fallback이 없다.
+
+1,028개 본학습: HF job `6acef50cc662881452234b24` **running**.
+16개 development로 checkpoint를 선택하고 별도 20개는 종료 후 한 번 평가한다.
+GPU 학습 상한 90분, job 전체 상한 150분이며 fit 판정이 아니다. 아직 본학습 성공을
+주장하지 않고, 실패 체크포인트로 Space를 자동 교체하지 않는다.
+
+## 구현 및 초기 실행 기록
+
+사용자 후속 승인에 따라 `structured.py`/`graph_decoder.py`/`graph_constraints.py`/
+`graph_evaluation.py`와 [새 하네스](harness/shared-graph-training.md)를 구현했다.
+native path 177개와 TEXT/MTEXT 196개를 첫 5개 정답에 추가 보존했고,
+독립 미분류 LINE은 2,542→1,379개다. 작은 native 부분은 train-only local
+prototype로 추가 보강한다. semantic wall/window/room의 완성된 라벨을 주장하지 않는다.
+
+5개 GT factory는 구조와 치수 112개를 보존했다. 실제 이미지에서 실행한 초기
+node pointer 모델은 연결·정밀도 미달로 중단하고 실패 자료를 보존했다.
+node 위치/참조 gradient 분리, 위치 기반 proposal, 숫자 parameter, FP32/joint-batch
+보강 버전 tiny-v4는 위의 stable five-pass로 종료했다. 별도 20개는
+체크포인트 선택에 사용하지 않았다. 초기 실패·취소 기록은 보존한다.
+private 새 비교 화면은 실제 모델 예측이며 GT factory와 구분한다.
+
 ## 실제 페어 5개 학습·20개 검증 진행
 
 [EXP-045](experiments/2026-10-14-EXP-045-real-pairs.md): v0.2의 실제 준공도면에서
@@ -10,7 +49,7 @@
 컴포넌트 출력이 구현되지 않았다는 사용자 지적을 확인한 뒤 canceled다. 8,000-step
 체크포인트와 마지막 로그를 보존했고 후속 실행의 20개 평가/모델 배포는 하지 않았다.
 25개 비교 화면은 첫 실제 모델의 실패 결과이며 정답으로 바꿔치기하지 않는다.
-20개 검증 결과로 학습/threshold/checkpoint를 선택하지 않는다. 같은 validation을
+20개 검증 결과로 학습/threshold/checkpoint를 선택하지 않는다.
 노출된 20개는 pilot validation이며 독립 최종 test라고 부르지 않는다. 취소된 후속
 실행에서 새로운 20개 평가 결과를 만든 것으로 기록하지 않는다.
 

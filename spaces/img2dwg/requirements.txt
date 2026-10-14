@@ -5,6 +5,7 @@ huggingface-hub==0.36.2
 gradio==5.49.1
 safetensors==0.6.2
 numpy==2.2.6
+scipy==1.15.3
 pillow==11.3.0
 ezdxf==1.4.4
 opencv-python-headless==4.11.0.86

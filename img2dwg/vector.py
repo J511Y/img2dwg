@@ -73,7 +73,10 @@ def svg(graph):
         else:
             out.append(f'<path d="M {p[0,0]:.4f} {p[0,1]:.4f} L {p[1,0]:.4f} {p[1,1]:.4f}"/>')
         out.append('</g>')
-    out.append('</g></svg>')
+    out.append('</g>')
+    for position,text in graph.get('texts',[]):
+        out.append(f'<text x="{position[0]:.4f}" y="{position[1]:.4f}" font-size="8" fill="#273449">{html.escape(str(text))}</text>')
+    out.append('</svg>')
     return ''.join(out)
 
 def write_dxf(graph, path):
@@ -89,7 +92,7 @@ def write_dxf(graph, path):
         doc.appids.new('IMG2DWG_COMPONENT')
         for assembly in graph.get('assemblies',[]):
             kind=assembly['kind']; params=assembly['parameters']
-            if kind not in ('swing_opening','rectangular_loop','wall_face_pair'): continue
+            if kind not in ('swing_opening','rectangular_loop','wall_face_pair','native_path','native_symbol'): continue
             pieces=[c for c in graph['components'] if c.get('component_id')==assembly['id']]
             if not pieces: continue
             if kind=='swing_opening':
@@ -98,10 +101,12 @@ def write_dxf(graph, path):
             elif kind=='rectangular_loop':
                 origin_mm=np.asarray(params['center_mm']); angle=-params['angle_degrees']
                 sx,sy=params['width_mm'],params['height_mm']
-            else:
+            elif kind=='wall_face_pair':
                 origin_mm=np.asarray(params['spine_origin_mm']); angle=-params['angle_degrees']
                 sx=max(max(x) for x in params['face_extents_mm'])-min(min(x) for x in params['face_extents_mm'])
                 sy=params['thickness_mm']
+            else:
+                origin_mm=np.asarray(params['origin_mm']); angle=0.; sx=sy=params.get('size_mm',1.)
             if min(sx,sy)<=1e-8: raise ValueError('Invalid component dimensions')
             origin=np.array([origin_mm[0]+graph['canvas'][0]*scale/2,height*scale/2-origin_mm[1]])
             radians=math.radians(angle); rotation=np.array([[math.cos(radians),-math.sin(radians)],
@@ -109,6 +114,7 @@ def write_dxf(graph, path):
             def local(q): return ((np.asarray(xy(q))-origin)@rotation)/[sx,sy]
             normalized=[]
             for piece in pieces:
+                if piece['kind']=='symbol':continue
                 normalized.append({'kind':piece['kind'],'points':[local(p).tolist() for p in piece['points']],
                                    'role':piece.get('role',0)})
             signature=hashlib.sha256(json.dumps({'kind':kind,'geometry':[
@@ -172,6 +178,8 @@ def write_dxf(graph, path):
             # A predicted envelope is explicitly unresolved, never a recovered fixture.
             a,b=xy(p[0]),xy(p[1]); ms.add_lwpolyline([a,(a[0],b[1]),b,(b[0],a[1])],close=True,dxfattribs=attrs)
         else: ms.add_line(xy(p[0]),xy(p[1]),dxfattribs=attrs)
+    for position, text in graph.get('texts', []):
+        ms.add_mtext(str(text),dxfattribs={'insert':xy(position),'char_height':max(scale*9,1.),'layer':ROLES[0]})
     doc.saveas(path)
     reopened=ezdxf.readfile(path); audit=reopened.audit()
     if audit.has_errors: raise ValueError('DXF audit failed')

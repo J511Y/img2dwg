@@ -18,6 +18,11 @@ def extract(path, bounds, size=768, min_length_pixels=2):
         p=np.asarray([pixel(q) for q in points]);
         if not np.isfinite(p).all() or (p<15).any() or (p>size-15).any(): return
         if np.linalg.norm((p[2] if kind=='arc' else p[1])-p[0])<min_length_pixels: return
+        if kind=='arc':
+            from img2dwg.vector import arc_parameters
+            if arc_parameters(p) is None:
+                skipped['degenerate-native-arc']=skipped.get('degenerate-native-arc',0)+1
+                return
         if kind=='segment' and tuple(p[0])>tuple(p[1]): p=p[[1,0,2]]
         components.append({'kind':kind,'points':p.tolist(),'role':role(e.dxf.layer),
             'source_id':e.dxf.get('handle','virtual'),'parent':parent,'confidence':1.,
@@ -71,6 +76,10 @@ def extract(path, bounds, size=768, min_length_pixels=2):
     unique=[]; seen=set()
     for c in components:
         sig=(c['kind'],tuple(np.round(np.asarray(c['points']).ravel(),3)))
+        if c['kind']=='dimension':
+            # Native annotations may share geometry but have distinct styles
+            # or instances. Geometry dedup must never discard required DIMs.
+            sig+=(c['source_id'],c['dimension_kind'],c['measurement_mm'],c['angle_cad'])
         if sig not in seen: seen.add(sig); unique.append(c)
     return {'schema':'img2dwg-vector/v1','canvas':[size,size],'scale':1/factor,'units':'mm',
             'components':unique,'texts':texts,'source_counts':counts,'skipped_types':skipped,

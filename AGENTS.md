@@ -2,6 +2,15 @@
 
 ## 2026-10-14 실행 권한
 
+**최신 실행 정본:** `docs/experiments/2026-10-14-EXP-046-shared-decoder.md`와
+`docs/harness/shared-graph-training.md`. shared node/component decoder를 실제 구현·학습했다.
+사용자가 비교 화면의 오차를 수용하고 모델 배포·Space 갱신을 명시 요청하여 **5개 재현
+실험 모델**의 private 배포를 승인했다. 이는 이전의 20개 전체 pass gate에 대한 실험
+미리보기 예외이며, 검증 성공으로 재작성하지 않는다. GPU 5/5·112/112 치수, CPU 4/5·
+112/112 치수, 별도 CPU 20개 0/20·0/476이다. 1,028개 본학습은 새 bounded job이며
+완료 상태는 STATUS/실제 receipt로 확인한다. 미통과 본학습 모델을 자동 교체하지 않는다.
+`deploy_shared_space.py`가 최신 deployer이고 관측 선 기준선 deployer는 폐기했다.
+
 사용자가 실제 준공도면–CAD 페어의 5개 재현 학습, 별도 20개 검증, 비교 화면과
 검증된 모델의 Space 재배포를 명시적으로 요청했다. EXP-045와
 `docs/harness/raw-pair-training.md`를 따른다. 실패한 모델은 재배포하지 않는다.

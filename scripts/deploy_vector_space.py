@@ -14,6 +14,7 @@ from huggingface_hub import HfApi
 
 
 def main():
+    raise RuntimeError('Historical baseline deployer retired. Use deploy_shared_space.py for the current app.')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--space', default='youjunhyeok/img2dwg')
     parser.add_argument('--output', type=Path, default=Path('outputs/vector-recovery-2026-10-13/deployment.json'))

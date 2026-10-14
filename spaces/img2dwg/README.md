@@ -1,5 +1,5 @@
 ---
-title: img2dwg Vector Preview
+title: img2dwg Shared Component Pilot
 emoji: 📐
 colorFrom: blue
 colorTo: green
@@ -10,7 +10,33 @@ app_file: app.py
 pinned: false
 ---
 
-## Current state: coordinate model rejected
+## Current state: user-authorized shared-component pilot
+
+The default app now runs the real-image shared-node / typed component decoder.
+This checkpoint was trained on **five real source-image/CAD pairs**, not on the
+full 1,028-case training split. It is a reproduction pilot. New-image structure,
+dimension completeness and generalization failed the separate 20-case pilot
+(0/20, 0/476 required dimensions correct) for this five-case checkpoint.
+GPU five-case reproduction passed 5/5 with 112/112 required dimensions; CPU
+serving reproduction passed 4/5 under the strict geometry/component threshold,
+with 112/112 required dimensions. These are separate protocols/runtimes.
+Latest user visual
+acceptance and explicit deployment request authorize this experimental release;
+they do not establish the original quality gate as passed.
+
+Upload a source drawing, inspect zoomable raster-free SVG, and download editable
+DXF with actual BLOCK/INSERT, DIMENSION and text components. Optional 100mm edits
+affect long wall spans / rectangle sizes; numeric dimensions, wall thickness,
+door sizes and shared node coordinates are preserved. Check dimension-to-geometry
+consistency after editing. The unedited raw vectors and receipt remain available.
+
+The private model revision and checkpoint SHA256 are pinned in Space variables.
+The app has no mounted source dataset, source CAD, target lookup, image retrieval
+or observed-line fallback. The pretrained backbone is loaded at a pinned revision.
+Direct native DWG download and complete business wall/window/room semantics are
+not implemented. DXF can be opened in CAD and saved as DWG.
+
+## Historical state: coordinate model rejected
 
 The first learned coordinate model failed on real scans, including the user's
 provided case. It is removed from the default output. The app temporarily displays

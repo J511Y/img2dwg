@@ -42,3 +42,17 @@
   loss/합성 F1로 서비스 복원 품질을 대신하지 않는다. 실제 raw input–canonical output을
   배우는 component/parameter/관계 경로를 우선하고, 실제 구조 및 필수 치수 검증 receipt
   없이 학습 모델을 다시 기본 배포하지 않는다. 관측 선 기준선과 학습 모델의 출처를 구분한다.
+
+- ADR-024 · 공유 노드·컴포넌트 set decoder와 learned reference/host/axis 관계를 실제 구현한다.
+  GT factory와 모델을 구분하고 source handle/고정 LINE 순서를 query identity로 감독하지 않는다.
+  필요한 모든 치수의 숫자·측정점·실제 길이를 검사하며 geometry confidence로 실패를 덮지 않는다.
+  학습 판정은 실제 구조·치수 지표의 stable pass/plateau다. 시간 상한은 비용 제약이다.
+  본학습/development/별도 20개를 분리하며 통과 모델만 private Space에 올린다.
+
+- ADR-025 · 2026-10-14 · 사용자의 현재 시각 수용 및 명시 배포 요청에 따라 5개 재현
+  실험 checkpoint를 private Space에서 미리 제공한다. 원래 production quality gate를
+  성공으로 바꾸지 않으며 별도 20개 실패와 CPU/GPU 차이를 공개한다. 본학습의 미통과
+  checkpoint를 자동 배포하지 않는다. 실제 인증 upload/download와 checkpoint/revision을 검증한다.
+- ADR-026 · 100mm 보정은 사용자가 선택하는 편집이다. 1m 이상 벽 face span/사각 폭·높이만
+  보정하고 치수 숫자, shared node 좌표, 벽 두께, 문 크기는 유지한다. 독립 절대좌표
+  rounding으로 두꺼운 벽을 하나의 선으로 붕괴시키지 않는다. dimension-host 일치는 별도 검수다.

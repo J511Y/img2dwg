@@ -1,7 +1,23 @@
 {
   "schema": "img2dwg-component-decoder-plan/v1",
   "date_kst": "2026-10-14",
-  "status": "partial-GT-parameter-factory-verified;new-model-not-implemented-or-trained",
+  "status": "shared-decoder-implemented;five-GPU-passed;twenty-CPU-failed;authorized-pilot-deployed;full-running",
+  "current_experiment": {
+    "id": "EXP-046",
+    "model_sha256": "05a545dd74100f072e56b359fcfa1006eae39e104b076f15ad10df75d0694911",
+    "GPU_five_passed": 5,
+    "CPU_five_passed": 4,
+    "five_required_dimensions": 112,
+    "five_correct_dimensions_GPU_and_CPU": 112,
+    "CPU_twenty_passed": 0,
+    "CPU_twenty_correct_dimensions": 0,
+    "CPU_twenty_required_dimensions": 476,
+    "full_job_id": "6acef50cc662881452234b24",
+    "full_training_cap_minutes": 90,
+    "full_job_cap_minutes": 150,
+    "space_deployment_role": "explicit-user-authorized-five-case-pilot;not-production-quality-pass",
+    "space_revision": "402d7958db12605f8346b682e64a51f0d1a5c395"
+  },
   "rejected_approach": "fixed-canonical-query independent primitive coordinate regression",
   "first_step_count_interpretation": "12000 was an author-selected ceiling, not empirically justified convergence",
   "completed_experiment": {
