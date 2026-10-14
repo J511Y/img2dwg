@@ -7,7 +7,7 @@
   ],
   "review_status": "existing-experiments-reviewed;no-new-training",
   "complete_DWG_product_passed": false,
-  "metric_protocol": "shared-component-set/v2;raw_evaluation;10mm geometry;1mm dimension number/anchors/length",
+  "metric_protocol": "shared-component-set/v2;raw_evaluation;10mm geometry and dimension anchor/layout matching;1mm dimension numeric value, physical length and value-length residual",
   "input_protocol": "actual as-built;EXIF+512 letterbox;seed20261014;threshold0.5;frozen DINOv3@5931719e67bbdb9737e363e781fb0c67687896bc",
   "full": {
     "job_id": "6acef50cc662881452234b24",

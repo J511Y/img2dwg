@@ -326,7 +326,8 @@ tiny-v4 checkpoint를 쓰며 새 full-v1은 올라가지 않았다.
 ## 11. 재현 근거와 보관
 
 평가: `img2dwg/graph_evaluation.py`의 shared-component-set/v2 및
-`raw_evaluation.py`. geometry 10mm, DIM 값·측정점·길이 1mm, structure >=.90,
+`raw_evaluation.py`. geometry 및 치수 측정점·배치 위치 matching은 10mm,
+DIM 숫자·실제 길이·숫자와 길이의 잔차는 1mm, structure >=.90,
 component/reference >=.95, 필수 치수 완전성, 참조·제약·native DXF 검사.
 EXIF+512 letterbox, seed 20261014, threshold .5, frozen backbone revision
 `5931719e67bbdb9737e363e781fb0c67687896bc`. GPU/CPU 조건은 위 표에서 분리했다.
@@ -346,6 +347,9 @@ contact sheet와 실제 비교 화면 capture를 보관한다. 원본·고객 �
 공개 Git에 넣지 않는다. 원 receipt의 `visual_inspection_pending:true`는 당시 상태로
 보존하고 이후 직접 검수는 별도 receipt에 기록한다. Codex의 직접 시각 검사이며
 직원의 승인으로 소개하지 않는다.
+
+지표 설명 정정: 초기 회고 문구에서 치수 측정점까지 1mm라고 쓴 것은 잘못됐다.
+실제 실행 코드는 위의 위치 10mm/치수 값·길이 1mm 기준이며 결과 숫자는 변경하지 않았다.
 
 본 리뷰 집계는 [비식별 근거 색인](assets/2026-10-14-retrospective-summary.json)에
 원자료 hash와 함께 저장한다. 연구노트는 새 private companion에 Markdown, 실행된

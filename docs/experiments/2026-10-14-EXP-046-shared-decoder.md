@@ -25,7 +25,7 @@ reference/axis/host/dimension numeric heads를 사용한다. known host 분모�
 
 private v0.2 실제 이미지/변경전 CAD, seed 20261014, EXIF+512 letterbox, threshold .5.
 DINOv3 ViT-B/16 frozen @ `5931719e67bbdb9737e363e781fb0c67687896bc`.
-geometry 10mm, DIM 숫자/측정점/실제 길이 1mm, structure >=.90,
+geometry 및 DIM 측정점·배치 위치 matching 10mm, DIM 숫자/실제 길이/잔차 1mm, structure >=.90,
 component/shared-reference >=.95. 실제 그래프 compile/DXF audit를 매 검사에 포함한다.
 같은 시작점을 공유하는 다른 엔티티를 first point만으로 matching하던 평가 오류는
 모든 required refs matching으로 수정했다. 이전 metric v1 결과는 보존하며 v2 재평가를 별도로 기록한다.
