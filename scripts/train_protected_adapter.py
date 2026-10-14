@@ -120,7 +120,8 @@ def main():
                 for row in rows:
                     before=reference(bank[row['sample_id']]);after=model(bank[row['sample_id']])
                     for key in before:
-                        if not torch.equal(before[key],after[key]):raise ValueError('Neutral nonlinear migration altered '+key)
+                        if not torch.equal(before[key].contiguous().view(torch.uint8),after[key].contiguous().view(torch.uint8)):
+                            raise ValueError('Neutral nonlinear migration altered '+key)
                         checked_fields+=1
             del reference,before,after
             write(a.output/v['name']/'neutral-initialization.json',{'status':'passed','actual_inputs':10,
