@@ -89,7 +89,8 @@ def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=Fal
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--data',type=Path,required=True);parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--device',default='cuda');parser.add_argument('--suite-minutes',type=float,default=65)
-    parser.add_argument('--trial-minutes',type=float,default=4);parser.add_argument('--preflight-only',action='store_true');a=parser.parse_args()
+    parser.add_argument('--trial-minutes',type=float,default=4);parser.add_argument('--preflight-only',action='store_true')
+    parser.add_argument('--comparison-plan',type=Path);a=parser.parse_args()
     torch.set_num_threads(6);torch.manual_seed(20261014);torch.backends.cuda.matmul.allow_tf32=False
     if a.device=='cuda' and not torch.cuda.is_available():raise RuntimeError('GPU is required for matched training comparisons')
     rows=json.loads((a.data/'index.json').read_text());c=json.loads((a.data/'config.json').read_text())
@@ -113,15 +114,24 @@ def main():
         raise ValueError('Original reproduction preflight changed; refuse learning before investigation')
     if a.preflight_only:
         write(a.output/'preflight.json',{'status':'passed','initial':initial_eval['groups'],'training_executed':False});return
+    comparisons=json.loads(a.comparison_plan.read_text()) if a.comparison_plan else variants()
+    if not comparisons or len(comparisons)>16:raise ValueError('Bounded comparison plan required')
+    fields=set(variants()[0])
+    for v in comparisons:
+        if set(v)!=fields or v['cohort'] not in ('five','mixed') or v['batch'] not in ('joint','online','accumulate') or v['capacity'] not in ('fixed','variable'):
+            raise ValueError('Unsupported intervention')
+        if v['precision_digits'] not in (None,[6,5],(6,5)) or not 0<v['lr']<=.0001:
+            raise ValueError('Numeric precision/rate outside diagnostic bounds')
+        if v['batch']=='joint' and v['capacity']=='variable':raise ValueError('Use accumulation for variable capacities')
     manifest={'schema':'img2dwg-retention-ablation/v1','cases':10,'original_ids':[r['sample_id'] for r in rows if r['cohort']=='original'],
         'additional_ids':[r['sample_id'] for r in rows if r['cohort']=='additional'],'initializer_sha256':prep['expanded_initializer_sha256'],
         'source_checkpoint_sha256':prep['source_checkpoint']['source_sha256'],'feature_protocol':prep['feature_input'],
-        'protocol':PROTOCOL,'comparisons':variants(),'diagnostic_exposure_doses':DOSES,
+        'protocol':PROTOCOL,'comparisons':comparisons,'diagnostic_exposure_doses':DOSES,
         'dose_is_not_fit_or_convergence':True,'new_optimizer_each_variant':True,'optimizer':'Adam',
         'global_gradient_clip_norm':5,'suite_cap_minutes':a.suite_minutes,'trial_cap_minutes':a.trial_minutes,
         'full_training_or_deployment_allowed':False,'twenty_used':False}
     write(a.output/'manifest.json',manifest);completed=[]
-    for variant in variants():
+    for variant in comparisons:
         if time.monotonic()-started>a.suite_minutes*60:break
         folder=a.output/variant['name'];folder.mkdir(parents=True,exist_ok=True)
         model.load_state_dict(initial);optimizer=torch.optim.Adam(model.parameters(),lr=variant['lr'])
@@ -170,8 +180,8 @@ def main():
         write(folder/'receipt.json',receipt);completed.append(receipt)
         print(json.dumps({'completed':variant['name'],'fixed':final['groups'],'inferred':inferred['groups'],'seconds':receipt['elapsed_seconds']}),flush=True)
         write(a.output/'progress.json',{'completed':[r['variant']['name'] for r in completed],'elapsed_seconds':time.monotonic()-started})
-    write(a.output/'receipt.json',{'status':'completed' if len(completed)==len(variants()) else 'partial-resource-cap',
-          'variants_planned':len(variants()),'variants_completed':len(completed),'conditions':completed,
+    write(a.output/'receipt.json',{'status':'completed' if len(completed)==len(comparisons) else 'partial-resource-cap',
+          'variants_planned':len(comparisons),'variants_completed':len(completed),'conditions':completed,
           'elapsed_seconds':time.monotonic()-started,'training_cases':10,'twenty_used':False,
           'full_training_executed':False,'Space_deployed':False})
 if __name__=='__main__':main()

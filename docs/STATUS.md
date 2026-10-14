@@ -5,9 +5,14 @@
 사용자 후속 요청으로 [EXP-047](experiments/2026-10-14-EXP-047-retention-ablation.md)을
 구현했다. 원래5+train 추가5, batch/capacity/count/loss와 LR/assignment 단일 요인이다.
 CPU 시작 검사 4/5·112/112로 기존 결과를 재현했고 관련18개 검사가 통과했다.
-bounded GPU 비교는 planned다. 1,028개 재학습·Space 재배포와 validation20 사용은 금지한다.
+bounded GPU 비교16개와 LR 확인4개가 모두 completed다. 20개 조건은 같은10개의
+train 사례만 사용했다. 원래5 단독 Adam1e-6은 두 노출 순서 모두5/5·112/112,
+혼합10개는 원래60/112·62/112로 악화하고 추가0/140이다.
+첫 update의 물리 좌표 불안정과 지배적인 node loss gradient를 확인했지만 혼합 유지/재현은
+미해결이다. 310개 최종 DXF의 실제 audit/단위/DIM count와20개 checkpoint SHA를 대조했다.
+1,028개 재학습·Space 재배포와 validation20 사용은 하지 않았다. 다음에도 금지 상태를 유지한다.
 
-## 최신 판정: 본학습 완료·품질 실패, 실험 회고
+## 앞선 본학습 판정: 완료·품질 실패, 실험 회고
 
 사용자 요청으로 새 방법 선정·추가 실험·재배포를 중단하고
 [상세 리뷰](research/2026-10-14-experiment-retrospective.md)를 작성했다.
@@ -28,7 +33,8 @@ native DIMENSION 804개, DXF audit error 0이지만 정확한 도면은 아니�
 완료된 CPU 초기화 대조: 원래 5개 input/컴포넌트 target 불변, 동일 capacity에서
 tiny 원본과 full 확장 직후 모두 4/5·112/112였고 full 학습 후 0/5·0/112다.
 확장 즉시의 복사 오류만으로 설명되지 않으며 학습 중 악화가 관측됐다.
-optimizer/assignment/감독/이미지 조건 등의 개별 실패 원인은 아직 분리하지 못했다.
+이 회고 시점에는 개별 원인이 미분리였다. 위 EXP-047이 최초 update 민감도를 좁혔으며,
+전체 본학습 실패를 모두 설명하는 단일 원인 규명은 아직 아니다.
 모델/데이터 크기만으로 해결된다고 결론 내리지 않는다.
 
 ## 현재 배포: 공유 노드 컴포넌트 5개 재현 실험 모델

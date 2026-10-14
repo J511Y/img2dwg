@@ -39,9 +39,9 @@ class RetentionAblationTests(unittest.TestCase):
         p=m(torch.randn(1,4,768));t=[self.target()]
         base,terms,matches=loss(p,t)
         zero,_,_=loss(p,t,matches,term_weights={'count':0})
-        self.assertAlmostEqual(float(base-zero),terms['count'],places=4)
+        self.assertAlmostEqual(float((base-zero).detach()),terms['count'],places=4)
         same,_,_=loss(p,t,matches,term_weights={'count':1})
-        self.assertEqual(float(base),float(same))
+        self.assertEqual(float(base.detach()),float(same.detach()))
         zero.backward()
         for par in m.count.parameters():self.assertEqual(float(par.grad.abs().max()),0.)
         self.assertGreater(float(m.node_xy.weight.grad.abs().sum()),0.)

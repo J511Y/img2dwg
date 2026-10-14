@@ -7,6 +7,10 @@ EXP-047-retention-ablation.md를 따른다. 원래5+train 추가5,
 batch/capacity/count/loss 단일 요인과 관측된 LR/assignment 차이를 bounded GPU job으로
 비교한다. **원인 확인 전 1,028개 재학습·Space 재배포 금지**다. validation20을 튜닝에 쓰지 않는다.
 아래 회고 중단 상태는 이번 명시 요청의 작은 진단 범위에서만 대체된다.
+EXP-047의 bounded 20조건 진단은 완료됐다. 원래5 첫 update 실패는 unexpanded에서도
+재현됐고 Adam1e-6 원래5 단독은5/5·112/112로 유지됐지만 혼합10개는 실패했다.
+다음 혼합 재현 통과 전 본학습/재배포를 재개하지 않는다. 32회 노출을 수렴 판정으로
+쓰지 않으며 새 후속 GPU 실험은 이번 완료 상태에 자동 승계하지 않는다.
 
 **직전 요청은 실험 회고였다.** 새 방법 선정·추가 GPU/API 실험·재배포를 중단하고
 `docs/research/2026-10-14-experiment-retrospective.md`를 먼저 읽는다. full-v1은 실행

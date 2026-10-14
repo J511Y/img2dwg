@@ -1,36 +1,7 @@
 {
   "schema": "img2dwg-component-decoder-plan/v1",
   "date_kst": "2026-10-14",
-  "status": "shared-decoder-implemented;five-pilot-deployed;full-completed-quality-failed;retrospective-only",
-  "current_experiment": {
-    "id": "EXP-046",
-    "model_sha256": "05a545dd74100f072e56b359fcfa1006eae39e104b076f15ad10df75d0694911",
-    "GPU_five_passed": 5,
-    "CPU_five_passed": 4,
-    "five_required_dimensions": 112,
-    "five_correct_dimensions_GPU_and_CPU": 112,
-    "CPU_twenty_passed": 0,
-    "CPU_twenty_correct_dimensions": 0,
-    "CPU_twenty_required_dimensions": 476,
-    "full_job_id": "6acef50cc662881452234b24",
-    "full_training_cap_minutes": 90,
-    "full_job_cap_minutes": 150,
-    "space_deployment_role": "explicit-user-authorized-five-case-pilot;not-production-quality-pass",
-    "space_revision": "402d7958db12605f8346b682e64a51f0d1a5c395",
-    "full_execution_status": "completed",
-    "full_quality_status": "failed",
-    "full_stopping_reason": "quality-plateau",
-    "full_model_sha256": "52cdda59bb3023c7c71f8d9774dcfb59fb28a0a13ee31d0c75e5d3d82ca86138",
-    "full_updates": 28157,
-    "full_epochs_entered": 28,
-    "full_trainer_elapsed_seconds": 4323.438516877941,
-    "full_GPU_five_passed": 0,
-    "full_GPU_five_correct_dimensions": 0,
-    "full_GPU_twenty_passed": 0,
-    "full_GPU_twenty_correct_dimensions": 0,
-    "full_visual_inspection_complete": true,
-    "full_space_replaced": false
-  },
+  "status": "retention-diagnostics-completed;five-only-retained;mixed-ten-failed;full-and-deployment-on-hold",
   "rejected_approach": "fixed-canonical-query independent primitive coordinate regression",
   "first_step_count_interpretation": "12000 was an author-selected ceiling, not empirically justified convergence",
   "completed_experiment": {
@@ -68,11 +39,9 @@
     "dimension-node-and-numeric-constraints"
   ],
   "next_training_order": [
-    "complete required component catalog and GT factory checks",
-    "new decoder five-pair geometry-and-dimension reproduction",
-    "real train-pair full learning",
-    "separate twenty-case pilot validation",
-    "only a verified candidate can be deployed"
+    "confirm old retention and new reproduction jointly on the small mixed dataset",
+    "only after a new decision: full training and independent validation",
+    "deploy only a verified candidate"
   ],
   "checkpoint_interpretation": "fixed-interval actual structure/dimension checks and plateau diagnosis; training loss alone cannot establish fit",
   "forbidden_substitutions": [
@@ -81,7 +50,58 @@
     "primitive-step-extension-as-component-decoder",
     "file-audit-as-geometry-success"
   ],
-  "current_user_scope": "experiment-review;no-new-training-or-method-selection-or-redeployment",
+  "current_user_scope": "completed-small-train-only-causal-diagnostics;no-full-retraining-or-Space-redeployment",
   "review_document": "docs/research/2026-10-14-experiment-retrospective.md",
-  "next_outputs_status": "previous-design-record;not-a-new-execution-request"
+  "next_outputs_status": "previous-design-record;not-a-new-execution-request",
+  "prior_experiment": {
+    "id": "EXP-046",
+    "model_sha256": "05a545dd74100f072e56b359fcfa1006eae39e104b076f15ad10df75d0694911",
+    "GPU_five_passed": 5,
+    "CPU_five_passed": 4,
+    "five_required_dimensions": 112,
+    "five_correct_dimensions_GPU_and_CPU": 112,
+    "CPU_twenty_passed": 0,
+    "CPU_twenty_correct_dimensions": 0,
+    "CPU_twenty_required_dimensions": 476,
+    "full_job_id": "6acef50cc662881452234b24",
+    "full_training_cap_minutes": 90,
+    "full_job_cap_minutes": 150,
+    "space_deployment_role": "explicit-user-authorized-five-case-pilot;not-production-quality-pass",
+    "space_revision": "402d7958db12605f8346b682e64a51f0d1a5c395",
+    "full_execution_status": "completed",
+    "full_quality_status": "failed",
+    "full_stopping_reason": "quality-plateau",
+    "full_model_sha256": "52cdda59bb3023c7c71f8d9774dcfb59fb28a0a13ee31d0c75e5d3d82ca86138",
+    "full_updates": 28157,
+    "full_epochs_entered": 28,
+    "full_trainer_elapsed_seconds": 4323.438516877941,
+    "full_GPU_five_passed": 0,
+    "full_GPU_five_correct_dimensions": 0,
+    "full_GPU_twenty_passed": 0,
+    "full_GPU_twenty_correct_dimensions": 0,
+    "full_visual_inspection_complete": true,
+    "full_space_replaced": false
+  },
+  "current_experiment": {
+    "id": "EXP-047",
+    "status": "completed-diagnostic;not-convergence",
+    "actual_train_pairs": 10,
+    "validation_pairs_used": 0,
+    "conditions_completed": 20,
+    "matched_exposure_dose": 32,
+    "initializer_sha256": "6832b79afda3470ae49c4b80f56287fdec2ebb5f853e90e779b55ea6216aa57e",
+    "original_five_safe_lr_passed": 5,
+    "original_five_safe_lr_correct_dimensions": 112,
+    "mixed_safe_lr_original_correct_dimensions": 60,
+    "mixed_safe_lr_additional_correct_dimensions": 0,
+    "mixed_safe_lr_required_dimensions_original": 112,
+    "mixed_safe_lr_required_dimensions_additional": 140,
+    "GPU_jobs": [
+      "6acf22715ccb47ba0f792733",
+      "6acf28bf5ccb47ba0f7937b5"
+    ],
+    "full_retrained": false,
+    "Space_redeployed": false
+  },
+  "diagnostic_document": "docs/experiments/2026-10-14-EXP-047-retention-ablation.md"
 }

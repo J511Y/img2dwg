@@ -1,0 +1,1590 @@
+{
+  "schema": "img2dwg-retention-ablation-summary/v1",
+  "date_kst": "2026-10-14",
+  "training_cases": 10,
+  "original_cases": 5,
+  "additional_cases": 5,
+  "required_dimensions_original": 112,
+  "required_dimensions_additional": 140,
+  "conditions": [
+    {
+      "name": "five-joint",
+      "intervention": {
+        "batch": "joint",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "five-joint",
+        "cohort": "five"
+      },
+      "dose": 32,
+      "updates": 32,
+      "exposures": 160,
+      "model_sha256": "88b15f41f4e8c73b009977bbd6c95a398e84e45f5d6ae7d0fe38af154fd8c1fa",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.32212684787792084,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 22,
+          "dimensions_missing_or_incorrect": 90,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.231992893677686,
+          "shared_reference_f1": 0.14199934649766682
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.32212684787792084,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 22,
+          "dimensions_missing_or_incorrect": 90,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.231992893677686,
+          "shared_reference_f1": 0.14199934649766682
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "five-online",
+      "intervention": {
+        "batch": "online",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "five-online",
+        "cohort": "five"
+      },
+      "dose": 32,
+      "updates": 160,
+      "exposures": 160,
+      "model_sha256": "6e3e0560191ca2ceb11f5a64cac1cae058b15c3cdca0fcd91f12bb2a73d3dd9f",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.008106819265617548,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.002866753671894688,
+          "shared_reference_f1": 0.001183431952662722
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.008106819265617548,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.002866753671894688,
+          "shared_reference_f1": 0.001183431952662722
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "five-accumulate",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "five-accumulate",
+        "cohort": "five"
+      },
+      "dose": 32,
+      "updates": 32,
+      "exposures": 160,
+      "model_sha256": "8177949cd86a60df8aa69549c9cf89ee2a1f1a60ad33b5d9406f0c7f28d4c7a5",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.3152122079160706,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 16,
+          "dimensions_missing_or_incorrect": 96,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.22719522583827367,
+          "shared_reference_f1": 0.14005240280592401
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.3152122079160706,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 16,
+          "dimensions_missing_or_incorrect": 96,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.22719522583827367,
+          "shared_reference_f1": 0.14005240280592401
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "five-legacy-digit-loss",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": [
+          6,
+          5
+        ],
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "five-legacy-digit-loss",
+        "cohort": "five"
+      },
+      "dose": 32,
+      "updates": 32,
+      "exposures": 160,
+      "model_sha256": "8effd403e53321651f126b037603388f2bb574256bc4e406f9063775e34a006d",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.34954697186456846,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 25,
+          "dimensions_missing_or_incorrect": 87,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.26231098621895754,
+          "shared_reference_f1": 0.19602195863728958
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.34954697186456846,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 25,
+          "dimensions_missing_or_incorrect": 87,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.26231098621895754,
+          "shared_reference_f1": 0.19602195863728958
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "five-lower-lr",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 3e-05,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "five-lower-lr",
+        "cohort": "five"
+      },
+      "dose": 32,
+      "updates": 32,
+      "exposures": 160,
+      "model_sha256": "2ce40de10108e30c4b67f03c35c7c317bdf5fe54a6321a7cd1d7328abe62bca5",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 4,
+          "structure_f1": 0.9914163090128756,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 111,
+          "dimensions_missing_or_incorrect": 1,
+          "geometry_candidate_cases": 4,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9914024444270316,
+          "shared_reference_f1": 0.9976768085219344
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 4,
+          "structure_f1": 0.9892729439809297,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 111,
+          "dimensions_missing_or_incorrect": 1,
+          "geometry_candidate_cases": 4,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9895426085533521,
+          "shared_reference_f1": 0.9949805372821612
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-joint",
+      "intervention": {
+        "batch": "joint",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "mixed-joint",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "19317680d3a4345138f13e500cb05e974714b74c5cb3461ec15b9ed403fa623c",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.001162385214460072,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0002969561989606533,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0001433794537242813,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.001145475372279496,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.00029048656499636893,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00015356265356265356,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 4,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-online",
+      "intervention": {
+        "batch": "online",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "mixed-online",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 320,
+      "exposures": 320,
+      "model_sha256": "2bc6496b0ba99240a06acd87326316c83e57c43957d6b17bea68aa2651fad6d5",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0007099751508697196,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.000299625468164794,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0007044734061289186,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.00029850746268656717,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-accumulate",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "mixed-accumulate",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "596efa232bc783929777c80dbf3a612db624f0db26ce1b61192930cefed20098",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 4,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-variable-capacity",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "variable",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "mixed-variable-capacity",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "afb63949bb4a584ec573b5f948506df3f34338023054a87f22c34233e811e93e",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.002705444707473791,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0016262826658334662,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0028722934158197082,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0016185378836188352,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 4,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-count-loss-off",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "variable",
+        "loss_weights": {
+          "count": 0
+        },
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "mixed-count-loss-off",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "10bf5cf3d59b08b207194720f1fb0bcfee377d356c0252fb10cda0d1f61f8b44",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00022642363862787276,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00022642363862787276,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 5,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-legacy-digit-loss",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "variable",
+        "loss_weights": {},
+        "precision_digits": [
+          6,
+          5
+        ],
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "mixed-legacy-digit-loss",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "8c7a2a5ebe578b72fe55f4bed97f9fd70f315e0df77750e1d5d328e99a991d0e",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.000678119349005425,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.00029239766081871346,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00044340982152754686,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 4,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-template-loss-off",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "variable",
+        "loss_weights": {
+          "template": 0
+        },
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "mixed-template-loss-off",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "c9832214459fa96a253f680b52f07140b3cfbc75a56b1863d87b7ae74726e931",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.000905592030790129,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0008883953359244864,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 4,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-lower-lr",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "variable",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 3e-05,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "mixed-lower-lr",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "b31c4c135ef65d8f32b40b0cea27923207818289e65f6120144164ccc29ec876",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0020329794443189517,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0008253041362530413,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0019514310494362533,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0008059986366734833,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 4,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-refresh-assignment",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "variable",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 1,
+        "order_seed": 20261014,
+        "name": "mixed-refresh-assignment",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "02a166a22877d2676aa0a08e809ed49b688e8f58dd5057590b7d35f8d80c29f7",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0011328877308258753,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.00029239766081871346,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0011148272017837235,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0002851033499643621,
+          "shared_reference_f1": 0.0
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 4,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "five-online-order2",
+      "intervention": {
+        "batch": "online",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261015,
+        "name": "five-online-order2",
+        "cohort": "five"
+      },
+      "dose": 32,
+      "updates": 160,
+      "exposures": 160,
+      "model_sha256": "dd86732acf633032e1f9c5f9309f04a1ff54b6c5412b9e625d3e6c966277c1c5",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00976888253514415,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0035547071369952483,
+          "shared_reference_f1": 0.001183431952662722
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00976888253514415,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0035547071369952483,
+          "shared_reference_f1": 0.001183431952662722
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "five-accumulate-order2",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 0.0001,
+        "refresh_every": 20,
+        "order_seed": 20261015,
+        "name": "five-accumulate-order2",
+        "cohort": "five"
+      },
+      "dose": 32,
+      "updates": 32,
+      "exposures": 160,
+      "model_sha256": "56a8fce99f7b28d1b0673be8c2e9b4ac2fe0f5d73324af7febe77dc7419f1d48",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.2956604673342871,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 17,
+          "dimensions_missing_or_incorrect": 95,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.2154351901187123,
+          "shared_reference_f1": 0.14889831457683927
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.2956604673342871,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 17,
+          "dimensions_missing_or_incorrect": 95,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.2154351901187123,
+          "shared_reference_f1": 0.14889831457683927
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "five-safe-lr",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 1e-06,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "five-safe-lr",
+        "cohort": "five"
+      },
+      "dose": 32,
+      "updates": 32,
+      "exposures": 160,
+      "model_sha256": "ccb4e637837280d547201a8c2a48a6957529edeb18102a33d808f2ea70e39b96",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9992846924177397,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9990031130438914,
+          "shared_reference_f1": 0.9996431608684742
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9992846924177397,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9990031130438914,
+          "shared_reference_f1": 0.9996431608684742
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "five-safe-lr-order2",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "fixed",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 1e-06,
+        "refresh_every": 20,
+        "order_seed": 20261015,
+        "name": "five-safe-lr-order2",
+        "cohort": "five"
+      },
+      "dose": 32,
+      "updates": 32,
+      "exposures": 160,
+      "model_sha256": "362dfef5bff66d8a05aab0c6db969c7c7b4f0935582bd66c4cfe7c28c22b2f7e",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9992846924177397,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9990031130438914,
+          "shared_reference_f1": 0.9996431608684742
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9992846924177397,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9990031130438914,
+          "shared_reference_f1": 0.9996431608684742
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-safe-lr",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "variable",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 1e-06,
+        "refresh_every": 20,
+        "order_seed": 20261014,
+        "name": "mixed-safe-lr",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "dbef04521db5bf81c7cd5c02efe376a18649d1570656d9e66524acf8cf02ee30",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.3917501192179304,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 60,
+          "dimensions_missing_or_incorrect": 52,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.4127746511569745,
+          "shared_reference_f1": 0.4811704111565218
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00015554518587649713,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.36921999065857075,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 57,
+          "dimensions_missing_or_incorrect": 55,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.4027601470468526,
+          "shared_reference_f1": 0.46445901470794554
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 5,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    },
+    {
+      "name": "mixed-safe-lr-order2",
+      "intervention": {
+        "batch": "accumulate",
+        "capacity": "variable",
+        "loss_weights": {},
+        "precision_digits": null,
+        "lr": 1e-06,
+        "refresh_every": 20,
+        "order_seed": 20261015,
+        "name": "mixed-safe-lr-order2",
+        "cohort": "mixed"
+      },
+      "dose": 32,
+      "updates": 64,
+      "exposures": 320,
+      "model_sha256": "983c5e899613d0f7155d479d8ca7708421eaf846dcc4c0034db7ee8b071cf8c7",
+      "fixed": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.38960419647114924,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 62,
+          "dimensions_missing_or_incorrect": 50,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.4065357235053533,
+          "shared_reference_f1": 0.4959708077171475
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.00015555728396982187,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "inferred": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.3704309237416793,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 59,
+          "dimensions_missing_or_incorrect": 53,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.3973110267720407,
+          "shared_reference_f1": 0.47930973729562953
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 140,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 5,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      },
+      "stopping_reason": "diagnostic-dose-cap;not-fit"
+    }
+  ],
+  "twenty_validation_used": false,
+  "full_training_executed": false,
+  "Space_deployed": false,
+  "geometry_location_tolerance_mm": 10,
+  "dimension_numeric_length_residual_tolerance_mm": 1,
+  "source_initializer_sha256": "05a545dd74100f072e56b359fcfa1006eae39e104b076f15ad10df75d0694911",
+  "expanded_initializer_sha256": "6832b79afda3470ae49c4b80f56287fdec2ebb5f853e90e779b55ea6216aa57e",
+  "interpretation": "first-update geometry instability confirmed;batch1 worsens;small LR retains original-only reproduction;new/old co-training still fails in32-exposure diagnostic window;not a generalization or convergence claim",
+  "private_sources": [
+    {
+      "path": "outputs/retention-ablation-2026-10-14-v1/GPU-final/receipt.json",
+      "sha256": "a0febca10588226841e5673ebe80a5f4a874418495729ea6f1197ab6b4bb2bd3"
+    },
+    {
+      "path": "outputs/retention-ablation-2026-10-14-v1/GPU-confirmation/receipt.json",
+      "sha256": "a94d7b781e7a6062bfc3dbe5fc4362fc8a5b80cee612147fe3dba8418d2ec073"
+    },
+    {
+      "path": "outputs/retention-ablation-2026-10-14-v1/one-update-CPU/receipt.json",
+      "sha256": "2246ffbc1b5d7f67f703dfd2a0a9a70c55fbc3ed30c716d6530507bacd4a2b21"
+    },
+    {
+      "path": "outputs/retention-ablation-2026-10-14-v1/gradient-decomposition.json",
+      "sha256": "9e898d015015bb1363aad4c6b3a9fa104dff3b807bfb64e6c449692e31876989"
+    },
+    {
+      "path": "outputs/retention-ablation-2026-10-14-v1/artifact-verification.json",
+      "sha256": "b35facc4bc32e77eae94fafaa754342c412e6be9ccd8974598d9cf9639e1298f"
+    },
+    {
+      "path": "outputs/retention-ablation-2026-10-14-v1/no-redeployment-receipt.json",
+      "sha256": "e42e673fba452d786bca4694a01ccb8fceb85ab13940972d54ddaae3d41a4c14"
+    }
+  ],
+  "one_update_controls": [
+    {
+      "shape": "tiny",
+      "optimizer": "Adam",
+      "lr": 0.0001,
+      "updates": 1,
+      "gradient_norm_before_clip": 170.84625244140625,
+      "parameter_update_L2": 0.1139671579003334,
+      "before": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 4,
+          "structure_f1": 0.9835479256080114,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 4,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9866751027779758,
+          "shared_reference_f1": 0.9889140793232487
+        }
+      },
+      "after": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0002384358607534573,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      }
+    },
+    {
+      "shape": "expanded",
+      "optimizer": "Adam",
+      "lr": 0.0001,
+      "updates": 1,
+      "gradient_norm_before_clip": 170.8463897705078,
+      "parameter_update_L2": 0.11461284756660461,
+      "before": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 4,
+          "structure_f1": 0.9835479256080114,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 4,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9866751027779758,
+          "shared_reference_f1": 0.9889140793232487
+        }
+      },
+      "after": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.0002384358607534573,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.0,
+          "shared_reference_f1": 0.0
+        }
+      }
+    },
+    {
+      "shape": "expanded",
+      "optimizer": "Adam",
+      "lr": 3e-05,
+      "updates": 1,
+      "gradient_norm_before_clip": 170.8463897705078,
+      "parameter_update_L2": 0.034383825957775116,
+      "before": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 4,
+          "structure_f1": 0.9835479256080114,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 4,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9866751027779758,
+          "shared_reference_f1": 0.9889140793232487
+        }
+      },
+      "after": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.002861230329041488,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.002166355267423508,
+          "shared_reference_f1": 4.770992366412214e-05
+        }
+      }
+    },
+    {
+      "shape": "expanded",
+      "optimizer": "Adam",
+      "lr": 1e-06,
+      "updates": 1,
+      "gradient_norm_before_clip": 170.8463897705078,
+      "parameter_update_L2": 0.0011434834450483322,
+      "before": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 4,
+          "structure_f1": 0.9835479256080114,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 4,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9866751027779758,
+          "shared_reference_f1": 0.9889140793232487
+        }
+      },
+      "after": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.994754411063424,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9943917682564578,
+          "shared_reference_f1": 0.9983978138935401
+        }
+      }
+    },
+    {
+      "shape": "expanded",
+      "optimizer": "SGD",
+      "lr": 0.0001,
+      "updates": 1,
+      "gradient_norm_before_clip": 170.8463897705078,
+      "parameter_update_L2": 0.0005000006058253348,
+      "before": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 4,
+          "structure_f1": 0.9835479256080114,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 4,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9866751027779758,
+          "shared_reference_f1": 0.9889140793232487
+        }
+      },
+      "after": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 0,
+          "structure_f1": 0.030758226037195996,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 0,
+          "dimensions_missing_or_incorrect": 112,
+          "geometry_candidate_cases": 0,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.014874543578583744,
+          "shared_reference_f1": 0.0029680403260089134
+        }
+      }
+    }
+  ],
+  "weighted_gradient_decomposition": {
+    "status": "completed",
+    "training_updates": 0,
+    "cases": 5,
+    "device": "CPU",
+    "source_model_sha256": "05a545dd74100f072e56b359fcfa1006eae39e104b076f15ad10df75d0694911",
+    "total_gradient_L2": 170.8462371826172,
+    "total_loss": 0.13103580474853516,
+    "terms": [
+      {
+        "term": "node",
+        "weight": 100,
+        "unweighted_loss": 4.872730569331906e-05,
+        "weighted_gradient_L2": 162.44981384277344,
+        "cosine_with_total_gradient": 0.9763765931129456
+      },
+      {
+        "term": "proposal",
+        "weight": 40,
+        "unweighted_loss": 6.615896127186716e-05,
+        "weighted_gradient_L2": 27.415237426757812,
+        "cosine_with_total_gradient": 0.16302040219306946
+      },
+      {
+        "term": "parameter",
+        "weight": 20,
+        "unweighted_loss": 0.00011452755279606208,
+        "weighted_gradient_L2": 19.39823341369629,
+        "cosine_with_total_gradient": 0.11684194952249527
+      },
+      {
+        "term": "pointer",
+        "weight": 1,
+        "unweighted_loss": 0.011651743575930596,
+        "weighted_gradient_L2": 0.11558230966329575,
+        "cosine_with_total_gradient": -0.003998261410742998
+      },
+      {
+        "term": "axis",
+        "weight": 0.3,
+        "unweighted_loss": 0.012050725211156531,
+        "weighted_gradient_L2": 0.050754617899656296,
+        "cosine_with_total_gradient": 0.0005729256081394851
+      },
+      {
+        "term": "node_precision",
+        "weight": 1,
+        "unweighted_loss": 0.1052154615521431,
+        "weighted_gradient_L2": 0.0938173159956932,
+        "cosine_with_total_gradient": -0.003450144315138459
+      },
+      {
+        "term": "dimension",
+        "weight": 4,
+        "unweighted_loss": 0.00011833550524897873,
+        "weighted_gradient_L2": 15.50973129272461,
+        "cosine_with_total_gradient": 0.35455530881881714
+      },
+      {
+        "term": "count",
+        "weight": 1,
+        "unweighted_loss": 4.9270283852820285e-08,
+        "weighted_gradient_L2": 0.0011521875858306885,
+        "cosine_with_total_gradient": 8.888709999155253e-06
+      },
+      {
+        "term": "template",
+        "weight": 1,
+        "unweighted_loss": 9.116327532865398e-08,
+        "weighted_gradient_L2": 2.976992618641816e-06,
+        "cosine_with_total_gradient": -0.0013795426348224282
+      }
+    ],
+    "elapsed_seconds": 23.578999999910593,
+    "Space_deployed": false,
+    "twenty_used": false
+  }
+}

@@ -7,7 +7,8 @@
 20개를 직접 시각 검수했고 Space에 교체하지 않았다. 이후
 [상세 실험 리뷰](docs/research/2026-10-14-experiment-retrospective.md)를 작성했다.
 현재는 사용자 요청으로 [작은 데이터 원인 분리](docs/experiments/2026-10-14-EXP-047-retention-ablation.md)를
-준비했다. 1,028개 재학습과 Space 재배포는 진행하지 않는다.
+완료했다. 최초 악화는 fitted 좌표 함수의 재시작 update에서 재현됐다.
+작은 update의 원래5 단독 유지와10개 혼합 실패를 구분한다. 1,028개 재학습과 Space 재배포는 진행하지 않는다.
 
 현재 private Space는 앞서 승인된 **5개 재현 실험 모델**이다.
 GPU 재현은 5/5·치수 112/112, CPU 서빙 재현은 4/5·치수 112/112다.
