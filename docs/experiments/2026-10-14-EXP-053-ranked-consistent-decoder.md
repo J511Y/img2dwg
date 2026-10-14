@@ -1,6 +1,6 @@
 # EXP-053 · 과잉 치수와 강제 제약으로 인한 도면 파괴의 분리·수정
 
-상태: implemented / 동일 weight CPU10/10·252/252 / 연속 checkpoint 및fresh 검수 준비.
+상태: succeeded · TRAIN10 재현/연속2checkpoint/fresh image/nativeCAD roundtrip/direct visual.
 1,028개 본학습/holdout20/Space 배포는 하지 않는다. 기존 실패를 덮어쓰지 않는다.
 
 ## 확인된 원인
@@ -60,3 +60,36 @@ nativeDXF가통과하면멈춘다. 조건5분/suite8분/job20분상한은수렴�
 새source weight와decoder contract를따로고정하여fresh DINO IMAGE→MODEL→CAD를검사하고
 직접10개비교/모델DXF→DWG→DXF를확인한다. 실제CAD UI edit/save는별도상태로남긴다.
 이는10개train 재현이며 일반화/1,028학습/Space 배포 성공을뜻하지않는다.
+
+## 실제 완료 증거
+
+Job `6acf8d5bc66288145224064a`, source `dca601f`,code SHA
+`666fa2bc57ac2e0c24a724451b99fd15e689a00424722a2726820a6226e0fefd`,data SHA
+`1baaff4e7dba88a3001711d309c776e8b0e2ea60b2f3c9deaa6af894dba3fdb5`.
+같은source9052/model·Adam을복원하여8 updates에서stable-ten-actual-quality-pass로종료했다.
+최종SHA `6ca23df9d4b2e080c84f2b1b600c68976af8de4daab9247336ba74f742f9f375`.
+누적9053과9060의연속검사에서각10/10·252/252가실제nativeDXF로통과했고두서로다른
+checkpointSHA와20개qualityDXF를독립확인했다. 최종fixed/inferred DXF20개도재열기했다.
+최종의fresh DINO image추론10개에서도동일결과이며cached feature와최대차이0이다.
+
+| 실제fresh image→model→CAD | pass | 구조F1 | componentF1 | shared referenceF1 | 필수치수 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 기존5 | 5/5 | .999284692 | .999003113 | .999643161 | 112/112 |
+| 추가5 | 5/5 | .998430813 | .998670818 | .998260535 | 140/140 |
+
+모든정답치수의숫자·위치·실제길이joint검사를통과했고추가치수0이다. 실제보정이동최대
+1.03642055mm,old function drift0이다. source배포model은변경하지않았다.
+최종10개input/추출GT/모델예측을2개contact sheet로직접검수했고수m의잘못된연결은
+사라졌다. 작은train 재현오차를허용하되직원승인이나일반화로확대하지않는다.
+
+fresh model DXF10개를ODA27.1.0의ACAD2018 DWG/AC1032로변환해DXF로재열기했다.
+mm/audit0/raster0·nativeDimension252와INSERT/LINE/ARC/CIRCLE 기하의1:1대응을검사했고
+최대delta1.0914e-11이다. 첫검사두번은각도360°동등성/동일좌표LINE의sort pairing을
+잘못비교하여실패했으며inspection-failure를보존했다. 세번째는각도주기성과LINE방향·
+entity저장순서에독립적인1:1 geometry assignment로검증했다. 실제CAD UI edit/save는미실행이다.
+
+trainer elapsed245.991069835초이며가격/전체개발공수/서빙latency로소개하지않는다.
+비교화면: `http://127.0.0.1:8780/retention-review.html`에서10개SVG확대/모델DXF·DWG를확인한다.
+private output: `outputs/ranked-consistent-2026-10-14-v1/`.
+[aggregate evidence](../research/assets/2026-10-14-ranked-consistent-summary.json).
+새입력의rejected dimension candidate는HITL검수대상이다. 이10개통과가모든도면의완벽복원은아니다.

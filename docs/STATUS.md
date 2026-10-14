@@ -1,5 +1,17 @@
 # 현재 상태 · 2026-10-14 KST
 
+## 현재 완료: 기존5 유지 + 추가5 동시 재현
+
+[EXP-053](experiments/2026-10-14-EXP-053-ranked-consistent-decoder.md)에서10/10·필수치수
+252/252를연속2개의서로다른checkpoint와fresh image CPU추론으로확인했다.
+기존F1 .999284692/추가 .998430813이며누락·추가치수0,old function drift0이다.
+직접10개시각검수와모델DXF→DWG→DXF 재열기도통과했다. 실제CAD UI edit/save는미확인이다.
+원인은이번작은데이터의raw 구조가아니라과잉DIM9개의무검증hard projection이었다.
+image count ranked set/치수equation consistency/보정trust region으로수정했다.
+단,EXP-047의본학습raw update불안정과구분한다.10개는train 재현이고일반화검증은아니다.
+1,028개 본학습/holdout20/Space는새로실행하지않았다.모델SHA `6ca23df9…`,job`6acf8d5b…`.
+비교화면`http://127.0.0.1:8780/retention-review.html`,실제DWG/DXF 다운로드포함.
+
 ## 지속 목표: 실제10개 동시 재현
 
 사용자가 목표 달성까지 계속 진행하도록 명시 승인하여 active goal을 설정했다.

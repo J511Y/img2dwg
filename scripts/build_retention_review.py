@@ -5,14 +5,14 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from img2dwg.vector import svg
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--run',type=Path,required=True,nargs='+');p.add_argument('--experiment',choices=['EXP-047','EXP-048','EXP-049','EXP-050'],default='EXP-047');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--run',type=Path,required=True,nargs='+');p.add_argument('--experiment',choices=['EXP-047','EXP-048','EXP-049','EXP-050','EXP-053'],default='EXP-047');a=p.parse_args()
     rows=json.loads((a.root/'data/index.json').read_text());conditions=[]
     for file in sorted(file for run in a.run for file in run.glob('*/receipt.json')):
         d=json.loads(file.read_text());conditions.append({'name':d['variant']['name'],'variant':d['variant'],
              'model_sha256':d['model_sha256'],'stopping_reason':d['stopping_reason'],'updates':d['updates'],'exposures':d['exposures'],
              'fixed':d['fixed_final']['groups'],'inferred':d['inferred_final']['groups'],'history':d['history'],
              'path':file.parent.relative_to(a.root).as_posix(),'guard':d.get('guard_summary'),
-             'balance':d.get('loss_balance'),'accepted_updates':d.get('accepted_updates',d['updates'])})
+             'balance':d.get('loss_balance'),'decoder':d.get('decoder'),'accepted_updates':d.get('accepted_updates',d['updates'])})
     if not conditions:raise ValueError('No completed diagnostic condition')
     for r in rows:
         folder=a.root/'data'/r['sample_id'];g=json.loads((folder/'target.json').read_text(encoding='utf-8'))
@@ -47,12 +47,21 @@ $('history').innerHTML='';for(const h of v.history){const g=h.groups.original,n=
         html=html.replace('원래 5개 유지 · 추가 5개 재현 — 단일 조건 비교','좌표 이동 제한 · loss 균형 — 기존5 유지와 추가5 재현')
         html=html.replace("v.name==='five-safe-lr'","v.name==='guard-and-balance'")
         html=html.replace("<h3>같은 이미지 노출량에서 구조·치수 유지</h3>","<p>좌표 guard: update2mm / 기존5 누적10mm. loss balance: 같은 TRAIN10의 초기 shared gradient로 정한 고정 scale. 최종 native 검사와 원자료를 확인하세요. 조건별 자원 상한이므로 같은 노출량의 history도 함께 비교합니다.</p><h3>같은 이미지 노출량에서 구조·치수 유지</h3>")
-    if a.experiment in ('EXP-049','EXP-050'):
+    if a.experiment in ('EXP-049','EXP-050','EXP-053'):
         html=html.replace('EXP-047 · 재현 유지 원인 비교',a.experiment+' · 보호된 잔차 컴포넌트 학습')
         html=html.replace('고정 count','공통 query reserve').replace('고정 capacity 진단','공통 query reserve').replace('이미지 예측 count','이미지 active/no-object 선택')
         html=html.replace('고정 count 원래5','query reserve 원래5').replace('이미지 count','active/no-object')
         html=html.replace('동일 초기 가중치에서 시작한 실제 학습 예측입니다.','각 실험 내 동일 초기 가중치에서 시작한 실제 학습 예측입니다. EXP-049는 frozen five-safe base + 조건부 residual입니다.')
         html=html.replace('<h3>같은 이미지 노출량에서 구조·치수 유지</h3>','<p>두 모드는 같은 query reserve와 이미지 기반 객체 선택을 사용합니다. 정답 개수·CAD 조회·case ID routing은 없습니다. 기존5 입력 특징의 보호는 이 10개 train 재현 범위이며 일반화 증명이 아닙니다.</p><h3>동일 조건의 실제 노출량과 구조·치수</h3>')
+    if a.experiment=='EXP-053':
+        html=html.replace('active/no-object','이미지 count 순위 선택')
+        html=html.replace('이미지 이미지 count 순위 선택 선택','이미지 count로 선택')
+        html=html.replace('원래 5개 유지 · 추가 5개 재현 — 단일 조건 비교','검증된 10개 실제 입력 · 구조와 필수 치수 252개')
+        html=html.replace('EXP-049는 frozen five-safe base + 조건부 residual입니다.','이번 결과는 image count로 전체 query를 정렬하고, 기하와 맞지 않는 치수 후보를 강제 제약에서 제외한 실제 추론입니다.')
+        html=html.replace("$('metrics').textContent=(m.passed?", "$('metrics').textContent=(m.passed?")
+        html=html.replace("+'\\ncheckpoint '+v.model_sha256", "+'\\n제외된 불일치 치수 후보 '+(m.query_selection_receipt?.rejected_dimension_candidates?.length||0)+'개 · 실제 보정 이동 '+(m.constraint_receipt?.maximum_node_displacement_mm||0).toFixed(3)+'mm'+'\\ncheckpoint '+v.model_sha256")
+        html=html.replace('<h3>동일 조건의 실제 노출량과 구조·치수</h3>','<p>치수는 누락·추가 없이 숫자와 실제 길이를 함께 검사합니다. 제외 후보도 원자료에 기록하며, 새 입력에서는 HITL 검수 대상입니다.</p><h3>실제 품질 검사와 연속 통과 기록</h3>')
+        html=html.replace("'<a href=\"'+path+'/prediction.dxf\">실제 모델 DXF</a>","'<a href=\"DWG-roundtrip-v3/dwg/'+r.sample_id+'.dwg\">모델 DWG (ODA 재열기 확인)</a> · <a href=\"'+path+'/prediction.dxf\">실제 모델 DXF</a>")
     (a.root/'retention-review.html').write_text(html,encoding='utf-8')
     print(json.dumps({'conditions':len(conditions),'review':str(a.root/'retention-review.html')}))
 if __name__=='__main__':main()

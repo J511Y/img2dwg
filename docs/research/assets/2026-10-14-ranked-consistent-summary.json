@@ -1,0 +1,100 @@
+{
+  "schema": "ranked-consistent-verification/v1",
+  "job_id": "6acf8d5bc66288145224064a",
+  "source_commit": "dca601f",
+  "model_sha256": "6ca23df9d4b2e080c84f2b1b600c68976af8de4daab9247336ba74f742f9f375",
+  "decoder": {
+    "set_selection": "image-count-topk",
+    "dimension_consistency_mm": 10.0,
+    "projection_limit_mm": 10.0
+  },
+  "cases": 10,
+  "data_split": "TRAIN only;original5 plus additional5",
+  "native_groups": {
+    "original": {
+      "cases": 5,
+      "passed_cases": 5,
+      "structure_f1": 0.9992846924177397,
+      "required_dimensions": 112,
+      "dimensions_correct_geometry_and_value": 112,
+      "dimensions_missing_or_incorrect": 0,
+      "geometry_candidate_cases": 5,
+      "actual_DXF_audit_executed": true,
+      "capacity_below_required_cases": 0,
+      "component_f1": 0.9990031130438914,
+      "shared_reference_f1": 0.9996431608684742
+    },
+    "additional": {
+      "cases": 5,
+      "passed_cases": 5,
+      "structure_f1": 0.9984308131241084,
+      "required_dimensions": 140,
+      "dimensions_correct_geometry_and_value": 140,
+      "dimensions_missing_or_incorrect": 0,
+      "geometry_candidate_cases": 5,
+      "actual_DXF_audit_executed": true,
+      "capacity_below_required_cases": 0,
+      "component_f1": 0.9986708181160819,
+      "shared_reference_f1": 0.998260535471632
+    }
+  },
+  "fresh_groups": {
+    "original": {
+      "cases": 5,
+      "passed_cases": 5,
+      "structure_f1": 0.9992846924177397,
+      "required_dimensions": 112,
+      "dimensions_correct_geometry_and_value": 112,
+      "dimensions_missing_or_incorrect": 0,
+      "geometry_candidate_cases": 5,
+      "actual_DXF_audit_executed": true,
+      "capacity_below_required_cases": 0,
+      "component_f1": 0.9990031130438914,
+      "shared_reference_f1": 0.9996431608684742
+    },
+    "additional": {
+      "cases": 5,
+      "passed_cases": 5,
+      "structure_f1": 0.9984308131241084,
+      "required_dimensions": 140,
+      "dimensions_correct_geometry_and_value": 140,
+      "dimensions_missing_or_incorrect": 0,
+      "geometry_candidate_cases": 5,
+      "actual_DXF_audit_executed": true,
+      "capacity_below_required_cases": 0,
+      "component_f1": 0.9986708181160819,
+      "shared_reference_f1": 0.998260535471632
+    }
+  },
+  "fresh_feature_max_absolute_difference": 0.0,
+  "consecutive_checkpoints": [
+    {
+      "checkpoint": "quality-1",
+      "sha256": "beac8251597b138cef8e5b627e7d4d789cba4cf40f9acad92a3792ab8985b64c"
+    },
+    {
+      "checkpoint": "quality-8",
+      "sha256": "6ca23df9d4b2e080c84f2b1b600c68976af8de4daab9247336ba74f742f9f375"
+    }
+  ],
+  "updates": 8,
+  "stopping_reason": "stable-ten-actual-quality-pass",
+  "trainer_elapsed_seconds": 245.9910698350286,
+  "original_function_max_drift_mm": 0.0,
+  "maximum_fresh_projection_mm": 1.0364205490830565,
+  "DXF_to_DWG_to_DXF": "10 passed;252 native DIMENSION preserved",
+  "roundtrip_max_delta": 1.0913936421275139e-11,
+  "direct_visual_cases": 10,
+  "staff_approval": false,
+  "full_training_executed": false,
+  "Space_deployed": false,
+  "holdout20_used": false,
+  "actual_CAD_UI_open_edit_save": false,
+  "receipts": {
+    "GPU-final/receipt.json": "564b8ea8cfbc081af90ccae4f04f7c46279f3834eac8074dc5d2ba815a070eb9",
+    "CPU-fresh-confirmed/receipt.json": "6036140f4719dc14c5ac3d95acf1e12dbbbc2fe9ec34ce602d65c9b826b54667",
+    "DWG-roundtrip-v3/receipt.json": "e3b4c307e6bd6a65e6f930a2abaf3f29fb13139b69d22ec716bea9bda38773c9",
+    "quality-checkpoint-verification.json": "19b0f50c3a127156457c10c16b0667544b121b6e022a11156312c6e91bc515f0",
+    "visual-review-receipt.json": "5791abce8734248470ca2063620e363e994ce4704082fe34ff49c1f86c840062"
+  }
+}

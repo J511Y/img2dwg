@@ -1,6 +1,6 @@
 # EXP-052 · 같은 입력 함수에서 query 비선형 잔차 용량 비교
 
-상태: implemented / CPU 사전 확인·bounded GPU planned.10개 통과 미확인.
+상태: cancelled-diagnostic-pivot. flat조건완료/비선형조건partial이며10개 성공으로분류하지않는다.
 지속 목표의 TRAIN10만 사용하고 원본/holdout20/Space를 보존한다.
 
 EXP-050에서 .0003/.0001은 신규node오차를약1~2mm로 안정화했지만 구조/치수는7/10에
@@ -34,3 +34,12 @@ CPU 실제10개 관측 feature에서flat→zero-output nonlinear migration의18�
 112/112 및신규2/5·106/140이다. 초기화 검사가 신규 학습 성공을 뜻하지 않는다.
 source best SHA `f10551c91a0f266831acbe71df0166e7cc69e202a355e17793d556c53cc4824d`,
 누적4772 epoch이며새 parameter는추가4개 matrix/262,144개의 scalar다.
+
+Job `6acf78b5c66288145223f6fa`,code SHA
+`64d1a33684f11b1fa02a590569e5b5cef708ac4c963afb6b1f3552fdedad3d8b`,
+data SHA `e057da343feeba5a3403462ae6bb67694fb831d8cb91557477f9ec2d3da3708a`.
+실행중EXP-050 before_constraints와extra DIMcount를확인하여raw geometry는이미거의
+재현됐으나과잉치수의hard projection이도면을파괴함을알았다. 이확인을먼저하지않고
+표현력가설로추가GPU를진행한판단미흡을EXP-053에남겼다. job을중단하고출력prefix와
+completed flat receipt/partial nonlinear history·best weight/Adam을보존했다.
+취소원자료는local cancellation-receipt다. 비선형가설의전체유용성을기각했다고주장하지않는다.
