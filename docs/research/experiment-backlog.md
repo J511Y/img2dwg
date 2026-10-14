@@ -67,6 +67,8 @@
 | EXP-043 | DINOv3 native-component/coordinate 첫 학습 + vector Space | 학습/서빙 계약 실행, [결과](../experiments/2026-10-13-EXP-043-vector-first.md); 합성 선분 F1 0.396, 치수 정확성/완성 CAD 미달 |
 
 | EXP-044 | 실제 사용자 스캔 실패·decoder/출시 판단 진단 | 실제 복원 failed, [실패 분석](../experiments/2026-10-13-EXP-044-real-scan-failure.md); 모델 기본 사용 중단·관측 선 기준선 표시 |
+| EXP-045 | 원본 준공도면 5개 canonical 학습과 별도 20개 평가 | 첫 실제 run failed, primitive 후속 실행 canceled; [실행 기록](../experiments/2026-10-14-EXP-045-real-pairs.md) |
+| EXP-046 | 재사용 컴포넌트 parameter factory·node/관계 decoder 정정 | GT 조립기 5개 검사, 새 decoder/model 학습 미실행; [현재 정본](2026-10-14-component-decoder-correction.md) |
 
 EXP-012/040/041/027의 첫 구현은 EXP-043에서 일부 실행됐다. relation/업무 semantics/실제
 입력 fine-tune/숫자 치수·제약 solver는 계속 planned다. EXP-010 Raster2Seq 비교 미실행.

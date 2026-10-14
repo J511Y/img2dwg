@@ -3,6 +3,9 @@
 평면도 이미지에서 **CAD에서 열고 편집할 수 있는 DWG**를 복원하는 모델·파이프라인 연구 프로젝트.
 
 현재 단계: **첫 좌표 모델은 실제 준공도면 복원에 실패해 기본 서비스 출력에서 제외했다.**
+실제 페어 5개 학습/20개 검증 모델도 구조·치수 기준을 통과하지 못했다.
+[컴포넌트 출력 설계 정정](docs/research/2026-10-14-component-decoder-correction.md)을 적용하며,
+primitive head의 후속 학습은 중단했다. 새 컴포넌트 모델은 아직 학습하지 않았다.
 [실패 분석](docs/experiments/2026-10-13-EXP-044-real-scan-failure.md).
 [Space](https://huggingface.co/spaces/youjunhyeok/img2dwg)는 현재 관측 선 검출 기준선만 제공하며
 이는 학습 모델의 CAD 복원 결과가 아니다. 중심선·컴포넌트·수치 치수 복원은 미완성이다.

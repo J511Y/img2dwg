@@ -1,5 +1,17 @@
 # 에이전트 작업 지침
 
+## 2026-10-14 실행 권한
+
+사용자가 실제 준공도면–CAD 페어의 5개 재현 학습, 별도 20개 검증, 비교 화면과
+검증된 모델의 Space 재배포를 명시적으로 요청했다. EXP-045와
+`docs/harness/raw-pair-training.md`를 따른다. 실패한 모델은 재배포하지 않는다.
+현재 두 실행은 각각 A100/90분으로 제한한다. 원본과 기존 운영 모델은 보존한다.
+
+**후속 정정:** EXP-045의 primitive canonical-query 모델도 실패했고, 컴포넌트 구현 없이
+step만 늘린 후속 GPU job은 사용자 지적 후 취소했다. `docs/research/2026-10-14-component-decoder-correction.md`
+를 다음 실행 정본으로 사용한다. CAD-derived parameter factory의 재조립 성공과
+학습 모델 예측을 엄격히 구분한다. WIN layer를 window 정답으로 쓰지 않는다.
+
 ## 시작 순서
 
 1. 이 파일, `README.md`, `docs/STATUS.md`, `docs/PROJECT.md`, `docs/DECISIONS.md`, `docs/harness/workflow.md`를 읽는다.

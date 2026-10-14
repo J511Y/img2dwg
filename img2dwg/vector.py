@@ -1,6 +1,6 @@
 """Typed vector proposals, a raster-free SVG viewer, and an editable DXF factory."""
 from __future__ import annotations
-import html, json, math
+import hashlib, html, json, math
 from pathlib import Path
 import ezdxf
 import numpy as np
@@ -82,12 +82,64 @@ def write_dxf(graph, path):
     ms=doc.modelspace(); scale=float(graph['scale']); height=graph['canvas'][1]
     def xy(p): return (float(p[0])*scale,(height-float(p[1]))*scale)
     for i,name in enumerate(ROLES): doc.layers.new(name,dxfattribs={'color':i+1})
+    compiled_assemblies=set(); assembly_templates={}
+    if graph.get('component_assemblies'):
+        # Parameter factories become real reusable BLOCK/INSERT components.
+        # This consumes generated geometry and parameters, never source CAD.
+        doc.appids.new('IMG2DWG_COMPONENT')
+        for assembly in graph.get('assemblies',[]):
+            kind=assembly['kind']; params=assembly['parameters']
+            if kind not in ('swing_opening','rectangular_loop','wall_face_pair'): continue
+            pieces=[c for c in graph['components'] if c.get('component_id')==assembly['id']]
+            if not pieces: continue
+            if kind=='swing_opening':
+                origin_mm=np.asarray(params['hinge_mm']); angle=-params['start_degrees']
+                sx=sy=params['radius_mm']
+            elif kind=='rectangular_loop':
+                origin_mm=np.asarray(params['center_mm']); angle=-params['angle_degrees']
+                sx,sy=params['width_mm'],params['height_mm']
+            else:
+                origin_mm=np.asarray(params['spine_origin_mm']); angle=-params['angle_degrees']
+                sx=max(max(x) for x in params['face_extents_mm'])-min(min(x) for x in params['face_extents_mm'])
+                sy=params['thickness_mm']
+            if min(sx,sy)<=1e-8: raise ValueError('Invalid component dimensions')
+            origin=np.array([origin_mm[0]+graph['canvas'][0]*scale/2,height*scale/2-origin_mm[1]])
+            radians=math.radians(angle); rotation=np.array([[math.cos(radians),-math.sin(radians)],
+                                                           [math.sin(radians),math.cos(radians)]])
+            def local(q): return ((np.asarray(xy(q))-origin)@rotation)/[sx,sy]
+            normalized=[]
+            for piece in pieces:
+                normalized.append({'kind':piece['kind'],'points':[local(p).tolist() for p in piece['points']],
+                                   'role':piece.get('role',0)})
+            signature=hashlib.sha256(json.dumps({'kind':kind,'geometry':[
+                {**c,'points':np.round(c['points'],10).tolist()} for c in normalized]},sort_keys=True).encode()).hexdigest()[:16]
+            name=f'{kind}_{signature}'
+            if name not in assembly_templates:
+                block=doc.blocks.new(name)
+                for child in normalized:
+                    q=np.asarray(child['points']); ca={'layer':ROLES[child['role']]}
+                    if child['kind']=='segment': block.add_line(q[0],q[1],dxfattribs=ca)
+                    elif child['kind']=='arc':
+                        # Door inserts use uniform scale; no elliptical arc approximation.
+                        a=arc_parameters(q)
+                        if a is None: raise ValueError('Invalid component arc')
+                        center,r,angles,sweep,_=a
+                        # local() returns CAD y-up, so angles are already CAD angles.
+                        start,end=(angles[0],angles[2]) if sweep else (angles[2],angles[0])
+                        block.add_arc(center,r,start,end,dxfattribs=ca)
+                    else: raise ValueError('Unsupported component child')
+                assembly_templates[name]=True
+            insert=ms.add_blockref(name,origin,dxfattribs={'xscale':sx,'yscale':sy,'rotation':angle,
+                                  'layer':ROLES[pieces[0].get('role',0)]})
+            insert.set_xdata('IMG2DWG_COMPONENT',[(1000,kind),(1000,assembly['id'])])
+            compiled_assemblies.add(assembly['id'])
     block_children={}
     for e in graph['components']:
         if e['kind']!='symbol' and e.get('parent'):
             block_children.setdefault(e['parent'],[]).append(e)
     exported_children={e.get('parent') for e in graph['components'] if e['kind']=='symbol' and block_children.get(e.get('parent'))}
     for i,e in enumerate(graph['components']):
+        if e.get('component_id') in compiled_assemblies: continue
         if e.get('parent') in exported_children and e['kind']!='symbol': continue
         p=np.asarray(e['points']); attrs={'layer':ROLES[e.get('role',0)]}
         if e['kind']=='arc' and (a:=arc_parameters(p)) is not None:

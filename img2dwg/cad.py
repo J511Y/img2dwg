@@ -8,7 +8,7 @@ from ezdxf import disassemble, bbox
 from PIL import Image, ImageDraw, ImageFont
 from img2dwg.vector import role, KINDS
 
-def extract(path, bounds, size=768):
+def extract(path, bounds, size=768, min_length_pixels=2):
     doc=ezdxf.readfile(path); x0,y0,x1,y1=map(float,bounds)
     factor=(size-48)/max(x1-x0,y1-y0)
     offset=np.array([(size-(x1-x0)*factor)/2,(size-(y1-y0)*factor)/2])
@@ -17,7 +17,7 @@ def extract(path, bounds, size=768):
     def add(kind,points,e,parent=None):
         p=np.asarray([pixel(q) for q in points]);
         if not np.isfinite(p).all() or (p<15).any() or (p>size-15).any(): return
-        if np.linalg.norm((p[2] if kind=='arc' else p[1])-p[0])<2: return
+        if np.linalg.norm((p[2] if kind=='arc' else p[1])-p[0])<min_length_pixels: return
         if kind=='segment' and tuple(p[0])>tuple(p[1]): p=p[[1,0,2]]
         components.append({'kind':kind,'points':p.tolist(),'role':role(e.dxf.layer),
             'source_id':e.dxf.get('handle','virtual'),'parent':parent,'confidence':1.,
