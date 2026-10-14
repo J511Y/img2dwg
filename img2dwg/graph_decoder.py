@@ -44,8 +44,8 @@ class SharedGraphDecoder(nn.Module):
     def forward(self, features,capacities=None):
         b=features.shape[0]; pooled=torch.cat((features.mean(1),features.amax(1)),-1)
         log_count=self.count(pooled);n_count=self.nodes;c_count=self.components
-        if self.adaptive_capacity:
-            if b!=1:raise ValueError('Variable-capacity training uses single-image batches')
+        if self.adaptive_capacity or capacities is not None:
+            if capacities is None and b!=1:raise ValueError('Inferred variable capacity requires a single image')
             if capacities is None:
                 capacity=(log_count[0].detach().exp()+32).round().long().tolist()
             else:capacity=capacities
@@ -115,7 +115,7 @@ def assignments(pred,target,batch=0):
     return inverse,torch.as_tensor(ci,device=xy.device),torch.as_tensor(cj,device=xy.device)
 
 
-def loss(pred,targets,matches=None):
+def loss(pred,targets,matches=None,*,term_weights=None,precision_digits=None):
     total=pred['xy'].sum()*0; details={}; all_matches=[]
     for b,t in enumerate(targets):
         match=matches[b] if matches is not None else assignments(pred,t,b); all_matches.append(match)
@@ -125,7 +125,12 @@ def loss(pred,targets,matches=None):
         dim_targets=t['kind']==0;dim_nodes=torch.unique(t['refs'][dim_targets].clamp_min(0))
         node_weights=pred['xy'].new_ones(len(t['nodes']));node_weights[dim_nodes]=10.
         node_loss=(F.smooth_l1_loss(pred['xy'][b,inverse],t['nodes'],beta=.0005,reduction='none').mean(-1)*node_weights).sum()/node_weights.sum()
-        node_precision=(F.cross_entropy(pred['node_digits'][b,inverse].reshape(-1,10),t['node_digits'].reshape(-1))+
+        node_logits=pred['node_digits'][b,inverse];node_targets=t['node_digits']
+        if precision_digits:
+            keep=precision_digits[0]
+            if torch.any(node_targets[...,:-keep]!=0):raise ValueError('Precision control would discard nonzero coordinate digits')
+            node_logits=node_logits[...,-keep:,:];node_targets=node_targets[...,-keep:]
+        node_precision=(F.cross_entropy(node_logits.reshape(-1,10),node_targets.reshape(-1))+
                         F.cross_entropy(pred['node_sign'][b,inverse].reshape(-1,2),t['node_sign'].reshape(-1)))
         node_obj=F.binary_cross_entropy_with_logits(pred['active'][b],active)
         cls=torch.full((pred['kind'].shape[1],),len(TYPES),device=ci.device,dtype=torch.long); cls[ci]=t['kind'][cj]
@@ -150,7 +155,12 @@ def loss(pred,targets,matches=None):
         bearing=t['bearing'][cj];defined=bearing>=0
         bearing_loss=F.cross_entropy(pred['bearing'][b,ci[defined]],bearing[defined]) if defined.any() else parameter*0
         sd=t['size_digits'][cj];defined=sd[:,:,0]>=0
-        scalar_loss=(F.cross_entropy(pred['size_digits'][b,ci][defined].reshape(-1,10),sd[defined].reshape(-1))+
+        size_logits=pred['size_digits'][b,ci][defined];size_targets=sd[defined]
+        if precision_digits:
+            keep=precision_digits[1]
+            if torch.any(size_targets[...,:-keep]!=0):raise ValueError('Precision control would discard nonzero size digits')
+            size_logits=size_logits[...,-keep:,:];size_targets=size_targets[...,-keep:]
+        scalar_loss=(F.cross_entropy(size_logits.reshape(-1,10),size_targets.reshape(-1))+
                      F.cross_entropy(pred['size_sign'][b,ci][defined],t['size_sign'][cj][defined])) if defined.any() else parameter*0
         # Axis representatives are themselves matched predicted nodes. The
         # reference classes are not arbitrary per-file group-label numbers.
@@ -170,8 +180,18 @@ def loss(pred,targets,matches=None):
             dimension=F.smooth_l1_loss(length/UNIT,value/UNIT,beta=.0001)
         else: dimension=parameter*0
         value=100*node_loss+node_precision+40*proposal+node_obj+type_loss+pointer+20*parameter+roles*.2+numeric+text_loss*.3+template_loss+bearing_loss+scalar_loss+axis*.3+host_loss*.3+dimension*4+count_loss
+        terms=dict(node=node_loss,node_precision=node_precision,proposal=proposal,node_objectness=node_obj,
+                   type=type_loss,pointer=pointer,parameter=parameter,role=roles,numeric=numeric,
+                   text=text_loss,template=template_loss,bearing=bearing_loss,scalar=scalar_loss,
+                   axis=axis,host=host_loss,dimension=dimension,count=count_loss)
+        default_weights=dict(node=100,node_precision=1,proposal=40,node_objectness=1,type=1,pointer=1,
+                             parameter=20,role=.2,numeric=1,text=.3,template=1,bearing=1,scalar=1,
+                             axis=.3,host=.3,dimension=4,count=1)
+        for name,weight in (term_weights or {}).items():
+            if name not in terms:raise ValueError('Unknown loss term: '+name)
+            value=value+(weight-default_weights[name])*terms[name]
         total+=value/len(targets)
-        for key,v in dict(node=node_loss,pointer=pointer,parameter=parameter,numeric=numeric,dimension=dimension,axis=axis,type=type_loss).items():
+        for key,v in terms.items():
             details[key]=details.get(key,0)+float(v.detach())/len(targets)
     return total,details,all_matches
 

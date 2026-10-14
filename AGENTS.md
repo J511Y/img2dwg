@@ -2,7 +2,13 @@
 
 ## 2026-10-14 실행 권한
 
-**최신 사용자 요청은 실험 회고다.** 새 방법 선정·추가 GPU/API 실험·재배포를 중단하고
+**최신 사용자 요청은 작은 데이터의 원인 분리 실험이다.**
+EXP-047-retention-ablation.md를 따른다. 원래5+train 추가5,
+batch/capacity/count/loss 단일 요인과 관측된 LR/assignment 차이를 bounded GPU job으로
+비교한다. **원인 확인 전 1,028개 재학습·Space 재배포 금지**다. validation20을 튜닝에 쓰지 않는다.
+아래 회고 중단 상태는 이번 명시 요청의 작은 진단 범위에서만 대체된다.
+
+**직전 요청은 실험 회고였다.** 새 방법 선정·추가 GPU/API 실험·재배포를 중단하고
 `docs/research/2026-10-14-experiment-retrospective.md`를 먼저 읽는다. full-v1은 실행
 completed / 품질 failed이며 GPU 5개 0/5·0/112, 별도 20개 0/20·0/476이다.
 직접 시각 검수도 실패다. full checkpoint SHA는 `52cdda59…`, 기존 Space의 승인된

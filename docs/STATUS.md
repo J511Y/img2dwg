@@ -1,5 +1,12 @@
 # 현재 상태 · 2026-10-14 KST
 
+## 최신 작업: 작은 데이터의 5개 재현 유지 원인 분리
+
+사용자 후속 요청으로 [EXP-047](experiments/2026-10-14-EXP-047-retention-ablation.md)을
+구현했다. 원래5+train 추가5, batch/capacity/count/loss와 LR/assignment 단일 요인이다.
+CPU 시작 검사 4/5·112/112로 기존 결과를 재현했고 관련18개 검사가 통과했다.
+bounded GPU 비교는 planned다. 1,028개 재학습·Space 재배포와 validation20 사용은 금지한다.
+
 ## 최신 판정: 본학습 완료·품질 실패, 실험 회고
 
 사용자 요청으로 새 방법 선정·추가 실험·재배포를 중단하고
