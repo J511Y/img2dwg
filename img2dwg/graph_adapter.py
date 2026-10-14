@@ -11,7 +11,7 @@ from torch import nn
 from img2dwg.structured import MAX_REFS,PARAMS,TYPES
 
 class ProtectedGraphAdapter(nn.Module):
-    def __init__(self,base,original_features=None,*,nodes=1198,components=951,hidden=128,base_capacity=None,protected_rank=4):
+    def __init__(self,base,original_features=None,*,nodes=1198,components=951,hidden=128,base_capacity=None,protected_rank=4,query_nonlinear=False):
         super().__init__();self.base=base;self.base.requires_grad_(False)
         self.nodes=nodes;self.components=components;self.fixed_capacity=[nodes,components];self.hidden=hidden
         self.base_capacity=base_capacity or self.fixed_capacity
@@ -40,6 +40,14 @@ class ProtectedGraphAdapter(nn.Module):
         self.axis_q=nn.Linear(hidden,2*width,bias=False);self.axis_k=nn.Linear(hidden,2*width,bias=False)
         self.host_q=nn.Linear(hidden,width,bias=False);self.host_k=nn.Linear(hidden,width,bias=False)
         for head in [self.ref_q,self.axis_q,self.host_q]:nn.init.zeros_(head.weight)
+        self.query_nonlinear=query_nonlinear
+        if query_nonlinear:
+            # Appended modules preserve the source parameter/Adam ordering.
+            # Zero last layers preserve the entire initial function, including
+            # novel inputs; no bias can create a residual on protected inputs.
+            self.node_refine=nn.Sequential(nn.Linear(hidden,hidden*4,bias=False),nn.GELU(),nn.Linear(hidden*4,hidden,bias=False))
+            self.component_refine=nn.Sequential(nn.Linear(hidden,hidden*4,bias=False),nn.GELU(),nn.Linear(hidden*4,hidden,bias=False))
+            nn.init.zeros_(self.node_refine[-1].weight);nn.init.zeros_(self.component_refine[-1].weight)
 
     def protected_features(self,features):
         pooled=torch.cat((features.mean(1),features.amax(1)),-1).double()
@@ -58,6 +66,7 @@ class ProtectedGraphAdapter(nn.Module):
         else:base=cached_base
         phi=torch.tanh(self.feature(self.protected_features(features)))
         n=self.node_queries.weight[None]*phi[:,None];c=self.component_queries.weight[None]*phi[:,None]
+        if self.query_nonlinear:n=n+self.node_refine(n);c=c+self.component_refine(c)
         out=dict(base);b=features.shape[0]
         for source,heads,shapes,count in [(n,self.node_heads,self.node_shapes,self.nodes),(c,self.component_heads,self.component_shapes,self.components)]:
             for key,head in heads.items():

@@ -55,4 +55,26 @@ class ProtectedGraphAdapterTests(unittest.TestCase):
         loaded.load_state_dict(m.state_dict())
         with torch.no_grad():a=m(features[0]);b=loaded(features[0])
         for k in a:self.assertTrue(torch.equal(a[k],b[k]),k)
+
+    def test_zero_output_nonlinear_capacity_preserves_all_source_responses(self):
+        source,features=self.make()
+        with torch.no_grad():source.node_heads['xy'].weight.normal_(std=.1)
+        base=SharedGraphDecoder(12,10,hidden=48,coord_digits=8,measure_digits=6,minimum_nodes=4,minimum_components=4)
+        expanded=ProtectedGraphAdapter(base,None,nodes=12,components=10,hidden=32,protected_rank=source.protected_rank,query_nonlinear=True)
+        missing,unexpected=expanded.load_state_dict(source.state_dict(),strict=False)
+        self.assertFalse(unexpected);self.assertTrue(all(k.startswith(('node_refine.','component_refine.')) for k in missing))
+        old_names=[k for k,p in source.named_parameters() if p.requires_grad]
+        new_names=[k for k,p in expanded.named_parameters() if p.requires_grad]
+        self.assertEqual(old_names,new_names[:len(old_names)])
+        novel=torch.randn(1,4,768)
+        for f in features+[novel]:
+            with torch.no_grad():a=source(f);b=expanded(f)
+            for k in a:self.assertTrue(torch.equal(a[k],b[k]),k)
+        expanded(novel)['xy'].sum().backward()
+        self.assertGreater(float(expanded.node_refine[-1].weight.grad.abs().sum()),0.)
+        with torch.no_grad():
+            expanded.node_refine[-1].weight.normal_(std=.2);expanded.component_refine[-1].weight.normal_(std=.2)
+        for f in features:
+            with torch.no_grad():a=source(f);b=expanded(f)
+            for k in a:self.assertTrue(torch.equal(a[k],b[k]),k)
 if __name__=='__main__':unittest.main()

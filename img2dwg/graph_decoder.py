@@ -199,7 +199,8 @@ def loss(pred,targets,matches=None,*,term_weights=None,precision_digits=None):
 
 
 @torch.no_grad()
-def decode(pred,texts,threshold=.5,batch=0,templates=None):
+def decode(pred,texts,threshold=.5,batch=0,templates=None,reference_radius_mm=None):
+    if reference_radius_mm is not None and reference_radius_mm<=0:raise ValueError('Positive physical reference radius required')
     xy=pred['xy'][batch].cpu().numpy()*UNIT
     probability=pred['node_digits'][batch].softmax(-1);digit_conf=probability.amax(-1).amin(-1).amin(-1)
     precise=(probability.argmax(-1)*probability.new_tensor([10**i for i in range(probability.shape[-2]-1,-1,-1)])).sum(-1).cpu().numpy()/10
@@ -218,7 +219,12 @@ def decode(pred,texts,threshold=.5,batch=0,templates=None):
     bearing=pred['bearing'][batch].argmax(-1).cpu().numpy()
     sizes=(pred['size_digits'][batch].argmax(-1)*pred['size_digits'].new_tensor([10**i for i in range(pred['size_digits'].shape[-2]-1,-1,-1)])).sum(-1).cpu().numpy()
     sizes*=np.where(pred['size_sign'][batch].argmax(-1).cpu().numpy(),-1,1)
-    components=[]; query_to_component={}; bad=0
+    components=[]; query_to_component={}; bad=0;missing_candidates=0;changed_references=0
+    candidate_mask=None
+    if reference_radius_mm is not None:
+        points=torch.as_tensor(xy,device=reference_logits.device,dtype=pred['anchors'].dtype)
+        candidate_mask=(pred['anchors'][batch,:,:,None]*UNIT-points[None,None]).norm(dim=-1)<=reference_radius_mm
+        candidate_mask&=active[None,None]
     for i in range(len(kind)):
         k=int(kind[i]); score=float(conf[i])
         if k==len(TYPES) or score<threshold: continue
@@ -226,10 +232,22 @@ def decode(pred,texts,threshold=.5,batch=0,templates=None):
         if name=='native_path': length=int(np.clip(round(params[i,1]*MAX_REFS),2,MAX_REFS))
         ids=refs[i,:length].tolist()
         required=length if name=='native_path' else 2 if name in ('dimension','centerline','unresolved_edge','symbol') else 1
+        local_logits=reference_logits[i].clone()
+        if candidate_mask is not None:
+            for slot in range(length):
+                allowed=candidate_mask[i,slot]
+                if allowed.any():
+                    local_logits[slot,~allowed]=-float('inf')
+                    updated=int(local_logits[slot].argmax());changed_references+=int(updated!=ids[slot]);ids[slot]=updated
+                else:missing_candidates+=1
         used=set()
         for slot in range(required):
             if ids[slot] in used:
-                candidates=reference_logits[i,slot].clone();candidates[list(used)]=-float('inf');ids[slot]=int(candidates.argmax())
+                candidates=local_logits[slot].clone();candidates[list(used)]=-float('inf')
+                if not torch.isfinite(candidates).any():
+                    if candidate_mask is not None:missing_candidates+=1
+                    candidates=reference_logits[i,slot].clone();candidates[list(used)]=-float('inf')
+                ids[slot]=int(candidates.argmax())
             used.add(ids[slot])
         bad+=int(len(set(ids[:required]))!=required)
         query_to_component[i]=len(components)
@@ -257,5 +275,7 @@ def decode(pred,texts,threshold=.5,batch=0,templates=None):
             'nodes_mm':xy.tolist(),'components':components,'axis_links':axis.tolist(),
             'axis_confidence':axis_conf,
             'templates':library,
+            'reference_resolution_receipt':{'radius_mm':reference_radius_mm,'changed_reference_slots':changed_references,
+                'unresolved_slots':missing_candidates,'source_CAD_or_GT_access':False},
             'high_confidence_0_1mm_coordinate_nodes':int(mask.sum()),
             'source':'image-model-prediction','invalid_repeated_references':bad,'complete_business_semantics':False}

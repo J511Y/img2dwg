@@ -3,6 +3,20 @@ import torch
 from scripts.train_protected_adapter import restore_adapter_optimizer
 
 class ContinuationTests(unittest.TestCase):
+    def test_new_capacity_starts_its_own_adam_state_and_preserves_old_moments(self):
+        model=torch.nn.Linear(3,2);opt=torch.optim.Adam(model.parameters(),lr=.003)
+        model(torch.ones(1,3)).sum().backward();opt.step()
+        snapshot={'optimizer':copy.deepcopy(opt.state_dict()),'matches':{},'epoch':1}
+        extended=torch.nn.Sequential(copy.deepcopy(model),torch.nn.Linear(2,2))
+        restored,_=restore_adapter_optimizer(extended,snapshot,.0003,'cpu')
+        old=list(extended[0].parameters());new=list(extended[1].parameters())
+        self.assertEqual(int(restored.state[old[0]]['step']),1)
+        self.assertNotIn(new[0],restored.state)
+        extended(torch.ones(1,3)).sum().backward();restored.step()
+        self.assertEqual(int(restored.state[old[0]]['step']),2)
+        self.assertEqual(int(restored.state[new[0]]['step']),1)
+        self.assertEqual(len(snapshot['optimizer']['param_groups'][0]['params']),2)
+
     def test_resumed_adam_matches_uninterrupted_update_at_new_rate(self):
         torch.manual_seed(17);model=torch.nn.Linear(3,2)
         optimizer=torch.optim.Adam(model.parameters(),lr=.003)

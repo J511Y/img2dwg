@@ -1,6 +1,6 @@
 # EXP-050 · 동일 adapter 상태에서 학습률만 낮춘 구조·치수 안정화
 
-상태: GPU running.10개 통과 미확인. active goal의 bounded 후속 실험이다.
+상태: GPU completed /10개 동시 품질 failed. active goal은 후속 EXP-052로 계속 진행한다.
 1,028개 본학습·Space 배포·holdout20 사용은 하지 않는다.
 
 EXP-049 plain은 기존5의 실제 함수를 보존하면서 추가5의 노드 오차를1.9m→수mm로
@@ -34,3 +34,23 @@ data SHA `460eb6a59951840286726e3cc7538e7a6069696ba9de23ca939853363863180f`.
 4740 Adam/assignment 상태를 복원한다. archive 원격 byte readback4개와 CPU preflight의
 기존5 5/5·112/112를 확인한 후 실행했다. 기존 Space/model revision을 직전에 read-only
 확인하여 무변경을 증명했다. 결과는 아직 최종 판정하지 않았다.
+최종 결과는 아래에 별도로 확정한다.
+
+| 최종 실제 이미지 set 추론 | updates | 기존5 pass·DIM | 신규5 pass·DIM | 신규F1 |
+| --- | ---: | --- | --- | ---: |
+| .0003 | 4312 | 5/5·112/112 | 2/5·89/140 | .938141391 |
+| .0001 | 4301 | 5/5·112/112 | 2/5·96/140 | .928978081 |
+
+두 조건 모두accepted=attempted/alpha1/old actual drift0이고 실제 구조·치수·물리 오차
+검사8회 정체로 종료했다. loss 수렴이나모든 방법의 한계로 해석하지 않는다.
+source의~수십mm 흔들림은 줄었으나 동일3개 신규 사례가 여전히 실패다. 최종40개
+DXF 독립 재열기·SHA/guard 검사와20개 실제 예측 직접 검수를 완료했다. 원래5는
+두 조건 모두 보존되고 신규2/4번째는 통과,1/3/5번째는 잘못된 연결·문/공간 윤곽이나
+치수 위치가 남았다. elapsed2121.927838305초다.1,028학습/holdout/Space는 사용하지 않았다.
+
+EXP-052 source로 선택한 .0003 best dose32/누적4772 checkpoint
+`f10551c91a0f266831acbe71df0166e7cc69e202a355e17793d556c53cc4824d`는CPU native
+재검사에서기존5/5·112/112,신규2/5·106/140이다. 이것과 final89/140을 구분한다.
+best source에 맞는 같은epoch optimizer를 사용한다. source node/component 대응 감사는
+`outputs/adapter-refinement-2026-10-14-v1/assignment-consistency-diagnostic.json`에 보존했다.
+[최종 aggregate](../research/assets/2026-10-14-adapter-refinement-summary.json).

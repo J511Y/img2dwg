@@ -19,7 +19,12 @@ from img2dwg.graph_evaluation import PROTOCOL
 
 def restore_adapter_optimizer(model,restored,lr,device):
     optimizer=torch.optim.Adam([p for p in model.parameters() if p.requires_grad],lr=lr)
-    optimizer.load_state_dict(copy.deepcopy(restored['optimizer']))
+    state=copy.deepcopy(restored['optimizer']);fresh=optimizer.state_dict()
+    if len(state['param_groups'])!=1 or len(fresh['param_groups'])!=1:raise ValueError('Single Adam group required')
+    old_ids=state['param_groups'][0]['params'];new_ids=fresh['param_groups'][0]['params']
+    if new_ids[:len(old_ids)]!=old_ids:raise ValueError('Original parameter order changed')
+    state['param_groups'][0]['params']=new_ids
+    optimizer.load_state_dict(state)
     for group in optimizer.param_groups:group['lr']=lr
     matches={k:tuple(t.to(device).clone() for t in x) for k,x in restored['matches'].items()}
     return optimizer,matches
@@ -85,7 +90,7 @@ def main():
     initializer=digest(a.output/'adapter-initializer.safetensors');initial_state={k:v.detach().clone() for k,v in model.state_dict().items()}
     comparisons=continuation['comparisons'] if continuation else [{'name':'protected-plain','balance':False},{'name':'protected-balanced','balance':True}]
     if continuation:
-        if not 1<=len(comparisons)<=2 or any(set(v)!={'name','balance','lr'} or not 0<v['lr']<=.0003 or v['balance']!=bool(calibration) for v in comparisons):
+        if not 1<=len(comparisons)<=2 or any(set(v) not in ({'name','balance','lr'},{'name','balance','lr','query_nonlinear'}) or not 0<v['lr']<=.0003 or v['balance']!=bool(calibration) for v in comparisons):
             raise ValueError('Matched-rate continuation only')
     write(a.output/'manifest.json',{'schema':'protected-adapter-ten/v1','cases':10,'base_model_sha256':prep['expanded_initializer_sha256'],
         'adapter_initializer_sha256':initializer,'protocol':PROTOCOL,'comparisons':comparisons,'base_frozen':True,
@@ -101,7 +106,33 @@ def main():
     completed=[]
     for v in comparisons:
         if time.monotonic()-started>a.suite_minutes*60:break
-        model.load_state_dict(initial_state);params=[p for p in model.parameters() if p.requires_grad]
+        if v.get('query_nonlinear'):
+            source_names=[name for name,p in model.named_parameters() if p.requires_grad]
+            model=ProtectedGraphAdapter(make_model(c,a.device),None,base_capacity=[959,726],protected_rank=config['adapter']['protected_rank'],query_nonlinear=True).to(a.device)
+            new_names=[name for name,p in model.named_parameters() if p.requires_grad]
+            if new_names[:len(source_names)]!=source_names:raise ValueError('Adam source parameter names changed')
+            missing,unexpected=model.load_state_dict(initial_state,strict=False)
+            if unexpected or any(not k.startswith(('node_refine.','component_refine.')) for k in missing):raise ValueError('Nonlinear capacity migration changed unrelated weights')
+            reference=ProtectedGraphAdapter(make_model(c,a.device),None,base_capacity=[959,726],protected_rank=config['adapter']['protected_rank']).to(a.device)
+            reference.load_state_dict(initial_state)
+            checked_fields=0
+            with torch.no_grad():
+                for row in rows:
+                    before=reference(bank[row['sample_id']]);after=model(bank[row['sample_id']])
+                    for key in before:
+                        if not torch.equal(before[key],after[key]):raise ValueError('Neutral nonlinear migration altered '+key)
+                        checked_fields+=1
+            del reference,before,after
+            write(a.output/v['name']/'neutral-initialization.json',{'status':'passed','actual_inputs':10,
+                'tensor_fields_checked':checked_fields,'bit_equal_outputs':True,'source_initializer_sha256':initializer,
+                'source_CAD_or_GT_access':False,'old_Adam_parameter_names_preserved':True})
+            nonlinear_config=copy.deepcopy(config);nonlinear_config['adapter']['query_nonlinear']=True
+            write(a.output/v['name']/'config.json',nonlinear_config)
+        else:
+            if model.query_nonlinear:raise ValueError('Place source architecture control before added-capacity condition')
+            model.load_state_dict(initial_state)
+            write(a.output/v['name']/'config.json',config)
+        params=[p for p in model.parameters() if p.requires_grad]
         optimizer=torch.optim.Adam(params,lr=v.get('lr',.003));matches={}
         if restored:
             optimizer,matches=restore_adapter_optimizer(model,restored,v['lr'],a.device)

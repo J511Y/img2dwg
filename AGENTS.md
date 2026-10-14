@@ -7,6 +7,9 @@
 EXP-048 하드 guard의 신규학습 정지 결과를 보존하고 EXP-049의 조건부 잔차 adapter를
 bounded job으로 비교한다. EXP-050은 같은 plain final 모델/Adam/assignment를 보존하고
 학습률만 .0003/.0001로 낮춘다(각20분/suite50분/job65분). 필요한 작은 후속 실험을 이어가되 각 실행의 scope/cap/hash를
+기록한다. EXP-050도신규2/5에정체됐다. EXP-051 반경 참조 후보는CPU diagnostic/rejected이며
+기본 inference는None이다. EXP-052는동일4772 best 모델/Adam에서zero-output query
+비선형 residual을 비교한다(각25분/suite65분/job80분). 실제 neutral function/Adam 상태 보존을
 기록한다.1,028개 본학습/Space 배포와 holdout20 사용은 계속 금지다. 실패를 완료로 바꾸지 않는다.
 
 **현재 요청:** EXP-048의 같은 TRAIN10에 좌표 업데이트 guard와 loss group balance를

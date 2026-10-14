@@ -14,13 +14,13 @@ from scripts.train_retention_ablation import digest,make_model,measurement,write
 def main():
     p=argparse.ArgumentParser();p.add_argument('--data',type=Path,required=True)
     p.add_argument('--config',type=Path,required=True);p.add_argument('--checkpoint',type=Path,required=True)
-    p.add_argument('--output',type=Path,required=True);p.add_argument('--fresh-features',action='store_true');a=p.parse_args()
+    p.add_argument('--output',type=Path,required=True);p.add_argument('--fresh-features',action='store_true');p.add_argument('--reference-radius-mm',type=float);a=p.parse_args()
     if a.output.exists():raise FileExistsError('Use a fresh verification directory')
     started=time.monotonic();torch.set_num_threads(6)
     rows=json.loads((a.data/'index.json').read_text());c=json.loads(a.config.read_text())
     assert len(rows)==10 and all(r['split']=='train' for r in rows)
     ad=c['adapter'];model=ProtectedGraphAdapter(make_model(c,'cpu'),None,nodes=ad['nodes'],components=ad['components'],
-        hidden=ad['hidden'],base_capacity=ad['base_capacity'],protected_rank=ad['protected_rank']).eval()
+        hidden=ad['hidden'],base_capacity=ad['base_capacity'],protected_rank=ad['protected_rank'],query_nonlinear=ad.get('query_nonlinear',False)).eval()
     model.load_state_dict(load_file(str(a.checkpoint)));bank={};bundles={};graphs={};diffs={}
     if a.fresh_features:
         from transformers import AutoModel
@@ -36,9 +36,10 @@ def main():
         diffs[k]=float((bank[k]-cached).abs().max())
         bundles[k]=json.loads((d/'components.json').read_text(encoding='utf-8'));graphs[k]=json.loads((d/'target.json').read_text(encoding='utf-8'))
     library=json.loads((a.data/'library.json').read_text(encoding='utf-8'))
-    result=measurement(model,rows,bank,bundles,graphs,c,library,a.output/'inferred-final',inferred=True,save=True)
+    result=measurement(model,rows,bank,bundles,graphs,c,library,a.output/'inferred-final',inferred=True,save=True,reference_radius_mm=a.reference_radius_mm)
     write(a.output/'receipt.json',{'schema':'protected-adapter-independent-evaluation/v1','model_sha256':digest(a.checkpoint),
         'config_sha256':digest(a.config),'fresh_image_features':a.fresh_features,'feature_max_absolute_differences':diffs,
+        'reference_radius_mm':a.reference_radius_mm,
         'model_forward_inputs':'vision features only;fixed query reserve;active/no-object selection',
         'target_CAD_used_only_after_forward_for_evaluation':True,'holdout_accessed':False,'Space_deployed':False,
         'evaluation':result,'elapsed_seconds':time.monotonic()-started})

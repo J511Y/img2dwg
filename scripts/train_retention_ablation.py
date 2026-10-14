@@ -51,11 +51,11 @@ def candidate_pass(m):
         m['invalid_repeated_node_references']==0 and m['unsupported_components']==0 and (res is None or res<=1))
 
 @torch.no_grad()
-def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=False,save=False,fixed_capacity=None):
+def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=False,save=False,fixed_capacity=None,reference_radius_mm=None):
     model.eval();result=[]
     for r in rows:
         key=r['sample_id'];cap=None if inferred else (fixed_capacity or ([959,726] if r['cohort']=='original' else config['diagnostic_fixed_capacity']))
-        pred=model(bank[key],capacities=cap);raw=decode(pred,config['texts'],templates=library);solved=project(raw)
+        pred=model(bank[key],capacities=cap);raw=decode(pred,config['texts'],templates=library,reference_radius_mm=reference_radius_mm);solved=project(raw)
         folder=out/key;error=None;factory=None
         try:
             graph=compile_graph(solved,strict=False)
@@ -63,10 +63,13 @@ def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=Fal
         except Exception as exc:
             error=type(exc).__name__+': '+str(exc);graph={**solved['frame'],'components':[],'texts':[],'unsupported_components':['compile-error']}
         m=evaluate(solved,bundles[key],graph,graphs[key],factory)
+        m['reference_resolution_receipt']=raw['reference_resolution_receipt']
+        if raw['reference_resolution_receipt']['unresolved_slots']:m['passed']=False
         m.update(sample_id=key,cohort=r['cohort'],geometry_candidate_without_DXF_audit=candidate_pass(m),
                  actual_DXF_audit_executed=save,capacity_nodes=pred['xy'].shape[1],capacity_components=pred['kind'].shape[1],
                  capacity_below_required=bool(pred['xy'].shape[1]<r['nodes'] or pred['kind'].shape[1]<r['component_count']),
                  export_error=error)
+        if raw['reference_resolution_receipt']['unresolved_slots']:m['geometry_candidate_without_DXF_audit']=False
         raw_graph=compile_graph(raw,strict=False)
         before=evaluate(raw,bundles[key],raw_graph,graphs[key],None)
         m['before_constraints']={k:before[k] for k in ['structure_f1','component_f1','shared_reference_f1']}

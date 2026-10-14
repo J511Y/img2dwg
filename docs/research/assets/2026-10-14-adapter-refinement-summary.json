@@ -1,0 +1,106 @@
+{
+  "schema": "adapter-refinement-summary/v1",
+  "job_id": "6acf67f15ccb47ba0f799dd9",
+  "source_commit": "4c87b38",
+  "receipt_sha256": "72d138255aa55657f51075490870db16052969ca185bdb35c1790be80aab717c",
+  "elapsed_seconds": 2121.9278383050114,
+  "cases": 10,
+  "conditions": [
+    {
+      "variant": {
+        "name": "continuation-lr3e-4",
+        "balance": false,
+        "lr": 0.0003
+      },
+      "updates": 4312,
+      "model_sha256": "79a05c986e28c09e9875f6501339c052a869ebe0fd705459fce18692e1a8ae9b",
+      "stop": "actual-structure-dimension-physical-plateau",
+      "actual_inference_groups": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9992846924177397,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9990031130438914,
+          "shared_reference_f1": 0.9996431608684742
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 2,
+          "structure_f1": 0.9381413911060433,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 89,
+          "dimensions_missing_or_incorrect": 51,
+          "geometry_candidate_cases": 2,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.914760852013288,
+          "shared_reference_f1": 0.835023551191853
+        }
+      },
+      "guard": {
+        "attempts": 4312,
+        "accepted": 4312,
+        "rejected": 0,
+        "mean_alpha": 1.0,
+        "max_accepted_original_drift_mm": 0.0
+      }
+    },
+    {
+      "variant": {
+        "name": "continuation-lr1e-4",
+        "balance": false,
+        "lr": 0.0001
+      },
+      "updates": 4301,
+      "model_sha256": "c941a2516ed78461e6cd878b1396f4fa6da450958925ab5c0a059cf086eb8a2a",
+      "stop": "actual-structure-dimension-physical-plateau",
+      "actual_inference_groups": {
+        "original": {
+          "cases": 5,
+          "passed_cases": 5,
+          "structure_f1": 0.9992846924177397,
+          "required_dimensions": 112,
+          "dimensions_correct_geometry_and_value": 112,
+          "dimensions_missing_or_incorrect": 0,
+          "geometry_candidate_cases": 5,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9990031130438914,
+          "shared_reference_f1": 0.9996431608684742
+        },
+        "additional": {
+          "cases": 5,
+          "passed_cases": 2,
+          "structure_f1": 0.9289780814118986,
+          "required_dimensions": 140,
+          "dimensions_correct_geometry_and_value": 96,
+          "dimensions_missing_or_incorrect": 44,
+          "geometry_candidate_cases": 2,
+          "actual_DXF_audit_executed": true,
+          "capacity_below_required_cases": 0,
+          "component_f1": 0.9084644882808455,
+          "shared_reference_f1": 0.8321718479328158
+        }
+      },
+      "guard": {
+        "attempts": 4301,
+        "accepted": 4301,
+        "rejected": 0,
+        "mean_alpha": 1.0,
+        "max_accepted_original_drift_mm": 0.0
+      }
+    }
+  ],
+  "direct_visual_predictions_inspected": 20,
+  "native_DXFs_independently_checked": 40,
+  "generalization_validated": false,
+  "twenty_used": false,
+  "Space_deployed": false,
+  "full_training_executed": false
+}

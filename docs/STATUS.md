@@ -12,8 +12,12 @@ checkpoint의 별도 CPU 재검사에서 기존5 5/5·112/112, 신규5 2/5·112/
 plain 최종은 신규0/5·44/140으로 다시 악화했다. balanced도 완료했으며 신규0/5·43/140이다.
 좋은 중간 결과와 최종 결과를 구분하며10개 동시 통과를 선언하지 않는다.
 관측된 흔들림에 대한 [EXP-050](experiments/2026-10-14-EXP-050-adapter-refinement.md)은
-같은 final checkpoint/Adam/assignment를 보존하고 학습률만 낮추는 bounded 비교가 running이다.
-EXP-050 job `6acf67f15ccb47ba0f799dd9`이며 고정10개 외 자료는 사용하지 않는다.
+같은 final checkpoint/Adam/assignment를 보존한 학습률 비교를 완료했다.
+EXP-050 두 조건 모두기존5/5·112/112,신규2/5이며finalDIM89/140·96/140이다.
+EXP-051 물리 참조 후보 검사는anchor 오류까지 있어해결 가설을 기각했다.
+EXP-052는같은source best/Adam/assignment에서query 비선형 residual만비교한다.
+CPU neutral 초기화는실제10개180개 출력tensor의bit equality와기존5/5·신규2/5를 확인했다.
+GPU는준비 단계이며 고정10개 외 자료는 사용하지 않는다.
 원본/holdout/Space를 보존한다.
 
 ## 현재 실행: 좌표 제한과 loss 균형의 분리 비교
