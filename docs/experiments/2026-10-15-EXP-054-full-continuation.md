@@ -1,6 +1,6 @@
 # EXP-054 · 수정 decoder와 1,028개 본학습
 
-기록일2026-10-15 KST. 상태: preparing. R&D 후보이며 본학습 결과 미측정이다.
+기록일2026-10-15 KST. 상태: running. R&D 후보이며 본학습 결과 미측정이다.
 사용자가 본학습/retention10/별도20 직접검수/통과 시 Space 반영을 명시 승인했다.
 
 ## 질문과 고정 조건
@@ -80,6 +80,30 @@ threshold를 바꾸지 않는다. 과거 Space의05a545dd… 모델과 이 기�
 - data: `prepare_full_continuation.py`, 원본 train/development만 복사, SHA/CPU features 검증.
 - model: `graph_loading.py`의 serializable adapter stack, `train_full_continuation.py`.
 - 사전 native10 결과/실행 job/비교 화면/후속 검수 결과는 실행 뒤 추가한다.
+
+## 본학습 작업 제출
+
+job `6ad0277a5ccb47ba0f7a2ced`, A100, training180분/job240분 상한이다.
+source`cee3828fcc18ad58e9223f25f79b6eb31dd80a2c`와 code archive
+`ffabd6c6d30e90d077f77dee69847c678467df829974d3232dc34a4abd117762`,
+training archive`f07df5b783efba2d589d1f660c62ad0f0073dfadcc85865dbd3dde3bc5c30574`,
+twenty archive`24ea671885f4fcaaeddf807157e971d1637590e9ba5caa88807d44114c0bc6fe`다.
+5개 published file1,071,408,424 bytes를 remote에서 전부 readback하여 SHA를 대조했다.
+initial GPU/native quality와 업데이트/완료/최종 품질은 이후 receipt로 확정한다.
+기존Space revision402d7958…와 model pin05a545dd…/revision6c51ac29…는 그대로다.
+
+### 실행 명세 감사 정정
+
+running source의 plateau 조건은 `eligible and epoch>=3`다. 즉1028개 전체 노출 후
+세 번째 epoch에 진입하면 동작하며, 초기 본문의 "세 번 전체 순회 완료 후"보다 이르다.
+manifest의 같은 문구도 이 조건으로 해석해야 한다. 이 감사 정정을 별도 보존하며
+실행 중 코드를 바꾸거나 과거 protocol을 덮어쓰지 않는다. strict native pass/두 checkpoint,
+본학습 전체 노출 전 후보 선택 금지,20 후보 선택 제외 조건은 유지한다.
+실행 결과를 보고 step 자체를 fit 근거로 삼지 않는다.
+
+직접검수에서는 모델의 실제 구조·치수 오류와 단순 CAD 원점/좌우반전을 구분한다.
+반전 자동판별을 복원 선행 gate로 추가하지 않는다. fixed-frame 주지표를 유리한 정합으로
+바꿔 쓰지 않으며, CAD 후편집만으로 동등해지는 경우는 별도 HITL 관측으로 기록한다.
 
 ## 사전 검사
 

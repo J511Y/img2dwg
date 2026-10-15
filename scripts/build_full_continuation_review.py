@@ -41,10 +41,20 @@ $('cases').onchange=()=>{index=Number($('cases').value);show()};$('prev').onclic
     groups += [('twenty-'+str(i+1),twenty[i*4:(i+1)*4]) for i in range(5)]
     for name,selected in groups:
         contact=Image.new('RGB',(1536,550*len(selected)),'white');draw=ImageDraw.Draw(contact)
+        sources=[]
         for i,r in enumerate(selected):
             d=root/r['data'];pred=root/r['prediction'];contact.paste(Image.open(d/'input.png').convert('RGB'),(0,i*550+30))
             contact.paste(render(json.loads((d/'target.json').read_text(encoding='utf-8'))),(512,i*550+30));contact.paste(render(json.loads((pred/'prediction.json').read_text(encoding='utf-8'))),(1024,i*550+30))
             draw.text((10,i*550+8),r['sample_id']+' | INPUT / GT / MODEL | DIM '+str(r['correct_dimensions'])+'/'+str(r['required_dimensions'])+' | F1 '+str(round(r['structure_f1'],5)),fill='black')
-        contact.save(root/('full-'+name+'.jpg'))
+            sources.append({'sample_id':r['sample_id'],'input_sha256':hashlib.sha256((d/'input.png').read_bytes()).hexdigest(),
+                'GT_sha256':hashlib.sha256((d/'target.json').read_bytes()).hexdigest(),
+                'prediction_sha256':hashlib.sha256((pred/'prediction.json').read_bytes()).hexdigest()})
+        image=root/('full-'+name+'.jpg');contact.save(image)
+        image.with_suffix('.provenance.json').write_text(json.dumps({'derived_from_actual_run':True,'sources':sources,
+            'model_sha256':state['model_sha256'],'image_sha256':hashlib.sha256(image.read_bytes()).hexdigest(),
+            'image_size':contact.size,'image_bytes':image.stat().st_size,
+            'builder_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            'transformation':'PIL native vector rendering;three512px columns;no geometry fitting or editing',
+            'redistribution':'prohibited;controlled internal/private only'},indent=2),encoding='utf-8')
     print(json.dumps({'review':str(root/'full-continuation-review.html'),'cases':30,'contact_sheets':7}))
 if __name__=='__main__':main()

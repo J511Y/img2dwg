@@ -4,9 +4,14 @@
 
 사용자가 EXP-053 수정 반영 1,028개 본학습과 retention10/별도20 검수 후 통과 모델의
 Space 반영을 명시 요청했다. [EXP-054](experiments/2026-10-15-EXP-054-full-continuation.md).
-원본1028+고정development16의 CPU DINO 특징을 준비 중이다. 별도20은 training archive에서
+원본1028+고정development16의 CPU DINO 특징을 준비했다. 별도20은 training archive에서
 제외한다. 검증된10 모델 전체를 동결한 새 잔차 분기로 기존10의 출력을 보호한다.
 아래 미실행/금지 기록은 이전 요청 당시 상태다. 현재 GPU/품질/배포 상태는 별도 기록한다.
+HF A100 job `6ad0277a5ccb47ba0f7a2ced`는 RUNNING(환경/데이터 준비 포함)이다.
+source`cee3828`, code`ffabd6c6…`,train archive`f07df5b7…`,세 archive와bootstrap/protocol
+전체5파일 약1.07GB private readback SHA가 일치했다. 초기 CPU native10/10·252/252,
+관련44개 검사 통과다. 기존20중 exact processed pixel leak1건을미사용validation1건으로
+사전교체한정정20(19+1)을쓴다. 본학습/20 품질은아직미측정이며기존Space는유지한다.
 
 ## 현재 완료: 기존5 유지 + 추가5 동시 재현
 
