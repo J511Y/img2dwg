@@ -2,6 +2,12 @@
 
 평면도 이미지에서 **CAD에서 열고 편집할 수 있는 DWG**를 복원하는 모델·파이프라인 연구 프로젝트.
 
+현재 요청: [EXP-054](docs/experiments/2026-10-15-EXP-054-full-continuation.md)의 실제1,028페어
+본학습을 준비한다. 기존10 native preflight10/10·252/252, 관련43개 검사가 통과했다.
+정정 검증20은 학습 전 발견한 processed PNG 중복1건을 미사용validation1건으로 교체해
+기존19+신규1로 고정했다. 본학습/기존10 유지/별도20 직접검수와 통과 모델의 Space 반영이
+최신 사용자 승인 범위다. 아래 미실행/금지/실패 상태는 이전 실행의 기록이다.
+
 최신 완료: [EXP-053](docs/experiments/2026-10-14-EXP-053-ranked-consistent-decoder.md)의
 실제 TRAIN10(기존5+추가5)은연속2checkpoint·fresh image추론에서10/10·필수치수252/252다.
 10개를직접검수했고모델DXF→DWG→DXF 재열기/실제브라우저DWG다운로드를확인했다.

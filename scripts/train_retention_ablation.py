@@ -51,7 +51,14 @@ def candidate_pass(m):
         m['invalid_repeated_node_references']==0 and m['unsupported_components']==0 and (res is None or res<=1))
 
 @torch.no_grad()
-def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=False,save=False,fixed_capacity=None,reference_radius_mm=None,set_selection='no-object',dimension_consistency_mm=None,projection_limit_mm=None):
+def compact_bundle(bundle):
+    """Retain every used prototype, without duplicating the unused catalog."""
+    used={c['parameters']['template_id'] for c in bundle['components'] if c['kind']=='native_symbol'}
+    return {**bundle,'templates':{k:v for k,v in bundle.get('templates',{}).items() if k in used},
+            'artifact_template_catalog_total':len(bundle.get('templates',{}))}
+
+@torch.no_grad()
+def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=False,save=False,fixed_capacity=None,reference_radius_mm=None,set_selection='no-object',dimension_consistency_mm=None,projection_limit_mm=None,compact_artifacts=False):
     model.eval();result=[]
     for r in rows:
         key=r['sample_id'];cap=None if inferred else (fixed_capacity or ([959,726] if r['cohort']=='original' else config['diagnostic_fixed_capacity']))
@@ -59,7 +66,9 @@ def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=Fal
         folder=out/key;error=None;factory=None
         try:
             graph=compile_graph(solved,strict=False)
-            if save:factory=exports(graph,folder)
+            if save:
+                stored={**graph,'shared_component_graph':compact_bundle(solved)} if compact_artifacts else graph
+                factory=exports(stored,folder)
         except Exception as exc:
             error=type(exc).__name__+': '+str(exc);graph={**solved['frame'],'components':[],'texts':[],'unsupported_components':['compile-error']}
         m=evaluate(solved,bundles[key],graph,graphs[key],factory)
@@ -68,16 +77,21 @@ def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=Fal
         selection_invalid=raw['reference_resolution_receipt']['unresolved_slots'] or raw['query_selection_receipt'].get('capacity_limited',False) or solved.get('constraint_receipt',{}).get('status')=='rejected-displacement'
         if selection_invalid:m['passed']=False
         m.update(sample_id=key,cohort=r['cohort'],geometry_candidate_without_DXF_audit=candidate_pass(m),
-                 actual_DXF_audit_executed=save,capacity_nodes=pred['xy'].shape[1],capacity_components=pred['kind'].shape[1],
+                 actual_DXF_audit_executed=bool(factory is not None),capacity_nodes=pred['xy'].shape[1],capacity_components=pred['kind'].shape[1],
                  capacity_below_required=bool(pred['xy'].shape[1]<r['nodes'] or pred['kind'].shape[1]<r['component_count']),
                  export_error=error)
         if selection_invalid:m['geometry_candidate_without_DXF_audit']=False
-        raw_graph=compile_graph(raw,strict=False)
+        try:raw_graph=compile_graph(raw,strict=False)
+        except Exception as exc:
+            raw_graph={**raw['frame'],'components':[],'texts':[],'unsupported_components':['raw-compile-error']}
+            m['raw_compile_error']=type(exc).__name__+': '+str(exc);m['passed']=False
+            m['geometry_candidate_without_DXF_audit']=False
         before=evaluate(raw,bundles[key],raw_graph,graphs[key],None)
         m['before_constraints']={k:before[k] for k in ['structure_f1','component_f1','shared_reference_f1']}
+        m['before_constraints']['dimension']=before['components']['dimension']
         result.append(m)
         if save:
-            write(folder/'metrics.json',m);write(folder/'shared-graph.json',solved)
+            write(folder/'metrics.json',m);write(folder/'shared-graph.json',compact_bundle(solved) if compact_artifacts else solved)
             (folder/'raw.svg').write_text(svg(raw_graph),encoding='utf-8')
     groups={}
     for group in ['original','additional']:

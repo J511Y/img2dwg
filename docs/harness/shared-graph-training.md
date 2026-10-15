@@ -1,5 +1,17 @@
 # 공유 노드·컴포넌트 학습 하네스
 
+## 2026-10-15 · 최신 본학습 승인
+
+사용자가 EXP-053 수정 반영1028학습/기존10 유지/별도20 검수/통과 시 Space를 요청했다.
+[EXP-054](../experiments/2026-10-15-EXP-054-full-continuation.md)의새하네스를사용한다.
+`prepare_full_continuation.py`→`package_full_continuation.py`→`train_full_continuation.py`→
+후보 SHA 동결→`evaluate_full_continuation.py`→직접검수→통과 시 배포다.
+20은학습archive에서분리한다. 기존20중1건의processed PNG train중복을학습전에찾아
+미사용validation1건으로교체한정정20(19+1)을사용한다. pixel/source-group 교차0이지만
+건물/layout family 분리는미완료다. 아래 full-v1은과거실행이며금지가이번승인을덮지않는다.
+
+## 이전 실행 기록
+
 현재 상태: full-v1은 completed/quality-failed, 원래 5개 0/5·0/112와 별도 20개
 0/20·0/476이다. 새 실험은 중단하고
 [상세 회고](../research/2026-10-14-experiment-retrospective.md)를 먼저 진행한다.
