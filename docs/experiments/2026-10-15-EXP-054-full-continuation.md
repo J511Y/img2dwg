@@ -134,3 +134,27 @@ component 파일 SHA 차이를 곧바로 감독 충돌로 보지 않는다. 처�
 이를 개선했다. 기존 학습된 inner adapter의 식과 weight는 바꾸지 않았다.
 검수용 JSON에는 실제 사용한 prototype만 포함하고 전체 catalog는 모델 library에 보존하여
 미사용6381개 catalog를 사례마다 중복 저장하지 않는다. 기하/수치 계산과 판정은 동일하다.
+
+## 실행 중 진단 · 최종 검증과 구분
+
+update1420/epoch2의 중간 best를 별도로 SHA 고정하여 TRAIN4에서 CPU로 추론했다.
+네 사례 모두 구조F1=0, 표시 DIM=0이며 실제 벡터를 직접 보니 분산된 객체와 긴 잘못된
+연결이 남았다. 원점 이동/좌우반전/100mm 반올림으로 복구할 오차가 아니었다.
+이 중간 검사를 별도20 결과나 최종 후보 검사로 사용하지 않는다.
+
+이 snapshot의 post-forward GT 최적 대응에서 node median 오차는138.6~212.9mm이고
+node activity recall은 .147~.299였다. pointer slot/DIM digit sequence도 맞지 않았다.
+이 대응은 실제 학습 중 cached assignment와 다를 수 있어 순수 OCR 정확도나 실제
+학습 assignment 성능으로 해석하지 않는다. 원자료는 private monitor/snapshot-train4다.
+
+고정 source의 active logit 범위가 넓어 새 잔차가 기존 prior를 넘기 어려울 가능성을
+조사했다. 같은 TRAIN4/같은 weight/같은 좌표의 CPU control에서 source-active prior와
+padding prior만 .05배로 낮췄으나 activity recall/참조 node Chamfer의 일관된 개선이
+없고 구조/DIM도 전부0이었다. 원인으로 확정하거나 inference 설정에 채택하지 않았다.
+이는 inference-only control이므로 초기화/재학습 효과 전체를 기각하지는 않는다.
+GPU 실행·weight·고정 decoder와20 검증 조건은 바꾸지 않았다.
+
+기존10의 이전 릴리스 원본 사본을 primary frame/EXIF 처리한 뒤 actual serving normalize를
+적용하니 준비된 입력과10/10 pixel exact였다. fresh CPU 특징 검증과 함께 입력 경로를
+확인하는 증거이며 신규 구조 재현 성공은 아니다. native DXF 검수기는 canvas bottom-left
+원점/동일 anchor의 서로 다른 치수값을 구분하는 단위 검사1개도 통과했다.

@@ -17,6 +17,7 @@ def inspect_native(folder):
     graph=json.loads((folder/'prediction.json').read_text(encoding='utf-8'));m=json.loads((folder/'metrics.json').read_text())
     doc=ezdxf.readfile(folder/'prediction.dxf');audit=doc.audit();ms=doc.modelspace()
     assert doc.units==4 and not audit.errors
+    assert len(ms)==m['factory']['entities'] and len(ms.query('INSERT'))==m['factory']['block_instances']
     assert not any(e.dxftype() in ('IMAGE','IMAGEDEF','OLEFRAME','PDFUNDERLAY','DWFUNDERLAY') for e in doc.entitydb.values() if e.is_alive)
     assert '<image' not in (folder/'prediction.svg').read_text(encoding='utf-8').lower()
     dims=list(ms.query('DIMENSION'));pred=[c for c in graph['components'] if c['kind']=='dimension']
