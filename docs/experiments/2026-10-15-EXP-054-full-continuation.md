@@ -1,7 +1,24 @@
 # EXP-054 · 수정 decoder와 1,028개 본학습
 
-기록일2026-10-15 KST. 상태: running. R&D 후보이며 본학습 결과 미측정이다.
+기록일2026-10-15 KST. 상태: execution completed / quality failed. 기술 가설의 실패 실험이다.
 사용자가 본학습/retention10/별도20 직접검수/통과 시 Space 반영을 명시 승인했다.
+
+**결론: 기존10은10/10·252/252를 유지했으나 별도20은0/20·0/479다. 미배포다.**
+1,028개 모두를 학습에 사용했고21,928 update/22번째 순회 진입 후 실제 품질 정체로 종료했다.
+전체 모델 fine-tuning이 아니라 검증 모델을 동결한 **268만 parameter의 새 pooled residual
+adapter 학습**이다. 기존10 보호 성공을 신규 도면 학습 성공으로 해석하지 않는다.
+최종30개 직접검수/원본 input pixel audit/native DXF/기존10 DWG 재열기를 완료했다.
+
+| 고정 후보 fresh CPU | pass | 구조F1 | component/refF1 | 필수DIM joint |
+| --- | ---: | ---: | ---: | ---: |
+| 기존 TRAIN10 | 10/10 | .9987504463 | .9988369656 / .9989518482 | 252/252 |
+| 별도 정정20 | 0/20 | .0000526718 | 0 / 0 | 0/479 |
+| 같은20의 동결 EXP053 기준선 | 0/20 | .0000460162 | 0 / 0 | 0/479 |
+
+[수치 정본](../research/assets/2026-10-15-full-continuation-summary.json),
+[loss와 실제 품질의 분리](../research/assets/2026-10-15-full-continuation-learning.svg).
+비교 화면은 `http://127.0.0.1:8781/full-continuation-review.html`이며 실제30개 전체와
+치수 누락·숫자/길이 오차·vector DXF, 통과한 기존10의 DWG 다운로드를 제공한다.
 
 ## 질문과 고정 조건
 
@@ -158,3 +175,89 @@ GPU 실행·weight·고정 decoder와20 검증 조건은 바꾸지 않았다.
 적용하니 준비된 입력과10/10 pixel exact였다. fresh CPU 특징 검증과 함께 입력 경로를
 확인하는 증거이며 신규 구조 재현 성공은 아니다. native DXF 검수기는 canvas bottom-left
 원점/동일 anchor의 서로 다른 치수값을 구분하는 단위 검사1개도 통과했다.
+
+
+## 최종 실행·검증과 배포 판단
+
+A100 job은 COMPLETED다. 21회 전체 순회와 22번째 340건을 포함해 21,928 update를 모두
+허용했고 quality-plateau로 종료했다. Training elapsed 8232.136466초에는 최종 native
+export가 포함된다. GPU kernel 실사용 시간이나 실청구액은 아니다. Source 모델
+6ca23df9…의 bytes는 유지됐다. Backbone과 base graph decoder는 동결했고, 학습한 새
+분기의 parameter는 2,681,728개다. 새 분기는 mean/max pooled 특징을 사용하며 새롭게
+학습하는 spatial cross-attention은 없다.
+
+개발 지표로 선택한 후보는 1420 update / epoch2의 best다. SHA는
+`aed6d0e89326e761703f18e9726207c95efe542e100c5556484059480818d707`, config SHA는
+`b39b36b74a0cc55b70ce24903e714fcea56d4b047e89c565e082bb7be45581bd`다.
+21,928 update의 last와 best에 대응하는 model/optimizer/assignment를 각각 보존했다.
+별도20을 본 뒤 checkpoint를 바꾸지 않았다. 검증한 후보를 22회 학습된 마지막 weight라고
+소개하지 않는다. 후보 선택 시점에는 이미 1,028개를 전부 최소 한 번 노출했다.
+
+Best의 development16은 0/16·0/369, TRAIN probe16은 0/16·0/379다. 마지막 업데이트에서도
+각각 0/16·0/369와 0/16·0/379였다. Last의 참조 node Chamfer는 개발687.36mm/학습표본
+614.78mm다. 개발638.37mm인 best보다 개발 지표가 나빠졌다. 학습 loss 로그877점은
+25 update마다 다른 입력에서 수집한 표본이며 전체 데이터 평균이 아니다. Loss는 하락했지만
+CAD pass는 늘지 않았다. 시간 상한이나 loss 감소를 fit 근거로 삼지 않았다.
+
+후보를 고정한 뒤 별도20과 EXP053 기준선을 같은 fresh CPU/image/decoder로 각각 한 번
+측정했다. 후보의 참조 node Chamfer는 562.75mm, 기준선은 557.34mm이며 둘 다 0/20·0/479다.
+이 작은 차이를 통계적 우열이나 일반화 성과로 주장하지 않는다. 최종20의 제약 전 구조F1도
+제약 후와 같았다. EXP053의 과잉DIM hard projection만으로 이번 실패를 설명할 수 없다.
+최종20 CAD에 DIMENSION은 총1개뿐이고 그1개도 오답이다. 첫 사례에서 정답6900mm에
+대해6510mm를 그렸고 참조점 최대 오차는2258mm다. 100mm 반올림으로 값·공간 관계·누락
+치수를 복구할 수 없다.
+
+### 직접 검수와 파일 검증
+
+실제 입력/GT/모델의7개 contact sheet로 기존10과 별도20을 전부 직접 보았다. 기존10의
+방·문·벽체, 곡선 발코니와 경사 외벽 배치는 유지됐다. 별도20에서는 방이 닫히지 않고 대각
+연결, 가로 띠 군집, 세로 붕괴가 남았다. 단순 원점 이동이나 좌우반전으로 복원할 수 없었다.
+사례별 관측은 private `direct-visual-inspection.json`30행에 남겼다. 직원 승인은 아니다.
+
+30개 모두 이전 릴리스 원본 사본의 primary page/EXIF/실제 serving normalize와 준비된
+입력 PNG가 pixel exact였다. Linux fresh CPU DINO와 Windows cached 특징의 최대 차이는
+1.049041748e-5였고, 기존10의 실제 구조·치수 검사는 통과했다. 특징 bit equality는 아니다.
+독립 native verifier로 모델/config/입력/cohort SHA, 모든 update의50mm guard와30개 DXF를
+검사했다. Native DIM253개는 기존252개와 신규의 잘못된1개다. 파일 audit·단위·래스터 없음이
+통과해도 신규 도면 품질은 실패다. 검수 화면은 모든 필수 치수를 표시하고, 대응 예측이 없는
+행을 누락으로 표시한다. 사례 전환 시 서로 다른 사례의 숫자가 섞이지 않도록 함께 갱신한다.
+
+통과한 기존10의 모델DXF→ODA27.1.0→ACAD2018 DWG/AC1032→DXF 재열기에서252DIM과
+INSERT/LINE/ARC/CIRCLE을 보존했다. 최대 기하 delta는1.091393642e-11이다. 별도20은
+품질 실패로 DWG 검증을 진행하지 않았다. 실제 CAD UI edit/save는 증명하지 않는다.
+브라우저에서도 기존1건의27개 치수 행과 DWG 다운로드를 확인하고, 다운로드한 파일과
+roundtrip 모델 DWG의 bytes가 같은지 검사했다.
+
+### 해석과 회고
+
+이번에는 본학습으로 기존 재현을 잃는 문제를 막았고, 파일 생성과 실제 공간·치수 복원을
+분리해 검사했다. 검증군의 pixel 중복을 학습 전 metadata만으로 수정했고 실패 모델을
+배포하지 않았다. 반면 기존 모델을 전부 동결한 pooled residual은 이번 예산과 학습법에서
+신규 TRAIN 표본조차 재현하지 못했다. 이를 성공적인 full-model fine-tuning이나 1,000개
+데이터의 무효성으로 해석하면 잘못이다.
+
+앞선 추가5는 joint batch로 같은 사례를 많이 반복 학습했다. 이번은 batch1, 큰 고정 query
+reserve, 사례당 약21회 노출이다. 작은 실험과 사례당 학습량이 같은 capacity ablation이
+아니다. 더 오래 학습하거나 더 큰 모델로 반드시 해결된다는 결론도, 개선 가능성이 없다는
+결론도 얻지 못했다. 전역 pooled 분기의 표현력, 동결된 source prior와 연결 관계 학습,
+512입력의 작은 치수 문자, ROI/target의 비유일성은 분리할 후속 가설이다. TRAIN에서 같은
+사진에 다른 target이 있는3건을 관측했으나 전체 실패를 그3건으로 설명하지 않는다.
+같은 의뢰 페어 정책과 1,028건을 유지했다.
+
+다음 판단은 새로운 작은 TRAIN 집합에서 구조와 필수DIM을 먼저 fit시키는 것이다.
+Spatial feature를 학습하는 decoder와 현재 pooled adapter를 같은 사례당 노출·기하 감독으로
+비교하고, 좌표·연결 관계·치수 숫자 중 먼저 실패하는 출력을 분리할 필요가 있다. 이번20으로
+threshold나 학습을 재조정하거나 추가 GPU를 실행하지 않았다. 후속 가설은 실행 성과가 아니다.
+
+### 증거와 운영 상태
+
+Private run의 `GPU/receipt.json`, `CPU-fresh/receipt.json`, `GPU/candidate-freeze.json`,
+`artifact-verification.json`, `raw-input-verification/receipt.json`,
+`direct-visual-inspection.json`, `retention-DWG-roundtrip/receipt.json`,
+`browser-verification.json`, `learning-quality.provenance.json`, `release-decision.json`이 정본이다.
+고객 도면·weight·실제 원본 경로는 Git 제외다. 원본과 Jippin 운영 모델은 변경하지 않았다.
+
+Space revision `402d7958db12605f8346b682e64a51f0d1a5c395`, model repo revision
+`6c51ac297ce3916f3eaf5f16efde17cdd90895f3`와 pin `05a545dd…`는 실행 전후 동일하다.
+이는 기존 five-case pilot이다. 이번 source6ca23df9…나 full후보aed6d0e8…로 교체하지 않았다.
+Private `deployment-after.json`과 `release-decision.json`으로 미배포를 확인했다.

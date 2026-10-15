@@ -2,55 +2,31 @@
 
 평면도 이미지에서 **CAD에서 열고 편집할 수 있는 DWG**를 복원하는 모델·파이프라인 연구 프로젝트.
 
-현재 요청: [EXP-054](docs/experiments/2026-10-15-EXP-054-full-continuation.md)의 실제1,028페어
-본학습 A100 job `6ad0277a5ccb47ba0f7a2ced`를 실행 중이다(환경/데이터 준비 포함).
-기존10 native preflight10/10·252/252, 관련44개 검사가 통과했다.
-정정 검증20은 학습 전 발견한 processed PNG 중복1건을 미사용validation1건으로 교체해
-기존19+신규1로 고정했다. 본학습/기존10 유지/별도20 직접검수와 통과 모델의 Space 반영이
-최신 사용자 승인 범위다. 아래 미실행/금지/실패 상태는 이전 실행의 기록이다.
+최신 결과: [EXP-054](docs/experiments/2026-10-15-EXP-054-full-continuation.md)의 실제1,028페어
+본학습을 완료했다. **기존10 재현은 유지됐지만 신규 도면 복원은 실패해 배포하지 않았다.**
 
-최신 완료: [EXP-053](docs/experiments/2026-10-14-EXP-053-ranked-consistent-decoder.md)의
-실제 TRAIN10(기존5+추가5)은연속2checkpoint·fresh image추론에서10/10·필수치수252/252다.
-10개를직접검수했고모델DXF→DWG→DXF 재열기/실제브라우저DWG다운로드를확인했다.
-과잉DIMENSION을무검증hard constraint로적용하던decoder를수정했다.
-비교화면: `http://127.0.0.1:8780/retention-review.html`.
-실제CAD UI edit/save·일반화는미확인이고1,028개본학습/holdout20/Space는새로실행하지않았다.
-아래실패한본학습/기존Space는별도과거모델이며이통과weight로자동교체하지않았다.
+| 고정 후보 fresh CPU 검사 | pass | 필수 치수 값·실제 길이 |
+| --- | ---: | ---: |
+| 기존 TRAIN10 | 10/10 | 252/252 |
+| 별도 정정20 | 0/20 | 0/479 |
 
-현재 단계: **1,028개 실제 페어 본학습은 완료했으나 구조·치수 복원은 실패했다.**
-본학습 선택 모델은 원래 5개 0/5·치수 0/112, 별도 20개 0/20·치수 0/476이다.
-20개를 직접 시각 검수했고 Space에 교체하지 않았다. 이후
-[상세 실험 리뷰](docs/research/2026-10-14-experiment-retrospective.md)를 작성했다.
-현재는 사용자 요청으로 [작은 데이터 원인 분리](docs/experiments/2026-10-14-EXP-047-retention-ablation.md)를
-완료했다. 최초 악화는 fitted 좌표 함수의 재시작 update에서 재현됐다.
-작은 update의 원래5 단독 유지와10개 혼합 실패를 구분한다. 1,028개 재학습과 Space 재배포는 진행하지 않는다.
-현재 요청은 [좌표 guard/loss balance 비교](docs/experiments/2026-10-14-EXP-048-guard-balance.md)다.
-같은 TRAIN10의4조건을 제한된 GPU 실행으로 비교하며10개 동시 재현 전 본학습/배포를 보류한다.
+21,928 update 후 품질 정체로 종료했고 개발 지표로 고른1420 update best를 검증했다.
+검증 모델 전체를 동결한 새268만 parameter pooled residual 학습이며 전체 모델 fine-tuning은 아니다.
+30개 직접 검수, 원본 pixel 검사, native DXF와 기존10 DWG 재열기·브라우저 다운로드를 확인했다.
+[비교 화면](http://127.0.0.1:8781/full-continuation-review.html)은30개 전체를 제공한다.
+[학습 loss와 복원 품질](docs/research/assets/2026-10-15-full-continuation-learning.svg)을 구분한다.
+검증20은 학습 전 pixel 중복1건을 교체한 기존19+신규1로 옛20의476개와 다른479개 치수다.
 
-현재 private Space는 앞서 승인된 **5개 재현 실험 모델**이다.
-GPU 재현은 5/5·치수 112/112, CPU 서빙 재현은 4/5·치수 112/112다.
-별도 CPU 20개 검증은 0/20이므로 Space에는 사용자가 승인한 **5개 재현 실험 모델**로
-표시한다. 이 모델과 실패한 본학습 모델을 구분하며 일반화 성공을 주장하지 않는다.
-[EXP-046](docs/experiments/2026-10-14-EXP-046-shared-decoder.md),
-[공유 노드 학습 하네스](docs/harness/shared-graph-training.md).
-Space는 실제 모델의 raster-free SVG·native BLOCK/INSERT와 DIMENSION을 갖는 DXF를
-반환한다. 선택 100mm 보정과 보정 전 결과/기록을 제공한다. 직접 DWG 다운로드는 미구현이다.
+현재 [private Space](https://huggingface.co/spaces/youjunhyeok/img2dwg)는 기존에 승인된
+**five-case pilot**이며 이번 source6ca23df9…/full 후보aed6d0e8…로 교체하지 않았다.
+Space는 확대 가능한 SVG·편집 가능한 native DXF를 제공하며 직접 DWG 다운로드는 미구현이다.
+이번 로컬 비교 화면의 기존10 DWG 다운로드와 혼동하지 않는다.
 
-이전 기록: **첫 좌표 모델은 실제 준공도면 복원에 실패해 기본 서비스 출력에서 제외했다.**
-실제 페어 5개 학습/20개 검증 모델도 구조·치수 기준을 통과하지 못했다.
-[컴포넌트 출력 설계 정정](docs/research/2026-10-14-component-decoder-correction.md)을 적용하며,
-primitive head의 후속 학습은 중단했다. 이후 구현·학습은 EXP-046이 대체한다.
-[실패 분석](docs/experiments/2026-10-13-EXP-044-real-scan-failure.md).
-[Space](https://huggingface.co/spaces/youjunhyeok/img2dwg)의 이전 관측 선 검출 기준선은
-학습 모델의 CAD 복원 결과가 아니었다. 당시 실패 결과와 실행 기록은 보존한다.
-
-첫 실험의 당시 기록: DINOv3 벡터 좌표 모델 학습과 비공개 inference Space를 연결했다.
-[Space](https://huggingface.co/spaces/youjunhyeok/img2dwg)에서 전유부를 잘라 업로드하고
-확대 가능한 SVG·편집 가능한 DXF 초안을 확인한다. HF 소유 계정 로그인이 필요하다.
-CAD 합성 train 1,028개/validation 128개, full 2,500 steps.
-합성 validation 선분 F1 0.396이며 실제 입력의 정밀도·치수 완전성·직접 DWG 다운로드는
-아직 완료하지 않았다. [실험 결과](docs/experiments/2026-10-13-EXP-043-vector-first.md),
-[학습/배포 하네스](docs/harness/vector-training.md)를 참조한다.
+이전 실험: [EXP-053 TRAIN10 재현](docs/experiments/2026-10-14-EXP-053-ranked-consistent-decoder.md),
+[EXP-046 공유 노드·컴포넌트 학습](docs/experiments/2026-10-14-EXP-046-shared-decoder.md),
+[과거 full-v1 회고](docs/research/2026-10-14-experiment-retrospective.md),
+[첫 합성 baseline](docs/experiments/2026-10-13-EXP-043-vector-first.md).
+각 실행의 모델·데이터·품질·배포 상태를 구분한다. 아래는 프로젝트의 지속 목표다.
 
 사내 input/output 1,383개와 변경전/native CAD는 private HF img2dwg bucket에 저장하고
 전체 원격 해시 검증을 마쳤다. [데이터 릴리스](docs/research/2026-10-13-dataset-v02-release.md),

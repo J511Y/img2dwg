@@ -1,17 +1,30 @@
 # 현재 상태 · 2026-10-15 KST
 
-## 현재 실행 · EXP-054 본학습
+## 최신 완료 · EXP-054 본학습 / 품질 미통과
 
-사용자가 EXP-053 수정 반영 1,028개 본학습과 retention10/별도20 검수 후 통과 모델의
-Space 반영을 명시 요청했다. [EXP-054](experiments/2026-10-15-EXP-054-full-continuation.md).
-원본1028+고정development16의 CPU DINO 특징을 준비했다. 별도20은 training archive에서
-제외한다. 검증된10 모델 전체를 동결한 새 잔차 분기로 기존10의 출력을 보호한다.
-아래 미실행/금지 기록은 이전 요청 당시 상태다. 현재 GPU/품질/배포 상태는 별도 기록한다.
-HF A100 job `6ad0277a5ccb47ba0f7a2ced`는 RUNNING(환경/데이터 준비 포함)이다.
-source`cee3828`, code`ffabd6c6…`,train archive`f07df5b7…`,세 archive와bootstrap/protocol
-전체5파일 약1.07GB private readback SHA가 일치했다. 초기 CPU native10/10·252/252,
-관련44개 검사 통과다. 기존20중 exact processed pixel leak1건을미사용validation1건으로
-사전교체한정정20(19+1)을쓴다. 본학습/20 품질은아직미측정이며기존Space는유지한다.
+[EXP-054](experiments/2026-10-15-EXP-054-full-continuation.md)의1,028개 본학습과
+기존10/별도20 검증·직접30개 검수를 완료했다. job6ad0277a… COMPLETED,
+21,928 update 후 quality-plateau 종료이며, 개발 지표로 선택한1420 update best가 후보 정본이다.
+
+| fresh CPU 고정 후보 | 사례 pass | 필수DIM 값·실제 길이 joint |
+| --- | ---: | ---: |
+| 기존 TRAIN10 | 10/10 | 252/252 |
+| 별도 정정20 | 0/20 | 0/479 |
+
+기존 모델 전체를 동결하고 새268만 parameter pooled residual만 학습했다. 기존10 보호는
+성공했지만 신규 TRAIN probe16도0/16이다. 전체 모델 fine-tuning/일반화 성공으로 쓰지 않는다.
+후보 SHA aed6d0e8…, frozen base6ca23df9…다. 원본 pixel30/30 일치, native DXF30개 검사,
+기존10의252DIM DWG 재열기·실제 브라우저 DWG 다운로드를 확인했다. 파일 유효성과
+도면 품질은 별도다. 실제 CAD UI edit/save는 미확인이다.
+
+비교 화면: `http://127.0.0.1:8781/full-continuation-review.html`.
+실제30개 input/GT/model과 필수치수 누락 행을 모두 표시한다. 별도20은 학습 전 pixel 중복
+1건을 사전 교체한 기존19+신규1이며 옛476DIM과 다른479DIM이다. 새 sealed test는 아니다.
+실패 모델은 Space에 반영하지 않았다. 기존 revision402d7958…/pin05a545dd…가 유지됐다.
+[수치 정본](research/assets/2026-10-15-full-continuation-summary.json),
+[loss·실제 품질 곡선](research/assets/2026-10-15-full-continuation-learning.svg).
+
+**이하 현재/지속 목표 문구는 이전 실험 당시 기록이며 실행을 자동 재개하는 지시가 아니다.**
 
 ## 현재 완료: 기존5 유지 + 추가5 동시 재현
 

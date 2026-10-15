@@ -1,6 +1,19 @@
 # 에이전트 작업 지침
 
-## 2026-10-15 최신 사용자 승인 · EXP-054
+## 2026-10-15 최신 완료 · EXP-054
+
+실제 1,028개 본학습을 완료했으나 신규 도면 품질은 실패했다. job6ad0277a…는 COMPLETED,
+21,928 update/quality-plateau 종료다. 선택 후보는1420 update의 best aed6d0e8…이며
+기존 verified 모델6ca23df9… 전체를 동결한 새 pooled residual268만 parameter 학습이다.
+전체 decoder/backbone fine-tuning으로 소개하지 않는다. fresh CPU 기존10은10/10·252/252,
+별도 정정20은0/20·0/479다. 30개 직접 검수도 기존10 유지/신규20 실패를 확인했다.
+모든30개 원본→serving 입력 pixel exact/native DXF 검사와 기존10 DWG 재열기를 마쳤다.
+Space revision402d7958…/기존 five-case pilot pin05a545dd…는 그대로다. 실패 모델은 미배포다.
+실행 연구노트·manifest/receipt/readback은 private run에 보존한다. 추가 GPU/20 재튜닝/Space
+교체를 자동 재개하지 않는다. 후속은 새 사용자 요청 범위에서 진행한다.
+아래 running/active goal/금지/승인 문구는 각각의 과거 요청 당시 기록이다.
+
+## 2026-10-15 승인된 실행 범위 · EXP-054
 
 사용자가 EXP-053 수정을 반영한 실제 TRAIN 1,028개 본학습, 기존10 유지 검사,
 후보 고정 뒤 별도20 구조·치수 직접 검수와 비교 화면을 명시 승인했다.
@@ -80,11 +93,10 @@ step만 늘린 후속 GPU job은 사용자 지적 후 취소했다. `docs/resear
 
 ## 시작 순서
 
-**현재진행:** EXP-053을읽는다. EXP-052는projection원인확인으로cancelled-diagnostic-pivot이다.
-과잉DIM9개가거의맞는raw graph를hard constraint로파괴했다. image count ranked set와
-치수equation consistency10mm/보정trust region10mm로동일weight10/10·252/252가CPU에서
-통과했다. source9052 final/model·Adam을보존한LR1e-6의작은연속quality확인(5분/suite8분/
-job20분)과fresh/직접10개검수/DWG roundtrip을마친다.1,028학습/holdout/Space는사용하지않는다.
+**먼저 EXP-054 최종 보고서를 읽는다.** 기존10 보존과 신규 학습/검증 실패를 구분한다.
+비교 화면은8781/full-continuation-review.html이며30개 전체와 필수 치수 누락을 표시한다.
+EXP-053의10개 train 성공, 과거 full-v1 실패, 현재 EXP-054 실패는 별도 모델/프로토콜이다.
+이번20은 기존19+학습 전 중복교체1로, 과거20의476DIM과 다른479DIM이다.
 
 1. 이 파일, `README.md`, `docs/STATUS.md`, `docs/PROJECT.md`, `docs/DECISIONS.md`, `docs/harness/workflow.md`를 읽는다.
 2. `git status --short --branch`, 원격, 관련 변경을 확인하고 기존 작업을 보존한다.
