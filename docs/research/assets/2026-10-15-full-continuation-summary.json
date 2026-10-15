@@ -63,5 +63,15 @@
     "source_sha256": "c443ab72745af8a8219e274808ad9b84c14af65ba8da851f20ce44229a267378",
     "public_sha256": "d0e5075ad8ef87e22c44e21cbca8972d38397831acc3f92667dc788d14cf1a1b",
     "public_transform": "trim trailing whitespace only; same SVG geometry"
+  },
+  "research_note": {
+    "scope": "EXP054 only W42 interim; central weekly/monthly final not replaced",
+    "markdown": "outputs/full-continuation-2026-10-15-v1/research-note/weekly/2026-W42.md",
+    "notebook": "outputs/full-continuation-2026-10-15-v1/research-note/weekly/2026-W42.ipynb",
+    "executed_cells": 6,
+    "notebook_sha256": "94b203a834252c1972ee6f61a453c7e51bd0ed7eee42120420a4b2b5d5eee259",
+    "publication_manifest_sha256": "18ef862ff814007ef1c8304d6c3cf50f9eecafc29b952cd1ee0e187b977a858c",
+    "files_fully_read_back": 400,
+    "private_remote": "hf://buckets/youjunhyeok/img2dwg/runs/full-continuation-2026-10-15-v1/postprocessing-v1"
   }
 }

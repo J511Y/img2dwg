@@ -261,3 +261,11 @@ Space revision `402d7958db12605f8346b682e64a51f0d1a5c395`, model repo revision
 `6c51ac297ce3916f3eaf5f16efde17cdd90895f3`와 pin `05a545dd…`는 실행 전후 동일하다.
 이는 기존 five-case pilot이다. 이번 source6ca23df9…나 full후보aed6d0e8…로 교체하지 않았다.
 Private `deployment-after.json`과 `release-decision.json`으로 미배포를 확인했다.
+
+
+실험 연구노트는 private run의 `research-note/weekly/2026-W42.md`와 같은 이름의 `.ipynb`다.
+중앙 정규 주간본을 대체하지 않는 EXP054 중간 기록이다. 원자료 metric10개·이미지10개·
+manifest를 보존했고 notebook6개 code cell이 실제 실행됐다. Private HF의 같은 run 아래
+`postprocessing-v1`400파일을 전부 다시 내려받아 SHA를 확인했다. Publication manifest SHA는
+`18ef862ff814007ef1c8304d6c3cf50f9eecafc29b952cd1ee0e187b977a858c`다.
+이 번들의 source snapshot은 c8fef2e이며, 이 완료 기록 추가와 모델 학습 source cee3828을 구분한다.
