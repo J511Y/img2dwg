@@ -5,6 +5,13 @@ from img2dwg.graph_adapter import ProtectedGraphAdapter
 from img2dwg.graph_loading import build_graph_model
 
 class FullContinuationTests(unittest.TestCase):
+    def test_physical_progress_does_not_count_unused_query_grid_as_geometry(self):
+        from scripts.train_retention_ablation import node_set_chamfer
+        truth={'nodes_mm':[[0,0],[100,0]],'components':[{'nodes':[0,1]}]}
+        pred={'nodes_mm':[[0,0],[100,0],[1000,0],[1100,0]],'components':[{'nodes':[2,3]}]}
+        self.assertAlmostEqual(node_set_chamfer(pred,truth),950.)
+        self.assertIsNone(node_set_chamfer({'nodes_mm':[],'components':[]},truth))
+
     def test_package_rejects_same_processed_pixels_even_with_different_source_groups(self):
         import json,tempfile,sys
         from pathlib import Path

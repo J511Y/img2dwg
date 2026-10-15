@@ -2,6 +2,7 @@
 import argparse,copy,hashlib,json,random,sys,time
 from pathlib import Path
 import numpy as np
+from scipy.spatial import cKDTree
 import torch
 from safetensors.torch import load_file,save_file
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -50,6 +51,14 @@ def candidate_pass(m):
         m['native_dimension_supervision_missing']==0 and m['host_recall']==1 and
         m['invalid_repeated_node_references']==0 and m['unsupported_components']==0 and (res is None or res<=1))
 
+def node_set_chamfer(bundle,target):
+    """Physical diagnostic on referenced nodes; unused reserve cannot help."""
+    used=sorted({n for c in bundle['components'] for n in c['nodes']})
+    expected=sorted({n for c in target['components'] for n in c['nodes']})
+    if not used or not expected:return None
+    a=np.asarray(bundle['nodes_mm'])[used];b=np.asarray(target['nodes_mm'])[expected]
+    return float((cKDTree(a).query(b)[0].mean()+cKDTree(b).query(a)[0].mean())/2)
+
 @torch.no_grad()
 def compact_bundle(bundle):
     """Retain every used prototype, without duplicating the unused catalog."""
@@ -72,6 +81,7 @@ def measurement(model,rows,bank,bundles,graphs,config,library,out,*,inferred=Fal
         except Exception as exc:
             error=type(exc).__name__+': '+str(exc);graph={**solved['frame'],'components':[],'texts':[],'unsupported_components':['compile-error']}
         m=evaluate(solved,bundles[key],graph,graphs[key],factory)
+        m['referenced_node_set_chamfer_mm']=node_set_chamfer(solved,bundles[key])
         m['reference_resolution_receipt']=raw['reference_resolution_receipt']
         m['query_selection_receipt']=raw['query_selection_receipt']
         selection_invalid=raw['reference_resolution_receipt']['unresolved_slots'] or raw['query_selection_receipt'].get('capacity_limited',False) or solved.get('constraint_receipt',{}).get('status')=='rejected-displacement'

@@ -55,6 +55,10 @@ CPU frozen DINOv3 vitb16@5931719e…/512 letterbox/16x16 features를 사용해 C
 후보를 선택하며 train probe도 확인한다. 서로 다른checkpoint 두 회의 실제 전체 pass를 stable pass로
 판정한다. plateau는 최소3회 전체 자료 노출 뒤 유효 품질5회 정체 때 LR .3배, 세 단계 후 실패 종료다.
 cap 종료는 not-quality-pass다. source 코드가 실제 구현한 선택/정지 상태와 raw 결과를 보존한다.
+10mm 이진F1만으로 초기 수m→수백mm의 개선을 놓치지 않도록 실제 출력이 참조한 node만의
+양방향 Chamfer(mm)를 함께 측정한다. unused query grid는 분모/거리 후보에 넣지 않는다.
+선택 score는 F1 세 항+필수DIM joint fraction에최대0.1의 `1/(1+Chamfer/1000)` 항을 더한다.
+이는 coarse progress/plateau 보조이며 strict pass tolerance나 필수DIM coverage를 완화하지 않는다.
 
 학습 archive와 분리한 정정20 metadata SHA는
 `b7b6041898cb743fda7315e80500da5b1c82ceeb01905891c43ac7eaec245733`다.
@@ -83,7 +87,7 @@ CPU 확장 모델의10개 native 검사에서10/10·252/252를 확인했다.
 구조F1 .9987504463/component .9988369656/ref .9989518482다. source 모델을 재직렬화한
 SHA도 원본6ca23df9…와 일치했다. nested adapter의 새 입력 학습 후 보호 출력 불변,
 비전 입력만 사용하는 저장/재로딩, 거리 식의 값/미분 동등성, ranked selection, guard,
-native graph/inference와 교차 split pixel guard 포함43개 단위 검사가 통과했다. 이는 본학습 품질 검증과 별개다.
+native graph/inference와 교차 split pixel guard/unused reserve 거리 검사 포함44개 단위 검사가 통과했다. 이는 본학습 품질 검증과 별개다.
 
 TRAIN 내 고정 probe16의 input/GT 네 장을 직접 확인했다. 저해상도/사진 왜곡/주변 세대는
 입력에 남고 target은 canonical 전유부인 차이가 보였다. 한 사례의 큰 원호는 **예측이 아닌

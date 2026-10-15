@@ -25,11 +25,15 @@ def summarize(result):
     rr=result['rows'];g=aggregate(rr)
     for k in ['component_f1','shared_reference_f1']:g[k]=float(np.mean([r[k] for r in rr])) if rr else 0.
     g['geometry_candidate_cases']=sum(r['geometry_candidate_without_DXF_audit'] for r in rr)
+    distances=[r['referenced_node_set_chamfer_mm'] for r in rr if r.get('referenced_node_set_chamfer_mm') is not None]
+    g['referenced_node_set_chamfer_mm']=float(np.mean(distances)) if len(distances)==len(rr) and rr else None
     return g
 
 def selection_score(g):
     fraction=g['dimensions_correct_geometry_and_value']/max(g['required_dimensions'],1)
-    return g['structure_f1']+g['component_f1']+g['shared_reference_f1']+fraction
+    distance=g.get('referenced_node_set_chamfer_mm')
+    physical=.1/(1+distance/1000) if distance is not None else 0.
+    return g['structure_f1']+g['component_f1']+g['shared_reference_f1']+fraction+physical
 
 def make_continuation(c,bank,retention,rows,device):
     base=build_graph_model(c).to(device)
